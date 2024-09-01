@@ -1,0 +1,158 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qlbm"
+version = "0.0.1"
+requires-python = ">= 3.10"
+dependencies = [
+    "numpy>=1.26",
+    "numpy-stl>=3.1",
+    "pandas>=2.2.2",
+    "pylatexenc>=2.10",
+    "pytket>=1.29.2",
+    "pytket-qiskit",
+    "pytket-qulacs>=0.33",
+    "qiskit>=1.0",
+    "qiskit_qasm3_import>=0.4.2",
+    "qiskit-qulacs>=0.1.0",
+    "tqdm>=4.66",
+    "vtk",
+]
+authors = [
+    { name = "qlbm authors" },
+]
+maintainers = [{ name = "Calin Georgescu", email = "C.A.Georgescu@tudelft.nl" }]
+description = "Quantum Algorithms for Lattice Boltzmann Methods."
+readme = "README.md"
+
+
+[project.optional-dependencies]
+dev = [
+    "mypy",
+    "pytest",
+    "pytest-cov",
+    "coverage",
+    "ruff>=0.6.2",
+    "qulacsvis",
+    "matplotlib",
+    "seaborn",
+    "ipykernel",
+]
+cpu = ["qulacs>=0.6.3", "qiskit-aer>=0.13"]
+gpu = ["qulacs-gpu>=0.3", "qiskit-aer-gpu>=0.13"]
+mpiqulacs = ["mpi4py>=3.1", "mpiQulacs>=1.3.1", "qiskit-aer>=0.13"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false                              # False positives due to Qiskit implementation
+warn_unused_configs = true
+warn_unreachable = true
+check_untyped_defs = true
+exclude = []
+
+[tool.setuptools]
+py-modules = []
+
+[[tool.mypy.overrides]]
+module = [
+    "mpi4py",
+    "pandas",
+    "stl",
+    "qiskit",
+    "qiskit.circuit",
+    "qiskit.circuit.library",
+    "qiskit.compiler",
+    "qiskit.providers",
+    "qiskit.providers.aer",
+    "qiskit.providers.backend",
+    "qiskit.providers.fake_provider",
+    "qiskit.qasm2",
+    "qiskit.qasm3",
+    "qiskit.quantum_info",
+    "qiskit.result",
+    "qiskit.transpiler.preset_passmanagers",
+    "qiskit_aer",
+    "qiskit_aer.backends.aerbackend",
+    "qiskit_aer.backends.aer_simulator",
+    "qiskit_qulacs",
+    "vtk",
+    "vtk.util",
+]
+ignore_missing_imports = true
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.11
+target-version = "py311"
+
+[tool.ruff.lint]
+# Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
+# Unlike Flake8, Ruff doesn't enable pycodestyle warnings (`W`) or
+# McCabe complexity (`C901`) by default.
+select = ["E4", "E7", "E9", "F"]
+extend-select = ["I"]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+# Enable auto-formatting of code examples in docstrings. Markdown,
+# reStructuredText code/literal blocks and doctests are all supported.
+#
+# This is currently disabled by default, but it is planned for this
+# to be opt-out in the future.
+docstring-code-format = false
+
+# Set the line length limit used when formatting code snippets in
+# docstrings.
+#
+# This only has an effect when the `docstring-code-format` setting is
+# enabled.
+docstring-code-line-length = "dynamic"

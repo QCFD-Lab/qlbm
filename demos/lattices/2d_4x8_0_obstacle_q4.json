@@ -1,0 +1,14 @@
+{
+    "lattice": {
+      "dim": {
+        "x": 4,
+        "y": 8
+      },
+      "velocities": {
+        "x": 2,
+        "y": 2
+      }
+    },
+    "geometry": []
+  }
+  

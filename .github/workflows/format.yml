@@ -1,0 +1,28 @@
+name: Format using Ruff
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+          architecture: x64
+          cache: 'pip' # caching pip dependencies
+      - name: Install Ruff
+        run: |
+          pip install --upgrade pip
+          pip install -e .[cpu,dev]
+          pip install "ruff==0.6.3"
+      - name: Run Ruff
+        run: ruff check qlbm test

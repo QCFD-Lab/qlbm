@@ -1,0 +1,28 @@
+name: Typecheck using Mypy
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+
+jobs:
+  mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+          architecture: x64
+          cache: 'pip' # caching pip dependencies
+      - name: Install mypy
+        run: |
+          pip install --upgrade pip
+          pip install -e .[cpu,dev]
+          pip install "mypy==1.11.2"
+      - name: Run mypy
+        run: mypy qlbm test --config-file pyproject.toml

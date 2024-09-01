@@ -1,0 +1,19 @@
+{
+  "lattice": {
+    "dim": {
+      "x": 4,
+      "y": 8
+    },
+    "velocities": {
+      "x": 2,
+      "y": 2
+    }
+  },
+  "geometry": [
+    {
+      "x": [1, 2],
+      "y": [1, 2],
+      "boundary": "specular"
+    }
+  ]
+}
