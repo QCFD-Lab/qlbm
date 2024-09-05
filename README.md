@@ -43,7 +43,7 @@ source qlbm-cpu-venv/bin/activate
 ## Usage
 
 
-The `demos` directory contains several use cases for simulating and analyzing the Collisionless QLBM described in [Efficient and fail-safe quantum algorithm for the transport equation](https://doi.org/10.1016/j.jcp.2024.112816) ([arXiv:2211.14269](https://arxiv.org/abs/2211.14269)) by M. Schalkers and M. Möller.
+The `demos` directory contains several use cases for simulating and analyzing the Collisionless QLBM described in [Efficient and fail-safe quantum algorithm for the transport equation](https://doi.org/10.1016/j.jcp.2024.112816) ([arXiv:2211.14269](https://arxiv.org/abs/2211.14269)) by M.A. Schalkers and M. Möller.
 
 Each demo requires minimal setup once the virtual environment has been set up. Users only need to create a directory `qlbm-output`, where the library will output the visualization data and performance logs:
 
