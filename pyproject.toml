@@ -39,6 +39,9 @@ dev = [
     "matplotlib",
     "seaborn",
     "ipykernel",
+    "sphinx==8.0.2",
+    "pydata-sphinx-theme",
+    "sphinxcontrib-bibtex"
 ]
 cpu = ["qulacs>=0.6.3", "qiskit-aer>=0.13"]
 gpu = ["qulacs-gpu>=0.3", "qiskit-aer-gpu>=0.13"]
