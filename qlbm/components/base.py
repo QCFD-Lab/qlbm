@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from io import TextIOBase
 from logging import Logger, getLogger
-from typing import Tuple
 
 from qiskit import QuantumCircuit
 from qiskit.qasm2 import dump as dump_qasm2
