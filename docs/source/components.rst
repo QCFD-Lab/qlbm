@@ -9,4 +9,10 @@ Base Quantum Components
 .. automodule:: qlbm.components.base
     :members:
 
+*************************
+Common Quantum Components
+*************************
+.. automodule:: qlbm.components.common
+    :members:
+
 .. bibliography::
