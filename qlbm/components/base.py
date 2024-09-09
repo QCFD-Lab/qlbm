@@ -126,6 +126,13 @@ class LBMOperator(QuantumComponent):
     corresponding to the classical LBM (streaming, collision, etc.).
     Operators are inferred based on the structure of a :class:`.Lattice`
     object of an appropriate encoding.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.Lattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
+    ========================= ======================================================================
     """
 
     lattice: Lattice
@@ -146,6 +153,13 @@ class CQLBMOperator(LBMOperator):
     :cite:t:`collisionless`.
     Specializaitons of this class infer their properties
     based on a :class:`.CollisionlessLattice`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
+    ========================= ======================================================================
     """
 
     lattice: CollisionlessLattice
@@ -166,6 +180,13 @@ class SpaceTimeOperator(LBMOperator):
     :cite:t:`spacetime`.
     Specializaitons of this class infer their properties
     based on a :class:`.SpaceTimeLattice`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
+    ========================= ======================================================================
     """
 
     lattice: SpaceTimeLattice
@@ -185,6 +206,13 @@ class LBMAlgorithm(QuantumComponent):
     An end-to-end algorithm consists of a 
     series of :class:`.LBMOperator` that perform
     the physical operations of the appropriate algorithm.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.Lattice` based on which the properties of the algorithm are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
+    ========================= ======================================================================
     """
     lattice: Lattice
 

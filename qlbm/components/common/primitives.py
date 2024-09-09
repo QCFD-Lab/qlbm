@@ -26,6 +26,17 @@ class ComparatorMode(Enum):
 class SpeedSensitiveAdder(LBMPrimitive):
     """
     A QFT-based incrementer used in the CQBM algorithm :cite:p:`collisionless`.
+
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`num_qubits`        Number of qubits of the circuit.
+    :attr:`speed`             The index of the speed to increment.
+    :attr:`positive`          Whether to increment the particles travelling at this speed in the positive or negative direction.
+    :attr:`logger`            The performance logger, by default getLogger("qlbm")
+    ========================= ======================================================================
+
     """
 
     def __init__(
@@ -35,19 +46,6 @@ class SpeedSensitiveAdder(LBMPrimitive):
         positive: bool,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
-        """
-        Parameters
-        ----------
-        num_qubits : int
-            The number of circuits of the adder circuit.
-        speed : int
-            The speed to increment.
-        positive : bool
-            Whether to increment the particles travelling at
-            this speed in the positive or negative direction.
-        logger : Logger, optional
-            The performance logger, by default getLogger("qlbm")
-        """
         super().__init__(logger)
         self.num_qubits = num_qubits
         self.speed = speed
