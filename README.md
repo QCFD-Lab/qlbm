@@ -20,7 +20,7 @@ This library contains building blocks for constructing quantum circuits for LBMs
 `qlbm` can be installed through `pip`. We recommend th euse of a **Python 3.11** virtual environment:
 
 ```bash
-python3.11 -m venv venv
+python3.11 -m venv qlbm-cpu-venv
 pip install --upgrade pip
 pip install qlbm[cpu,dev]
 ```
@@ -58,6 +58,8 @@ Currently, `qlbm` supports two algorithms:
  - The Space-Time QLBM described in [On the importance of data encoding in quantum Boltzmann methods](https://link.springer.com/article/10.1007/s11128-023-04216-6) by M.A. Schalkers and M. Möller.
 
 The `demos` directory contains several use cases for simulating and analyzing these algorithms. Each demo requires minimal setup once the virtual environment has been configured. Consult the `README.md` file in the `demos` directory for further details.
+
+> **Note on visualization**: we rely on  Paraview for visualizing the flow field of the simulation. You can install Paraview from [this link](https://www.paraview.org/download/).
 
 ## Configuration
 

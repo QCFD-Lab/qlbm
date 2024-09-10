@@ -21,6 +21,8 @@ Users can visualize both geometry and quantum circuits constructed from the JSON
 
 `qlbm` currently supports two algorithms with different configurations and capabilities. To simulate the end-to-end algorithms and visualize the resulting flow field, users can interact with the notebooks in the `simulation` directory. Each notebook will generate outputs in a new `qlbm-output` directory. Each output subdirectory of `qlbm-output` will itself contain a `paraview` directory where the time step `step_<x>.vti` and geometry `cube_<x>.stl` files can be visualized in Paraview.
 
+> **Note on visualization**: we rely on  Paraview for visualizing the flow field of the simulation. You can install Paraview from [this link](https://www.paraview.org/download/).
+
 ## Benchmarks
 
 Users who are interested in developing and analyzing the theoretical and runtime properties of QLBMs can use the notebooks residing in the `benchmarks` directory. These notebooks contain utilities for automatically generating QLBM algorithms of different scales, logging relevant data about their properties, and parsing the data into helpful formats such as in-memory databases or plots. Benchmarks include simulator performance, statevector snapshot performance, and algorithm scalability with real hardware.
