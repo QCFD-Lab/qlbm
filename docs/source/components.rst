@@ -15,4 +15,10 @@ Common Quantum Components
 .. automodule:: qlbm.components.common
     :members:
 
+********************************
+Collisionless Quantum Components
+********************************
+.. automodule:: qlbm.components.collisionless
+    :members:
+
 .. bibliography::
