@@ -24,6 +24,18 @@ from .primitives import ControlledIncrementer
 
 
 class SpecularWallComparator(LBMPrimitive):
+    """
+    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
+    comparator for the specular reflection boundary conditions around the wall as described :cite:t:`collisionless`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`wall`              The coordinates of the wall within the grid.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -85,6 +97,18 @@ class SpecularWallComparator(LBMPrimitive):
 
 
 class SpecularEdgeComparator(LBMPrimitive):
+    """
+    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
+    comparator for the specular reflection boundary conditions around the edge as described :cite:t:`collisionless`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`edge`              The coordinates of the edge within the grid.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -138,6 +162,18 @@ class SpecularEdgeComparator(LBMPrimitive):
 
 
 class SpecularReflectionOperator(CQLBMOperator):
+    """
+    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
+    comparator for the specular reflection boundary conditions as described :cite:t:`collisionless`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`wall`              The coordinates of the wall within the grid.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
