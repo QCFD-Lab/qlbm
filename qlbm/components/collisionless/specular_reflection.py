@@ -163,15 +163,14 @@ class SpecularEdgeComparator(LBMPrimitive):
 
 class SpecularReflectionOperator(CQLBMOperator):
     """
-    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
-    comparator for the specular reflection boundary conditions as described :cite:t:`collisionless`.
+    A primitive that implements the bounce back boundary conditions as described :cite:t:`collisiionless`.
 
     ========================= ======================================================================
     Atribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`wall`              The coordinates of the wall within the grid.
+    :attr:`blocks`            A geometry encoded in a :class:`.Block` object
     ========================= ======================================================================
     """
     def __init__(
@@ -247,6 +246,20 @@ class SpecularReflectionOperator(CQLBMOperator):
     def reset_edge_state(
         self, circuit: QuantumCircuit, edge: ReflectionResetEdge
     ) -> QuantumCircuit:
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform resetting of the edge state.
+        edge : ReflectionResetEdge
+            The edge on which to apply the reflection reset logic.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit performing the resetting of the edge state.
+        """
         comparator_circuit = SpecularEdgeComparator(
             self.lattice, edge, self.logger
         ).circuit
@@ -307,6 +320,20 @@ class SpecularReflectionOperator(CQLBMOperator):
         circuit: QuantumCircuit,
         wall: ReflectionWall,
     ) -> QuantumCircuit:
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform resetting of the edge state.
+        wall : ReflectionWall
+            The wall encoding the reflection logic.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit performing specular reflection of the wall.
+        """
         grid_qubit_indices_to_invert = [
             self.lattice.grid_index(0)[0] + qubit
             for qubit in wall.data.qubits_to_invert
@@ -368,6 +395,13 @@ class SpecularReflectionOperator(CQLBMOperator):
         self,
         circuit: QuantumCircuit,
     ):
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform the flip and stream operation. 
+        """
         for dim in range(self.lattice.num_dimensions):
             # Flip the direction of the `d`-directional velocity qubit
             circuit.cx(
@@ -394,6 +428,20 @@ class SpecularReflectionOperator(CQLBMOperator):
         circuit: QuantumCircuit,
         corner: ReflectionPoint,
     ) -> QuantumCircuit:
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform the resetting of the point state.
+        corner : ReflectionPoint
+            The corner for which to reset the desired point states.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit resetting the point state as desired.
+        """
         grid_qubit_indices_to_invert = [
             self.lattice.grid_index(0)[0] + qubit for qubit in corner.qubits_to_invert
         ]
