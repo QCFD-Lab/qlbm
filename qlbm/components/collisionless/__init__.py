@@ -1,4 +1,7 @@
-from .bounceback_reflection import BounceBackReflectionOperator, BounceBackWallComparator
+from .bounceback_reflection import (
+    BounceBackReflectionOperator,
+    BounceBackWallComparator,
+)
 from .cqlbm import CQLBM
 from .primitives import (
     CollisionlessInitialConditions,

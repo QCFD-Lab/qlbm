@@ -367,3 +367,11 @@ class CollisionlessLattice(Lattice):
 
     def __str__(self) -> str:
         return f"[Lattice with {self.num_gridpoints} gps, {self.num_velocities} vels, and {str(self.blocks)} blocks with {self.num_total_qubits} qubits]"
+
+    def logger_name(self) -> str:
+        gp_string = ""
+        for c, gp in enumerate(self.num_gridpoints):
+            gp_string += f"{gp+1}"
+            if c < len(self.num_gridpoints) - 1:
+                gp_string += "x"
+        return f"{self.num_dimensions}d-{gp_string}-{len(self.block_list)}-obstacle"
