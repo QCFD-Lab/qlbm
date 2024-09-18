@@ -1,4 +1,7 @@
-from .bounceback_reflection import BounceBackReflectionOperator
+from .bounceback_reflection import (
+    BounceBackReflectionOperator,
+    BounceBackWallComparator,
+)
 from .cqlbm import CQLBM
 from .primitives import (
     CollisionlessInitialConditions,
@@ -19,5 +22,6 @@ __all__ = [
     "CollisionlessStreamingOperator",
     "SpecularReflectionOperator",
     "BounceBackReflectionOperator",
+    "BounceBackWallComparator",
     "CQLBM",
 ]

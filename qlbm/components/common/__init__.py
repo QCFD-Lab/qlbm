@@ -3,14 +3,14 @@ from .primitives import (
     ComparatorMode,
     EmptyPrimitive,
     PhaseShift,
-    SimpleAdder,
+    SpeedSensitiveAdder,
     SpeedSensitivePhaseShift,
 )
 
 __all__ = [
     "ComparatorMode",
     "Comparator",
-    "SimpleAdder",
+    "SpeedSensitiveAdder",
     "PhaseShift",
     "SpeedSensitivePhaseShift",
     "EmptyPrimitive",
