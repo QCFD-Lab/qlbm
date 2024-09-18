@@ -72,8 +72,8 @@ class VonNeumannNeighbor:
 
 
 class SpaceTimeLattice(Lattice):
-    """Lattice implementing the Space-Time data encoding.
-    """
+    """Lattice implementing the Space-Time data encoding."""
+
     # ! Only works for D2Q4
 
     # Points with 3 neighbors with higher Manhattan distances
@@ -121,7 +121,7 @@ class SpaceTimeLattice(Lattice):
         self.total_gridpoints: int = (
             sum(self.num_gridpoints) + len(self.num_gridpoints)
         ) * (sum(self.num_gridpoints) + len(self.num_gridpoints))
-        self.num_velocities_per_point: int = sum(2 ** v for v in self.num_velocities)
+        self.num_velocities_per_point: int = sum(2**v for v in self.num_velocities)
         self.num_timesteps = num_timesteps
         self.num_grid_qubits: int = sum(
             num_gridpoints_in_dim.bit_length()
@@ -368,3 +368,11 @@ class SpaceTimeLattice(Lattice):
             }
 
         return extreme_point_neighbor_indices, intermediate_point_neighbor_indices
+
+    def logger_name(self) -> str:
+        gp_string = ""
+        for c, gp in enumerate(self.num_gridpoints):
+            gp_string += f"{gp+1}"
+            if c < len(self.num_gridpoints) - 1:
+                gp_string += "x"
+        return f"{self.num_dimensions}d-{gp_string}-q4"

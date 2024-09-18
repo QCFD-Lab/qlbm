@@ -21,7 +21,7 @@ from .common import (
     ComparatorMode,
     EmptyPrimitive,
     PhaseShift,
-    SimpleAdder,
+    SpeedSensitiveAdder,
     SpeedSensitivePhaseShift,
 )
 
@@ -34,7 +34,7 @@ __all__ = [
     "LBMAlgorithm",
     "ComparatorMode",
     "Comparator",
-    "SimpleAdder",
+    "SpeedSensitiveAdder",
     "PhaseShift",
     "SpeedSensitivePhaseShift",
     "EmptyPrimitive",

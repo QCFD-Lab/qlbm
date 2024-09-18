@@ -16,6 +16,19 @@ from .primitives import ControlledIncrementer
 
 
 class BounceBackWallComparator(LBMPrimitive):
+    """
+    A primitive used in the collision :class:`BounceBackReflectionOperator` that implements the 
+    comparator for the bounce back boundary conditions as described :cite:t:`qmem`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`wall`              The coordinates of the wall within the grid.
+    :attr:`inside_object`     The coordinates of the grid points adjacent to the wall inside the object.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -79,6 +92,17 @@ class BounceBackWallComparator(LBMPrimitive):
 
 
 class BounceBackReflectionOperator(CQLBMOperator):
+    """
+    A primitive that implements the bounce back boundary conditions as described :cite:t:`qmem`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`blocks`            A geometry encoded in a :class:`.Block` object
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -128,13 +152,28 @@ class BounceBackReflectionOperator(CQLBMOperator):
                 self.reset_point_state(circuit, corner)
 
         return circuit
-
     def reflect_wall(
         self,
         circuit: QuantumCircuit,
         wall: ReflectionWall,
         inside_object: bool,
     ) -> QuantumCircuit:
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform bounceback reflection of the wall.
+        wall : ReflectionWall
+            The wall encoding the reflection logic.
+        inside_object : bool
+            Whether the wall is inside the object.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit performing bounceback reflection of the wall.
+        """
         comparator_circuit = BounceBackWallComparator(
             self.lattice, wall, inside_object, self.logger
         ).circuit
@@ -197,6 +236,16 @@ class BounceBackReflectionOperator(CQLBMOperator):
         circuit: QuantumCircuit,
         inner_corner: ReflectionPoint,
     ):
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform bounceback reflection of the wall.
+        inner_corner : ReflectionPoint
+            The inner corner encoding the reflection logic
+
+        """
         grid_qubit_indices_to_invert = [
             self.lattice.grid_index(0)[0] + qubit
             for qubit in inner_corner.qubits_to_invert
@@ -227,6 +276,14 @@ class BounceBackReflectionOperator(CQLBMOperator):
         self,
         circuit: QuantumCircuit,
     ):
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform the flip and stream operation.
+
+        """
         control_qubits = self.lattice.ancillae_obstacle_index(0)
         target_qubits = self.lattice.velocity_dir_index()
 
@@ -260,6 +317,16 @@ class BounceBackReflectionOperator(CQLBMOperator):
         corner: ReflectionPoint,
         # reset_ancillae: bool,
     ) -> QuantumCircuit:
+        """_summary_
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The quantum circuit to input on which to reset the point state.
+        corner : ReflectionPoint
+            The point on which to reset the state.
+
+        """
         grid_qubit_indices_to_invert = [
             self.lattice.grid_index(0)[0] + qubit for qubit in corner.qubits_to_invert
         ]

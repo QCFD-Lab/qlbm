@@ -196,3 +196,7 @@ class Lattice(ABC):
     @abstractmethod
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         pass
+
+    @abstractmethod
+    def logger_name(self) -> str:
+        pass

@@ -12,6 +12,21 @@ from qlbm.tools import CircuitException, bit_value, flatten
 
 
 class StreamingAncillaPreparation(LBMPrimitive):
+    """
+    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the preparatory step of 
+    streaming necessary for the collisionless QLBM method. Specifically
+    this operator sets the ancilla qubits to 1 for the velocities that 
+    will be streamed in the next time step.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`velocities`        The velocities that need to be streamed within the next time step. 
+    :attr:`dim`               The dimension to which the velocities correspond.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -71,6 +86,20 @@ class StreamingAncillaPreparation(LBMPrimitive):
 
 
 class ControlledIncrementer(LBMPrimitive):
+    """
+    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the streaming operation 
+    on the states for which the ancilla qubits are in the state 1. This primitive is applied 
+    after the primitive :class:`.StreamingAncillaPreparation`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`reflection`        The reflection attribute decides the type of reflection that will take place. This should
+                              be either "specular" or "bounceback".
+    ========================= ======================================================================
+    """
     supported_reflection: List[str] = ["specular", "bounceback"]
 
     def __init__(
@@ -161,6 +190,16 @@ class ControlledIncrementer(LBMPrimitive):
 
 
 class GridMeasurement(LBMPrimitive):
+    """
+    A primitive that implements a measurement operation on the qubits expressing the grid. 
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -195,6 +234,16 @@ class GridMeasurement(LBMPrimitive):
 
 
 class CollisionlessInitialConditions(LBMPrimitive):
+    """
+    A primitive that creates the quantum circuit to prepare the flow field in its initial conditions. 
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -232,6 +281,16 @@ class CollisionlessInitialConditions(LBMPrimitive):
 
 
 class CollisionlessInitialConditions3DSlim(LBMPrimitive):
+    """
+    A primitive that creates the quantum circuit to prepare the flow field in its initial conditions for 3 dimensions. 
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,
