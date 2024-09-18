@@ -22,7 +22,7 @@ This library contains building blocks for constructing quantum circuits for LBMs
 ```bash
 python3.11 -m venv qlbm-cpu-venv
 pip install --upgrade pip
-pip install qlbm[cpu,dev]
+pip install qlbm
 ```
 
 ## Local installation
