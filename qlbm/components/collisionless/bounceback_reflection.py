@@ -22,15 +22,16 @@ from .primitives import ControlledIncrementer, EdgeComparator
 class BounceBackWallComparator(LBMPrimitive):
     """
     A primitive used in the collision :class:`BounceBackReflectionOperator` that implements the
-    comparator for the bounce back boundary conditions as described :cite:t:`qmem`.
+    comparator for the BB boundary conditions as described :cite:t:`qmem`.
+    The comparator sets an ancilla qubit to :math:`\ket{1}` for the components of
+    the quantum state whose grid qubits fall within the range spanned by the wall.
 
     ========================= ======================================================================
     Atribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`wall`              The coordinates of the wall within the grid.
-    :attr:`inside_object`     The coordinates of the grid points adjacent to the wall inside the object.
     ========================= ======================================================================
     """
 
@@ -102,14 +103,23 @@ class BounceBackWallComparator(LBMPrimitive):
 
 class BounceBackReflectionOperator(CQLBMOperator):
     """
-    A primitive that implements the bounce back boundary conditions as described :cite:t:`qmem`.
+    Operator implementing the 2D and 3D BB boundary conditions as described :cite:t:`qmem`.
+    The operator parses information encoded in :class:`.Block` objects to detect particles that
+    have virtually streamed into the solid domain before placing them back to their
+    previous positions in the fluid domain.
+    The pseudocode for this procedure is as follows:
+
+    #. Components of the quantum state that encode particles that have streamed inside the obstacle are identified with :class:`.BounceBackWallComparator` objects;
+    #. These components have their velocity direction qubits flipped in all three dimensions;
+    #. Particles are streamed outside the solid domain with inverted velocity directions;
+    #. Once streamed outside the solid domain, components encoding affected particles have their obstacle ancilla qubit reset based on grid position, velocity direction, and whether they have streamed in the CFL timestep.
 
     ========================= ======================================================================
     Atribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`blocks`            A geometry encoded in a :class:`.Block` object
     ========================= ======================================================================
     """
 
@@ -189,25 +199,37 @@ class BounceBackReflectionOperator(CQLBMOperator):
         circuit: QuantumCircuit,
         wall: ReflectionWall,
     ) -> QuantumCircuit:
-        """_summary_
+        """Performs reflection based on information encoded in a :class:`.ReflectionWall` as follows:
+
+        #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
+        #. Comparator circuits set the comparator ancilla qubits to :math:`\ket{1}` based on the size of the wall in the other dimension(s).
+        #. Depending on the use, the directional velocity qubits are also set to :math:`\ket{1}` based on the dimension that the wall spans.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.
+
+        The wall reflection operation is versatile and can be used to both set and re-set the state
+        of the obstacle ancilla qubit at different stages of reflection.
+        When performing BB reflection, this function is first used to flip the
+        ancilla obstacle qubit from :math:`\ket{0}` to :math:`\ket{1}`, irrespective of how particles arrived there.
+        Subsequently, an additional controls are placed on the velocity direction qubits to reset the
+        ancilla obstacle qubit to :math:`\ket{0}`, after particles have been streamed out of the solid domain.
 
         Parameters
         ----------
         circuit : QuantumCircuit
-            The circuit on which to perform bounceback reflection of the wall.
+            The circuit on which to perform BB reflection of the wall.
         wall : ReflectionWall
             The wall encoding the reflection logic.
-        inside_object : bool
-            Whether the wall is inside the object.
+        inside_obstacle : bool
+            Whether the wall is inside the obstacle.
 
         Returns
         -------
         QuantumCircuit
-            The circuit performing bounceback reflection of the wall.
+            The circuit performing BB reflection of the wall.
         """
         comparator_circuit = (
             BounceBackWallComparator(self.lattice, wall, self.logger).circuit
-            if not wall.data.is_outside_obstacle_bounds  # If the wall is outside the object, the two comparators behave identically
+            if not wall.data.is_outside_obstacle_bounds  # If the wall is outside the obstacle, the two comparators behave identically
             else SpecularWallComparator(self.lattice, wall, self.logger).circuit
         )
 
@@ -268,52 +290,15 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
         return circuit
 
-    def reflect_inner_corner(
-        self,
-        circuit: QuantumCircuit,
-        inner_corner: ReflectionPoint,
-    ):
-        """_summary_
-
-        Parameters
-        ----------
-        circuit : QuantumCircuit
-            The circuit on which to perform bounceback reflection of the wall.
-        inner_corner : ReflectionPoint
-            The inner corner encoding the reflection logic
-
-        """
-        grid_qubit_indices_to_invert = [
-            self.lattice.grid_index(0)[0] + qubit
-            for qubit in inner_corner.qubits_to_invert
-        ]
-
-        if grid_qubit_indices_to_invert:
-            circuit.x(grid_qubit_indices_to_invert)
-
-        control_qubits = self.lattice.grid_index()
-        target_qubits = self.lattice.ancillae_obstacle_index(0)
-
-        circuit.compose(
-            MCMT(
-                XGate(),
-                len(control_qubits),
-                len(target_qubits),
-            ),
-            qubits=control_qubits + target_qubits,
-            inplace=True,
-        )
-
-        if grid_qubit_indices_to_invert:
-            circuit.x(grid_qubit_indices_to_invert)
-
-        return circuit
-
     def flip_and_stream(
         self,
         circuit: QuantumCircuit,
     ):
-        """_summary_
+        """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
+        Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
+        phase shift circuit is additionally controlled on the ancilla obstacle qubit, which
+        ensures that only particles whose grid position gets incremented (decremented) are those
+        that have streamed inside the solid domain in this CFL time step.
 
         Parameters
         ----------
