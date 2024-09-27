@@ -7,15 +7,17 @@ from qiskit.circuit.library import MCMT, QFT, XGate
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common import PhaseShift
+from qlbm.components.common.primitives import Comparator, ComparatorMode
 from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice.blocks import ReflectionResetEdge
 from qlbm.tools import CircuitException, bit_value, flatten
 
 
 class StreamingAncillaPreparation(LBMPrimitive):
     """
-    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the preparatory step of 
+    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the preparatory step of
     streaming necessary for the collisionless QLBM method. Specifically
-    this operator sets the ancilla qubits to 1 for the velocities that 
+    this operator sets the ancilla qubits to 1 for the velocities that
     will be streamed in the next time step.
 
     ========================= ======================================================================
@@ -23,10 +25,11 @@ class StreamingAncillaPreparation(LBMPrimitive):
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`velocities`        The velocities that need to be streamed within the next time step. 
+    :attr:`velocities`        The velocities that need to be streamed within the next time step.
     :attr:`dim`               The dimension to which the velocities correspond.
     ========================= ======================================================================
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -87,8 +90,8 @@ class StreamingAncillaPreparation(LBMPrimitive):
 
 class ControlledIncrementer(LBMPrimitive):
     """
-    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the streaming operation 
-    on the states for which the ancilla qubits are in the state 1. This primitive is applied 
+    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the streaming operation
+    on the states for which the ancilla qubits are in the state 1. This primitive is applied
     after the primitive :class:`.StreamingAncillaPreparation`.
 
     ========================= ======================================================================
@@ -100,6 +103,7 @@ class ControlledIncrementer(LBMPrimitive):
                               be either "specular" or "bounceback".
     ========================= ======================================================================
     """
+
     supported_reflection: List[str] = ["specular", "bounceback"]
 
     def __init__(
@@ -128,7 +132,7 @@ class ControlledIncrementer(LBMPrimitive):
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(*self.lattice.registers)
 
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             num_qubits_dim = self.lattice.num_gridpoints[dim].bit_length()
             grid_index = self.lattice.grid_index(dim)
 
@@ -191,7 +195,7 @@ class ControlledIncrementer(LBMPrimitive):
 
 class GridMeasurement(LBMPrimitive):
     """
-    A primitive that implements a measurement operation on the qubits expressing the grid. 
+    A primitive that implements a measurement operation on the qubits expressing the grid.
 
     ========================= ======================================================================
     Atribute                  Summary
@@ -200,6 +204,7 @@ class GridMeasurement(LBMPrimitive):
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -218,7 +223,7 @@ class GridMeasurement(LBMPrimitive):
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(*self.lattice.registers)
         all_grid_qubits: List[int] = flatten(
-            [self.lattice.grid_index(dim) for dim in range(self.lattice.num_dimensions)]
+            [self.lattice.grid_index(dim) for dim in range(self.lattice.num_dims)]
         )
         circuit.add_register(ClassicalRegister(self.lattice.num_grid_qubits))
 
@@ -235,7 +240,7 @@ class GridMeasurement(LBMPrimitive):
 
 class CollisionlessInitialConditions(LBMPrimitive):
     """
-    A primitive that creates the quantum circuit to prepare the flow field in its initial conditions. 
+    A primitive that creates the quantum circuit to prepare the flow field in its initial conditions.
 
     ========================= ======================================================================
     Atribute                  Summary
@@ -244,6 +249,7 @@ class CollisionlessInitialConditions(LBMPrimitive):
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -262,16 +268,16 @@ class CollisionlessInitialConditions(LBMPrimitive):
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(*self.lattice.registers)
 
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             circuit.x(self.lattice.velocity_dir_index(dim)[0])
 
-        for x in self.lattice.grid_index(0)[:-1]:
-            circuit.h(x)
+        # for x in self.lattice.grid_index(0)[:-1]:
+        #     circuit.h(x)
 
-        if self.lattice.num_dimensions > 1:
+        if self.lattice.num_dims > 1:
             circuit.h(self.lattice.grid_index(1))
 
-        if self.lattice.num_dimensions > 2:
+        if self.lattice.num_dims > 2:
             circuit.h(self.lattice.grid_index(2))
 
         return circuit
@@ -282,7 +288,7 @@ class CollisionlessInitialConditions(LBMPrimitive):
 
 class CollisionlessInitialConditions3DSlim(LBMPrimitive):
     """
-    A primitive that creates the quantum circuit to prepare the flow field in its initial conditions for 3 dimensions. 
+    A primitive that creates the quantum circuit to prepare the flow field in its initial conditions for 3 dimensions.
 
     ========================= ======================================================================
     Atribute                  Summary
@@ -291,6 +297,7 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -319,10 +326,77 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
         # if self.lattice.num_dimensions > 1:
         #     circuit.h(self.lattice.grid_index(1))
 
-        if self.lattice.num_dimensions > 2:
+        if self.lattice.num_dims > 2:
             circuit.h(self.lattice.grid_index(2))
 
         return circuit
 
     def __str__(self) -> str:
         return f"[Primitive InitialConditions with lattice {self.lattice}]"
+
+
+class EdgeComparator(LBMPrimitive):
+    """
+    A primitive used in the collisionless :class:`SpecularReflectionOperator`
+    and :class:`BounceBackReflectionOperator` that implements the
+    comparator for the specular reflection boundary conditions around the edge as described :cite:t:`collisionless`.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`edge`              The coordinates of the edge within the grid.
+    ========================= ======================================================================
+    """
+
+    def __init__(
+        self,
+        lattice: CollisionlessLattice,
+        edge: ReflectionResetEdge,
+        logger: Logger = getLogger("qlbm"),
+    ) -> None:
+        super().__init__(logger)
+        self.lattice = lattice
+        self.edge = edge
+
+        self.circuit = self.create_circuit()
+
+    def create_circuit(self) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+        lb_comparator = Comparator(
+            self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
+            self.edge.bounds_disconnected_dim[0],
+            ComparatorMode.GE,
+            logger=self.logger,
+        ).circuit
+        ub_comparator = Comparator(
+            self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
+            self.edge.bounds_disconnected_dim[1],
+            ComparatorMode.LE,
+            logger=self.logger,
+        ).circuit
+
+        # for c, wall_alignment_dim in enumerate(self.wall.alignment_dims):
+        circuit.compose(
+            lb_comparator,
+            qubits=self.lattice.grid_index(self.edge.dim_disconnected)
+            + self.lattice.ancillae_comparator_index(0)[
+                :-1  # :-1 Effectively selects only the first (lb) qubit
+            ],  # There are two comparator ancillae, for each relevant dimension, one for l and one for u
+            inplace=True,
+        )
+
+        circuit.compose(
+            ub_comparator,
+            qubits=self.lattice.grid_index(self.edge.dim_disconnected)
+            + self.lattice.ancillae_comparator_index(0)[
+                1:  # 1: Effectively selects only the last (ub) qubit
+            ],  # There are two comparator ancillae, for each relevant dimension, one for l and one for u.
+            inplace=True,
+        )
+
+        return circuit
+
+    def __str__(self) -> str:
+        return f"[Primitive SpecularEdgeComparator on edge={self.edge}]"

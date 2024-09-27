@@ -46,26 +46,27 @@ class CQLBM(LBMAlgorithm):
                 ).circuit,
                 inplace=True,
             )
+            if self.lattice.blocks["specular"]:
+                circuit.compose(
+                    SpecularReflectionOperator(
+                        self.lattice,
+                        self.lattice.blocks["specular"],
+                        logger=self.logger,
+                    ).circuit,
+                    inplace=True,
+                )
 
-            circuit.compose(
-                SpecularReflectionOperator(
-                    self.lattice,
-                    self.lattice.blocks["specular"],
-                    logger=self.logger,
-                ).circuit,
-                inplace=True,
-            )
+            if self.lattice.blocks["bounceback"]:
+                circuit.compose(
+                    BounceBackReflectionOperator(
+                        self.lattice,
+                        self.lattice.blocks["bounceback"],
+                        logger=self.logger,
+                    ).circuit,
+                    inplace=True,
+                )
 
-            circuit.compose(
-                BounceBackReflectionOperator(
-                    self.lattice,
-                    self.lattice.blocks["bounceback"],
-                    logger=self.logger,
-                ).circuit,
-                inplace=True,
-            )
-
-            for dim in range(self.lattice.num_dimensions):
+            for dim in range(self.lattice.num_dims):
                 circuit.compose(
                     StreamingAncillaPreparation(
                         self.lattice,

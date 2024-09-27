@@ -20,12 +20,12 @@ from qlbm.lattice import (
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
-from .primitives import ControlledIncrementer
+from .primitives import ControlledIncrementer, EdgeComparator
 
 
 class SpecularWallComparator(LBMPrimitive):
     """
-    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
+    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the
     comparator for the specular reflection boundary conditions around the wall as described :cite:t:`collisionless`.
 
     ========================= ======================================================================
@@ -36,6 +36,7 @@ class SpecularWallComparator(LBMPrimitive):
     :attr:`wall`              The coordinates of the wall within the grid.
     ========================= ======================================================================
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -96,71 +97,6 @@ class SpecularWallComparator(LBMPrimitive):
         return f"[Primitive SpecularWallComparator on wall={self.wall}]"
 
 
-class SpecularEdgeComparator(LBMPrimitive):
-    """
-    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
-    comparator for the specular reflection boundary conditions around the edge as described :cite:t:`collisionless`.
-
-    ========================= ======================================================================
-    Atribute                  Summary
-    ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
-    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`edge`              The coordinates of the edge within the grid.
-    ========================= ======================================================================
-    """
-    def __init__(
-        self,
-        lattice: CollisionlessLattice,
-        edge: ReflectionResetEdge,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-        self.lattice = lattice
-        self.edge = edge
-
-        self.circuit = self.create_circuit()
-
-    def create_circuit(self) -> QuantumCircuit:
-        circuit = self.lattice.circuit.copy()
-        lb_comparator = Comparator(
-            self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
-            self.edge.bounds_disconnected_dim[0],
-            ComparatorMode.GE,
-            logger=self.logger,
-        ).circuit
-        ub_comparator = Comparator(
-            self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
-            self.edge.bounds_disconnected_dim[1],
-            ComparatorMode.LE,
-            logger=self.logger,
-        ).circuit
-
-        # for c, wall_alignment_dim in enumerate(self.wall.alignment_dims):
-        circuit.compose(
-            lb_comparator,
-            qubits=self.lattice.grid_index(self.edge.dim_disconnected)
-            + self.lattice.ancillae_comparator_index(0)[
-                :-1  # :-1 Effectively selects only the first (lb) qubit
-            ],  # There are two comparator ancillae, for each relevant dimension, one for l and one for u
-            inplace=True,
-        )
-
-        circuit.compose(
-            ub_comparator,
-            qubits=self.lattice.grid_index(self.edge.dim_disconnected)
-            + self.lattice.ancillae_comparator_index(0)[
-                1:  # 1: Effectively selects only the last (ub) qubit
-            ],  # There are two comparator ancillae, for each relevant dimension, one for l and one for u.
-            inplace=True,
-        )
-
-        return circuit
-
-    def __str__(self) -> str:
-        return f"[Primitive SpecularEdgeComparator on edge={self.edge}]"
-
-
 class SpecularReflectionOperator(CQLBMOperator):
     """
     A primitive that implements the bounce back boundary conditions as described :cite:t:`collisiionless`.
@@ -173,6 +109,7 @@ class SpecularReflectionOperator(CQLBMOperator):
     :attr:`blocks`            A geometry encoded in a :class:`.Block` object
     ========================= ======================================================================
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -194,7 +131,7 @@ class SpecularReflectionOperator(CQLBMOperator):
 
         # Reflect the particles that have streamed
         # Into the inner walls of the object
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             for block in self.blocks:
                 for wall in block.walls_inside[dim]:
                     self.reflect_wall(circuit, wall)
@@ -204,20 +141,20 @@ class SpecularReflectionOperator(CQLBMOperator):
 
         # Reset the ancilla qubits for the particles that
         # Have been reflected onto the outer walls of the object
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             for block in self.blocks:
                 for wall in block.walls_outside[dim]:
                     self.reflect_wall(circuit, wall)
 
         # If this is a 2D simulation
-        if self.lattice.num_dimensions == 2:
+        if self.lattice.num_dims == 2:
             # Reset state for near-corner points
             for block in self.blocks:
                 for near_corner_point in block.near_corner_points_2d:
                     self.reset_point_state(circuit, near_corner_point)
 
         # If this is a 3D simulation
-        elif self.lattice.num_dimensions == 3:
+        elif self.lattice.num_dims == 3:
             for block in self.blocks:
                 # Reset the near-corner edges (24x)
                 for near_corner_edge in block.near_corner_edges_3d:
@@ -231,7 +168,7 @@ class SpecularReflectionOperator(CQLBMOperator):
                     self.reset_point_state(circuit, point)
         else:
             raise CircuitException(
-                f"CQBM specular reflection is not supported for {self.lattice.num_dimensions} dimensions."
+                f"CQBM specular reflection is not supported for {self.lattice.num_dims} dimensions."
             )
 
         # Reset state for outside corners
@@ -260,9 +197,7 @@ class SpecularReflectionOperator(CQLBMOperator):
         QuantumCircuit
             The circuit performing the resetting of the edge state.
         """
-        comparator_circuit = SpecularEdgeComparator(
-            self.lattice, edge, self.logger
-        ).circuit
+        comparator_circuit = EdgeComparator(self.lattice, edge, self.logger).circuit
 
         grid_qubits_indices_to_invert = [
             self.lattice.grid_index(0)[0] + qubit
@@ -400,9 +335,9 @@ class SpecularReflectionOperator(CQLBMOperator):
         Parameters
         ----------
         circuit : QuantumCircuit
-            The circuit on which to perform the flip and stream operation. 
+            The circuit on which to perform the flip and stream operation.
         """
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             # Flip the direction of the `d`-directional velocity qubit
             circuit.cx(
                 self.lattice.ancillae_obstacle_index(dim)[0],

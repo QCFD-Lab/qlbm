@@ -32,7 +32,7 @@ class CollisionlessStreamingOperator(CQLBMOperator):
     def create_circuit(self):
         circuit = self.lattice.circuit.copy()
 
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             circuit.compose(
                 StreamingAncillaPreparation(
                     self.lattice,
