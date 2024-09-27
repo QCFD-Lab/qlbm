@@ -7,12 +7,12 @@ from qlbm.lattice.blocks import Block, ReflectionWall
 
 @pytest.fixture
 def simple_3d_block():
-    return Block([(5, 6), (2, 10), (3, 8)], [4, 4, 4])
+    return Block([(5, 6), (2, 10), (3, 8)], [4, 4, 4], "specular")
 
 
 @pytest.fixture
 def simple_symmetric_3d_block():
-    return Block([(2, 5), (2, 5), (2, 5)], [3, 3, 3])
+    return Block([(2, 5), (2, 5), (2, 5)], [3, 3, 3], "bounceback")
 
 
 def test_3d_mesh(simple_3d_block):

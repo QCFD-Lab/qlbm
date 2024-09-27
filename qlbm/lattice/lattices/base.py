@@ -165,6 +165,7 @@ class Lattice(ABC):
                         (grid_list[numeric_dim_index]).bit_length()
                         for numeric_dim_index in range(num_dimensions)
                     ],
+                    obstacle_dict["boundary"],  # type: ignore
                 )
             )
 

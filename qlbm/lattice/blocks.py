@@ -34,10 +34,12 @@ class Block:
         self,
         bounds: List[Tuple[int, int]],
         num_qubits: List[int],
+        boundary_condition: str,
     ) -> None:
         # TODO: check whether the number of dimensions is consistent
         self.bounds = bounds
         self.num_dims = len(bounds)
+        self.boundary_condition = boundary_condition
         self.mesh_vertices = np.array(
             list(
                 product(*bounds)  # All combinations of bounds for 3D
@@ -431,6 +433,19 @@ class ReflectionWall:
         self.lower_bounds = lower_bounds
         self.upper_bounds = upper_bounds
         self.data = reflection_data
+        self.bounceback_loose_bounds: List[List[bool]] = (
+            self.__get_bounceback_wall_loose_bounds()
+        )
+
+    def __get_bounceback_wall_loose_bounds(self):
+        # Whether to use comparator bounds (LE, GE - True) or (LT, GT - False)
+        # When performing BB reflection on the inside walls.
+        # Oragnized as outer list -> dimension, inner list -> alignment dimensions
+        # Many combinations are possible here
+        if self.num_dims == 2:
+            return [[True], [False]]
+        else:
+            return [[True, True], [False, False], [False, True]]
 
 
 class ReflectionPoint:
