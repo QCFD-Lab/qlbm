@@ -28,7 +28,69 @@ def lattice_2d_16x16_1_obstacle_asymmetric() -> CollisionlessLattice:
                 "velocities": {"x": 16, "y": 4},
             },
             "geometry": [
+                {"x": [4, 6], "y": [3, 12], "boundary": "specular"},
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def lattice_2d_16x16_1_obstacle_bounceback() -> CollisionlessLattice:
+    return CollisionlessLattice(
+        {
+            "lattice": {
+                "dim": {"x": 16, "y": 16},
+                "velocities": {"x": 4, "y": 4},
+            },
+            "geometry": [
                 {"x": [4, 6], "y": [3, 12], "boundary": "bounceback"},
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def lattice_2d_16x16_2_obstacle_mixed() -> CollisionlessLattice:
+    return CollisionlessLattice(
+        {
+            "lattice": {
+                "dim": {"x": 16, "y": 16},
+                "velocities": {"x": 4, "y": 4},
+            },
+            "geometry": [
+                {"x": [4, 6], "y": [3, 5], "boundary": "specular"},
+                {"x": [4, 6], "y": [7, 12], "boundary": "bounceback"},
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def lattice_3d_8x8x8_2_obstacle_mixed() -> CollisionlessLattice:
+    return CollisionlessLattice(
+        {
+            "lattice": {
+                "dim": {"x": 8, "y": 8, "z": 8},
+                "velocities": {"x": 4, "y": 4, "z": 4},
+            },
+            "geometry": [
+                {"x": [4, 6], "y": [1, 3], "z": [1, 5], "boundary": "specular"},
+                {"x": [4, 6], "y": [5, 7], "z": [1, 5], "boundary": "bounceback"},
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def lattice_3d_8x8x8_1_obstacle_bounceback() -> CollisionlessLattice:
+    return CollisionlessLattice(
+        {
+            "lattice": {
+                "dim": {"x": 8, "y": 8, "z": 8},
+                "velocities": {"x": 4, "y": 4, "z": 4},
+            },
+            "geometry": [
+                {"x": [4, 6], "y": [5, 7], "z": [1, 5], "boundary": "bounceback"},
             ],
         }
     )
@@ -247,7 +309,7 @@ def test_lattice_exception_no_object_boundary_conditions():
 
 
 def test_2d_lattice_basic_properties(lattice_2d_16x16_1_obstacle: CollisionlessLattice):
-    assert lattice_2d_16x16_1_obstacle.num_dimensions == 2
+    assert lattice_2d_16x16_1_obstacle.num_dims == 2
     assert lattice_2d_16x16_1_obstacle.num_gridpoints == [15, 15]
     assert lattice_2d_16x16_1_obstacle.num_velocities == [3, 3]
     assert lattice_2d_16x16_1_obstacle.num_ancilla_qubits == 6
@@ -308,7 +370,7 @@ def test_2d_lattice_ancilla_obstacle_register(
     with pytest.raises(LatticeException) as excinfo:
         lattice_2d_16x16_1_obstacle.ancillae_obstacle_index(2)
     assert (
-        "Cannot index ancilla obstacle register for dimension 2 in 2-dimensional lattice."
+        "Cannot index ancilla obstacle register for index 2. Maximum index for this lattice is 1."
         == str(excinfo.value)
     )
 
@@ -447,5 +509,322 @@ def test_2d_asymmetric_lattice_velocity_dir_register(
         lattice_2d_16x16_1_obstacle_asymmetric.velocity_dir_index(2)
     assert (
         "Cannot index velocity direction register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+
+def test_registers_2d_only_bounceback(lattice_2d_16x16_1_obstacle_bounceback):
+    # Only bounce-back objects in this lattice, therefore 1 fewer qubits
+    assert lattice_2d_16x16_1_obstacle_bounceback.num_dims == 2
+    assert lattice_2d_16x16_1_obstacle_bounceback.num_gridpoints == [15, 15]
+    assert lattice_2d_16x16_1_obstacle_bounceback.num_velocities == [3, 3]
+    assert lattice_2d_16x16_1_obstacle_bounceback.num_ancilla_qubits == 5
+    assert lattice_2d_16x16_1_obstacle_bounceback.num_grid_qubits == 8
+    assert lattice_2d_16x16_1_obstacle_bounceback.num_velocity_qubits == 4
+    assert lattice_2d_16x16_1_obstacle_bounceback.num_total_qubits == 17
+
+    assert lattice_2d_16x16_1_obstacle_bounceback.ancillae_velocity_index(0) == [0]
+    assert lattice_2d_16x16_1_obstacle_bounceback.ancillae_velocity_index(1) == [1]
+    assert lattice_2d_16x16_1_obstacle_bounceback.ancillae_velocity_index() == [0, 1]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_1_obstacle_bounceback.ancillae_velocity_index(17)
+    assert (
+        "Cannot index ancilla velocity register for dimension 17 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_1_obstacle_bounceback.ancillae_obstacle_index(0) == [2]
+    assert lattice_2d_16x16_1_obstacle_bounceback.ancillae_obstacle_index() == [2]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_1_obstacle_bounceback.ancillae_obstacle_index(1)
+    assert (
+        "Cannot index ancilla obstacle register for index 1. Maximum index for this lattice is 0."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_1_obstacle_bounceback.ancillae_comparator_index(0) == [3, 4]
+    assert lattice_2d_16x16_1_obstacle_bounceback.ancillae_comparator_index() == [3, 4]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_1_obstacle_bounceback.ancillae_comparator_index(1)
+    assert (
+        "Cannot index ancilla comparator register for index 1 in 2-dimensional lattice. Maximum is 0."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_1_obstacle_bounceback.grid_index(0) == list(range(5, 9))
+    assert lattice_2d_16x16_1_obstacle_bounceback.grid_index(1) == list(range(9, 13))
+    assert lattice_2d_16x16_1_obstacle_bounceback.grid_index() == list(range(5, 13))
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_1_obstacle_bounceback.grid_index(2)
+    assert (
+        "Cannot index grid register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_1_obstacle_bounceback.velocity_index(0) == [13]
+    assert lattice_2d_16x16_1_obstacle_bounceback.velocity_index(1) == [14]
+    assert lattice_2d_16x16_1_obstacle_bounceback.velocity_index() == [13, 14]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_1_obstacle_bounceback.velocity_index(2)
+    assert (
+        "Cannot index velocity register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_1_obstacle_bounceback.velocity_dir_index(0) == [15]
+    assert lattice_2d_16x16_1_obstacle_bounceback.velocity_dir_index(1) == [16]
+    assert lattice_2d_16x16_1_obstacle_bounceback.velocity_dir_index() == [15, 16]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_1_obstacle_bounceback.velocity_dir_index(2)
+    assert (
+        "Cannot index velocity direction register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+
+def test_registers_2d_mixed(lattice_2d_16x16_2_obstacle_mixed):
+    # BB and SR BCs, therefore 2 obstacle qubits and 2 comparator qubits
+    assert lattice_2d_16x16_2_obstacle_mixed.num_dims == 2
+    assert lattice_2d_16x16_2_obstacle_mixed.num_gridpoints == [15, 15]
+    assert lattice_2d_16x16_2_obstacle_mixed.num_velocities == [3, 3]
+    assert lattice_2d_16x16_2_obstacle_mixed.num_ancilla_qubits == 6
+    assert lattice_2d_16x16_2_obstacle_mixed.num_grid_qubits == 8
+    assert lattice_2d_16x16_2_obstacle_mixed.num_velocity_qubits == 4
+    assert lattice_2d_16x16_2_obstacle_mixed.num_total_qubits == 18
+
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_velocity_index(0) == [0]
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_velocity_index(1) == [1]
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_velocity_index() == [0, 1]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_2_obstacle_mixed.ancillae_velocity_index(17)
+    assert (
+        "Cannot index ancilla velocity register for dimension 17 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_obstacle_index(0) == [2]
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_obstacle_index(1) == [3]
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_obstacle_index() == [2, 3]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_2_obstacle_mixed.ancillae_obstacle_index(2)
+    assert (
+        "Cannot index ancilla obstacle register for index 2. Maximum index for this lattice is 1."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_comparator_index(0) == [4, 5]
+    assert lattice_2d_16x16_2_obstacle_mixed.ancillae_comparator_index() == [4, 5]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_2_obstacle_mixed.ancillae_comparator_index(1)
+    assert (
+        "Cannot index ancilla comparator register for index 1 in 2-dimensional lattice. Maximum is 0."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_2_obstacle_mixed.grid_index(0) == list(range(6, 10))
+    assert lattice_2d_16x16_2_obstacle_mixed.grid_index(1) == list(range(10, 14))
+    assert lattice_2d_16x16_2_obstacle_mixed.grid_index() == list(range(6, 14))
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_2_obstacle_mixed.grid_index(2)
+    assert (
+        "Cannot index grid register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_2_obstacle_mixed.velocity_index(0) == [14]
+    assert lattice_2d_16x16_2_obstacle_mixed.velocity_index(1) == [15]
+    assert lattice_2d_16x16_2_obstacle_mixed.velocity_index() == [14, 15]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_2_obstacle_mixed.velocity_index(2)
+    assert (
+        "Cannot index velocity register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_2d_16x16_2_obstacle_mixed.velocity_dir_index(0) == [16]
+    assert lattice_2d_16x16_2_obstacle_mixed.velocity_dir_index(1) == [17]
+    assert lattice_2d_16x16_2_obstacle_mixed.velocity_dir_index() == [16, 17]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_2d_16x16_2_obstacle_mixed.velocity_dir_index(2)
+    assert (
+        "Cannot index velocity direction register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+
+def test_registers_3d_mixed(lattice_3d_8x8x8_2_obstacle_mixed):
+    # BB and SR BCs, therefore 2 obstacle qubits and 2 comparator qubits
+    assert lattice_3d_8x8x8_2_obstacle_mixed.num_dims == 3
+    assert lattice_3d_8x8x8_2_obstacle_mixed.num_gridpoints == [7, 7, 7]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.num_velocities == [3, 3, 3]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.num_ancilla_qubits == 10
+    assert lattice_3d_8x8x8_2_obstacle_mixed.num_grid_qubits == 9
+    assert lattice_3d_8x8x8_2_obstacle_mixed.num_velocity_qubits == 6
+    assert lattice_3d_8x8x8_2_obstacle_mixed.num_total_qubits == 25
+
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_velocity_index(0) == [0]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_velocity_index(1) == [1]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_velocity_index(2) == [2]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_velocity_index() == [0, 1, 2]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_2_obstacle_mixed.ancillae_velocity_index(3)
+    assert (
+        "Cannot index ancilla velocity register for dimension 3 in 3-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_obstacle_index(0) == [3]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_obstacle_index(1) == [4]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_obstacle_index(2) == [5]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_obstacle_index() == [3, 4, 5]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_2_obstacle_mixed.ancillae_obstacle_index(3)
+    assert (
+        "Cannot index ancilla obstacle register for index 3. Maximum index for this lattice is 2."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_comparator_index(0) == [6, 7]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_comparator_index(1) == [8, 9]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.ancillae_comparator_index() == list(
+        range(6, 10)
+    )
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_2_obstacle_mixed.ancillae_comparator_index(2)
+    assert (
+        "Cannot index ancilla comparator register for index 2 in 3-dimensional lattice. Maximum is 1."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_2_obstacle_mixed.grid_index(0) == list(range(10, 13))
+    assert lattice_3d_8x8x8_2_obstacle_mixed.grid_index(1) == list(range(13, 16))
+    assert lattice_3d_8x8x8_2_obstacle_mixed.grid_index(2) == list(range(16, 19))
+    assert lattice_3d_8x8x8_2_obstacle_mixed.grid_index() == list(range(10, 19))
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_2_obstacle_mixed.grid_index(3)
+    assert (
+        "Cannot index grid register for dimension 3 in 3-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_index(0) == [19]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_index(1) == [20]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_index(2) == [21]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_index() == [19, 20, 21]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_2_obstacle_mixed.velocity_index(3)
+    assert (
+        "Cannot index velocity register for dimension 3 in 3-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_dir_index(0) == [22]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_dir_index(1) == [23]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_dir_index(2) == [24]
+    assert lattice_3d_8x8x8_2_obstacle_mixed.velocity_dir_index() == [22, 23, 24]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_2_obstacle_mixed.velocity_dir_index(3)
+    assert (
+        "Cannot index velocity direction register for dimension 3 in 3-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+
+def test_registers_3d_only_bounceback(lattice_3d_8x8x8_1_obstacle_bounceback):
+    # BB and SR BCs, therefore 2 obstacle qubits and 2 comparator qubits
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.num_dims == 3
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.num_gridpoints == [7, 7, 7]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.num_velocities == [3, 3, 3]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.num_ancilla_qubits == 8
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.num_grid_qubits == 9
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.num_velocity_qubits == 6
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.num_total_qubits == 23
+
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_velocity_index(0) == [0]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_velocity_index(1) == [1]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_velocity_index(2) == [2]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_velocity_index() == [0, 1, 2]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_velocity_index(3)
+    assert (
+        "Cannot index ancilla velocity register for dimension 3 in 3-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_obstacle_index(0) == [3]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_obstacle_index() == [3]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_obstacle_index(1)
+    assert (
+        "Cannot index ancilla obstacle register for index 1. Maximum index for this lattice is 0."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_comparator_index(0) == [4, 5]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_comparator_index(1) == [6, 7]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_comparator_index() == list(
+        range(4, 8)
+    )
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_1_obstacle_bounceback.ancillae_comparator_index(2)
+    assert (
+        "Cannot index ancilla comparator register for index 2 in 3-dimensional lattice. Maximum is 1."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.grid_index(0) == list(range(8, 11))
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.grid_index(1) == list(range(11, 14))
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.grid_index(2) == list(range(14, 17))
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.grid_index() == list(range(8, 17))
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_1_obstacle_bounceback.grid_index(3)
+    assert (
+        "Cannot index grid register for dimension 3 in 3-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_index(0) == [17]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_index(1) == [18]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_index(2) == [19]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_index() == [17, 18, 19]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_1_obstacle_bounceback.velocity_index(3)
+    assert (
+        "Cannot index velocity register for dimension 3 in 3-dimensional lattice."
+        == str(excinfo.value)
+    )
+
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_dir_index(0) == [20]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_dir_index(1) == [21]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_dir_index(2) == [22]
+    assert lattice_3d_8x8x8_1_obstacle_bounceback.velocity_dir_index() == [20, 21, 22]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice_3d_8x8x8_1_obstacle_bounceback.velocity_dir_index(3)
+    assert (
+        "Cannot index velocity direction register for dimension 3 in 3-dimensional lattice."
         == str(excinfo.value)
     )

@@ -72,10 +72,10 @@ class QBMResult(ABC):
         img.SetDimensions(
             self.lattice.num_gridpoints[0] + 1,
             self.lattice.num_gridpoints[1] + 1
-            if self.lattice.num_dimensions > 1
+            if self.lattice.num_dims > 1
             else 1,
             self.lattice.num_gridpoints[2] + 1
-            if self.lattice.num_dimensions > 2
+            if self.lattice.num_dims > 2
             else 1,
         )
 

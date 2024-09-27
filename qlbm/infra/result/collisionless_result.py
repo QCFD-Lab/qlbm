@@ -36,16 +36,16 @@ class CollisionlessResult(QBMResult):
             self.lattice.num_gridpoints[0].bit_length(),
             self.lattice.num_gridpoints[0].bit_length()
             + self.lattice.num_gridpoints[1].bit_length()
-            if self.lattice.num_dimensions > 1
+            if self.lattice.num_dims > 1
             else 0,
             self.lattice.num_gridpoints[0].bit_length()
             + self.lattice.num_gridpoints[1].bit_length()
             + self.lattice.num_gridpoints[2].bit_length()
-            if self.lattice.num_dimensions > 2
+            if self.lattice.num_dims > 2
             else 0,
         )
 
-        if self.lattice.num_dimensions == 2:
+        if self.lattice.num_dims == 2:
             count_history = np.zeros(
                 (self.lattice.num_gridpoints[0] + 1, self.lattice.num_gridpoints[1] + 1)
             )
@@ -58,7 +58,7 @@ class CollisionlessResult(QBMResult):
                 )
                 count_history[x][y] = counts[count]
 
-        elif self.lattice.num_dimensions == 3:
+        elif self.lattice.num_dims == 3:
             count_history = np.zeros(
                 (
                     self.lattice.num_gridpoints[0] + 1,
@@ -100,10 +100,10 @@ class CollisionlessResult(QBMResult):
             img.SetDimensions(
                 self.lattice.num_gridpoints[0] + 1,
                 self.lattice.num_gridpoints[1] + 1
-                if self.lattice.num_dimensions > 1
+                if self.lattice.num_dims > 1
                 else 1,
                 self.lattice.num_gridpoints[2] + 1
-                if self.lattice.num_dimensions > 2
+                if self.lattice.num_dims > 2
                 else 1,
             )
             img.GetPointData().SetScalars(vtk_data)

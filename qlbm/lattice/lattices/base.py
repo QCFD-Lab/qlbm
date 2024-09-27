@@ -18,7 +18,7 @@ class LatticeDiscretization(Enum):
 class Lattice(ABC):
     """Holds the properties of the lattice to simulate."""
 
-    num_dimensions: int
+    num_dims: int
     num_gridpoints: List[int]
     num_velocities: List[int]
     num_total_qubits: int
@@ -176,11 +176,11 @@ class Lattice(ABC):
             "lattice": {
                 "dim": {
                     dimension_letter(dim): self.num_gridpoints[dim] + 1
-                    for dim in range(self.num_dimensions)
+                    for dim in range(self.num_dims)
                 },
                 "velocities": {
                     dimension_letter(dim): self.num_velocities[dim] + 1
-                    for dim in range(self.num_dimensions)
+                    for dim in range(self.num_dims)
                 },
             },
         }

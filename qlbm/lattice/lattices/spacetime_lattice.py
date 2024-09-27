@@ -143,7 +143,7 @@ class SpaceTimeLattice(Lattice):
         self.extreme_point_indices, self.intermediate_point_indices = (
             self.get_neighbor_indices()
         )
-        self.num_dimensions = len(self.num_gridpoints)
+        self.num_dims = len(self.num_gridpoints)
 
         logger.info(self.__str__())
 
@@ -151,9 +151,9 @@ class SpaceTimeLattice(Lattice):
         if dim is None:
             return list(range(self.num_grid_qubits))
 
-        if dim >= self.num_dimensions or dim < 0:
+        if dim >= self.num_dims or dim < 0:
             raise LatticeException(
-                f"Cannot index grid register for dimension {dim} in {self.num_dimensions}-dimensional lattice."
+                f"Cannot index grid register for dimension {dim} in {self.num_dims}-dimensional lattice."
             )
 
         previous_qubits = sum(self.num_gridpoints[d].bit_length() for d in range(dim))
@@ -375,4 +375,4 @@ class SpaceTimeLattice(Lattice):
             gp_string += f"{gp+1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
-        return f"{self.num_dimensions}d-{gp_string}-q4"
+        return f"{self.num_dims}d-{gp_string}-q4"
