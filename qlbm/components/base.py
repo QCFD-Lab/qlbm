@@ -11,9 +11,20 @@ from qlbm.lattice import CollisionlessLattice, Lattice, SpaceTimeLattice
 
 class QuantumComponent(ABC):
     """
-    Base class for all quantum circuits implementing QBM functionality.
+    Base class for all quantum circuits implementing QLBM functionality.
     This class wraps a :class:`qiskit.QuantumCircuit` object constructed
     through the parameters supplied to the constructor.
+    The :meth:`create_circuit` is automatically called at construct time
+    and its output is stored in the `circuit` attribute.
+    All quantum components have an implementation of the :meth:`create_circuit` method
+    which builds their specialized quantum circuits.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the component.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
+    ========================= ======================================================================
     """
 
     circuit: QuantumCircuit
@@ -97,7 +108,7 @@ class QuantumComponent(ABC):
         Parameters
         ----------
         output : str
-            The format of the output. Use "text", "matlotplib", or "texsource", respectively.
+            The format of the output. Use "text", "mpl", or "texsource", respectively.
         filename : str | None, optional
             The file to write the output to, by default None.
         """
@@ -109,6 +120,13 @@ class LBMPrimitive(QuantumComponent):
     Base class for all primitive-level quantum components.
     A primitive component is a small, isolated, and structurally parameterizable
     quantum circuit that can be reused throughout one or multiple algorithms.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the primitive.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
+    ========================= ======================================================================
     """
 
     logger: Logger
@@ -131,6 +149,7 @@ class LBMOperator(QuantumComponent):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
+    :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the operator.
     :attr:`lattice`           The :class:`.Lattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
     ========================= ======================================================================
@@ -158,6 +177,7 @@ class CQLBMOperator(LBMOperator):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
+    :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the operator.
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
     ========================= ======================================================================
@@ -185,6 +205,7 @@ class SpaceTimeOperator(LBMOperator):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
+    :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the operator.
     :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
     ========================= ======================================================================
@@ -211,6 +232,7 @@ class LBMAlgorithm(QuantumComponent):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
+    :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the algorithm.
     :attr:`lattice`           The :class:`.Lattice` based on which the properties of the algorithm are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
     ========================= ======================================================================

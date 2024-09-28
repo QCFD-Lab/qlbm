@@ -16,7 +16,67 @@ class LatticeDiscretization(Enum):
 
 
 class Lattice(ABC):
-    """Holds the properties of the lattice to simulate."""
+    """Base class for all algorithm-specific Lattices.
+    A ``Lattice`` object performs the following functions:
+
+    #. Parse high-level input from JSON files or Python dictionaries into appropriate quantum registers and other information used to infer quantum circuits.
+    #. Validate the soundness of the input information and raise warnings if algorithmic assumptions are violated.
+    #. Provide parameterized inputs for the inference of quantum circuits that comprise QLBMs.
+
+    The inheritance structure of ``Lattice``\ s is such that each QLBM uses a specialized implementation of this base class.
+    This allows the same parsing procedures to be used for all algorithms, while additional validity checks can be built on top.
+    All ``Lattice`` objects share the following attributes:
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`num_dims`           The number of dimensions of the lattice.
+    :attr:`num_gridpoints`     A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
+                               **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
+                               specified in the input dicitionary is one larger than the one held in the ``Lattice``.
+                               That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
+    :attr:`num_total_qubits`   The total number of qubits required for the quantum circuit to simulate this lattice.
+    :attr:`registers`          A ``Tuple[qiskit.QuantumRegister, ...]`` that holds registers responsible for specific operations of the QLBM algorithm.
+    :attr:`circuit`            An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
+                               Each quantum component that is parameterized by a ``Lattice`` makes a copy of this quantum circuit
+                               to which it appends its designated logic.
+    :attr:`blocks`             A ``Dict[str, List[Block]]`` that contains all of the :class:`.Block`\ s encoding the solid geometry of the lattice.
+                               The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+    :attr:`logger`             The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+
+    A lattice can be constructed from from either an input file or a Python dictionary.
+    A sample configuration might look as follows:
+
+    .. code-block:: json
+
+        {
+            "lattice": {
+                "dim": {
+                    "x": 16,
+                    "y": 16
+                },
+                "velocities": {
+                    "x": 4,
+                    "y": 4
+                }
+            },
+            "geometry": [
+                {
+                    "x": [9, 12],
+                    "y": [3, 6],
+                    "boundary": "specular"
+                },
+                {
+                    "x": [9, 12],
+                    "y": [9, 12],
+                    "boundary": "bounceback"
+                }
+            ]
+        }
+
+
+    """
 
     num_dims: int
     num_gridpoints: List[int]
@@ -39,6 +99,30 @@ class Lattice(ABC):
         self,
         lattice_data: str | Dict,  # type: ignore
     ) -> Tuple[List[int], List[int], Dict[str, List[Block]]]:
+        """
+        Parses the lattice input data, provided in either a file path or a dictionary.
+
+        Parameters
+        ----------
+        lattice_data : str | Dict
+            Either a file path to read a JSON-formatted specification from,
+            or a dictionary formatted as in the main class description.
+
+        Returns
+        -------
+        Tuple[List[int], List[int], Dict[str, List[Block]]]
+            A tuple containing
+            (i) a list of the number of gridpoints per dimension,
+            (ii) a list of the number of velicities per dimension,
+            and (iii) a dictionary containing the solid :class:`.Block`\ s.
+            The key of the dictionary is the specific kind of
+            boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+
+        Raises
+        ------
+        LatticeException
+            If the specification violates any algorithmic assumptions.
+        """
         if isinstance(lattice_data, str):
             with open(lattice_data, "r") as f:
                 lattice_dict = json.load(f)
@@ -52,6 +136,29 @@ class Lattice(ABC):
         self,
         input_dict: Dict,  # type: ignore
     ) -> Tuple[List[int], List[int], Dict[str, List[Block]]]:
+        """
+        Parses the lattice input data, provided as a dictionary.
+
+        Parameters
+        ----------
+        input_dict : Dict
+            The dictionary encoding the lattice.
+
+        Returns
+        -------
+        Tuple[List[int], List[int], Dict[str, List[Block]]]
+            A tuple containing
+            (i) a list of the number of gridpoints per dimension,
+            (ii) a list of the number of velicities per dimension,
+            and (iii) a dictionary containing the solid :class:`.Block`\ s.
+            The key of the dictionary is the specific kind of
+            boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+
+        Raises
+        ------
+        LatticeException
+            A specific exception informing the user of the exact kind of assumption that the specification violates.
+        """
         if "lattice" not in input_dict:
             raise LatticeException('Input configuration missing "lattice" properties.')
 
@@ -196,8 +303,24 @@ class Lattice(ABC):
 
     @abstractmethod
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
+        """
+        Generates the registers on which the quantum circuits will be placed.
+
+        Returns
+        -------
+        Tuple[List[QuantumRegister], ...]
+            A fixed number of registers according to the lattice specification.
+        """
         pass
 
     @abstractmethod
     def logger_name(self) -> str:
+        """
+        An identifiable name to be used in the logger to help with benchmarking and analysis.
+
+        Returns
+        -------
+        str
+            A string that can be used to sufficiently identify the lattice specification.
+        """
         pass
