@@ -8,12 +8,30 @@ from qlbm.lattice import CollisionlessLattice
 from qlbm.tools.utils import get_time_series
 
 from .bounceback_reflection import BounceBackReflectionOperator
-from .primitives import StreamingAncillaPreparation
 from .specular_reflection import SpecularReflectionOperator
-from .streaming import CollisionlessStreamingOperator
+from .streaming import CollisionlessStreamingOperator, StreamingAncillaPreparation
 
 
 class CQLBM(LBMAlgorithm):
+    """
+    The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm
+    first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
+    This implementation supports 2D and 3D simulations with with cuboid objects
+    with either bounce-back or specular reflection boundary conditions.
+
+    The algorithm is composed of three steps that are repeated according to a CFL counter:
+
+    #. Streaming performed by the :class:`.CollisionlessStreamingOperator` increments or decrements the positions of particles on the grid.
+    #. :class:`.BounceBackReflectionOperator` and :class:`.SpecularReflectionOperator` reflect the particles that come in contact with :class:`.Block` obstacles encoded in the :class:`.CollisionlessLattice`.
+    #. The :class:`.StreamingAncillaPreparation` resets the state of the ancilla qubits for the next CFL counter substep.
+
+    ========================= ======================================================================
+    Atribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+    """
     def __init__(
         self,
         lattice: CollisionlessLattice,

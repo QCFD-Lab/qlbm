@@ -30,6 +30,7 @@ class QuantumComponent(ABC):
     def create_circuit(self) -> QuantumCircuit:
         """
         Creates the :class:`qiskit.QuantumCircuit` of this object.
+        This method is called automatically at construction time for all quantum components.
 
         Returns
         -------
@@ -203,7 +204,7 @@ class SpaceTimeOperator(LBMOperator):
 class LBMAlgorithm(QuantumComponent):
     """
     Base class for all end-to-end Quantum Boltzmann Methods.
-    An end-to-end algorithm consists of a 
+    An end-to-end algorithm consists of a
     series of :class:`.LBMOperator` that perform
     the physical operations of the appropriate algorithm.
 
@@ -214,6 +215,7 @@ class LBMAlgorithm(QuantumComponent):
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
     ========================= ======================================================================
     """
+
     lattice: Lattice
 
     def __init__(

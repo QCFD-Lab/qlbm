@@ -6,17 +6,18 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
 
 from qlbm.components.base import CQLBMOperator, LBMPrimitive
-from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
-from qlbm.components.common import (
+from qlbm.components.collisionless.primitives import (
     Comparator,
     ComparatorMode,
 )
+from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
 from qlbm.lattice import Block, CollisionlessLattice, ReflectionPoint, ReflectionWall
 from qlbm.lattice.blocks import ReflectionResetEdge
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
-from .primitives import ControlledIncrementer, EdgeComparator
+from .primitives import EdgeComparator
+from .streaming import ControlledIncrementer
 
 
 class BounceBackWallComparator(LBMPrimitive):
@@ -103,7 +104,7 @@ class BounceBackWallComparator(LBMPrimitive):
 
 class BounceBackReflectionOperator(CQLBMOperator):
     """
-    Operator implementing the 2D and 3D BB boundary conditions as described :cite:t:`qmem`.
+    Operator implementing the 2D and 3D Bounce-Back (BB) boundary conditions as described in :cite:t:`qmem`.
     The operator parses information encoded in :class:`.Block` objects to detect particles that
     have virtually streamed into the solid domain before placing them back to their
     previous positions in the fluid domain.
@@ -205,6 +206,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
         #. Comparator circuits set the comparator ancilla qubits to :math:`\ket{1}` based on the size of the wall in the other dimension(s).
         #. Depending on the use, the directional velocity qubits are also set to :math:`\ket{1}` based on the dimension that the wall spans.
         #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.
+        #. The control qubits are set back to their previous state.
 
         The wall reflection operation is versatile and can be used to both set and re-set the state
         of the obstacle ancilla qubit at different stages of reflection.
@@ -290,117 +292,19 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
         return circuit
 
-    def flip_and_stream(
-        self,
-        circuit: QuantumCircuit,
-    ):
-        """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
-        Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
-        phase shift circuit is additionally controlled on the ancilla obstacle qubit, which
-        ensures that only particles whose grid position gets incremented (decremented) are those
-        that have streamed inside the solid domain in this CFL time step.
-
-        Parameters
-        ----------
-        circuit : QuantumCircuit
-            The circuit on which to perform the flip and stream operation.
-
-        """
-        control_qubits = self.lattice.ancillae_obstacle_index(0)
-        target_qubits = self.lattice.velocity_dir_index()
-
-        circuit.compose(
-            MCMT(
-                XGate(),
-                len(control_qubits),
-                len(target_qubits),
-            ),
-            qubits=control_qubits + target_qubits,
-            inplace=True,
-        )
-
-        circuit.compose(
-            ControlledIncrementer(
-                self.lattice, reflection="bounceback", logger=self.logger
-            ).circuit,
-            inplace=True,
-        )
-
-        return circuit
-
-    def __str__(self) -> str:
-        return f"[Operator BounceBackReflectionOperator against block {self.lattice.blocks}]"
-
-    def reset_point_state(
-        self,
-        circuit: QuantumCircuit,
-        corner: ReflectionPoint,
-    ) -> QuantumCircuit:
-        """_summary_
-
-        Parameters
-        ----------
-        circuit : QuantumCircuit
-            The circuit on which to perform the resetting of the point state.
-        corner : ReflectionPoint
-            The corner for which to reset the desired point states.
-
-        Returns
-        -------
-        QuantumCircuit
-            The circuit resetting the point state as desired.
-        """
-        grid_qubit_indices_to_invert = [
-            self.lattice.grid_index(0)[0] + qubit for qubit in corner.qubits_to_invert
-        ]
-
-        # If statement required because qiskit does not allow x([])
-        # x([]) would only happen for the |11...1> grid point
-        # i.e., the bottom-right most grid point.
-        if grid_qubit_indices_to_invert:
-            # Inverting the qubits that are 0 turns the
-            # Grid qubit state encoding this corner lattice point to |11...1>
-            # Which in turn allows us to control on this one grid point
-            circuit.x(grid_qubit_indices_to_invert)
-
-        for dim in range(corner.num_dims):
-            if corner.invert_velocity_in_dimension[dim]:
-                circuit.x(self.lattice.velocity_dir_index(dim))
-
-        control_qubits = (
-            self.lattice.ancillae_velocity_index()
-            + self.lattice.velocity_dir_index()
-            + self.lattice.grid_index()
-        )
-
-        target_qubits = self.lattice.ancillae_obstacle_index(0)
-
-        circuit.compose(
-            MCMT(
-                XGate(),
-                len(control_qubits),
-                len(target_qubits),
-            ),
-            qubits=control_qubits + target_qubits,
-            inplace=True,
-        )
-
-        for dim in range(corner.num_dims):
-            # Reset the state to the one before the MCMX
-            if corner.invert_velocity_in_dimension[dim]:
-                circuit.x(self.lattice.velocity_dir_index(dim))
-
-        if grid_qubit_indices_to_invert:
-            # Applying the exact same inversion returns
-            # The grid qubits to their state before the operation
-            circuit.x(grid_qubit_indices_to_invert)
-
-        return circuit
-
     def reset_edge_state(
         self, circuit: QuantumCircuit, edge: ReflectionResetEdge
     ) -> QuantumCircuit:
-        """_summary_
+        """Resets the state of an edge along the side of an obstacle in 3D as follows:
+
+        #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the 2 dimensions that the edge spans.
+        #. A comparator circuits sets the comparator ancilla qubits to :math:`\ket{1}` based on the size of the edge in the remaining dimension.
+        #. The directional velocity qubits are also set to :math:`\ket{1}` on the specific velocity profile of the targeted particles.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.
+        #. The control qubits are set back to their previous state.
+
+        This function resets the ancilla obstacle qubit to :math:`\ket{0}` for particles
+        along 36 specific edges of a cube after those particles have been streamed out of the obstacle in the CFL time step.
 
         Parameters
         ----------
@@ -461,3 +365,115 @@ class BounceBackReflectionOperator(CQLBMOperator):
         circuit.compose(comparator_circuit, inplace=True)
 
         return circuit
+
+    def reset_point_state(
+        self,
+        circuit: QuantumCircuit,
+        corner: ReflectionPoint,
+    ) -> QuantumCircuit:
+        """Resets the state of the ancilla obstacle qubit of a single point on the grid as follows:
+
+        #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
+        #. The directional velocity qubits are also set to :math:`\ket{1}` based on the specific velocity profile of the targeted particles.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.
+        #. The control qubits are set back to their previous state.
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform the resetting of the point state.
+        corner : ReflectionPoint
+            The corner for which to reset the desired point states.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit resetting the point state as desired.
+        """
+        grid_qubit_indices_to_invert = [
+            self.lattice.grid_index(0)[0] + qubit for qubit in corner.qubits_to_invert
+        ]
+
+        # If statement required because qiskit does not allow x([])
+        # x([]) would only happen for the |11...1> grid point
+        # i.e., the bottom-right most grid point.
+        if grid_qubit_indices_to_invert:
+            # Inverting the qubits that are 0 turns the
+            # Grid qubit state encoding this corner lattice point to |11...1>
+            # Which in turn allows us to control on this one grid point
+            circuit.x(grid_qubit_indices_to_invert)
+
+        for dim in range(corner.num_dims):
+            if corner.invert_velocity_in_dimension[dim]:
+                circuit.x(self.lattice.velocity_dir_index(dim))
+
+        control_qubits = (
+            self.lattice.ancillae_velocity_index()
+            + self.lattice.velocity_dir_index()
+            + self.lattice.grid_index()
+        )
+
+        target_qubits = self.lattice.ancillae_obstacle_index(0)
+
+        circuit.compose(
+            MCMT(
+                XGate(),
+                len(control_qubits),
+                len(target_qubits),
+            ),
+            qubits=control_qubits + target_qubits,
+            inplace=True,
+        )
+
+        for dim in range(corner.num_dims):
+            # Reset the state to the one before the MCMX
+            if corner.invert_velocity_in_dimension[dim]:
+                circuit.x(self.lattice.velocity_dir_index(dim))
+
+        if grid_qubit_indices_to_invert:
+            # Applying the exact same inversion returns
+            # The grid qubits to their state before the operation
+            circuit.x(grid_qubit_indices_to_invert)
+
+        return circuit
+
+    def flip_and_stream(
+        self,
+        circuit: QuantumCircuit,
+    ):
+        """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
+        Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
+        phase shift circuit is additionally controlled on the ancilla obstacle qubit, which
+        ensures that only particles whose grid position gets incremented (decremented) are those
+        that have streamed inside the solid domain in this CFL time step.
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform the flip and stream operation.
+
+        """
+        control_qubits = self.lattice.ancillae_obstacle_index(0)
+        target_qubits = self.lattice.velocity_dir_index()
+
+        circuit.compose(
+            MCMT(
+                XGate(),
+                len(control_qubits),
+                len(target_qubits),
+            ),
+            qubits=control_qubits + target_qubits,
+            inplace=True,
+        )
+
+        circuit.compose(
+            ControlledIncrementer(
+                self.lattice, reflection="bounceback", logger=self.logger
+            ).circuit,
+            inplace=True,
+        )
+
+        return circuit
+
+    def __str__(self) -> str:
+        return f"[Operator BounceBackReflectionOperator against block {self.lattice.blocks}]"
