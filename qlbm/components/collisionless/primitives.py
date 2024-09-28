@@ -24,6 +24,38 @@ class GridMeasurement(LBMPrimitive):
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import GridMeasurement
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice({
+            "lattice": {
+                "dim": {
+                "x": 8,
+                "y": 8
+                },
+                "velocities": {
+                "x": 4,
+                "y": 4
+                }
+            },
+            "geometry": [
+                {
+                "x": [5, 6],
+                "y": [1, 2],
+                "boundary": "specular"
+                }
+            ]
+        })
+
+        # Draw the measurement circuit
+        GridMeasurement(lattice).draw("mpl")
     """
 
     def __init__(
@@ -72,6 +104,38 @@ class CollisionlessInitialConditions(LBMPrimitive):
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import CollisionlessInitialConditions
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice({
+            "lattice": {
+                "dim": {
+                "x": 8,
+                "y": 8
+                },
+                "velocities": {
+                "x": 4,
+                "y": 4
+                }
+            },
+            "geometry": [
+                {
+                "x": [5, 6],
+                "y": [1, 2],
+                "boundary": "specular"
+                }
+            ]
+        })
+
+        # Draw the initial conditions circuit
+        CollisionlessInitialConditions(lattice).draw("mpl")
     """
 
     def __init__(
@@ -125,6 +189,34 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import CollisionlessInitialConditions3DSlim
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice({
+            "lattice": {
+                "dim": {
+                "x": 8,
+                "y": 8,
+                "z": 8
+                },
+                "velocities": {
+                "x": 4,
+                "y": 4,
+                "z": 4
+                }
+            },
+            "geometry": []
+        })
+
+        # Draw the initial conditions circuit
+        CollisionlessInitialConditions3DSlim(lattice).draw("mpl")
     """
 
     def __init__(
@@ -198,6 +290,14 @@ class SpeedSensitiveAdder(LBMPrimitive):
     :attr:`logger`            The performance logger, by default getLogger("qlbm")
     ========================= ======================================================================
 
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import SpeedSensitiveAdder
+
+        SpeedSensitiveAdder(4, 1, True).draw("mpl")
     """
 
     def __init__(
@@ -254,6 +354,18 @@ class Comparator(LBMPrimitive):
     :attr:`mode`              The :class:`.ComparatorMode` used to compare the two numbers.
     :attr:`logger`            The performance logger, by default getLogger("qlbm")
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import Comparator, ComparatorMode
+
+        # On a 5 qubit register, compare the number 3
+        Comparator(num_qubits=5,
+                   num_to_compare=3,
+                   mode=ComparatorMode.LT).draw("mpl")
     """
 
     def __init__(
@@ -343,6 +455,28 @@ class EdgeComparator(LBMPrimitive):
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     :attr:`edge`              The coordinates of the edge within the grid.
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import EdgeComparator
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {
+                    "dim": {"x": 8, "y": 8, "z": 8},
+                    "velocities": {"x": 4, "y": 4, "z": 4},
+                },
+                "geometry": [{"x": [2, 5], "y": [2, 5], "z": [2, 5], "boundary": "specular"}],
+            }
+        )
+
+        # Draw the edge comparator circuit for one specific corner edge
+        EdgeComparator(lattice, lattice.block_list[0].corner_edges_3d[0]).draw("mpl")
     """
 
     def __init__(

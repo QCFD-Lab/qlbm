@@ -27,6 +27,25 @@ class StreamingAncillaPreparation(LBMPrimitive):
     :attr:`dim`               The dimension to which the velocities correspond.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import StreamingAncillaPreparation
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [],
+            }
+        )
+
+        # Streaming velocities indexed 2 in the y (1) dimension
+        StreamingAncillaPreparation(lattice=lattice, velocities=[2], dim=1).draw("mpl")
     """
 
     def __init__(
@@ -87,57 +106,6 @@ class StreamingAncillaPreparation(LBMPrimitive):
         return f"[Primitive StreamingAncillaPreparation on dimension {self.dim}, for velocities {self.velocities}]"
 
 
-class PhaseShift(LBMPrimitive):
-    """
-    Applies the phase-shift required for controlled
-    incrementation as part of the streaming operator
-    of the CQBM algorithm :cite:p:`collisionless`.
-    Used in the :class`.ControlledIncrementer`.
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        positive: bool = False,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        """
-        Parameters
-        ----------
-        num_qubits : int
-            The number of qubits of the circuit.
-        positive : bool, optional
-            Whether incrementation should be performed in the positive direction, by default False.
-        logger : Logger, optional
-            The performance logger, by default getLogger("qlbm")
-        """
-        super().__init__(logger)
-
-        self.num_qubits = num_qubits
-        self.positive = positive
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    def create_circuit(self) -> QuantumCircuit:
-        circuit = QuantumCircuit(self.num_qubits)
-
-        for c, qubit_index in enumerate(range(self.num_qubits)):
-            # (2 * positive - 1) will flip the sign if positive is False
-            # This effectively inverts the circuit
-            phase = (2 * self.positive - 1) * pi / (2 ** (self.num_qubits - 1 - c))
-            circuit.p(phase, qubit_index)
-
-        return circuit
-
-    def __str__(self) -> str:
-        return f"[Primitive PhaseShift of {self.num_qubits} qubits, in direction {self.positive}]"
-
-
 class ControlledIncrementer(LBMPrimitive):
     """
     A primitive used in :class:`.CollisionlessStreamingOperator` that implements the streaming operation
@@ -153,6 +121,25 @@ class ControlledIncrementer(LBMPrimitive):
                               governs which qubits are used as controls for the Fourier space phase shifts.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import ControlledIncrementer
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [],
+            }
+        )
+
+        # Streaming velocities indexed 2 in the y (1) dimension
+        ControlledIncrementer(lattice=lattice).draw("mpl")
     """
 
     supported_reflection: List[str] = ["specular", "bounceback"]
@@ -245,6 +232,44 @@ class ControlledIncrementer(LBMPrimitive):
 
 
 class CollisionlessStreamingOperator(CQLBMOperator):
+    """
+    An operator that performs streaming in Fourier space as part of the :class:`.CQLBM` algorithm.
+    Streaming is broken down into the following steps:
+
+    #. A :class:`.StreamingAncillaPreparation` object prepares the ancilla velocity qubits for CFL time step. This happens independently for all dimensions, and it is assumed the velocity discretization is uniform across dimensions.
+    #. A :class:`.ControlledIncrementer` performs incrementation or decrementation in the Fourier space, controlled on the ancilla qubits set in the previous steps.
+    #. For efficiency reasons, the velocity qubits set in step 1 are **not** reset, as they will be re-used in the subsequent reflection step. Another instance of the :class:`.StreamingAncillaPreparation` would be required to consistently end the step.
+
+    For an in-depth mathematical explanation of the procedure, consult Section 4 of :cite:t:`collisionless`.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`velocities`        A list of velocities to increment. This is computed according to CFL counter.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import CollisionlessStreamingOperator
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [],
+            }
+        )
+
+        # Streaming the velocity with index 2
+        CollisionlessStreamingOperator(lattice=lattice, velocities=[2]).draw("mpl")
+    """
+
     circuit: QuantumCircuit
 
     def __init__(
@@ -293,7 +318,105 @@ class CollisionlessStreamingOperator(CQLBMOperator):
         )
 
 
+class PhaseShift(LBMPrimitive):
+    """
+    A primitive that applies the phase-shift as part of the :class:`.ControlledIncrementer` used in the :class:`.CollisionlessStreamingOperator`.
+    The rotation applied is :math:`\pm\\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
+    For an in-depth mathematical explanation of the procedure, consult Section 4 of :cite:t:`collisionless`.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`num_qubits`        The number of qubits to perform the phase shift for.
+    :attr:`positive`          Whether the phase shift is applied to increment (T)
+                              or decrement (F) the position of the particles.
+                              Defaults to ``False``.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import PhaseShift
+
+        # A phase shift of 5 qubits
+        PhaseShift(num_qubits=5, positive=False).draw("mpl")
+    """
+
+    def __init__(
+        self,
+        num_qubits: int,
+        positive: bool = False,
+        logger: Logger = getLogger("qlbm"),
+    ) -> None:
+        """
+        Parameters
+        ----------
+        num_qubits : int
+            The number of qubits of the circuit.
+        positive : bool, optional
+            Whether incrementation should be performed in the positive direction, by default False.
+        logger : Logger, optional
+            The performance logger, by default getLogger("qlbm")
+        """
+        super().__init__(logger)
+
+        self.num_qubits = num_qubits
+        self.positive = positive
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    def create_circuit(self) -> QuantumCircuit:
+        circuit = QuantumCircuit(self.num_qubits)
+
+        for c, qubit_index in enumerate(range(self.num_qubits)):
+            # (2 * positive - 1) will flip the sign if positive is False
+            # This effectively inverts the circuit
+            phase = (2 * self.positive - 1) * pi / (2 ** (self.num_qubits - 1 - c))
+            circuit.p(phase, qubit_index)
+
+        return circuit
+
+    def __str__(self) -> str:
+        return f"[Primitive PhaseShift of {self.num_qubits} qubits, in direction {self.positive}]"
+
+
 class SpeedSensitivePhaseShift(LBMPrimitive):
+    """
+    A primitive that applies the phase-shift as part of the :class:`.SpeedSensitiveAdder` used in :class:`.Comparator`\ s.
+    The rotation applied is :math:`\pm \\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
+    Unlike the regular :class:`.PhaseShift`, the speed-sensitive version additionally depends on a specific speed index.
+    For an in-depth mathematical explanation of the procedure, consult Sections 4 and 5.5 of :cite:t:`collisionless`.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`num_qubits`        The number of qubits to perform the phase shift for.
+    :attr:`positive`          Whether the phase shift is applied to increment (T)
+                              or decrement (F) the position of the particles.
+                              Defaults to ``False``.
+    :attr:`speed`             The specific speed index to perform the phase shift for.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import SpeedSensitivePhaseShift
+
+        # A phase shift of 5 qubits, controlled on speed index 2
+        SpeedSensitivePhaseShift(num_qubits=5, speed=2, positive=True).draw("mpl")
+    """
+
     def __init__(
         self,
         num_qubits: int,

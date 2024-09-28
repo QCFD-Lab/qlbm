@@ -38,6 +38,27 @@ class SpecularWallComparator(LBMPrimitive):
     :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
+    
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import SpecularWallComparator
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "specular"}],
+            }
+        )
+
+        # Comparing on the indices of the inside x-wall on the lower-bound of the obstacle
+        SpecularWallComparator(
+            lattice=lattice, wall=lattice.block_list[0].walls_inside[0][0]
+        ).draw("mpl")
     """
 
     def __init__(
@@ -120,6 +141,24 @@ class SpecularReflectionOperator(CQLBMOperator):
     :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import SpecularReflectionOperator
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "specular"}],
+            }
+        )
+
+        SpecularReflectionOperator(lattice=lattice, blocks=lattice.block_list)
     """
 
     def __init__(
