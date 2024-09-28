@@ -42,4 +42,46 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme = "pydata_sphinx_theme"
+
+autodoc_member_order = "bysource"
+
+html_theme_options = {
+    "secondary_sidebar_items": {
+        "**": ["page-toc", "searchbox", "sourcelink"],
+    },
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/qcfd-lab/qlbm",
+            "icon": "fa-brands fa-square-github",
+            "type": "fontawesome",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/qlbm/",
+            "icon": "fa-brands fa-python",
+            "type": "fontawesome",
+        },
+    ],
+    "collapse_navigation": True,
+    # "show_nav_level": 5,
+    # "navigation_depth": 5,
+    "show_toc_level": 2,
+    "use_edit_page_button": True,
+}
+
+html_context = {
+    "github_url": "https://github.com",
+    "github_user": "qcfd-lab",
+    "github_repo": "qlbm",
+    "github_version": "main",
+    "doc_path": "docs",
+}
+
 html_static_path = ["_static"]
+
+html_css_files = [
+    "css/custom.css",
+]
+
+master_doc = "index"

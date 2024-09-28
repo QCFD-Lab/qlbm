@@ -1,4 +1,4 @@
 .. _tools:
 
-Tools
+Other Tools
 ==================

@@ -1,7 +1,7 @@
 .. _lattice:
 
-Lattice
-==================
+Lattices and Geometry
+=====================
 
 ***********************
 Lattices
