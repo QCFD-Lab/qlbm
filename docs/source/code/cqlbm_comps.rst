@@ -42,6 +42,8 @@ Streaming
 
 .. autoclass:: qlbm.components.collisionless.SpeedSensitivePhaseShift
 
+.. autoclass:: qlbm.components.collisionless.PhaseShift
+
 .. _cqlbm_reflection:
 
 Reflection

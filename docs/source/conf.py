@@ -28,6 +28,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinxcontrib.bibtex",
+    "matplotlib.sphinxext.plot_directive",
 ]
 
 bibtex_bibfiles = ["refs.bib"]

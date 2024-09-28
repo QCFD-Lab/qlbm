@@ -6,5 +6,5 @@ Lattices and Geometry
 ***********************
 Lattices
 ***********************
-.. automodule:: qlbm.lattice
-    :members:
+.. .. automodule:: qlbm.lattice
+..     :members:
