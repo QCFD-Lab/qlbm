@@ -28,7 +28,7 @@ class BounceBackWallComparator(LBMPrimitive):
     the quantum state whose grid qubits fall within the range spanned by the wall.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
@@ -116,7 +116,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
     #. Once streamed outside the solid domain, components encoding affected particles have their obstacle ancilla qubit reset based on grid position, velocity direction, and whether they have streamed in the CFL timestep.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.

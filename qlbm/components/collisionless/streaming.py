@@ -20,7 +20,7 @@ class StreamingAncillaPreparation(LBMPrimitive):
     will be streamed in the next CFL time step.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`velocities`        The velocities that need to be streamed within the next time step.
@@ -145,7 +145,7 @@ class ControlledIncrementer(LBMPrimitive):
     after the primitive :class:`.StreamingAncillaPreparation` to compose the streaming operator.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`reflection`        The reflection attribute decides the type of reflection that will take place. This should

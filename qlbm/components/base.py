@@ -129,7 +129,7 @@ class LBMOperator(QuantumComponent):
     object of an appropriate encoding.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.Lattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
@@ -156,7 +156,7 @@ class CQLBMOperator(LBMOperator):
     based on a :class:`.CollisionlessLattice`.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
@@ -183,7 +183,7 @@ class SpaceTimeOperator(LBMOperator):
     based on a :class:`.SpaceTimeLattice`.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
@@ -209,7 +209,7 @@ class LBMAlgorithm(QuantumComponent):
     the physical operations of the appropriate algorithm.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.Lattice` based on which the properties of the algorithm are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``

@@ -26,7 +26,7 @@ class CQLBM(LBMAlgorithm):
     #. The :class:`.StreamingAncillaPreparation` resets the state of the ancilla qubits for the next CFL counter substep.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.

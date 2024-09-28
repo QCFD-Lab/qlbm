@@ -19,7 +19,7 @@ class GridMeasurement(LBMPrimitive):
     Used at the end of the time step circuit to extract information from the quantum state.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
@@ -67,7 +67,7 @@ class CollisionlessInitialConditions(LBMPrimitive):
     All velocities are pointing in the positive direction.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
@@ -120,7 +120,7 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
     All velocities are pointing in the positive direction.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
@@ -167,7 +167,12 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
 class ComparatorMode(Enum):
     """
     Enumerator for the modes of quantum comparator circuits.
-    The modes are as follows: (1, :math:`<`); (1, :math:`\leq`); (1, :math:`>`); (1, :math:`\geq`)
+    The modes are as follows:
+
+    * (1, ``ComparatorMode.LT``, :math:`<`);
+    * (2, ``ComparatorMode.LE``, :math:`\leq`);
+    * (3, ``ComparatorMode.GT``, :math:`>`);
+    * (4, ``ComparatorMode.GE``, :math:`\geq`).
     """
 
     LT = (1,)
@@ -185,7 +190,7 @@ class SpeedSensitiveAdder(LBMPrimitive):
     between regular and inverse :math:`QFT`\ s.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`num_qubits`        Number of qubits of the circuit.
     :attr:`speed`             The index of the speed to increment.
@@ -242,7 +247,7 @@ class Comparator(LBMPrimitive):
     ``num_to_compare`` with respect to a :class:`.ComparatorMode`.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`num_qubits`        Number of qubits encoding the integer to compare.
     :attr:`num_to_compare`    The integer to compare against.
@@ -332,7 +337,7 @@ class EdgeComparator(LBMPrimitive):
     comparator for the specular reflection boundary conditions around the edge as described :cite:t:`collisionless`.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
