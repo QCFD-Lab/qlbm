@@ -5,7 +5,7 @@ Space-Time Circuits
 ====================================
 
 This page contains documentation about the quantum circuits that make up the
-**Space-Time**\ **Q**\ uantum **L**\ attice **B**\ oltzmann **M**\ ethod (STQLBM)
+**S**\ pace-\ **T**\ ime **Q**\ uantum **L**\ attice **B**\ oltzmann **M**\ ethod (STQLBM)
 described in :cite:p:`spacetime`.
 At its core, the Space-Time QLBM uses an extended computational basis state
 encoding that that circumvents the non-locality of the streaming
