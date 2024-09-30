@@ -11,7 +11,7 @@ At its core, the CQLBM algorithm manipulates the particle probability distributi
 in an amplitude-based encoding of the quantum state.
 This happens in several distinct steps:
 
-#. Initial conditions prepare encode the starting state of the probability distribution function.
+#. Initial conditions prepare the starting state of the probability distribution function.
 #. :ref:`cqlbm_streaming` circuits increment or decrement the position of particles in physical space through QFT-based streaming.
 #. :ref:`cqlbm_reflection` circuits apply boundary conditions that affect particles that come in contact with solid obstacles. Reflection places those particles back in the appropriate position of the fluid domain.
 #. Measurement operations extract information out of the quantum state, which can later be post-processed classically.
