@@ -7,6 +7,45 @@ from qlbm.tools.exceptions import CircuitException
 
 
 class SpaceTimeStreamingOperator(SpaceTimeOperator):
+    """
+    An operator that performs streaming as a series of :math:`SWAP` gates as part of the :class:`.SpaceTimeQLBM` algorithm.
+    The velocities corresponding to neighboring gridpoints are streamed "into" the gridpoint affected relative to the ``timestep``.
+    The register setup of the :class:`.SpaceTimeLattice` is such that following each
+    time step, an additional "layer" neighboring velocity qubits can be discarded,
+    since the information they encode can never reach the relative origin in the remaining number of time steps.
+    As such, the complexity of the streaming operator decreases with the number of steps (still) to be simulated.
+    For an in-depth mathematical explanation of the procedure, consult pages 15-18 of :cite:t:`spacetime`.
+
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
+    :attr:`timestep`          The time step for which to perform streaming.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.spacetime import SpaceTimeStreamingOperator
+        from qlbm.lattice import SpaceTimeLattice
+
+        # Build an example lattice
+        lattice = SpaceTimeLattice(
+            num_timesteps=1,
+            lattice_data={
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "geometry": [],
+            },
+        )
+
+        # Draw the streaming operator for 1 time step
+        SpaceTimeStreamingOperator(lattice=lattice, timestep=1).draw("mpl")
+    """
+
     def __init__(
         self,
         lattice: SpaceTimeLattice,

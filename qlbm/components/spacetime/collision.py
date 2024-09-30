@@ -11,6 +11,54 @@ from qlbm.lattice import SpaceTimeLattice
 
 
 class SpaceTimeCollisionOperator(SpaceTimeOperator):
+    """
+    An operator that performs collision part of the :class:`.SpaceTimeQLBM` algorithm.
+    Collision is a local operation that is performed simultaneously on all velocity qubits corresponding to a grid location.
+    In practice, this means the same circuit is repeated across all "local" qubit register chunks.
+    Collision can be understood as follows:
+
+    #. For each group of qubits, the states encoding velocities belonging to a particular equivalence class are
+    first isolated with a series of :math:`X` and :math:`CX` gates. This leaves qubits not affected by the rotation in :math:`\ket{1}^{\otimes n_v-1}` state.
+    #. A rotation gate is applied to the qubit(s) relevant to the equivalence class shift, controlled on the qubits set in the previous step.
+    #. The operation performed in Step 1 is undone.
+
+    The register setup of the :class:`.SpaceTimeLattice` is such that following each
+    time step, an additional "layer" neighboring velocity qubits can be discarded,
+    since the information they encode can never reach the relative origin in the remaining number of time steps.
+    As such, the complexity of the collision operator decreases with the number of steps (still) to be simulated.
+    For an in-depth mathematical explanation of the procedure, consult pages 11-15 of :cite:t:`spacetime`.
+
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
+    :attr:`timestep`          The time step for which to perform streaming.
+    :attr:`gate_to_apply`     The gate to apply to the velocities matching equivalence classes. Defaults to :math:`R_y(\\frac{\pi}{2})`.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.spacetime import SpaceTimeCollisionOperator
+        from qlbm.lattice import SpaceTimeLattice
+
+        # Build an example lattice
+        lattice = SpaceTimeLattice(
+            num_timesteps=1,
+            lattice_data={
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "geometry": [],
+            },
+        )
+
+        # Draw the collision operator for 1 time step
+        SpaceTimeCollisionOperator(lattice=lattice, timestep=1).draw("mpl")
+    """
     def __init__(
         self,
         lattice: SpaceTimeLattice,
