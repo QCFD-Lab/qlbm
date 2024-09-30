@@ -75,9 +75,3 @@ Others
 .. autoclass:: qlbm.components.collisionless.CollisionlessInitialConditions3DSlim
 
 .. autoclass:: qlbm.components.collisionless.GridMeasurement
-
-
-References
------------------------------------
-
-.. bibliography::

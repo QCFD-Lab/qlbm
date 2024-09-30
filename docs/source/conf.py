@@ -33,7 +33,7 @@ extensions = [
 
 bibtex_bibfiles = ["refs.bib"]
 bibtex_default_style = "plain"
-bibtex_reference_style = "author_year"
+bibtex_reference_style = "label"
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]

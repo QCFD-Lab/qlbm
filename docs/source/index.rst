@@ -24,3 +24,8 @@ The :ref:`tools` module contains miscellaneous utilities.
    :maxdepth: 2
 
    code/index
+
+References
+-----------------------------------
+
+.. bibliography::
