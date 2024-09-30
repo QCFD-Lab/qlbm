@@ -27,23 +27,27 @@ class Lattice(ABC):
     This allows the same parsing procedures to be used for all algorithms, while additional validity checks can be built on top.
     All ``Lattice`` objects share the following attributes:
 
-    ========================= ======================================================================
-    Attribute                  Summary
-    ========================= ======================================================================
-    :attr:`num_dims`           The number of dimensions of the lattice.
-    :attr:`num_gridpoints`     A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
-                               **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
-                               specified in the input dicitionary is one larger than the one held in the ``Lattice``.
-                               That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
-    :attr:`num_total_qubits`   The total number of qubits required for the quantum circuit to simulate this lattice.
-    :attr:`registers`          A ``Tuple[qiskit.QuantumRegister, ...]`` that holds registers responsible for specific operations of the QLBM algorithm.
-    :attr:`circuit`            An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
-                               Each quantum component that is parameterized by a ``Lattice`` makes a copy of this quantum circuit
-                               to which it appends its designated logic.
-    :attr:`blocks`             A ``Dict[str, List[Block]]`` that contains all of the :class:`.Block`\ s encoding the solid geometry of the lattice.
-                               The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
-    :attr:`logger`             The performance logger, by default ``getLogger("qlbm")``.
-    ========================= ======================================================================
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`num_dims`            The number of dimensions of the lattice.
+    :attr:`num_gridpoints`      A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
+                                **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
+                                specified in the input dicitionary is one larger than the one held in the ``Lattice``.
+                                That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
+    :attr:`num_grid_qubits`     The total number of qubits required to encode the lattice grid.
+    :attr:`num_velocity_qubits` The total number of qubits required to encode the velocity discretization of the lattice.
+    :attr:`num_ancilla_qubits`  The total number of ancilla (non-velocity, non-grid) qubits required for the quantum circuit to simulate this lattice.
+    :attr:`num_total_qubits`    The total number of qubits required for the quantum circuit to simulate the lattice.
+                                This is the sum of the number of grid, velocity, and ancilla qubits.
+    :attr:`registers`           A ``Tuple[qiskit.QuantumRegister, ...]`` that holds registers responsible for specific operations of the QLBM algorithm.
+    :attr:`circuit`             An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
+                                Each quantum component that is parameterized by a ``Lattice`` makes a copy of this quantum circuit
+                                to which it appends its designated logic.
+    :attr:`blocks`              A ``Dict[str, List[Block]]`` that contains all of the :class:`.Block`\ s encoding the solid geometry of the lattice.
+                                The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    =========================== ======================================================================
 
     A lattice can be constructed from from either an input file or a Python dictionary.
     A sample configuration might look as follows:
@@ -74,8 +78,6 @@ class Lattice(ABC):
                 }
             ]
         }
-
-
     """
 
     num_dims: int
