@@ -10,6 +10,57 @@ from qlbm.tools.utils import bit_value, dimension_letter, flatten
 
 
 class Block:
+    """
+    Contains information required for the generation of bounce-back and specular reflection boundary conditions for the :class:`.CQLBM` algorithm.
+    A block can be constructed from minimal information, see the Table below.
+
+    .. list-table:: Constructor parameters
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - :attr:`bounds`
+          - A ``List[Tuple[int, int]]`` of lower and upper bounds in each dimension. For example, ``[(2, 5), (10, 12)]``; ``[(2, 5), (9, 12), (33, 70)]``.
+        * - :attr:`num_qubits`
+          - The number of grid qubits of the underlying lattice.
+        * - :attr:`boundary_condition`
+          - A string indicating the type of boundary condition of the block. Should be either ``"specular"`` or ``"bounceback"``.
+
+    The :class:`.Block` constructor will parse this information and automatically infer all of the information
+    required to perform all of the reflection edge cases.
+    This data is split over several attributes, see the table below.
+
+    .. list-table:: Class attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`bounds`
+          - The ``List[Tuple[int, int]]`` of lower and upper bounds in each dimension. For example, ``[(2, 5), (10, 12)]``; ``[(2, 5), (9, 12), (33, 70)]``.
+        * - :attr:`inside_points_data`
+          - The ``List[Tuple[DimensionalReflectionData, ...]]`` data encoding the corner points on the `inside` of the obstacle. The outer list contains :math:`d` entries, one per dimension. Each entry is a tuple of :class:`DimensionalReflectionData` of the lower and upper bounds of that dimension, respectively.
+        * - :attr:`outside_points_data`
+          - The ``List[Tuple[DimensionalReflectionData, ...]]`` data encoding the corner points on the `outside` of the obstacle. The outer list contains :math:`d` entries, one per dimension. Each entry is a tuple of :class:`DimensionalReflectionData` of the lower and upper bounds of that dimension, respectively.
+        * - :attr:`walls_inside`
+          - The ``List[List[ReflectionWall, ...]]`` data encoding the walls of the `inside` of the obstacle. The outer list contains :math:`d` entries, one per dimension. Each inner list is a list of two :class:`ReflectionWall`\ s of the lower and upper bounds of that dimension, respectively.
+        * - :attr:`walls_outside`
+          - The ``List[List[ReflectionWall, ...]]`` data encoding the walls of the `outside` of the obstacle. The outer list contains :math:`d` entries, one per dimension. Each inner list is a list of two :class:`ReflectionWall`\ s of the lower and upper bounds of that dimension, respectively.
+        * - :attr:`corners_inside`
+          - The ``List[ReflectionPoint]`` data encoding the corner points on the `inside` of the obstacle. There are 4 inner corner :class:`ReflectionPoint`\ s per obstacle in 2D, and 8 in 3D.
+        * - :attr:`corners_outside`
+          - The ``List[ReflectionPoint]`` data encoding the corner points on the `outside` of the obstacle. There are 4 outer corner :class:`ReflectionPoint`\ s per obstacle in 2D, and 8 in 3D.
+        * - :attr:`near_corner_points_2d`
+          - The ``List[ReflectionPoint]`` data encoding points on the outside of the object that are adjacent to inner corner points. These points require additional logic in the quantum circuit for particles that have streamed without reflecting off the obstacle. Only applicable to 2D example, since 3D example use edges instead. There are 8 near-corner :class:`ReflectionPoint` \s per obstacle.
+        * - :attr:`corner_edges_3d`
+          - The ``List[ReflectionResetEdge]`` data encoding edges on the outside of the object that are adjacent to corners of the obstacle. Used to reset ancilla qubit states after reflection. There are 12 corner :class:`ReflectionResetEdge` \s per obstacle.
+        * - :attr:`near_corner_edges_3d`
+          - The ``List[ReflectionResetEdge]`` data encoding edges on the outside of the object that are adjacent either side of :attr:`corner_edges_3d`. These edges require additional logic in the quantum circuit for particles that have streamed without reflecting off the obstacle. There are 24 near-corner :class:`ReflectionResetEdge` \s per obstacle.
+        * - :attr:`overlapping_near_corner_edge_points_3d`
+          - The ``List[ReflectionPoint]`` data encoding the set of points at the intersections of :attr:`near_corner_edges_3d`. These points require additional logic in to account for the fact that the state of obstacle ancilla qubits was doubly reset (once by each edge). There are 24 such :class:`ReflectionPoint` \s per obstacle.
+    """
+
     mesh_indices_list: List[np.ndarray] = [
         np.array([[0, 1, 2], [1, 2, 3]]),
         np.array(
@@ -376,7 +427,15 @@ class Block:
 
         return segments
 
-    def stl_mesh(self):
+    def stl_mesh(self) -> mesh.Mesh:
+        """
+        Provides the ``stl`` representation of the block.
+
+        Returns
+        -------
+        ``stl.mesh.Mesh``
+            The mesh representing the block.
+        """
         block = mesh.Mesh(np.zeros(self.mesh_indices.shape[0], dtype=mesh.Mesh.dtype))
         for i, triangle_face in enumerate(self.mesh_indices):
             for j in range(3):
@@ -384,20 +443,76 @@ class Block:
 
         return block
 
-    def to_json(self, boundary_type: str) -> str:
-        return dumps(self.to_dict(boundary_type))
+    def to_json(self) -> str:
+        """
+        Serializes the block to JSON format.
 
-    def to_dict(self, boundary_type: str) -> Dict[str, List[int] | str]:
+        Returns
+        -------
+        str
+            The JSON representation of the block.
+        """
+        return dumps(self.to_dict())
+
+    def to_dict(self) -> Dict[str, List[int] | str]:
+        """
+        Produces a dictionary representation of the block.
+
+        Returns
+        -------
+        Dict[str, List[int] | str]
+            A dictionary representation of the bounds and boundary conditions of the block.
+        """
         block_dict: Dict[str, List[int] | str] = {
             dimension_letter(numeric_dim_index): list(self.bounds[numeric_dim_index])
             for numeric_dim_index in range(self.num_dims)
         }
-        block_dict["boundary"] = boundary_type
+        block_dict["boundary"] = self.boundary_condition
 
         return block_dict
 
 
 class DimensionalReflectionData:
+    """
+    Contains one-dimensional information about the position of a grid point relevant to the obstacle.
+    Used for edge cases relating to either inside or outside corner points.
+
+    .. list-table:: Class attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`qubits_to_invert`
+          - The ``List[int]`` of qubit indices that should be inverted in order to convert the state of grid qubits encoding this dimension to :math:`\ket{1}^{\otimes n_{g_d}}`. See the example below.
+        * - :attr:`bound_type`
+          - The ``bool`` indicating the type of bound this point belongs to. ``False`` indicates a lower bound, and ``True`` indicates an upper bound.
+        * - :attr:`is_outside_obstacle_bounds`
+          - The ``bool`` indicating the whether the point belongs to the solid domain. ``False`` that the point is inside the solid domain, and ``True`` indicates the outside.
+        * - :attr:`dim`
+          - The ``int`` indicating which dimension this object refers to.
+        * - :attr:`gridpoint_encoded`
+          - The ``int`` indicating which grid point this object encodes. Used for debugging purposes.
+        * - :attr:`name`
+          - A string assigned to each dimensional data object in the :class:`Block` constructor. Used for debugging purposes.
+
+    .. note::
+       Consider for example encoding the grid point at location 2
+       (encoded as :math:`\ket{010}`) on the :math:`x`-axis on an :math:`8\\times 8` 2D grid.
+
+       The ``DimensionalReflectionData`` object encoding this information
+       would have a ``qubits_to_invert`` value of ``[0, 2]``.
+       This means that the :math:`0^{th}` and :math:`2^{nd}` qubits
+       would have to be inverted to produce the :math:`\ket{111}` state.
+       This information is passed on to the reflection operators,
+       which place the :math:`X` gates at the appropriate positions in the register,
+       and can then use the :math:`g_x` register to control reflection.
+
+       If we wanted to encode point :math:`3` (:math:`\ket{011}`) on :math:`y`-axis on the same grid,
+       this would result in ``qubits_to_invert = [5]``, since the most significant qubit (index 2 of the :math:`y`-axis)
+       is encoded last in the register, and there are 3 qubits encoding the :math:`x`-axis "in front" of it.
+    """
+
     def __init__(
         self,
         qubits_to_invert: List[int],
@@ -418,6 +533,33 @@ class DimensionalReflectionData:
 
 
 class ReflectionWall:
+    """
+    Encodes the information required to perform reflection on a wall.
+    Each wall is encoded as fixed over one dimensions and spanning one or two `alignment` dimensions.
+    This in turn models which qubits are used for the comparator operations of the reflection operators.
+    The information required for the alignment dimensions only consists of bounds,
+    while the fixed dimension uses its :class:`DimensionalReflectionData` representation.
+
+    .. list-table:: Class attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`lower_bounds`
+          - The ``List[int]`` of lower bounds for each dimension.
+        * - :attr:`upper_bounds`
+          - The ``List[int]`` of upper bounds for each dimension.
+        * - :attr:`data`
+          - The ``DimensionalReflectionData`` of the fixed dimension.
+        * - :attr:`dim`
+          - The ``int`` indicating the fixed dimension.
+        * - :attr:`alignment_dims`
+          - The ``List[int]`` indicating the one or two alignment dimensions.
+        * - :attr:`bounceback_loose_bounds`
+          - The ``List[List[bool]]`` indicating whether the comparators should span the dimensions using tight (i.e., :math:`<`) or loose (i.e., :math:`\leq`) bounds.
+    """
+
     def __init__(
         self,
         dim: int,
@@ -449,6 +591,37 @@ class ReflectionWall:
 
 
 class ReflectionPoint:
+    """
+    Encodes the information required to perform reflection on a single point.
+    A point is encoded as 2 or 3 fixed :class:`DimensionalReflectionData` objects, one per dimension.
+    This classes processes the information encoded in the reflection data
+    objects into boolean valued attributes that determine
+    whether the directional velocity qubits should be inverted to perform reflection.
+
+    .. list-table:: Class attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`data`
+          - The ``List[DimensionalReflectionData]`` containing the point data for each dimension.
+        * - :attr:`num_dims`
+          - The ``int`` number of dimensions of this point (also of the corresponding lattice).
+        * - :attr:`dims_inside`
+          - The ``List[int]`` that specifies which of the ``data`` entries are `inside` obstacle bounds in their respective dimension.
+        * - :attr:`dims_outside`
+          - The ``List[int]`` that specifies which of the ``data`` entries are `outside` obstacle bounds in their respective dimension.
+        * - :attr:`qubits_to_invert`
+          -  The ``List[int]`` of qubit indices that should be inverted in order to convert the state of grid qubits to :math:`\ket{1}^{\otimes n_{g_d}}`.
+        * - :attr:`inversion_function`
+          - The ``Callable[[List[DimensionalReflectionData]], List[bool]]`` function that converts the input data into a list of booleans that determine whether the directional velocity qubits should be inverted, per dimensions.
+        * - :attr:`invert_velocity_in_dimension`
+          - The ``List[bool]`` obtained by calling the ``inversion_function`` on the ``data``, indicating whether the directional velocity qubits should be inverted, per dimensions.
+        * - :attr:`is_near_corner_point`
+          - The ``bool`` indicating whether the point is a near-corner point (used in 2D reflection).
+    """
+
     def __init__(
         self,
         data: List[DimensionalReflectionData],
@@ -469,6 +642,35 @@ class ReflectionPoint:
 
 
 class ReflectionResetEdge:
+    """
+    Encodes the information required to perform reflection on an edge in 3D.
+    An edge is encoded as 2 fixed points as :class:`DimensionalReflectionData` objects, and one spanning dimension.
+    This classes processes the information encoded in the reflection data
+    object into boolean valued attributes that determine
+    whether the directional velocity qubits should be inverted to perform reflection.
+
+    .. list-table:: Class attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`walls_joining`
+          - The ``List[DimensionalReflectionData]`` containing the point data for the two fixed dimensions, stored in ascending order (:math:`x < y < z`).
+        * - :attr:`dims_of_edge`
+          - The ``Tuple[int, int]`` indicating the fixed dimensions.
+        * - :attr:`dim_disconnected`
+          - The ``int`` indicating the dimension the edge spans.
+        * - :attr:`bounds_disconnected_dim`
+          - The ``Tuple[int, int]`` that specifies the bounds of the edge in the dimension that it spans.
+        * - :attr:`reflected_velocities`
+          - The ``List[int]`` that indicates to which dimensions the velocities that this edge affects belong to.
+        * - :attr:`invert_velocity_in_dimension`
+          - The ``List[bool]`` indicating whether the directional velocity qubits should be inverted, per dimensions.
+        * - :attr:`is_corner_edge`
+          - The ``bool`` indicating whether the edge is directly at the corner of the object.
+    """
+
     def __init__(
         self,
         walls_joining: List[DimensionalReflectionData],
