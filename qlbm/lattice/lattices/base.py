@@ -296,7 +296,7 @@ class Lattice(ABC):
 
         lattice_dict["geometry"] = flatten(
             [
-                [block.to_dict(boundary_type) for block in self.blocks[boundary_type]]
+                [block.to_dict() for block in self.blocks[boundary_type]]
                 for boundary_type in self.blocks
             ]
         )
