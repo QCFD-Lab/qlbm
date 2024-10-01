@@ -34,3 +34,27 @@ Concretely, each :class:`.Lattice` fulfills the following functionality:
 
 Geometry
 ----------------------------------
+
+Processing obstacle geometry into quantum circuits is a tedious and error-prone task when performed manually.
+To alleviate this challenge, ``qlbm`` provides a :class:`.Block` class that
+parses the geometry information supplied as part of the :class:`.Lattice` specification
+into information that parameterized the construction of quantum circuits.
+This includes the position of the obstacle within the grid and its boundary conditions.
+In addition, :class:`Block`\ s contain triangulation methods that
+allow them to be exported as ``stl`` files and visualized in Paraview.
+
+.. note::
+    At the moment, only the :class:`.CQLBM` algorithm supports geometry.
+    Geometry objects can only be 2D or 3D cuboids, and they must be placed
+    at least two grid points apart for consistent behavior.
+
+.. autoclass:: qlbm.lattice.Block
+    :members:
+
+.. autoclass:: qlbm.lattice.DimensionalReflectionData
+
+.. autoclass:: qlbm.lattice.ReflectionPoint
+
+.. autoclass:: qlbm.lattice.ReflectionWall
+
+.. autoclass:: qlbm.lattice.ReflectionResetEdge
