@@ -12,15 +12,7 @@ from .base import Lattice
 
 class CollisionlessLattice(Lattice):
     """
-    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:`collisionless`.
-
-    #. Parse high-level input from JSON files or Python dictionaries into appropriate quantum registers and other information used to infer quantum circuits.
-    #. Validate the soundness of the input information and raise warnings if algorithmic assumptions are violated.
-    #. Provide parameterized inputs for the inference of quantum circuits that comprise QLBMs.
-
-    The inheritance structure of ``Lattice``\ s is such that each QLBM uses a specialized implementation of this base class.
-    This allows the same parsing procedures to be used for all algorithms, while additional validity checks can be built on top.
-    All ``Lattice`` objects share the following attributes:
+    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`.
 
     =========================== ======================================================================
     Attribute                   Summary
@@ -43,6 +35,12 @@ class CollisionlessLattice(Lattice):
                                 The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
     :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
     =========================== ======================================================================
+
+    The registers encoded in the lattice and their accessors are given below.
+    For the size of each register,
+    :math:`N_{g_j}` is the number of grid points of dimension :math:`j` (i.e., 64, 128),
+    :math:`N_{v_j}` is the number of discrete velocities of dimension :math:`j` (i.e., 2, 4),
+    and :math:`d` is the total number of dimensions: 2 or 3.
 
     .. list-table:: Register allocation
         :widths: 25 25 25 50
@@ -69,7 +67,7 @@ class CollisionlessLattice(Lattice):
           - :meth:`grid_index`
           - The qubits encoding the physical grid.
         * - :attr:`velocity_registers`
-          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} - 1 \\right \\rceil`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \\right \\rceil - 1`
           - :meth:`velocity_index`
           - The qubits encoding speeds.
         * - :attr:`velocity_dir_registers`
@@ -86,7 +84,7 @@ class CollisionlessLattice(Lattice):
     If a lattice contains at least one SR-conditioned object, then :math:`d` ancilla qubits are required
     to flag whether the particle has collided with the surface of the object, its edge (in 3D), or its corner.
     This information influences which directional qubits are inverted.
-    
+
     The BB boundary conditions are simpler in that they only require :math:`1` ancilla qubit
     to detect whether a particle has collided with the object.
     All velocities are inverted, irrespective of the interaction with the object.
@@ -95,7 +93,6 @@ class CollisionlessLattice(Lattice):
     The lattice object infers this at construction time and adjusts the
     relative index of all other registers accordingly.
 
-    ---
 
     A lattice can be constructed from from either an input file or a Python dictionary.
     A sample configuration might look as follows:
@@ -126,6 +123,20 @@ class CollisionlessLattice(Lattice):
                 }
             ]
         }
+
+    The register setup can be visualized by constructing a lattice object:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import CollisionlessLattice
+
+        CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
+            }
+        ).circuit.draw("mpl")
     """
 
     num_dims: int
@@ -179,8 +190,8 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the velocity qubit indices, by default `None`.
-            When `dim` is `None`, the indices of ancillae qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the velocity qubit indices, by default ``None``.
+            When ``dim`` is ``None``, the indices of ancillae qubits for all dimensions are returned.
 
         Returns
         -------
@@ -210,7 +221,7 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         index : int | None, optional
-            The index of the grid for which to retrieve the obstacle qubit index, by default `None`.
+            The index of the grid for which to retrieve the obstacle qubit index, by default ``None``.
             When ``index`` is ``None``, the indices of ancillae qubits for all dimensions are returned.
             For 2D lattices with only bounce-back boundary-conditions, only one obstacle
             qubit is required.
@@ -244,9 +255,9 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         index : int | None, optional
-            The index for which to retrieve the comparator qubit indices, by default `None`.
+            The index for which to retrieve the comparator qubit indices, by default ``None``.
             There are `num_dims-1` available indices (i.e., 1 for 2D and 2 for 3D).
-            When `index` is `None`, the indices of ancillae qubits for all dimensions are returned.
+            When `index` is ``None``, the indices of ancillae qubits for all dimensions are returned.
 
         Returns
         -------
@@ -286,8 +297,8 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the grid qubit indices, by default `None`.
-            When `dim` is `None`, the indices of all grid qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the grid qubit indices, by default ``None``.
+            When ``dim`` is ``None``, the indices of all grid qubits for all dimensions are returned.
 
         Returns
         -------
@@ -332,8 +343,8 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the velocity qubit indices, by default `None`.
-            When `dim` is `None`, the indices of all velocity magnitude qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the velocity qubit indices, by default ``None``.
+            When ``dim`` is ``None``, the indices of all velocity magnitude qubits for all dimensions are returned.
 
         Returns
         -------
@@ -389,13 +400,13 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the velocity direction qubit index, by default `None`.
-            When `dim` is `None`, the indices of all velocity direction qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the velocity direction qubit index, by default ``None``.
+            When ``dim`` is ``None``, the indices of all velocity direction qubits for all dimensions are returned.
 
         Returns
         -------
         List[int]
-            A list of indices of the qubit used to encode the velocity direction for the given dimension.
+            A list of indices of the qubits used to encode the velocity direction for the given dimension.
 
         Raises
         ------
