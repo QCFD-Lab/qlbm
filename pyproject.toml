@@ -42,6 +42,7 @@ dev = [
     "sphinx==8.0.2",
     "pydata-sphinx-theme",
     "sphinxcontrib-bibtex",
+    "sphinx_autodoc_typehints",
 ]
 cpu = ["qulacs>=0.6.3", "qiskit-aer>=0.13"]
 gpu = ["qulacs-gpu>=0.3", "qiskit-aer-gpu>=0.13"]

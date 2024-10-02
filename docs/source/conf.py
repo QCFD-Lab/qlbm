@@ -29,6 +29,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinxcontrib.bibtex",
     "matplotlib.sphinxext.plot_directive",
+    "sphinx_autodoc_typehints",
 ]
 
 bibtex_bibfiles = ["refs.bib"]
@@ -86,3 +87,9 @@ html_css_files = [
 ]
 
 master_doc = "index"
+
+# always_document_param_types = True
+# typehints_fully_qualified = True
+
+autodoc_typehints = "both"
+autodoc_typehints_format = "short"
