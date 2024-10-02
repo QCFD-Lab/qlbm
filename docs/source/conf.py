@@ -6,8 +6,14 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+import importlib
+import inspect
 import os
+import re
 import sys
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 sys.path.append(os.path.abspath("../../.."))
 sys.path.append(os.path.abspath("../.."))
@@ -29,6 +35,7 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinxcontrib.bibtex",
     "matplotlib.sphinxext.plot_directive",
+    "sphinx.ext.linkcode",
     "sphinx_autodoc_typehints",
 ]
 
@@ -76,8 +83,8 @@ html_context = {
     "github_url": "https://github.com",
     "github_user": "qcfd-lab",
     "github_repo": "qlbm",
-    "github_version": "main",
-    "doc_path": "docs",
+    "github_version": "main/docs",
+    "display_github": True,
 }
 
 html_static_path = ["_static"]
@@ -93,3 +100,44 @@ master_doc = "index"
 
 autodoc_typehints = "both"
 autodoc_typehints_format = "short"
+
+
+def linkcode_resolve(domain, info):
+    if domain != "py":
+        return None
+
+    module_name = info["module"]
+
+    try:
+        module = importlib.import_module(module_name)
+    except ModuleNotFoundError:
+        return "5"
+
+    obj = module
+    for part in info["fullname"].split("."):
+        try:
+            obj = getattr(obj, part)
+        except AttributeError:
+            return "#6"
+
+    try:
+        full_file_name = inspect.getsourcefile(obj)
+    except TypeError:
+        return "#4"
+    if full_file_name is None:
+        return "#3"
+    try:
+        file_name = info['module'].replace('.', '/')
+    except ValueError:
+        return "#2"
+
+    try:
+        source, lineno = inspect.getsourcelines(obj)
+    except (OSError, TypeError):
+        linespec = ""
+        return "#1"
+    else:
+        ending_lineno = lineno + len(source) - 1
+        linespec = f"#L{lineno}-L{ending_lineno}"
+
+    return f"https://github.com/qcfd-lab/qlbm/tree/main/{file_name}.py{linespec}"
