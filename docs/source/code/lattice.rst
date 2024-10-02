@@ -43,6 +43,16 @@ This includes the position of the obstacle within the grid and its boundary cond
 In addition, :class:`Block`\ s contain triangulation methods that
 allow them to be exported as ``stl`` files and visualized in Paraview.
 
+Each block contains snippets of information that determine how
+individual components of reflection behave.
+To make the generation of this circuits more manageable, we
+segment the block information into different categories of edge cases:
+
+#. :class:`.DimensionalReflectionData` models the isolated, one-dimensional features of a fixed point on the grid.
+#. :class:`.ReflectionPoint` models the 2D or 3D information of a fixed point in space.
+#. :class:`.ReflectionWall` models the 2D or 3D information of the wall of the obstacle.
+#. :class:`.ReflectionResetEdge` models the 3D information of an edge along the walls of an obstacle.
+
 .. note::
     At the moment, only the :class:`.CQLBM` algorithm supports geometry.
     Geometry objects can only be 2D or 3D cuboids, and they must be placed
