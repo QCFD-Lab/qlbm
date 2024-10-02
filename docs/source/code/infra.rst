@@ -23,13 +23,13 @@ researchers to focus on algorithm design rather than simulation techniques.
 Runners
 ----------------------------------
 
-.. autoclass:: qlbm.infra.runner.CircuitRunner
+.. autoclass:: qlbm.infra.runner.base.CircuitRunner
     :members:
 
-.. autoclass:: qlbm.infra.QiskitRunner
+.. autoclass:: qlbm.infra.runner.qiskit_runner.QiskitRunner
     :members:
 
-.. autoclass:: qlbm.infra.QulacsRunner
+.. autoclass:: qlbm.infra.runner.qulacs_runner.QulacsRunner
     :members: 
 
 .. _performance:
@@ -37,13 +37,13 @@ Runners
 Performance
 ----------------------------------
 
-.. autoclass:: qlbm.infra.reinitialize.Reinitializer
+.. autoclass:: qlbm.infra.reinitialize.base.Reinitializer
     :members:
 
-.. autoclass:: qlbm.infra.reinitialize.CollisionlessReinitializer
+.. autoclass:: qlbm.infra.reinitialize.collisionless_reinitializer.CollisionlessReinitializer
     :members:
 
-.. autoclass:: qlbm.infra.reinitialize.SpaceTimeReinitializer
+.. autoclass:: qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer
     :members:
 
 .. _compilers:
@@ -51,7 +51,7 @@ Performance
 Compilers
 ----------------------------------
 
-.. autoclass:: qlbm.infra.CircuitCompiler
+.. autoclass:: qlbm.infra.compiler.CircuitCompiler
     :members:
 
 .. _results:
@@ -59,13 +59,13 @@ Compilers
 Results
 ----------------------------------
 
-.. autoclass:: qlbm.infra.result.QBMResult
+.. autoclass:: qlbm.infra.result.base.QBMResult
     :members:
 
-.. autoclass:: qlbm.infra.CollisionlessResult
+.. autoclass:: qlbm.infra.result.collisionless_result.CollisionlessResult
     :members:
 
-.. autoclass:: qlbm.infra.SpaceTimeResult
+.. autoclass:: qlbm.infra.result.spacetime_result.SpaceTimeResult
     :members:
 
 .. _config:
@@ -73,5 +73,5 @@ Results
 Simulation Config
 ----------------------------------
 
-.. autoclass:: qlbm.infra.SimulationConfig
+.. autoclass:: qlbm.infra.runner.simulation_config.SimulationConfig
     :members: 

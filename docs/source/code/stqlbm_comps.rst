@@ -32,21 +32,21 @@ before being broken down into their constituent parts.
 End-to-end algorithms
 ----------------------------------
 
-.. autoclass:: qlbm.components.spacetime.SpaceTimeQLBM
+.. autoclass:: qlbm.components.spacetime.spacetime.SpaceTimeQLBM
 
 .. _stqlbm_streaming:
 
 Streaming
 ----------------------------------
 
-.. autoclass:: qlbm.components.spacetime.SpaceTimeStreamingOperator
+.. autoclass:: qlbm.components.spacetime.streaming.SpaceTimeStreamingOperator
 
 .. _stqlbm_collision:
 
 Collision
 ----------------------------------
 
-.. autoclass:: qlbm.components.spacetime.SpaceTimeCollisionOperator
+.. autoclass:: qlbm.components.spacetime.collision.SpaceTimeCollisionOperator
 
 
 .. _stqlbm_others:
@@ -54,6 +54,6 @@ Collision
 Others
 -----------------------------------
 
-.. autoclass:: qlbm.components.spacetime.SpaceTimeInitialConditions
+.. autoclass:: qlbm.components.spacetime.initial_conditions.SpaceTimeInitialConditions
 
-.. autoclass:: qlbm.components.spacetime.SpaceTimeGridVelocityMeasurement
+.. autoclass:: qlbm.components.spacetime.measurement.SpaceTimeGridVelocityMeasurement

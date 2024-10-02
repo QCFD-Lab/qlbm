@@ -25,53 +25,53 @@ before being broken down into their constituent parts.
 End-to-end algorithms
 ----------------------------------
 
-.. autoclass:: qlbm.components.collisionless.CQLBM
+.. autoclass:: qlbm.components.collisionless.cqlbm.CQLBM
 
 .. _cqlbm_streaming:
 
 Streaming
 ----------------------------------
 
-.. autoclass:: qlbm.components.collisionless.CollisionlessStreamingOperator
+.. autoclass:: qlbm.components.collisionless.streaming.CollisionlessStreamingOperator
 
-.. autoclass:: qlbm.components.collisionless.StreamingAncillaPreparation
+.. autoclass:: qlbm.components.collisionless.streaming.StreamingAncillaPreparation
 
-.. autoclass:: qlbm.components.collisionless.ControlledIncrementer
+.. autoclass:: qlbm.components.collisionless.streaming.ControlledIncrementer
 
-.. autoclass:: qlbm.components.collisionless.SpeedSensitiveAdder
+.. autoclass:: qlbm.components.collisionless.primitives.SpeedSensitiveAdder
 
-.. autoclass:: qlbm.components.collisionless.SpeedSensitivePhaseShift
+.. autoclass:: qlbm.components.collisionless.streaming.SpeedSensitivePhaseShift
 
-.. autoclass:: qlbm.components.collisionless.PhaseShift
+.. autoclass:: qlbm.components.collisionless.streaming.PhaseShift
 
 .. _cqlbm_reflection:
 
 Reflection
 ----------------------------------
 
-.. autoclass:: qlbm.components.collisionless.BounceBackReflectionOperator
+.. autoclass:: qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator
     :members:
 
-.. autoclass:: qlbm.components.collisionless.SpecularReflectionOperator
+.. autoclass:: qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator
     :members:
 
-.. autoclass:: qlbm.components.collisionless.BounceBackWallComparator
+.. autoclass:: qlbm.components.collisionless.bounceback_reflection.BounceBackWallComparator
 
-.. autoclass:: qlbm.components.collisionless.SpecularWallComparator
+.. autoclass:: qlbm.components.collisionless.specular_reflection.SpecularWallComparator
 
-.. autoclass:: qlbm.components.collisionless.EdgeComparator
+.. autoclass:: qlbm.components.collisionless.primitives.EdgeComparator
 
-.. autoclass:: qlbm.components.collisionless.Comparator
+.. autoclass:: qlbm.components.collisionless.primitives.Comparator
 
-.. autoclass:: qlbm.components.collisionless.ComparatorMode
+.. autoclass:: qlbm.components.collisionless.primitives.ComparatorMode
 
 .. _cqlbm_others:
 
 Others
 -----------------------------------
 
-.. autoclass:: qlbm.components.collisionless.CollisionlessInitialConditions
+.. autoclass:: qlbm.components.collisionless.primitives.CollisionlessInitialConditions
 
-.. autoclass:: qlbm.components.collisionless.CollisionlessInitialConditions3DSlim
+.. autoclass:: qlbm.components.collisionless.primitives.CollisionlessInitialConditions3DSlim
 
-.. autoclass:: qlbm.components.collisionless.GridMeasurement
+.. autoclass:: qlbm.components.collisionless.primitives.GridMeasurement

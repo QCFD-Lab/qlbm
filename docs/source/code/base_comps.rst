@@ -17,7 +17,7 @@ and horizontally based on methods (i.e., different implementations for different
 Lattice Base
 ----------------------------------
 
-.. autoclass:: qlbm.lattice.lattices.Lattice
+.. autoclass:: qlbm.lattice.lattices.base.Lattice
     :members:
 
 .. _components_bases:

@@ -24,10 +24,10 @@ Concretely, each :class:`.Lattice` fulfills the following functionality:
 #. Provide convenient indexing methods methods to access individual (or groups of) qubits based on their purpose.
 #. Encode additional information required for the automatic assembly of large quantum circuits.
 
-.. autoclass:: qlbm.lattice.CollisionlessLattice
+.. autoclass:: qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice
     :members:
 
-.. autoclass:: qlbm.lattice.SpaceTimeLattice
+.. autoclass:: qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice
     :members:
 
 .. _geometry:
@@ -58,13 +58,13 @@ segment the block information into different categories of edge cases:
     Geometry objects can only be 2D or 3D cuboids, and they must be placed
     at least two grid points apart for consistent behavior.
 
-.. autoclass:: qlbm.lattice.Block
+.. autoclass:: qlbm.lattice.blocks.Block
     :members:
 
-.. autoclass:: qlbm.lattice.DimensionalReflectionData
+.. autoclass:: qlbm.lattice.blocks.DimensionalReflectionData
 
-.. autoclass:: qlbm.lattice.ReflectionPoint
+.. autoclass:: qlbm.lattice.blocks.ReflectionPoint
 
-.. autoclass:: qlbm.lattice.ReflectionWall
+.. autoclass:: qlbm.lattice.blocks.ReflectionWall
 
-.. autoclass:: qlbm.lattice.ReflectionResetEdge
+.. autoclass:: qlbm.lattice.blocks.ReflectionResetEdge
