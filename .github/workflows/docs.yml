@@ -2,10 +2,9 @@ name: Build and deploy documentation
 
 on:
   push:
-    branches: [ dev ]
- 
+    branches: [dev]
+
 jobs:
- 
   docs:
     if: github.repository_owner == 'QCFD-Lab'
     runs-on: ubuntu-latest
@@ -13,7 +12,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
       contents: write
- 
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -22,11 +21,11 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.11.9
- 
+
       - name: Install dependencies
         run: |
           python -m pip install -U .[cpu,dev,docs]
-          
+
       - name: Build docs
         run: |
           sphinx-build docs/source _build
@@ -39,4 +38,3 @@ jobs:
           force_orphan: true
           publish_dir: ./_build/
           commit_message: ${{ github.event.head_commit.message }}
-

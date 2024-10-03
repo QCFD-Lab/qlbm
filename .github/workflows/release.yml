@@ -17,6 +17,7 @@ on:
 
 jobs:
   bump-version:
+    if: github.repository_owner == 'QCFD-Lab'
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
