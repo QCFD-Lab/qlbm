@@ -11,7 +11,7 @@ from .streaming import SpaceTimeStreamingOperator
 
 class SpaceTimeQLBM(LBMAlgorithm):
     """
-    The end-to-end algorithm of the Space-Time Boltzmann Algorithm
+    The end-to-end algorithm of the Space-Time Quantum Lattice Boltzmann Algorithm
     described in :cite:`spacetime`.
     This implementation currently only supports 1 time step on the :math:`D_2Q_4`
     lattice discretization.
@@ -28,7 +28,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
     :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
-    
+
     Example usage:
 
     .. plot::
@@ -49,6 +49,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
         # Draw the end-to-end algorithm for 1 time step
         SpaceTimeQLBM(lattice=lattice).draw("mpl")
     """
+
     lattice: SpaceTimeLattice
 
     def __init__(
