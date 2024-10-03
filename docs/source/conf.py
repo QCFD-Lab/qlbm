@@ -21,7 +21,7 @@ sys.path.append(os.path.abspath(".."))
 project = "qlbm"
 copyright = "2024, qlbm authors"
 author = "qlbm authors"
-release = "0.0.2"
+release = "0.0.4"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
