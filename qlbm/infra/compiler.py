@@ -19,6 +19,89 @@ from qlbm.tools.utils import get_circuit_properties
 
 
 class CircuitCompiler:
+    """
+    Wrapper for Qiskit and Tket transpilers with flexible targets.
+    This class provides a uniform interface for compiling ``qlbm`` circuits
+    to any Qiskit backend, as well as Qulacs.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`compiler_type`       Which transpiler platform to use. Should be either ``"QISKIT"`` or ``"TKET"``.
+    :attr:`compiler_target`     The platform to which the circuit should adhere. Should be either ``"QISKIT"`` or ``"QULACS"``.
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    =========================== ======================================================================
+
+    Example usage: we will construct an end-to-end QLBM algorithm and compile it to a qiskit simulator using Tket.
+    We begin by constructing a :class:`.SpaceTimeQLBM` algorithm for a :math:`4 \\times 8` lattice, with one time step.
+
+    .. plot::
+        :include-source:
+        :context:
+        :nofigs:
+
+        from qlbm.components.spacetime import SpaceTimeQLBM
+        from qlbm.infra import CircuitCompiler
+        from qlbm.lattice import SpaceTimeLattice
+
+        # Build an example lattice
+        lattice = SpaceTimeLattice(
+            num_timesteps=1,
+            lattice_data={
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "geometry": [],
+            },
+        )
+
+    We can first visualize the high-level quantum circuit the ``qlbm`` infers:
+
+    .. plot::
+        :include-source:
+        :context:
+
+        # Build a complex quantum circuit and visualize it
+        component = SpaceTimeQLBM(lattice=lattice)
+
+        component.draw("mpl")
+
+    To construct the compiler, we only need to specify that we intend to use Tket to compile to a Qiskit simulator:
+
+    .. plot::
+        :include-source:
+        :context:
+        :nofigs:
+
+        # Construct a compiler that uses Tket to target Qiskit
+        compiler = CircuitCompiler("TKET", "QISKIT")
+
+    Compilation takes a single call to the :meth:`compile` method:
+        
+    .. plot::
+        :include-source:
+        :context:
+        :nofigs:
+
+        from qiskit_aer import AerSimulator
+
+        # Compiler the circuit to the qiskit AerSimulator
+        compiled_circuit = compiler.compile(component, backend=AerSimulator())
+
+    The result is a Qiskit quantum circuit, which we can visualize the same way we would any ``qlbm`` component:
+        
+    .. plot::
+        :include-source:
+        :context:
+
+        compiled_circuit.draw("mpl")
+
+    Raises
+    ------
+    CompilerException
+        If the compiler type is not supported.
+    CompilerException
+        If the compiler target is not supported.
+    """
+
     compiler_type: str
     compiler_target: str
     supported_compiler_types: List[str] = ["QISKIT", "TKET"]
@@ -61,6 +144,32 @@ class CircuitCompiler:
         backend: AerBackend | None,
         optimization_level: int = 0,
     ) -> QulacsQC | QiskitQC:
+        """
+        Compiles the provided object to the appropriate backend.
+
+        Parameters
+        ----------
+        compile_object : QiskitQC | QuantumComponent
+            The object (``qlbm`` component or quantum) circuit to compile.
+        backend : AerBackend | None
+            The backend to compile to.
+        optimization_level : int, optional
+            The compiler optimization level, by default 0.
+
+        Returns
+        -------
+        QulacsQC | QiskitQC
+            The compiled circuit.
+
+        Raises
+        ------
+        CompilerException
+            If the optimization level is not available.
+        CompilerException
+            If the compiler target and backend are incompatible.
+        CompilerException
+            If the compiler platform is not supported.
+        """
         if optimization_level not in [0, 1, 2]:
             raise CompilerException(
                 f"Unsupported optimization level {optimization_level}. Supported optimization levels are 0, 1, and 2."

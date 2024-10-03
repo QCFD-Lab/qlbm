@@ -72,7 +72,98 @@ class VonNeumannNeighbor:
 
 
 class SpaceTimeLattice(Lattice):
-    """Lattice implementing the Space-Time data encoding."""
+    """
+    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.SpaceTimeQLBM` algorithm developed by :cite:t:`spacetime`.
+
+    .. warning::
+        The STQBLM algorithm is a based on typical :math:`D_dQ_q` discretizations.
+        The current implementation only supports :math:`D_2Q_4` for one time step.
+        This is work in progress.
+        Multiple steps are possible through ``qlbm``\ 's reinitialization mechanism.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`num_timesteps`       The number of time steps the lattice should be simulated for.
+    :attr:`num_dims`            The number of dimensions of the lattice.
+    :attr:`num_gridpoints`      A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
+                                **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
+                                specified in the input dicitionary is one larger than the one held in the ``Lattice``.
+                                That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
+    :attr:`num_grid_qubits`     The total number of qubits required to encode the lattice grid.
+    :attr:`num_velocity_qubits` The total number of qubits required to encode the velocity discretization of the lattice.
+    :attr:`num_ancilla_qubits`  The total number of ancilla (non-velocity, non-grid) qubits required for the quantum circuit to simulate this lattice.
+                                There are no ancilla qubits for the Space-Time QLBM.
+    :attr:`num_total_qubits`    The total number of qubits required for the quantum circuit to simulate the lattice.
+                                This is the sum of the number of grid, velocity, and ancilla qubits.
+    :attr:`registers`           A ``Tuple[qiskit.QuantumRegister, ...]`` that holds registers responsible for specific operations of the QLBM algorithm.
+    :attr:`circuit`             An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
+                                Each quantum component that is parameterized by a ``Lattice`` makes a copy of this quantum circuit
+                                to which it appends its designated logic.
+    :attr:`blocks`              A ``Dict[str, List[Block]]`` that contains all of the :class:`.Block`\ s encoding the solid geometry of the lattice.
+                                The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    =========================== ======================================================================
+
+    The registers encoded in the lattice and their accessors are given below.
+    For the size of each register,
+    :math:`N_{g_j}` is the number of grid points of dimension :math:`j` (i.e., 64, 128),
+    :math:`N_{v_j}` is the number of discrete velocities of dimension :math:`j` (i.e., 2, 4),
+    and :math:`d` is the total number of dimensions: 2 or 3.
+
+    .. list-table:: Register allocation
+        :widths: 25 25 25 50
+        :header-rows: 1
+
+        * - Register
+          - Size
+          - Access Method
+          - Description
+        * - :attr:`grid_registers`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \\right \\rceil`
+          - :meth:`grid_index`
+          - The qubits encoding the physical grid.
+        * - :attr:`velocity_registers`
+          - :math:`\min(N_g \cdot N_v, \\frac{N_v^2\cdot N_t \cdot (N_t + 1)}{2} + N_v)`
+          - :meth:`velocity_index`
+          - The qubits encoding local and neighboring velocities.
+
+    A lattice can be constructed from from either an input file or a Python dictionary.
+    Currently, only the :math:`D_2Q_4` discretization is supported, and no boundary conditions are implemented.
+    A sample configuration might look as follows. Keep in mind that the velocity and geometry section
+    should not be altered in this current implementation.
+
+    .. code-block:: json
+
+        {
+            "lattice": {
+                "dim": {
+                    "x": 16,
+                    "y": 16
+                },
+                "velocities": {
+                    "x": 2,
+                    "y": 2
+                }
+            },
+            "geometry": []
+        }
+
+    The register setup can be visualized by constructing a lattice object:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import SpaceTimeLattice
+
+        SpaceTimeLattice(
+            num_timesteps=1,
+            lattice_data={
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "geometry": [],
+            }
+        ).circuit.draw("mpl")
+    """
 
     # ! Only works for D2Q4
 
@@ -143,17 +234,35 @@ class SpaceTimeLattice(Lattice):
         self.extreme_point_indices, self.intermediate_point_indices = (
             self.get_neighbor_indices()
         )
-        self.num_dimensions = len(self.num_gridpoints)
+        self.num_dims = len(self.num_gridpoints)
 
         logger.info(self.__str__())
 
     def grid_index(self, dim: int | None = None) -> List[int]:
+        """Get the indices of the qubits used that encode the grid values for the specified dimension.
+                
+        Parameters
+        ----------
+        dim : int | None, optional
+            The dimension of the grid for which to retrieve the grid qubit indices, by default ``None``.
+            When ``dim`` is ``None``, the indices of all grid qubits for all dimensions are returned.
+
+        Returns
+        -------
+        List[int]
+            A list of indices of the qubits used to encode the grid values for the given dimension.
+
+        Raises
+        ------
+        LatticeException
+            If the dimension does not exist.
+        """
         if dim is None:
             return list(range(self.num_grid_qubits))
 
-        if dim >= self.num_dimensions or dim < 0:
+        if dim >= self.num_dims or dim < 0:
             raise LatticeException(
-                f"Cannot index grid register for dimension {dim} in {self.num_dimensions}-dimensional lattice."
+                f"Cannot index grid register for dimension {dim} in {self.num_dims}-dimensional lattice."
             )
 
         previous_qubits = sum(self.num_gridpoints[d].bit_length() for d in range(dim))
@@ -169,6 +278,21 @@ class SpaceTimeLattice(Lattice):
         point_neighborhood_index: int,
         velocity_direction: int | None = None,
     ) -> List[int]:
+        """Get the indices of the qubits used that encode the velocity for a specific neighboring grid point and direction.
+
+        Parameters
+        ----------
+        point_neighborhood_index : int
+            The index of the grid point neighbor.
+        velocity_direction : int | None, optional
+            The index of the discrete velocity according to the LBM discretization, by default None.
+            When ``velocity_direction`` is ``None``, the indices of all velocity qubits of the neighbor are returned.
+
+        Returns
+        -------
+        List[int]
+            A list of indices of the qubits that encode the specific neighbor, velocity pair.
+        """
         if velocity_direction is None:
             return list(
                 range(
@@ -187,6 +311,21 @@ class SpaceTimeLattice(Lattice):
     def grid_neighbors(
         self, coordinates: Tuple[int, int], up_to_distance: int
     ) -> List[List[int]]:
+        """
+
+
+        Parameters
+        ----------
+        coordinates : Tuple[int, int]
+            _description_
+        up_to_distance : int
+            _description_
+
+        Returns
+        -------
+        List[List[int]]
+            _description_
+        """
         return [
             [
                 (coordinates[0] + x_offset) % (self.num_gridpoints[0] + 1),
@@ -202,6 +341,19 @@ class SpaceTimeLattice(Lattice):
         self,
         num_timesteps: int,
     ) -> int:
+        """
+        Computes the number of required velocity qubits for a number of time steps to be simulated, :math:`\min(N_g \cdot N_v, \\frac{N_v^2\cdot N_t \cdot (N_t + 1)}{2} + N_v)`.
+
+        Parameters
+        ----------
+        num_timesteps : int
+            The number of time steps to be simulated.
+
+        Returns
+        -------
+        int
+            The number of velocity qubits required.
+        """
         # Generalization of equation 17 of the paper
         # ! TODO generalize to 3D
         return min(
@@ -217,6 +369,19 @@ class SpaceTimeLattice(Lattice):
         )
 
     def num_gridpoints_within_distance(self, manhattan_distance: int) -> int:
+        """
+        Calculate the number of grid points within a given Manhattan distance.
+
+        Parameters
+        ----------
+        manhattan_distance : int
+            The Manhattan distance up to which (and including) to include the gridpoints.
+
+        Returns
+        -------
+        int
+            The number of gridpoints, including the origin, within the given Manhattan distance.
+        """
         return int(
             self.num_required_velocity_qubits(manhattan_distance)
             / self.num_velocities_per_point
@@ -244,6 +409,19 @@ class SpaceTimeLattice(Lattice):
     def von_neumann_neighbor_indices(
         self, manhattan_distance_from_origin: int
     ) -> List[int]:
+        """
+        Get the indices of the neighbors up to a given Manhattan distance, in a von Neumann neighborhood structure.
+
+        Parameters
+        ----------
+        manhattan_distance_from_origin : int
+            The exact Manhattan distance from the origin for which to retrieve the indices.
+
+        Returns
+        -------
+        List[int]
+            The indices of the qubits encoding the velocity of neighboring gridpoints exactly ``manhattan_distance_from_origin`` away from the origin.
+        """
         if manhattan_distance_from_origin == 0:
             return [0]
 
@@ -268,6 +446,25 @@ class SpaceTimeLattice(Lattice):
         Dict[int, List[VonNeumannNeighbor]],
         Dict[int, Dict[int, List[VonNeumannNeighbor]]],
     ]:
+        """
+        Get all of the information encoding the neighborhood structure of the lattice grid.
+        We differentiate between two kinds of grid points, based on their relative position as neighbors relative to the origin.
+        `Extreme points` are grid points that, in the expanding Manhattan distance stencil, have 3 neighbors with higher Manhattan distances.
+        All other points (except the origin) are `intermediate points`, which have 2 neighbors with higher Manhattan distances and 2 neighbors with lower ones.
+        Both extreme and intermediate points are further broken down into `classes`, based on which side of the origin they are on.
+        The classes follow the same numerical ordering as the local :math:`D_2Q_4` discretization:
+        0 encodes right, 1 up, 2 left, 3 down.
+        These differences are relevant when constructing the :class:`.SpaceTimeStreamingOperator`.
+        The structure of the output of this function contains two dictionaries, one for each kind of neighbor:
+
+        #. A dictionary containing extreme points. The keys of the dictionary are Manhattan distances, and the entries are the indices of the neighbors, ordered by class.
+        #. A dictionary containing intermediate points. The keys of the dictionary are Manhattan distances, and the entries are themselves dictionaries. For each nested dictionary, the key is the class, and the value is a list consisting of the point indices belonging to that class.
+
+        Returns
+        -------
+        Tuple[ Dict[int, List[VonNeumannNeighbor]], Dict[int, Dict[int, List[VonNeumannNeighbor]]], ]
+            The information encoding the lattice neighborhood structure.
+        """
         # ! This ONLY works for D2Q4!
         extreme_point_neighbor_indices: Dict[int, List[VonNeumannNeighbor]] = {}
         intermediate_point_neighbor_indices: Dict[
@@ -375,4 +572,4 @@ class SpaceTimeLattice(Lattice):
             gp_string += f"{gp+1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
-        return f"{self.num_dimensions}d-{gp_string}-q4"
+        return f"{self.num_dims}d-{gp_string}-q4"

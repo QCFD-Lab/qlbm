@@ -6,7 +6,7 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
 
 from qlbm.components.base import CQLBMOperator, LBMPrimitive
-from qlbm.components.common import (
+from qlbm.components.collisionless.primitives import (
     Comparator,
     ComparatorMode,
 )
@@ -20,22 +20,47 @@ from qlbm.lattice import (
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
-from .primitives import ControlledIncrementer
+from .primitives import EdgeComparator
+from .streaming import ControlledIncrementer
 
 
 class SpecularWallComparator(LBMPrimitive):
     """
-    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
+    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the
     comparator for the specular reflection boundary conditions around the wall as described :cite:t:`collisionless`.
+    The comparator sets the `d` ancilla qubits to :math:`\ket{1}` for the components of
+    the quantum state whose grid qubits fall within the range spanned by the wall.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`wall`              The coordinates of the wall within the grid.
     ========================= ======================================================================
+    
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import SpecularWallComparator
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "specular"}],
+            }
+        )
+
+        # Comparing on the indices of the inside x-wall on the lower-bound of the obstacle
+        SpecularWallComparator(
+            lattice=lattice, wall=lattice.block_list[0].walls_inside[0][0]
+        ).draw("mpl")
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -96,83 +121,46 @@ class SpecularWallComparator(LBMPrimitive):
         return f"[Primitive SpecularWallComparator on wall={self.wall}]"
 
 
-class SpecularEdgeComparator(LBMPrimitive):
-    """
-    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the 
-    comparator for the specular reflection boundary conditions around the edge as described :cite:t:`collisionless`.
-
-    ========================= ======================================================================
-    Atribute                  Summary
-    ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
-    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`edge`              The coordinates of the edge within the grid.
-    ========================= ======================================================================
-    """
-    def __init__(
-        self,
-        lattice: CollisionlessLattice,
-        edge: ReflectionResetEdge,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-        self.lattice = lattice
-        self.edge = edge
-
-        self.circuit = self.create_circuit()
-
-    def create_circuit(self) -> QuantumCircuit:
-        circuit = self.lattice.circuit.copy()
-        lb_comparator = Comparator(
-            self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
-            self.edge.bounds_disconnected_dim[0],
-            ComparatorMode.GE,
-            logger=self.logger,
-        ).circuit
-        ub_comparator = Comparator(
-            self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
-            self.edge.bounds_disconnected_dim[1],
-            ComparatorMode.LE,
-            logger=self.logger,
-        ).circuit
-
-        # for c, wall_alignment_dim in enumerate(self.wall.alignment_dims):
-        circuit.compose(
-            lb_comparator,
-            qubits=self.lattice.grid_index(self.edge.dim_disconnected)
-            + self.lattice.ancillae_comparator_index(0)[
-                :-1  # :-1 Effectively selects only the first (lb) qubit
-            ],  # There are two comparator ancillae, for each relevant dimension, one for l and one for u
-            inplace=True,
-        )
-
-        circuit.compose(
-            ub_comparator,
-            qubits=self.lattice.grid_index(self.edge.dim_disconnected)
-            + self.lattice.ancillae_comparator_index(0)[
-                1:  # 1: Effectively selects only the last (ub) qubit
-            ],  # There are two comparator ancillae, for each relevant dimension, one for l and one for u.
-            inplace=True,
-        )
-
-        return circuit
-
-    def __str__(self) -> str:
-        return f"[Primitive SpecularEdgeComparator on edge={self.edge}]"
-
-
 class SpecularReflectionOperator(CQLBMOperator):
     """
-    A primitive that implements the bounce back boundary conditions as described :cite:t:`collisiionless`.
+    Operator implementing the 2D and 3D Specular Reflection (SR) boundary conditions as described :cite:t:`collisionless`.
+    The operator parses information encoded in :class:`.Block` objects to detect particles that
+    have virtually streamed into the solid domain before placing them back to their
+    previous positions in the fluid domain.
+    The pseudocode for this procedure is as follows:
+
+    #. Components of the quantum state that encode particles that have streamed inside the obstacle are identified with :class:`.SpecularWallComparator` objects;
+    #. These components have their velocity direction qubits flipped according to the wall they came in contact with. Where two or three walls come together, the two or three corresponding directions are inverted;
+    #. Particles are streamed outside the solid domain with inverted velocity directions;
+    #. Once streamed outside the solid domain, components encoding affected particles have their obstacle ancilla qubits reset based on grid position, velocity direction, and whether they have streamed in the CFL timestep.
 
     ========================= ======================================================================
-    Atribute                  Summary
+    Attribute                  Summary
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    :attr:`blocks`            A geometry encoded in a :class:`.Block` object
     ========================= ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.collisionless import SpecularReflectionOperator
+        from qlbm.lattice import CollisionlessLattice
+
+        # Build an example lattice
+        lattice = CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "specular"}],
+            }
+        )
+
+        SpecularReflectionOperator(lattice=lattice, blocks=lattice.block_list)
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -194,7 +182,7 @@ class SpecularReflectionOperator(CQLBMOperator):
 
         # Reflect the particles that have streamed
         # Into the inner walls of the object
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             for block in self.blocks:
                 for wall in block.walls_inside[dim]:
                     self.reflect_wall(circuit, wall)
@@ -204,20 +192,20 @@ class SpecularReflectionOperator(CQLBMOperator):
 
         # Reset the ancilla qubits for the particles that
         # Have been reflected onto the outer walls of the object
-        for dim in range(self.lattice.num_dimensions):
+        for dim in range(self.lattice.num_dims):
             for block in self.blocks:
                 for wall in block.walls_outside[dim]:
                     self.reflect_wall(circuit, wall)
 
         # If this is a 2D simulation
-        if self.lattice.num_dimensions == 2:
+        if self.lattice.num_dims == 2:
             # Reset state for near-corner points
             for block in self.blocks:
                 for near_corner_point in block.near_corner_points_2d:
                     self.reset_point_state(circuit, near_corner_point)
 
         # If this is a 3D simulation
-        elif self.lattice.num_dimensions == 3:
+        elif self.lattice.num_dims == 3:
             for block in self.blocks:
                 # Reset the near-corner edges (24x)
                 for near_corner_edge in block.near_corner_edges_3d:
@@ -231,7 +219,7 @@ class SpecularReflectionOperator(CQLBMOperator):
                     self.reset_point_state(circuit, point)
         else:
             raise CircuitException(
-                f"CQBM specular reflection is not supported for {self.lattice.num_dimensions} dimensions."
+                f"CQBM specular reflection is not supported for {self.lattice.num_dims} dimensions."
             )
 
         # Reset state for outside corners
@@ -243,84 +231,25 @@ class SpecularReflectionOperator(CQLBMOperator):
 
         return circuit
 
-    def reset_edge_state(
-        self, circuit: QuantumCircuit, edge: ReflectionResetEdge
-    ) -> QuantumCircuit:
-        """_summary_
-
-        Parameters
-        ----------
-        circuit : QuantumCircuit
-            The circuit on which to perform resetting of the edge state.
-        edge : ReflectionResetEdge
-            The edge on which to apply the reflection reset logic.
-
-        Returns
-        -------
-        QuantumCircuit
-            The circuit performing the resetting of the edge state.
-        """
-        comparator_circuit = SpecularEdgeComparator(
-            self.lattice, edge, self.logger
-        ).circuit
-
-        grid_qubits_indices_to_invert = [
-            self.lattice.grid_index(0)[0] + qubit
-            for qubit in flatten([wall.qubits_to_invert for wall in edge.walls_joining])
-        ]
-
-        control_qubits = flatten(
-            [
-                self.lattice.ancillae_velocity_index(dim)
-                + self.lattice.velocity_dir_index(dim)
-                + self.lattice.grid_index(dim)
-                for dim in edge.dims_of_edge
-            ]
-        ) + self.lattice.ancillae_comparator_index(0)
-
-        target_qubits = flatten(
-            [
-                self.lattice.ancillae_obstacle_index(reflected_dim)
-                for reflected_dim in edge.reflected_velocities
-            ]
-        )
-
-        circuit.compose(comparator_circuit, inplace=True)
-
-        if grid_qubits_indices_to_invert:
-            circuit.x(grid_qubits_indices_to_invert)
-
-        for c, dim in enumerate(edge.dims_of_edge):
-            if edge.invert_velocity_in_dimension[c]:
-                circuit.x(self.lattice.velocity_dir_index(dim))
-
-        circuit.compose(
-            MCMT(
-                XGate(),
-                len(control_qubits),
-                len(target_qubits),
-            ),
-            qubits=control_qubits + target_qubits,
-            inplace=True,
-        )
-
-        for c, dim in enumerate(edge.dims_of_edge):
-            if edge.invert_velocity_in_dimension[c]:
-                circuit.x(self.lattice.velocity_dir_index(dim))
-
-        if grid_qubits_indices_to_invert:
-            circuit.x(grid_qubits_indices_to_invert)
-
-        circuit.compose(comparator_circuit, inplace=True)
-
-        return circuit
-
     def reflect_wall(
         self,
         circuit: QuantumCircuit,
         wall: ReflectionWall,
     ) -> QuantumCircuit:
-        """_summary_
+        """Performs reflection based on information encoded in a :class:`.ReflectionWall` as follows:
+
+        #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
+        #. Comparator circuits set the comparator ancilla qubits to :math:`\ket{1}` based on the size of the wall in the other dimension(s).
+        #. Depending on the use, the directional velocity qubits are also set to :math:`\ket{1}` based on the dimension that the wall spans.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubits of the particular dimension that the wall reflects, controlled on the qubits set in the previous steps.
+        #. The control qubits are set back to their previous state.
+
+        The wall reflection operation is versatile and can be used to both set and re-set the state
+        of the obstacle ancilla qubit at different stages of reflection.
+        When performing SR reflection, this function is first used to flip the
+        ancilla obstacle qubit from :math:`\ket{0}` to :math:`\ket{1}`, irrespective of how particles arrived there.
+        Subsequently, an additional controls are placed on the velocity direction qubits to reset the
+        ancilla obstacle qubit to :math:`\ket{0}`, after particles have been streamed out of the solid domain.
 
         Parameters
         ----------
@@ -391,44 +320,96 @@ class SpecularReflectionOperator(CQLBMOperator):
 
         return circuit
 
-    def flip_and_stream(
-        self,
-        circuit: QuantumCircuit,
-    ):
-        """_summary_
+    def reset_edge_state(
+        self, circuit: QuantumCircuit, edge: ReflectionResetEdge
+    ) -> QuantumCircuit:
+        """Resets the state of an edge along the side of an obstacle in 3D as follows:
+
+        #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the 2 dimensions that the edge spans.
+        #. A comparator circuits sets the comparator ancilla qubits to :math:`\ket{1}` based on the size of the edge in the remaining dimension.
+        #. The directional velocity qubits are also set to :math:`\ket{1}` on the specific velocity profile of the targeted particles.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubits of the direction reflect by the wall(s) that the edge is next to, controlled on the qubits set in the previous steps.
+        #. The control qubits are set back to their previous state.
+
+        This function resets the ancilla obstacle qubit to :math:`\ket{0}` for particles
+        along 36 specific edges of a cube after those particles have been streamed out of the obstacle in the CFL time step.
 
         Parameters
         ----------
         circuit : QuantumCircuit
-            The circuit on which to perform the flip and stream operation. 
+            The circuit on which to perform resetting of the edge state.
+        edge : ReflectionResetEdge
+            The edge on which to apply the reflection reset logic.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit performing the resetting of the edge state.
         """
-        for dim in range(self.lattice.num_dimensions):
-            # Flip the direction of the `d`-directional velocity qubit
-            circuit.cx(
-                self.lattice.ancillae_obstacle_index(dim)[0],
-                self.lattice.velocity_dir_index(dim)[0],
-            )
+        comparator_circuit = EdgeComparator(self.lattice, edge, self.logger).circuit
+
+        grid_qubits_indices_to_invert = [
+            self.lattice.grid_index(0)[0] + qubit
+            for qubit in flatten([wall.qubits_to_invert for wall in edge.walls_joining])
+        ]
+
+        control_qubits = flatten(
+            [
+                self.lattice.ancillae_velocity_index(dim)
+                + self.lattice.velocity_dir_index(dim)
+                + self.lattice.grid_index(dim)
+                for dim in edge.dims_of_edge
+            ]
+        ) + self.lattice.ancillae_comparator_index(0)
+
+        target_qubits = flatten(
+            [
+                self.lattice.ancillae_obstacle_index(reflected_dim)
+                for reflected_dim in edge.reflected_velocities
+            ]
+        )
+
+        circuit.compose(comparator_circuit, inplace=True)
+
+        if grid_qubits_indices_to_invert:
+            circuit.x(grid_qubits_indices_to_invert)
+
+        for c, dim in enumerate(edge.dims_of_edge):
+            if edge.invert_velocity_in_dimension[c]:
+                circuit.x(self.lattice.velocity_dir_index(dim))
 
         circuit.compose(
-            ControlledIncrementer(
-                self.lattice, reflection="specular", logger=self.logger
-            ).circuit,
+            MCMT(
+                XGate(),
+                len(control_qubits),
+                len(target_qubits),
+            ),
+            qubits=control_qubits + target_qubits,
             inplace=True,
         )
 
-        return circuit
+        for c, dim in enumerate(edge.dims_of_edge):
+            if edge.invert_velocity_in_dimension[c]:
+                circuit.x(self.lattice.velocity_dir_index(dim))
 
-    def __str__(self) -> str:
-        return (
-            f"[Operator SpecularReflectionOperator against block {self.lattice.blocks}]"
-        )
+        if grid_qubits_indices_to_invert:
+            circuit.x(grid_qubits_indices_to_invert)
+
+        circuit.compose(comparator_circuit, inplace=True)
+
+        return circuit
 
     def reset_point_state(
         self,
         circuit: QuantumCircuit,
         corner: ReflectionPoint,
     ) -> QuantumCircuit:
-        """_summary_
+        """Resets the state of the ancilla obstacle qubit of a single point on the grid as follows:
+
+        #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
+        #. The directional velocity qubits are also set to :math:`\ket{1}` based on the specific velocity profile of the targeted particles.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubits corresponding to the dimensions that particles would have traveled to arrive there via reflection, controlled on the qubits set in the previous steps.
+        #. The control qubits are set back to their previous state.
 
         Parameters
         ----------
@@ -493,3 +474,39 @@ class SpecularReflectionOperator(CQLBMOperator):
             circuit.x(grid_qubit_indices_to_invert)
 
         return circuit
+
+    def flip_and_stream(
+        self,
+        circuit: QuantumCircuit,
+    ):
+        """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
+        Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
+        phase shift circuit is additionally controlled on the ancilla obstacle qubit of the streaming dimension,
+        which ensures that only particles whose grid position gets incremented (decremented) are those
+        that have streamed inside the solid domain in this CFL time step.
+
+        Parameters
+        ----------
+        circuit : QuantumCircuit
+            The circuit on which to perform the flip and stream operation.
+        """
+        for dim in range(self.lattice.num_dims):
+            # Flip the direction of the `d`-directional velocity qubit
+            circuit.cx(
+                self.lattice.ancillae_obstacle_index(dim)[0],
+                self.lattice.velocity_dir_index(dim)[0],
+            )
+
+        circuit.compose(
+            ControlledIncrementer(
+                self.lattice, reflection="specular", logger=self.logger
+            ).circuit,
+            inplace=True,
+        )
+
+        return circuit
+
+    def __str__(self) -> str:
+        return (
+            f"[Operator SpecularReflectionOperator against block {self.lattice.blocks}]"
+        )

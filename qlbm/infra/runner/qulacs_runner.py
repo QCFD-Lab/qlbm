@@ -19,6 +19,25 @@ from .simulation_config import SimulationConfig
 
 
 class QulacsRunner(CircuitRunner):
+    """
+    Qulacs-specific implementation of the :class:`CircuitRunner`.
+    A provided simulation configuration is compatible with this runner if the following conditions are met:
+
+    #. The ``initial_conditions`` is either a ``qlbm`` :class:`.QuantumComponent`, a Qulacs ``QuantumState`` or a Qulacs ``QuantumCircuit``.
+    #. The ``execution_backend`` is ``None``. A Qulacs ``QuantumSimulator`` object is automatically built from the config.
+    #. If enabled, the ``sampling_backend`` is a Qiskit ``AerBackend``. The Qulacs ``QuantumState`` is automatically converted to the appropriate Qiskit interface when performing sampling.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`config`              The :class:`.SimulationConfig` containing the simulation information.
+    :attr:`lattice`             The :class:`.Lattice` of the simulated system.
+    :attr:`reinitializer`       The :class:`.Reinitializer` that performs the transition between time steps.
+    :attr:`device`              Currently ignored.
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    =========================== ======================================================================
+    """
+
     def __init__(
         self,
         config: SimulationConfig,
@@ -94,7 +113,7 @@ class QulacsRunner(CircuitRunner):
         simulation_result: QBMResult,
     ) -> QBMResult:
         # circuit = QulacsQC(self.config.algorithm.get_qubit_count())  # type: ignore
-        circuit = self.config.algorithm.copy() # type: ignore
+        circuit = self.config.algorithm.copy()  # type: ignore
 
         for step in range(num_steps + 1):
             step_start_time = perf_counter_ns()

@@ -1,6 +1,6 @@
 import pytest
 
-from qlbm.components.collisionless import ControlledIncrementer
+from qlbm.components.collisionless.streaming import ControlledIncrementer
 from qlbm.lattice import CollisionlessLattice
 
 
