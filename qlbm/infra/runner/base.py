@@ -20,6 +20,25 @@ from .simulation_config import SimulationConfig
 
 
 class CircuitRunner(ABC):
+    """
+    Base class for all simulator-specific runners.
+    A ``CircuitRunner`` object uses the information provided in a :class:`.SimulationConfig`
+    to efficiently simulate the QLBM circuit.
+    This includes converting the initial conditions into a suitable
+    format, concatenating circuits together, performing reinitialization,
+    and processing results.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`config`              The :class:`.SimulationConfig` containing the simulation information.
+    :attr:`lattice`             The :class:`.Lattice` of the simulated system.
+    :attr:`reinitializer`       The :class:`.Reinitializer` that performs the transition between time steps.
+    :attr:`device`              Currently ignored.
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    =========================== ======================================================================
+    """
+
     available_devices: List[str] = AerSimulator().available_devices()  # type: ignore
 
     def __init__(
@@ -50,6 +69,27 @@ class CircuitRunner(ABC):
         output_file_name: str = "step",
         statevector_snapshots: bool = False,
     ) -> QBMResult:
+        """
+        Simulates the provided configuration.
+
+        Parameters
+        ----------
+        num_steps : int
+            The number of time steps to simulate the system for.
+        num_shots : int
+            The number of shots to perform for each time step.
+        output_directory : str
+            The directory to which output will be stored.
+        output_file_name : str, optional
+            The root name for files containing time step artifacts, by default "step".
+        statevector_snapshots : bool, optional
+            Whether to utilize statevector snapshots, by default False.
+
+        Returns
+        -------
+        QBMResult
+            The parsed result of the simulation.
+        """
         pass
 
     def new_result(self, output_directory: str, output_file_name: str) -> QBMResult:
@@ -67,6 +107,19 @@ class CircuitRunner(ABC):
             raise ResultsException(f"Unsupported lattice: {self.lattice}.")
 
     def new_reinitializer(self) -> Reinitializer:
+        """
+        Creates a new reinitializer for a simulated algorithm.
+
+        Returns
+        -------
+        Reinitializer
+            A suitable reinitializer.
+
+        Raises
+        ------
+        ResultsException
+            If the underlying algorithm does not support reinitialization.
+        """
         if isinstance(self.lattice, CollisionlessLattice):
             return CollisionlessReinitializer(
                 cast(CollisionlessLattice, self.lattice),
@@ -82,6 +135,19 @@ class CircuitRunner(ABC):
             raise ResultsException(f"Unsupported lattice: {self.lattice}.")
 
     def statevector_to_circuit(self, statevector: Statevector) -> QiskitQC:
+        """
+        Converts a given statevector to a qiskit quantum circuit representation for seamless circuit assembly.
+
+        Parameters
+        ----------
+        statevector : Statevector
+            The initial condition statevector.
+
+        Returns
+        -------
+        QiskitQC
+            The quantum circuit representation of the statevector.
+        """
         circuit = self.lattice.circuit.copy()
         circuit.append(Initialize(statevector), circuit.qubits)
         return circuit
