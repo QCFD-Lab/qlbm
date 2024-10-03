@@ -15,6 +15,29 @@ from .simulation_config import SimulationConfig
 
 
 class QiskitRunner(CircuitRunner):
+    """
+    Qiskit-specific implementation of the :class:`CircuitRunner`.
+    A provided simulation configuration is compatible with this runner if the following conditions are met:
+
+    #. The ``initial_conditions`` is either a ``qlbm`` :class:`.QuantumComponent`, a Qiskit ``Statevector`` or a Qiskit``QuantumCircuit``.
+    #. The ``execution_backend`` is a Qiskit ``AerBackend``.
+    #. If enabled, the ``sampling_backend`` is a Qiskit ``AerBackend``.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`config`              The :class:`.SimulationConfig` containing the simulation information.
+    :attr:`lattice`             The :class:`.Lattice` of the simulated system.
+    :attr:`reinitializer`       The :class:`.Reinitializer` that performs the transition between time steps.
+    :attr:`device`              Currently ignored.
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    =========================== ======================================================================
+
+    Any simulator with a Qiskit ``AerBackend`` interface
+    can be used as either ``execution_backend`` or ``sampling_backend``
+    in the config interface.
+    """
+
     def __init__(
         self,
         config: SimulationConfig,

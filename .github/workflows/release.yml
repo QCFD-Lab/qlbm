@@ -4,11 +4,11 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'New PyPI release version (major.minor.patch)'
+        description: "New PyPI release version (major.minor.patch)"
         required: true
         type: string
-      pypienv: 
-        description: 'The version of PyPI which the release is meant for (prod/test)'
+      pypienv:
+        description: "The version of PyPI which the release is meant for (prod/test)"
         required: true
         type: choice
         options:
@@ -17,71 +17,61 @@ on:
 
 jobs:
   bump-version:
+    if: github.repository_owner == 'QCFD-Lab'
     runs-on: ubuntu-latest
     steps:
-    - name: Check out source
-      uses: actions/checkout@v4
+      - name: Check out source
+        uses: actions/checkout@v4
 
-    - name: Setup Git
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
+      - name: Setup Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
 
-    - name: Set up Python 
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11.9
-        cache: 'pip' # caching pip dependencies
+      - name: Create release branch
+        uses: peterjgrainger/action-create-branch@v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          branch: "release/${{ inputs.version }}"
+          sha: "${{ github.sha }}"
 
-    - name: Install dependencies
-      run: |
-        pip install --upgrade pip
-        pip install bumpversion
+      - name: Bump version
+        run: |
+          OLD_PYPROJECT_VERSION=$(cat pyproject.toml | grep -w "^version =" | grep -oP '(?<=").*(?=")')
+          NEW_PYPROJECT_VERSION=${{ inputs.version }}
+          sed -i.bak 's/version = \"'$OLD_PYPROJECT_VERSION'\"/version = \"'$NEW_PYPROJECT_VERSION'\"/' pyproject.toml
+          sed -i.bak 's/release = \"'$OLD_PYPROJECT_VERSION'\"/release = \"'$NEW_PYPROJECT_VERSION'\"/' docs/source/conf.py
+          rm pyproject.toml.bak
+          rm docs/source/conf.py.bak
 
-    - name: Bump version
-      run: |
-        OLD_PYPROJECT_VERSION=$(cat pyproject.toml | grep -w "^version =" | grep -oP '(?<=").*(?=")')
-        NEW_PYPROJECT_VERSION=${{ inputs.version }}
-        sed -i.bak 's/version = \"'$OLD_PYPROJECT_VERSION'\"/version = \"'$NEW_PYPROJECT_VERSION'\"/' pyproject.toml
-        rm pyproject.toml.bak
+      - name: Commit & Push changes
+        uses: actions-js/push@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: "release/${{ inputs.version }}"
+          message: "Bump to version ${{ inputs.version }}"
+          directory: .
 
-    - name: Commit & Push changes
-      uses: actions-js/push@master
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        message: 'Bump to version ${{ inputs.version }}'
-        directory: .
-        force: true
+      - name: Create tag for release branch
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/v${{ inputs.version }}',
+              sha: '${{ github.sha }}'
+            })
 
-    - name: Create release branch
-      uses: peterjgrainger/action-create-branch@v3.0.0
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        branch: 'release/${{ inputs.version }}'
-        sha: '${{ github.sha }}'
-  
-    - name: Check out new release branch
-      uses: actions/checkout@v4
-      with:
-        ref: 'release/${{ inputs.version }}'
-
-    - name: Cherry pick latest commit
-      run: |
-        git fetch --all
-        git cherry-pick origin/main --strategy-option theirs
-        git push
-
-    - name: Create tag for release branch
-      uses: actions/github-script@v5
-      with:
-        script: |
-          github.rest.git.createRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: 'refs/tags/v${{ inputs.version }}',
-            sha: '${{ github.sha }}'
-          })
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: "Bump version to ${{ inputs.version }}"
+          title: "Bump version to ${{ inputs.version }}"
+          body: "Bump version to ${{ inputs.version }}"
+          branch: "release/${{ inputs.version }}"
+          base: main
 
   build:
     name: Build distribution
@@ -89,88 +79,88 @@ jobs:
       - bump-version
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        ref: 'release/${{ inputs.version }}'
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11.9
-    - name: Install pypa/build
-      run:  python3 -m pip install build --user
-    - name: Build a binary wheel and a source tarball
-      run: python3 -m build
-    - name: Store the distribution packages
-      uses: actions/upload-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
+      - uses: actions/checkout@v4
+        with:
+          ref: "release/${{ inputs.version }}"
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11.9
+      - name: Install pypa/build
+        run: python3 -m pip install build --user
+      - name: Build a binary wheel and a source tarball
+        run: python3 -m build
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
 
   publish-to-pypi:
     name: Publish to PyPI
     if: startsWith(inputs.pypienv, 'pypi')
     needs:
-    - build
+      - build
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/plm  # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/plm # Replace <package-name> with your PyPI project name
     permissions:
-      id-token: write  # IMPORTANT: mandatory for trusted publishing
+      id-token: write # IMPORTANT: mandatory for trusted publishing
 
     steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Publish to Pypi
-      uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Download all the dists
+        uses: actions/download-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish to Pypi
+        uses: pypa/gh-action-pypi-publish@release/v1
 
   github-release:
     name: Github release
     needs:
-    - build
+      - build
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # IMPORTANT: mandatory for making GitHub Releases
-      id-token: write  # IMPORTANT: mandatory for sigstore
+      contents: write # IMPORTANT: mandatory for making GitHub Releases
+      id-token: write # IMPORTANT: mandatory for sigstore
 
     steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Sign the dists with Sigstore
-      uses: sigstore/gh-action-sigstore-python@v2.1.1
-      with:
-        inputs: |
-          ./dist/*.tar.gz
-          ./dist/*.whl
-    - name: Create GitHub Release
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: >-
-        gh release create
-        v'${{ inputs.version }}'
-        --repo '${{ github.repository }}'
-        --notes ""
-        --latest
-        --target release/'${{ inputs.version }}'
-    - name: Upload artifact signatures to GitHub Release
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: >-
-        gh release upload
-        v'${{ inputs.version }}' dist/**
-        --repo '${{ github.repository }}'
+      - name: Download all the dists
+        uses: actions/download-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Sign the dists with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v2.1.1
+        with:
+          inputs: |
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - name: Create GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release create
+          v'${{ inputs.version }}'
+          --repo '${{ github.repository }}'
+          --notes ""
+          --latest
+          --target release/'${{ inputs.version }}'
+      - name: Upload artifact signatures to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: >-
+          gh release upload
+          v'${{ inputs.version }}' dist/**
+          --repo '${{ github.repository }}'
 
   publish-to-testpypi:
     name: Publish to TestPyPI
     if: startsWith(inputs.pypienv, 'testpypi')
     needs:
-    - build
+      - build
     runs-on: ubuntu-latest
     environment:
       name: testpypi
@@ -179,12 +169,12 @@ jobs:
       id-token: write
 
     steps:
-    - name: Download all the dists
-      uses: actions/download-artifact@v3
-      with:
-        name: python-package-distributions
-        path: dist/
-    - name: Publish distribution to TestPyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        repository-url: https://test.pypi.org/legacy/
+      - name: Download all the dists
+        uses: actions/download-artifact@v3
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/

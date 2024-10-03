@@ -9,12 +9,12 @@ from test.regression.blocks import Block2D as RegressionBlock2D
 
 @pytest.fixture
 def simple_2d_block():
-    return Block([(5, 6), (2, 10)], [4, 4])
+    return Block([(5, 6), (2, 10)], [4, 4], "specular")
 
 
 @pytest.fixture
 def simple_3d_block():
-    return Block([(5, 6), (2, 10), (3, 8)], [4, 4, 4])
+    return Block([(5, 6), (2, 10), (3, 8)], [4, 4, 4], "specular")
 
 
 @pytest.fixture

@@ -2,13 +2,13 @@ name: Format using Ruff
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
-
+    branches: [main]
 
 jobs:
-  mypy:
+  ruff:
+    if: github.repository_owner == 'QCFD-Lab'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: 3.11.9
           architecture: x64
-          cache: 'pip' # caching pip dependencies
+          cache: "pip" # caching pip dependencies
       - name: Install Ruff
         run: |
           pip install --upgrade pip

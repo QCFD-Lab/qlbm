@@ -15,6 +15,25 @@ from .base import Reinitializer
 
 
 class SpaceTimeReinitializer(Reinitializer):
+    """
+    :class:`.SpaceTimeQLBM`-specific implementation of the :class:`.Reinitializer`.
+    Compatible with both :class:`.QiskitRunner`\ s and :class:`.QulacsRunner`\ s.
+    To generate a new set of initial conditions for the CQLBM algorithm,
+    the reinitializer simply returns the quantum state computed
+    at the end of the previous simulation.
+    This allows the reuse of a single quantum circuit for the simulation
+    of arbitrarily many time steps.
+    No copy of the statevector is required.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`lattice`             The :class:`.SpaceTimeLattice` of the simulated system.
+    :attr:`compiler`            The compiler that converts the novel initial conditions circuits.
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``
+    =========================== ======================================================================
+    """
+
     lattice: SpaceTimeLattice
     counts: Counts
 
@@ -37,6 +56,26 @@ class SpaceTimeReinitializer(Reinitializer):
         backend: AerBackend | None,
         optimization_level: int = 0,
     ) -> QiskitQC | QulacsQC:
+        """
+        Converts the input ``counts`` into a new :class:`.SpaceTimeInitialConditions`
+        object that can be prepended to the time step circuit to resume simulation.
+
+        Parameters
+        ----------
+        statevector : Statevector
+            Ignored.
+        counts : Counts
+            The counts obtained from :class:`.SpacetimeGridVelocityMeasurement` at the end of the simulation.
+        backend : AerBackend | None
+            The backend used for simulation.
+        optimization_level : int, optional
+            The compiler optimization level.
+
+        Returns
+        -------
+        QiskitQC | QulacsQC
+            The suitably compiles initial conditions circuit.
+        """
         return self.compiler.compile(
             SpaceTimeInitialConditions(
                 self.lattice, self.counts_to_velocity_pairs(counts)
@@ -49,11 +88,39 @@ class SpaceTimeReinitializer(Reinitializer):
         self,
         counts: Counts,
     ) -> List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]:
+        """
+        Converts all counts into their grid and velocity components.
+
+        Parameters
+        ----------
+        counts : Counts
+            The Qiskit ``Count`` output of the simulation.
+
+        Returns
+        -------
+        List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]
+            The input counts split into their grid position and velocity profile.
+        """
         return [self.split_count(count) for count in counts if int(count[:4], 2) > 0]
 
     def split_count(
         self, count: str
     ) -> Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]:
+        """
+        Splits a given ``Count`` into its position and velocity components.
+        Counts are assumed to be obtained from :class:`.SpacetimeGridVelocityMeasurement` objects,
+        and split format is the same as the input to :class:`.SpaceTimeInitialConditions`.
+
+        Parameters
+        ----------
+        count : str
+            The Qiskit ``Count`` output of the simulation.
+
+        Returns
+        -------
+        Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]
+            The input count split into its grid position and velocity profile.
+        """
         inverse_count = count[::-1]
         return (
             (

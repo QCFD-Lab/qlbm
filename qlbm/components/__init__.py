@@ -11,18 +11,18 @@ from .collisionless import (
     BounceBackReflectionOperator,
     CollisionlessInitialConditions,
     CollisionlessStreamingOperator,
-    ControlledIncrementer,
     GridMeasurement,
     SpecularReflectionOperator,
+)
+from .collisionless.primitives import Comparator, ComparatorMode, SpeedSensitiveAdder
+from .collisionless.streaming import (
+    ControlledIncrementer,
+    PhaseShift,
+    SpeedSensitivePhaseShift,
     StreamingAncillaPreparation,
 )
 from .common import (
-    Comparator,
-    ComparatorMode,
     EmptyPrimitive,
-    PhaseShift,
-    SpeedSensitiveAdder,
-    SpeedSensitivePhaseShift,
 )
 
 __all__ = [

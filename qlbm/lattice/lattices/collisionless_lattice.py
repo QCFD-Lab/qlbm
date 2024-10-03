@@ -11,9 +11,135 @@ from .base import Lattice
 
 
 class CollisionlessLattice(Lattice):
-    """Holds the properties of the lattice to simulate."""
+    """
+    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`.
 
-    num_dimensions: int
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`num_dims`            The number of dimensions of the lattice.
+    :attr:`num_gridpoints`      A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
+                                **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
+                                specified in the input dicitionary is one larger than the one held in the ``Lattice``.
+                                That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
+    :attr:`num_grid_qubits`     The total number of qubits required to encode the lattice grid.
+    :attr:`num_velocity_qubits` The total number of qubits required to encode the velocity discretization of the lattice.
+    :attr:`num_ancilla_qubits`  The total number of ancilla (non-velocity, non-grid) qubits required for the quantum circuit to simulate this lattice.
+    :attr:`num_total_qubits`    The total number of qubits required for the quantum circuit to simulate the lattice.
+                                This is the sum of the number of grid, velocity, and ancilla qubits.
+    :attr:`registers`           A ``Tuple[qiskit.QuantumRegister, ...]`` that holds registers responsible for specific operations of the QLBM algorithm.
+    :attr:`circuit`             An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
+                                Each quantum component that is parameterized by a ``Lattice`` makes a copy of this quantum circuit
+                                to which it appends its designated logic.
+    :attr:`blocks`              A ``Dict[str, List[Block]]`` that contains all of the :class:`.Block`\ s encoding the solid geometry of the lattice.
+                                The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    =========================== ======================================================================
+
+    The registers encoded in the lattice and their accessors are given below.
+    For the size of each register,
+    :math:`N_{g_j}` is the number of grid points of dimension :math:`j` (i.e., 64, 128),
+    :math:`N_{v_j}` is the number of discrete velocities of dimension :math:`j` (i.e., 2, 4),
+    and :math:`d` is the total number of dimensions: 2 or 3.
+
+    .. list-table:: Register allocation
+        :widths: 25 25 25 50
+        :header-rows: 1
+
+        * - Register
+          - Size
+          - Access Method
+          - Description
+        * - :attr:`ancilla_velocity_register`
+          - :math:`d`
+          - :meth:`ancillae_velocity_index`
+          - The qubits controlling the streaming operation based on the CFL counter.
+        * - :attr:`ancilla_obstacle_register`
+          - :math:`d` or :math:`1`, See :ref:`adaptability`.
+          - :meth:`ancillae_obstacle_index`
+          - The qubits used to detect whether particles have streamed into obstacles. Used for reflection.
+        * - :attr:`ancilla_comparator_register`
+          - :math:`2(d-1)`
+          - :meth:`ancillae_comparator_index`
+          - The qubits used to for :class:`.Comparator`\ s. Used for reflection.
+        * - :attr:`grid_registers`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \\right \\rceil`
+          - :meth:`grid_index`
+          - The qubits encoding the physical grid.
+        * - :attr:`velocity_registers`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \\right \\rceil - 1`
+          - :meth:`velocity_index`
+          - The qubits encoding speeds.
+        * - :attr:`velocity_dir_registers`
+          - :math:`d`
+          - :meth:`velocity_dir_index`
+          - The qubits encoding velocity direction (positive or negative).
+
+    .. _adaptability:
+
+    Adaptable Lattice Register
+    **************************
+
+    The :class:`.BounceBackReflectionOperator` and :class:`.SpecularReflectionOperator` have different requirements for the number of qubits.
+    If a lattice contains at least one SR-conditioned object, then :math:`d` ancilla qubits are required
+    to flag whether the particle has collided with the surface of the object, its edge (in 3D), or its corner.
+    This information influences which directional qubits are inverted.
+
+    The BB boundary conditions are simpler in that they only require :math:`1` ancilla qubit
+    to detect whether a particle has collided with the object.
+    All velocities are inverted, irrespective of the interaction with the object.
+    As such, if only the lattice only contains BB objects, a single
+    ancilla qubit is required for reflection across all objects.
+    The lattice object infers this at construction time and adjusts the
+    relative index of all other registers accordingly.
+
+
+    A lattice can be constructed from from either an input file or a Python dictionary.
+    A sample configuration might look as follows:
+
+    .. code-block:: json
+
+        {
+            "lattice": {
+                "dim": {
+                    "x": 16,
+                    "y": 16
+                },
+                "velocities": {
+                    "x": 4,
+                    "y": 4
+                }
+            },
+            "geometry": [
+                {
+                    "x": [9, 12],
+                    "y": [3, 6],
+                    "boundary": "specular"
+                },
+                {
+                    "x": [9, 12],
+                    "y": [9, 12],
+                    "boundary": "bounceback"
+                }
+            ]
+        }
+
+    The register setup can be visualized by constructing a lattice object:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import CollisionlessLattice
+
+        CollisionlessLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
+            }
+        ).circuit.draw("mpl")
+    """
+
+    num_dims: int
     num_gridpoints: List[int]
     num_velocities: List[int]
     num_total_qubits: int
@@ -28,13 +154,15 @@ class CollisionlessLattice(Lattice):
         super().__init__(lattice_data, logger)
         dimensions, velocities, blocks = self.parse_input_data(lattice_data)  # type: ignore
 
-        self.num_dimensions = len(dimensions)
+        self.num_dims = len(dimensions)
         self.num_gridpoints = dimensions
         self.num_velocities = velocities
         self.blocks: Dict[str, List[Block]] = blocks
-        self.block_list = flatten(list(blocks.values()))
-        self.num_ancilla_qubits = 2 * self.num_dimensions + 2 * (
-            self.num_dimensions - 1
+        self.block_list: List[Block] = flatten(list(blocks.values()))
+        self.num_comparator_qubits = 2 * (self.num_dims - 1)
+        self.num_obstacle_qubits = self.__num_obstacle_qubits()
+        self.num_ancilla_qubits = (
+            self.num_dims + self.num_comparator_qubits + self.num_obstacle_qubits
         )
         self.num_grid_qubits = sum([dim.bit_length() for dim in dimensions])
         self.num_velocity_qubits = sum([v.bit_length() for v in velocities])
@@ -62,8 +190,8 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the velocity qubit indices, by default `None`.
-            When `dim` is `None`, the indices of ancillae qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the velocity qubit indices, by default ``None``.
+            When ``dim`` is ``None``, the indices of ancillae qubits for all dimensions are returned.
 
         Returns
         -------
@@ -77,24 +205,27 @@ class CollisionlessLattice(Lattice):
         """
 
         if dim is None:
-            return list(range(self.num_dimensions))
+            return list(range(self.num_dims))
 
-        if dim >= self.num_dimensions or dim < 0:
+        if dim >= self.num_dims or dim < 0:
             raise LatticeException(
-                f"Cannot index ancilla velocity register for dimension {dim} in {self.num_dimensions}-dimensional lattice."
+                f"Cannot index ancilla velocity register for dimension {dim} in {self.num_dims}-dimensional lattice."
             )
 
         # The velocity ancillas are on the first register, so no offset
         return [dim]
 
-    def ancillae_obstacle_index(self, dim: int | None = None) -> List[int]:
+    def ancillae_obstacle_index(self, index: int | None = None) -> List[int]:
         """Get the indices of the qubits used as obstacle ancilla for the specified dimension.
 
         Parameters
         ----------
-        dim : int | None, optional
-            The dimension of the grid for which to retrieve the obstacle qubit index, by default `None`.
-            When `dim` is `None`, the indices of ancillae qubits for all dimensions are returned.
+        index : int | None, optional
+            The index of the grid for which to retrieve the obstacle qubit index, by default ``None``.
+            When ``index`` is ``None``, the indices of ancillae qubits for all dimensions are returned.
+            For 2D lattices with only bounce-back boundary-conditions, only one obstacle
+            qubit is required.
+            For all other configurations, the algorithm uses ``2d-2`` obstacle qubits.
 
         Returns
         -------
@@ -107,16 +238,16 @@ class CollisionlessLattice(Lattice):
             If the dimension does not exist.
         """
 
-        if dim is None:
-            return list(range(self.num_dimensions, 2 * self.num_dimensions))
+        if index is None:
+            return list(range(self.num_dims, self.num_dims + self.num_obstacle_qubits))
 
-        if dim >= self.num_dimensions or dim < 0:
+        if index >= self.num_obstacle_qubits or index < 0:
             raise LatticeException(
-                f"Cannot index ancilla obstacle register for dimension {dim} in {self.num_dimensions}-dimensional lattice."
+                f"Cannot index ancilla obstacle register for index {index}. Maximum index for this lattice is {self.num_obstacle_qubits - 1}."
             )
 
         # There are `d` ancillae velocity qubits "ahead" of this register
-        return [self.num_dimensions + dim]
+        return [self.num_dims + index]
 
     def ancillae_comparator_index(self, index: int | None = None) -> List[int]:
         """Get the indices of the qubits used as comparator ancillae for the specified index.
@@ -124,9 +255,9 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         index : int | None, optional
-            The index for which to retrieve the comparator qubit indices, by default `None`.
+            The index for which to retrieve the comparator qubit indices, by default ``None``.
             There are `num_dims-1` available indices (i.e., 1 for 2D and 2 for 3D).
-            When `index` is `None`, the indices of ancillae qubits for all dimensions are returned.
+            When `index` is ``None``, the indices of ancillae qubits for all dimensions are returned.
 
         Returns
         -------
@@ -142,24 +273,22 @@ class CollisionlessLattice(Lattice):
         """
         # Ahead of this register
         # `d` ancillae velocity qubits
-        # `d` ancillae reflection qubits
-        # `d` ancillae reflection reset qubits
+        # `num_obstacle_qubits` ancillae obstacle qubits
         # 2 * `d` ancillae comparator qubits for "lower" dimensions
         # These are ordered as follows: lx, ux, ly, uy, lz, uz
-
         if index is None:
             return list(
                 range(
-                    2 * self.num_dimensions,
-                    2 * self.num_dimensions + 2 * (self.num_dimensions - 1),
+                    self.num_dims + self.num_obstacle_qubits,
+                    self.num_dims + self.num_obstacle_qubits + 2 * (self.num_dims - 1),
                 )
             )
 
-        if index >= self.num_dimensions - 1 or index < 0:
+        if index >= self.num_dims - 1 or index < 0:
             raise LatticeException(
-                f"Cannot index ancilla comparator register for index {index} in {self.num_dimensions}-dimensional lattice. Maximum is {self.num_dimensions - 2}."
+                f"Cannot index ancilla comparator register for index {index} in {self.num_dims}-dimensional lattice. Maximum is {self.num_dims - 2}."
             )
-        previous_qubits = 2 * self.num_dimensions + 2 * index
+        previous_qubits = self.num_dims + self.num_obstacle_qubits + 2 * index
         return list(range(previous_qubits, previous_qubits + 2))
 
     def grid_index(self, dim: int | None = None) -> List[int]:
@@ -168,8 +297,8 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the grid qubit indices, by default `None`.
-            When `dim` is `None`, the indices of all grid qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the grid qubit indices, by default ``None``.
+            When ``dim`` is ``None``, the indices of all grid qubits for all dimensions are returned.
 
         Returns
         -------
@@ -190,9 +319,9 @@ class CollisionlessLattice(Lattice):
                 )
             )
 
-        if dim >= self.num_dimensions or dim < 0:
+        if dim >= self.num_dims or dim < 0:
             raise LatticeException(
-                f"Cannot index grid register for dimension {dim} in {self.num_dimensions}-dimensional lattice."
+                f"Cannot index grid register for dimension {dim} in {self.num_dims}-dimensional lattice."
             )
 
         # Ahead of this register are
@@ -214,8 +343,8 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the velocity qubit indices, by default `None`.
-            When `dim` is `None`, the indices of all velocity magnitude qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the velocity qubit indices, by default ``None``.
+            When ``dim`` is ``None``, the indices of all velocity magnitude qubits for all dimensions are returned.
 
         Returns
         -------
@@ -235,14 +364,14 @@ class CollisionlessLattice(Lattice):
                     + self.num_grid_qubits
                     + sum(
                         self.num_velocities[d].bit_length() - 1
-                        for d in range(self.num_dimensions)
+                        for d in range(self.num_dims)
                     ),
                 )
             )
 
-        if dim >= self.num_dimensions or dim < 0:
+        if dim >= self.num_dims or dim < 0:
             raise LatticeException(
-                f"Cannot index velocity register for dimension {dim} in {self.num_dimensions}-dimensional lattice."
+                f"Cannot index velocity register for dimension {dim} in {self.num_dims}-dimensional lattice."
             )
 
         # Ahead of this register are
@@ -271,13 +400,13 @@ class CollisionlessLattice(Lattice):
         Parameters
         ----------
         dim : int | None, optional
-            The dimension of the grid for which to retrieve the velocity direction qubit index, by default `None`.
-            When `dim` is `None`, the indices of all velocity direction qubits for all dimensions are returned.
+            The dimension of the grid for which to retrieve the velocity direction qubit index, by default ``None``.
+            When ``dim`` is ``None``, the indices of all velocity direction qubits for all dimensions are returned.
 
         Returns
         -------
         List[int]
-            A list of indices of the qubit used to encode the velocity direction for the given dimension.
+            A list of indices of the qubits used to encode the velocity direction for the given dimension.
 
         Raises
         ------
@@ -290,14 +419,14 @@ class CollisionlessLattice(Lattice):
                     self.num_ancilla_qubits
                     + self.num_grid_qubits
                     + self.num_velocity_qubits
-                    - self.num_dimensions,
+                    - self.num_dims,
                     self.num_total_qubits,
                 )
             )
 
-        if dim >= self.num_dimensions or dim < 0:
+        if dim >= self.num_dims or dim < 0:
             raise LatticeException(
-                f"Cannot index velocity direction register for dimension {dim} in {self.num_dimensions}-dimensional lattice."
+                f"Cannot index velocity direction register for dimension {dim} in {self.num_dims}-dimensional lattice."
             )
 
         # Ahead of this register are
@@ -306,9 +435,7 @@ class CollisionlessLattice(Lattice):
         # The log2(nv_i) - 1 qubits encoding the non-directional velocity magnitudes in each dimension
         previous_qubits = (
             self.num_ancilla_qubits
-            + sum(
-                self.num_gridpoints[d].bit_length() for d in range(self.num_dimensions)
-            )
+            + sum(self.num_gridpoints[d].bit_length() for d in range(self.num_dims))
             + sum(v.bit_length() - 1 for v in self.num_velocities)
         )
 
@@ -328,14 +455,16 @@ class CollisionlessLattice(Lattice):
         """
 
         # d ancilla qubits tracking whether a velocity is to be streamed
-        ancilla_vel_register = [QuantumRegister(self.num_dimensions, name="a_v")]
+        ancilla_vel_register = [QuantumRegister(self.num_dims, name="a_v")]
 
         # d ancilla qubits used to conditionally reflect velocities
-        ancilla_object_register = [QuantumRegister(self.num_dimensions, name="a_o")]
+        ancilla_object_register = [
+            QuantumRegister(self.num_obstacle_qubits, name="a_o")
+        ]
 
         # 2(d-1) ancilla qubits
         ancilla_comparator_register = [
-            QuantumRegister(2 * (self.num_dimensions - 1), name="a_c")
+            QuantumRegister(self.num_comparator_qubits, name="a_c")
         ]
 
         # d qubits encoding the velocity direction
@@ -365,6 +494,19 @@ class CollisionlessLattice(Lattice):
             velocity_dir_register,
         )
 
+    def __num_obstacle_qubits(self) -> int:
+        all_obstacle_bounceback: bool = len(
+            [b for b in self.block_list if b.boundary_condition == "bounceback"]
+        ) == len(self.block_list)
+        if all_obstacle_bounceback:
+            # A single qubit suffices to determine
+            # Whether particles have streamed inside the object
+            return 1
+        # If there is at least one object with specular reflection
+        # 2 ancilla qubits are requried for velocity inversion
+        else:
+            return self.num_dims
+
     def __str__(self) -> str:
         return f"[Lattice with {self.num_gridpoints} gps, {self.num_velocities} vels, and {str(self.blocks)} blocks with {self.num_total_qubits} qubits]"
 
@@ -374,4 +516,4 @@ class CollisionlessLattice(Lattice):
             gp_string += f"{gp+1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
-        return f"{self.num_dimensions}d-{gp_string}-{len(self.block_list)}-obstacle"
+        return f"{self.num_dims}d-{gp_string}-{len(self.block_list)}-obstacle"

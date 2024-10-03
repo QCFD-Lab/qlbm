@@ -13,6 +13,165 @@ from qlbm.tools.exceptions import ExecutionException
 
 
 class SimulationConfig:
+    """
+    A ``SimulationConfig`` ties together algorithmic quantum
+    components, circuit compilers, runners, and performance optimizations.
+    This is the most convenient access point for performing simulations with ``qlbm``.
+    In total, the config contains 11 relevant class attributes that together
+    allow users to customize their simulations in a declarative manner.
+    For convenience, we split these attributes by the purpose they serve
+    for the simulation workflow.
+
+    Algorithmic attributes specify the complete, end-to-end, QLBM algorithm.
+    This includes initial conditions, the time step circuit,
+    an optional postprocessing step, and a final measurement procedure.
+
+    .. list-table:: Algorithmic attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`initial_conditions`
+          - The initial conditions of the simulations. For example, :class:`.CollisionlessInitialConditions` or :class:`.SpaceTimeInitialConditions`.
+        * - :attr:`algorithm`
+          - The algorithm that performs the QLBM time step computation. For example, :class:`.CQLBM` or :class:`.SpaceTimeQLBM`.
+        * - :attr:`postprocessing`
+          - The quantum component concataned to the ``algorithm``. Usually :class:`.EmptyPrimitive`.
+        * - :attr:`measurement`
+          - The circuit that samples the quantum state. For example, :class:`.GridMeasurement` or :class:`.SpaceTimeGridVelocityMeasurement`.
+
+    Compiler-related attributes govern how compilers convert algorithmic attributes to the appropriate format.
+    All quantum circuits will be compiled using the same settings.
+
+    .. list-table:: Compiler-related attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`target_platform`
+          - The platform that the simulation will be carried out on. Either ``"QISKIT"`` or ``"QULACS"``.
+        * - :attr:`compiler_platform`
+          - The platform of the compiler to use. Either ``"QISKIT"`` or ``"TKET"``.
+        * - :attr:`optimization_level`
+          - The compiler optimization level.
+
+    Runner-related attributes prescribe how the simulation should proceede.
+    This includes the specific simulators that will execute the circuits,
+    and performance optimization settings.
+
+    .. list-table:: Runner-related attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`execution_backend`
+          - The specific ``AerSimulator`` use (if using Qiskit) or ``None`` if using Qulacs.
+        * - :attr:`sampling_backend`
+          - The specific ``AerSimulator`` to use if ``statevector_sampling`` is enabled.
+        * - :attr:`statevector_sampling`
+          - Whether statevector sampling should be utilized.
+
+    .. note::
+        Example configuration: simulating :class:`.SpaceTimeQLBM` with Qiskit.
+        First, we set up the config with the circuits we want to simulate,
+        and the infrastructure we want to use.
+
+        .. code-block:: python
+
+            SimulationConfig(
+                initial_conditions=SpaceTimeInitialConditions(
+                    lattice, grid_data=[((1, 5), (True, True, True, True))]
+                ),
+                algorithm=SpaceTimeQLBM(lattice),
+                postprocessing=EmptyPrimitive(lattice),
+                measurement=SpaceTimeGridVelocityMeasurement(lattice),
+                target_platform="QISKIT",
+                compiler_platform="QISKIT",
+                optimization_level=0,
+                statevector_sampling=True,
+                execution_backend=AerSimulator(method="statevector"),
+                sampling_backend=AerSimulator(method="statevector"),
+            )
+
+        Once constructed, the ``cfg`` will figure out the appropriate
+        compiler calls to convert the circuit to the appropriate format.
+        All the user needs to do is call the :meth:`prepare_for_simulation()` method:
+
+        .. code-block:: python
+
+            cfg.prepare_for_simulation()
+
+        The circuits are compiled in-place, which makes it
+        easy to plug in the ``cfg`` object into a :class:`.QiskitRunner`:
+
+        .. code-block:: python
+
+            # Create a runner object to simulate the circuit
+            runner = QiskitRunner(
+                cfg,
+                lattice,
+            )
+
+            # Simulate the circuits
+            runner.run(
+                10
+                2**12,
+                "output_dir",
+                False
+            )
+
+
+    .. note::
+        Example configuration: simulating :class:`.CQLBM` with Qulacs and Tket.
+
+        .. code-block:: python
+
+            cfg = SimulationConfig(
+                initial_conditions=CollisionlessInitialConditions(lattice, logger),
+                algorithm=CQLBM(lattice, logger),
+                postprocessing=EmptyPrimitive(lattice, logger),
+                measurement=GridMeasurement(lattice, logger),
+                target_platform="QULACS",
+                compiler_platform="TKET",
+                optimization_level=0,
+                statevector_sampling=statevector_sampling,
+                execution_backend=None,
+                sampling_backend=AerSimulator(method="statevector"),
+                logger=logger,
+            )
+
+        Once constructed, the ``cfg`` will figure out the appropriate
+        compiler calls to convert the circuit to the appropriate format.
+        All the user needs to do is call the :meth:`prepare_for_simulation()` method:
+
+        .. code-block:: python
+
+            cfg.prepare_for_simulation()
+
+        The circuits are compiled in-place, which makes it
+        easy to plug in the ``cfg`` object into a :class:`.QulacsRunner`:
+
+        .. code-block:: python
+
+            # Create a runner object to simulate the circuit
+            runner = QulacsRunner(
+                cfg,
+                lattice,
+            )
+
+            # Simulate the circuits
+            runner.run(
+                10
+                2**12,
+                "output_dir",
+                True
+            )
+
+    """
+
     initial_conditions: (
         Statevector | QiskitQC | QuantumState | QulacsQC | QuantumComponent
     )
@@ -85,7 +244,19 @@ class SimulationConfig:
 
     def validate(
         self,
-    ) -> None:
+    ):
+        """
+        Validates the configuration.
+        This includes the following checks
+
+        #. The algorithmic attributes are of compatible types.
+        #. The target platform is available.
+        #. The execution backend (if enabled) is compatible with the target platform.
+        #. The sampling backend (if enabled) is compatible with the target platform.
+
+        This function simply checks that the provided attributes are
+        suitable - it does not perform any conversions.
+        """
         self.__is_appropriate_target_platform(self.target_platform)
         self.__is_compatible_type(
             self.initial_conditions,
@@ -151,12 +322,24 @@ class SimulationConfig:
     def prepare_for_simulation(
         self,
     ) -> None:
+        """
+        Converts all algorithmic components to the target platform according to the specification, in place.
+        """
         self.__perpare_circuits(
             self.get_execution_compiler(),
             self.get_sampling_compiler(),
         )
 
     def get_execution_compiler(self) -> CircuitCompiler:
+        """
+        Get the :class:`CircuitCompiler` that can converts the
+        algorithmic attributes to the target ``sampling_backend`` simulator.
+
+        Returns
+        -------
+        CircuitCompiler
+            A compatible circuit compiler.
+        """
         self.__is_appropriate_target_platform(self.target_platform)
 
         return CircuitCompiler(
@@ -164,6 +347,15 @@ class SimulationConfig:
         )
 
     def get_sampling_compiler(self) -> CircuitCompiler:
+        """
+        Get the :class:`CircuitCompiler` that can converts the
+        algorithmic attributes to the target ``execution_backend`` simulator.
+
+        Returns
+        -------
+        CircuitCompiler
+            A compatible circuit compiler.
+        """
         return (
             CircuitCompiler(self.compiler_platform, "QISKIT", self.logger)
             if self.statevector_sampling
