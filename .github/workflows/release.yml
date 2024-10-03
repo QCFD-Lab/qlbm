@@ -35,17 +35,6 @@ jobs:
           branch: "release/${{ inputs.version }}"
           sha: "${{ github.sha }}"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11.9
-          cache: "pip" # caching pip dependencies
-
-      - name: Install dependencies
-        run: |
-          pip install --upgrade pip
-          pip install bumpversion
-
       - name: Bump version
         run: |
           OLD_PYPROJECT_VERSION=$(cat pyproject.toml | grep -w "^version =" | grep -oP '(?<=").*(?=")')
