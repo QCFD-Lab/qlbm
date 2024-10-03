@@ -104,7 +104,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/p/plm # Replace <package-name> with your PyPI project name
+      url: https://pypi.org/p/qlbm # Replace <package-name> with your PyPI project name
     permissions:
       id-token: write # IMPORTANT: mandatory for trusted publishing
 
@@ -164,7 +164,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: testpypi
-      url: https://test.pypi.org/p/plmcsz
+      url: https://test.pypi.org/p/qlbm
     permissions:
       id-token: write
 
