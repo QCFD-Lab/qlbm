@@ -13,6 +13,14 @@ from qulacs.converter import convert_QASM_to_qulacs_circuit
 
 
 def create_directory_and_parents(directory: str) -> None:
+    """
+    Creates a given directory and all its parent directories.
+
+    Parameters
+    ----------
+    directory : str
+        The fully specified location of the directory.
+    """
     Path(directory).mkdir(parents=True, exist_ok=True)
 
 
@@ -33,10 +41,38 @@ def qiskit_circuit_to_qulacs(circuit: QiskitQC) -> QulacsQC:
 
 
 def flatten(xss):
+    """
+    Flattens nested lists by one level.
+
+    Parameters
+    ----------
+    xss : List[List[Any]]
+        A nested list.
+
+    Returns
+    -------
+    List[Any]
+        The input flattened to by one level.
+    """
     return [x for xs in xss for x in xs]
 
 
 def bit_value(num: int, position: int) -> int:
+    """
+    The value of the bit at a given position in a given integer.
+
+    Parameters
+    ----------
+    num : int
+        The number.
+    position : int
+        The position in the binary representation.
+
+    Returns
+    -------
+    int
+        The velut of the target bit.
+    """
     return (num & (1 << position)) >> position
 
 
@@ -74,6 +110,19 @@ def get_circuit_properties(circuit: QiskitQC | QulacsQC) -> Tuple[str, int, int,
 
 
 def qiskit_to_qulacs(circuit: QiskitQC) -> QulacsQC:
+    """
+    Converts a Qiskit quantum circuit to a Qulacs quantum circuit equivalent using Tket.
+
+    Parameters
+    ----------
+    circuit : QiskitQC
+        An arbitrary Qiskit circuit.
+
+    Returns
+    -------
+    QulacsQC
+        The equivalent Qulacs circuit, if compatible.
+    """
     return tk_to_qulacs(qiskit_to_tk(circuit))
 
 
