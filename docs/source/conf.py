@@ -36,6 +36,8 @@ extensions = [
     "sphinxcontrib.bibtex",
     "matplotlib.sphinxext.plot_directive",
     "sphinx.ext.linkcode",
+    "sphinx_favicon",
+    "sphinx_copybutton",
     "sphinx_autodoc_typehints",
 ]
 
@@ -101,6 +103,11 @@ master_doc = "index"
 autodoc_typehints = "both"
 autodoc_typehints_format = "short"
 
+favicons = [
+    "favicon-16x16.png",
+    "favicon-32x32.png",
+]
+
 
 def linkcode_resolve(domain, info):
     if domain != "py":
@@ -111,31 +118,31 @@ def linkcode_resolve(domain, info):
     try:
         module = importlib.import_module(module_name)
     except ModuleNotFoundError:
-        return "5"
+        return None
 
     obj = module
     for part in info["fullname"].split("."):
         try:
             obj = getattr(obj, part)
         except AttributeError:
-            return "#6"
+            return None
 
     try:
         full_file_name = inspect.getsourcefile(obj)
     except TypeError:
-        return "#4"
+        return None
     if full_file_name is None:
-        return "#3"
+        return None
     try:
-        file_name = info['module'].replace('.', '/')
+        file_name = info["module"].replace(".", "/")
     except ValueError:
-        return "#2"
+        return None
 
     try:
         source, lineno = inspect.getsourcelines(obj)
     except (OSError, TypeError):
         linespec = ""
-        return "#1"
+        return None
     else:
         ending_lineno = lineno + len(source) - 1
         linespec = f"#L{lineno}-L{ending_lineno}"
