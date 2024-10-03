@@ -9,7 +9,6 @@
 import importlib
 import inspect
 import os
-import re
 import sys
 from pathlib import Path
 
@@ -22,7 +21,7 @@ sys.path.append(os.path.abspath(".."))
 project = "qlbm"
 copyright = "2024, qlbm authors"
 author = "qlbm authors"
-release = "0.0.1"
+release = "0.0.2"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
