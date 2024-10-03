@@ -38,6 +38,7 @@ extensions = [
     "sphinx.ext.linkcode",
     "sphinx_favicon",
     "sphinx_copybutton",
+    "sphinx_design",
     "sphinx_autodoc_typehints",
 ]
 

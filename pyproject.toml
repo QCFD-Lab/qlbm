@@ -51,6 +51,7 @@ docs = [
     "sphinx_autodoc_typehints",
     "sphinx-favicon",
     "sphinx_copybutton",
+    "sphinx_design",
 ]
 
 [tool.setuptools]

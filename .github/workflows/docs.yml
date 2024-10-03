@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install -U sphinx
-          python -m pip install pydata-sphinx-theme sphinxcontrib-bibtex sphinx_autodoc_typehints sphinx-favicon sphinx_copybutton 
+          python -m pip install pydata-sphinx-theme sphinxcontrib-bibtex sphinx_autodoc_typehints sphinx-favicon sphinx_copybutton sphinx_design 
 
       - name: make the sphinx docs
         run: |
