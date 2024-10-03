@@ -11,6 +11,25 @@ from qlbm.tools.utils import create_directory_and_parents, flatten
 
 
 class QBMResult(ABC):
+    """
+    Base class for all algorithm-specific results.
+    A ``Result`` object parses the counts extracted from the quantum state
+    at the end of the simulation of some number of time steps.
+    This information is then either translated into a visual representation
+    of the encoded flow field or parsed into a format that is suitable for reinitialization.
+    Results can additionally create visual representations of
+    lattice geometry and save data to disk in compressed formats.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`lattice`             The :class:`.Lattice` of the simulated system.
+    :attr:`directory`           The directory to which the results outputs data to.
+    :attr:`paraview_dir`        The subdirectory under ``directory`` which stores the Paraview files.
+    :attr:`output_file_name`    The root name for files containing time step artifacts, by default "step".
+    =========================== ======================================================================
+    """
+
     num_steps: int
     directory: str
     output_file_name: str
@@ -37,6 +56,11 @@ class QBMResult(ABC):
         self.lattice = lattice
 
     def visualize_geometry(self):
+        """
+        Creates ``stl`` files for each block in the lattice.
+        Output files are formatted as ``output_dir/paraview_dir/cube_<x>.stl``.
+        The output is created through the :class:`.Block`'s :meth:`.Block.stl_mesh` method.
+        """
         for c, block in enumerate(flatten(self.lattice.blocks.values())):
             block.stl_mesh().save(f"{self.paraview_dir}/cube_{c}.stl")
 
@@ -47,6 +71,20 @@ class QBMResult(ABC):
         create_vis: bool = True,
         save_counts_array: bool = False,
     ):
+        """
+        Saves the time step array to a file.
+
+        Parameters
+        ----------
+        numpy_res : np.ndarray
+            The result in array format.
+        timestep : int
+            The time step to which the result corresponds.
+        create_vis : bool, optional
+            Whether to create the visualization, by default True.
+        save_counts_array : bool, optional
+            Whether to save the raw counts object to a CSV file, by default False.
+        """
         if save_counts_array:
             numpy_res.tofile(
                 f"{self.directory}/{self.output_file_name}_{timestep}.csv",
@@ -57,6 +95,16 @@ class QBMResult(ABC):
             self.create_visualization(data=numpy_res, timestep=timestep)
 
     def create_visualization(self, data: np.ndarray | None, timestep: int):
+        """
+        Creates a ``vtk`` visual representation of the data.
+
+        Parameters
+        ----------
+        data : np.ndarray | None
+            The ``np.ndarray`` representation of the population density at each grid location.
+        timestep : int
+            The time step to which the data corresponds.
+        """
         if not isdir(self.paraview_dir):
             create_directory_and_parents(self.paraview_dir)
 
@@ -71,12 +119,8 @@ class QBMResult(ABC):
         img.GetPointData().SetScalars(vtk_data)
         img.SetDimensions(
             self.lattice.num_gridpoints[0] + 1,
-            self.lattice.num_gridpoints[1] + 1
-            if self.lattice.num_dims > 1
-            else 1,
-            self.lattice.num_gridpoints[2] + 1
-            if self.lattice.num_dims > 2
-            else 1,
+            self.lattice.num_gridpoints[1] + 1 if self.lattice.num_dims > 1 else 1,
+            self.lattice.num_gridpoints[2] + 1 if self.lattice.num_dims > 2 else 1,
         )
 
         writer = vtk.vtkXMLImageDataWriter()
@@ -92,8 +136,25 @@ class QBMResult(ABC):
         create_vis: bool = True,
         save_array: bool = False,
     ):
+        """
+        Saves the time step counts to a file.
+
+        Parameters
+        ----------
+        counts: Dict[str, float]
+            The result in Qiskit ``Counts`` format.
+        timestep : int
+            The time step to which the result corresponds.k
+        create_vis : bool, optional
+            Whether to create the visualization, by default True.
+        save_array : bool, optional
+            Whether to save the raw counts object to a CSV file, by default False.
+        """
         pass
 
     @abstractmethod
     def visualize_all_numpy_data(self):
+        """
+        Converts all numpy data saved to disk to ``vti`` files.
+        """
         pass

@@ -12,6 +12,20 @@ from .base import QBMResult
 
 
 class CollisionlessResult(QBMResult):
+    """
+    :class:`.CQLBM`-specific implementation of the :class:`.QBMResult`.
+    Processes counts sampled from :class:`.GridMeasurement` primitives.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`lattice`             The :class:`.CollisionlessLattice` of the simulated system.
+    :attr:`directory`           The directory to which the results outputs data to.
+    :attr:`paraview_dir`        The subdirectory under ``directory`` which stores the Paraview files.
+    :attr:`output_file_name`    The root name for files containing time step artifacts, by default "step".
+    =========================== ======================================================================
+    """
+
     num_steps: int
     directory: str
     output_file_name: str
@@ -99,12 +113,8 @@ class CollisionlessResult(QBMResult):
             img = vtk.vtkImageData()
             img.SetDimensions(
                 self.lattice.num_gridpoints[0] + 1,
-                self.lattice.num_gridpoints[1] + 1
-                if self.lattice.num_dims > 1
-                else 1,
-                self.lattice.num_gridpoints[2] + 1
-                if self.lattice.num_dims > 2
-                else 1,
+                self.lattice.num_gridpoints[1] + 1 if self.lattice.num_dims > 1 else 1,
+                self.lattice.num_gridpoints[2] + 1 if self.lattice.num_dims > 2 else 1,
             )
             img.GetPointData().SetScalars(vtk_data)
 

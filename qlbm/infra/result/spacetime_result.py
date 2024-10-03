@@ -12,6 +12,19 @@ from .base import QBMResult
 
 
 class SpaceTimeResult(QBMResult):
+    """
+    :class:`.SpaceTimeQLBM`-specific implementation of the :class:`.QBMResult`.
+    Processes counts sampled from :class:`.SpaceTimeGridVelocityMeasurement` primitives.
+
+    =========================== ======================================================================
+    Attribute                   Summary
+    =========================== ======================================================================
+    :attr:`lattice`             The :class:`.SpaceTimeLattice` of the simulated system.
+    :attr:`directory`           The directory to which the results outputs data to.
+    :attr:`paraview_dir`        The subdirectory under ``directory`` which stores the Paraview files.
+    :attr:`output_file_name`    The root name for files containing time step artifacts, by default "step".
+    =========================== ======================================================================
+    """
     num_steps: int
     directory: str
     output_file_name: str
