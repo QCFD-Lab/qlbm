@@ -7,6 +7,7 @@ on:
 jobs:
  
   docs:
+    if: github.repository_owner == 'QCFD-Lab'
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
