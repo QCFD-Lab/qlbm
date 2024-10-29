@@ -17,8 +17,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
     In practice, this means the same circuit is repeated across all "local" qubit register chunks.
     Collision can be understood as follows:
 
-    #. For each group of qubits, the states encoding velocities belonging to a particular equivalence class are
-    first isolated with a series of :math:`X` and :math:`CX` gates. This leaves qubits not affected by the rotation in :math:`\ket{1}^{\otimes n_v-1}` state.
+    #. For each group of qubits, the states encoding velocities belonging to a particular equivalence class are first isolated with a series of :math:`X` and :math:`CX` gates. This leaves qubits not affected by the rotation in :math:`\ket{1}^{\otimes n_v-1}` state.
     #. A rotation gate is applied to the qubit(s) relevant to the equivalence class shift, controlled on the qubits set in the previous step.
     #. The operation performed in Step 1 is undone.
 
@@ -59,6 +58,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
         # Draw the collision operator for 1 time step
         SpaceTimeCollisionOperator(lattice=lattice, timestep=1).draw("mpl")
     """
+
     def __init__(
         self,
         lattice: SpaceTimeLattice,
