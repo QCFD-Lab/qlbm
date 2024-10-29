@@ -231,16 +231,17 @@ class SpaceTimeLattice(Lattice):
         ) = temporary_registers
         self.registers = tuple(flatten(temporary_registers))
         self.circuit = QuantumCircuit(*self.registers)
-        self.extreme_point_indices, self.intermediate_point_indices = (
-            self.get_neighbor_indices()
-        )
+        (
+            self.extreme_point_indices,
+            self.intermediate_point_indices,
+        ) = self.get_neighbor_indices()
         self.num_dims = len(self.num_gridpoints)
 
         logger.info(self.__str__())
 
     def grid_index(self, dim: int | None = None) -> List[int]:
         """Get the indices of the qubits used that encode the grid values for the specified dimension.
-                
+
         Parameters
         ----------
         dim : int | None, optional
@@ -565,6 +566,140 @@ class SpaceTimeLattice(Lattice):
             }
 
         return extreme_point_neighbor_indices, intermediate_point_neighbor_indices
+
+    def coordinates_to_quadrant(self, distance: Tuple[int, int]) -> int:
+        """
+        Maps a given point to the quadrant it belongs to.
+        Quadrants are ordered in counterclockwise fashion, starting on the top right at 0:
+         1 | 0
+        _______
+         2 | 3
+
+        Points along lines that intersect with the origin (i.e., (0, 5), (-8, 0)) belong to quadrants as well:
+
+        #. :math:`x>0,y=0 \to q_0`
+        #. :math:`x=0,y>0 \to q_1`
+        #. :math:`x=<0,y=0 \to q_2`
+        #. :math:`x=0,y<0 \to q_3`
+
+        Parameters
+        ----------
+        distance : Tuple[int, int]
+            The coordinates of the point to place in a quadrant, expressed as its distance from the origin in the x and y axes.
+
+        Returns
+        -------
+        int
+            The quadrant the point belongs to.
+        """
+
+        if distance[1] == 0:
+            if distance[0] > 0:
+                return 0
+            return 2
+
+        if distance[0] == 0:
+            if distance[1] > 0:
+                return 1
+            return 3
+
+        if distance[1] > 0:
+            if distance[0] > 0:
+                return 0
+            return 1
+
+        if distance[0] < 0:
+            return 2
+        return 3
+
+    def get_index_of_neighbor(self, distance: Tuple[int, int]) -> int:
+        """
+        Calculate the index of a given grid point within the von Neumann neighborhood.
+        The indices are assigned in counterclockwise fashion in increasing order of their
+        Manhattan distances from the origin, in the same way that velocity indices are typically
+        labelled within LBM :math:`D_dQ_q` discretizations.
+        This is helpful for determining the placements of :math:`SWAP` gates that perform streaming.
+
+        Parameters
+        ----------
+        distance : Tuple[int, int]
+            The coordinates of the point to place in a quadrant, expressed as its distance from the origin in the x and y axes.
+
+        Returns
+        -------
+        int
+            The index of the point.
+        """
+        if distance[0] == 0 and distance[1] == 0:
+            return 0
+
+        distance_from_origin = sum(map(abs, distance))
+        is_extreme_point = distance[0] == 0 or distance[1] == 0
+        num_points_lower_distances = self.num_gridpoints_within_distance(
+            distance_from_origin - 1
+        )
+        quadrant: int = self.coordinates_to_quadrant(distance)
+
+        if is_extreme_point:
+            return num_points_lower_distances + quadrant * distance_from_origin
+        else:
+            ordering_dim = 0 if quadrant in [1, 3] else 1
+            distance_across_ordering_dim = abs(distance[ordering_dim])
+            return (
+                num_points_lower_distances
+                + quadrant * distance_from_origin
+                + distance_across_ordering_dim
+            )
+
+    def get_streaming_lines(
+        self, dimension: int, direction: bool, timestep: int | None = None
+    ) -> List[List[int]]:
+        """
+        Returns the `stream line` for a given dimension, direction, and time step.
+        A stream line consists of all particles within the point's neighborhood, that
+        (1) have the same discrete velocity and (2) can "reach" each other
+        by only traveling across the same discrete velocity channel.
+        The streaming operator of the STQBM algorithm is sensitive to the order
+        in which particles in such stream lines are swapped.
+
+        Parameters
+        ----------
+        dimension : int
+            The dimension (``0`` or ``1``) that the stream line spans.
+        direction : bool
+            The direction (``False`` for negative, ``True`` for positive) that the stream line traverses.
+        timestep : int | None, optional
+            The time step for which to compute the stream lines, by default None. More time steps require larger neighborhoods and thus more (and longer) stream lines.
+
+        Returns
+        -------
+        List[List[int]]
+            A list of neighbor indices that are along the same stream lines.
+        """
+        neighbors_in_line = []
+        if timestep is None:
+            timestep = self.num_timesteps
+        for offset in range(-timestep + 1, timestep):
+            start = -self.num_timesteps + abs(offset)
+            end = self.num_timesteps - abs(offset)
+            step = 1
+
+            if (dimension == 0 and direction) or (dimension == 1 and not direction):
+                start, end = end, start
+                step *= -1
+
+            neighbors_in_line.append(
+                [
+                    self.get_index_of_neighbor(
+                        (
+                            i if dimension == 0 else offset,
+                            offset if dimension == 0 else i,
+                        )
+                    )
+                    for i in range(start, end + step, step)
+                ]
+            )
+        return neighbors_in_line
 
     def logger_name(self) -> str:
         gp_string = ""
