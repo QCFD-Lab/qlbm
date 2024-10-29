@@ -1,5 +1,8 @@
 from logging import Logger, getLogger
 from time import perf_counter_ns
+from typing import List
+
+from qiskit import QuantumCircuit
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.lattice import SpaceTimeLattice
@@ -56,6 +59,11 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
         self.lattice = lattice
         self.timestep = timestep
 
+        if timestep < 1 or timestep > lattice.num_timesteps:
+            raise CircuitException(
+                f"Invalid time step {timestep}, select a value between 1 and {lattice.num_timesteps}"
+            )
+
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
         self.circuit = self.create_circuit()
@@ -66,21 +74,37 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
     def create_circuit(self):
         circuit = self.lattice.circuit.copy()
 
-        if self.timestep == 1:
-            # !!! TODO: Generalize
-            for point_class, extreme_point in enumerate(
-                self.lattice.extreme_point_indices[self.timestep]
-            ):
-                velocity_to_swap = extreme_point.velocity_index_to_swap(point_class, 1)
+        circuit = self.stream_lines(
+            self.lattice.get_streaming_lines(0, True, self.timestep), 0, circuit
+        )
+        circuit = self.stream_lines(
+            self.lattice.get_streaming_lines(0, False, self.timestep), 2, circuit
+        )
+        circuit = self.stream_lines(
+            self.lattice.get_streaming_lines(1, True, self.timestep), 1, circuit
+        )
+        circuit = self.stream_lines(
+            self.lattice.get_streaming_lines(1, False, self.timestep), 3, circuit
+        )
+
+        return circuit
+
+    def stream_lines(
+        self,
+        streaming_lines: List[List[int]],
+        velocity_direction: int,
+        circuit: QuantumCircuit,
+    ) -> QuantumCircuit:
+        for streaming_line in streaming_lines:
+            for c, neighbor in enumerate(streaming_line):
+                if c == len(streaming_line) - 1:
+                    break
                 circuit.swap(
+                    self.lattice.velocity_index(neighbor, velocity_direction),
                     self.lattice.velocity_index(
-                        extreme_point.neighbor_index,
-                        velocity_to_swap,
+                        streaming_line[c + 1], velocity_direction
                     ),
-                    self.lattice.velocity_index(0, velocity_to_swap),
                 )
-        else:
-            raise CircuitException("Not implemented.")
 
         return circuit
 
