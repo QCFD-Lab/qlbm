@@ -35,7 +35,7 @@ extensions = [
     "sphinxcontrib.bibtex",
     "matplotlib.sphinxext.plot_directive",
     "sphinx.ext.linkcode",
-    "sphinx_favicon",
+    # "sphinx_favicon",
     "sphinx_copybutton",
     "sphinx_design",
     "sphinx_autodoc_typehints",
@@ -103,10 +103,10 @@ master_doc = "index"
 autodoc_typehints = "both"
 autodoc_typehints_format = "short"
 
-favicons = [
-    "favicon-16x16.png",
-    "favicon-32x32.png",
-]
+# favicons = [
+#     "favicon-16x16.png",
+#     "favicon-32x32.png",
+# ]
 
 
 def linkcode_resolve(domain, info):

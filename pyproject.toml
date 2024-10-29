@@ -50,7 +50,7 @@ docs = [
     "pydata-sphinx-theme",
     "sphinxcontrib-bibtex",
     "sphinx_autodoc_typehints",
-    "sphinx-favicon",
+    # "sphinx-favicon",
     "sphinx_copybutton",
     "sphinx_design",
 ]
