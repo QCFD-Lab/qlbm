@@ -1,10 +1,10 @@
-from test.regression.blocks import Block2D as RegressionBlock2D
 from typing import List
 
 import pytest
 
 from qlbm.lattice.blocks import Block, ReflectionPoint
 from qlbm.tools.utils import flatten
+from test.regression.blocks import Block2D as RegressionBlock2D
 
 
 @pytest.fixture
