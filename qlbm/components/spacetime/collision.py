@@ -7,7 +7,7 @@ from qiskit.circuit import Gate
 from qiskit.circuit.library import MCMT, RYGate
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
 
 
 class SpaceTimeCollisionOperator(SpaceTimeOperator):
@@ -85,10 +85,13 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
         collision_circuit.compose(
             MCMT(
                 self.gate_to_apply,
-                self.lattice.num_velocities_per_point - 1,
+                self.lattice.properties.get_num_velocities_per_point() - 1,
                 1,
             ),
-            qubits=list(range(1, self.lattice.num_velocities_per_point)) + [0],
+            qubits=list(
+                range(1, self.lattice.properties.get_num_velocities_per_point())
+            )
+            + [0],
             inplace=True,
         )
 
@@ -99,10 +102,10 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
 
         # Append the collision circuit at each step
         for velocity_qubit_indices in range(
-            self.lattice.num_grid_qubits,
-            self.lattice.num_grid_qubits
-            + self.lattice.num_required_velocity_qubits(self.timestep),
-            self.lattice.num_velocities_per_point,
+            self.lattice.properties.get_num_grid_qubits(),
+            self.lattice.properties.get_num_grid_qubits()
+            + self.lattice.properties.get_num_velocity_qubits(self.timestep),
+            self.lattice.properties.get_num_velocities_per_point(),
         ):
             circuit.compose(
                 collision_circuit,
@@ -112,7 +115,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
         return circuit
 
     def local_collision_circuit(self, reset_state: bool) -> QuantumCircuit:
-        circuit = QuantumCircuit(self.lattice.num_velocities_per_point)
+        circuit = QuantumCircuit(self.lattice.properties.get_num_velocities_per_point())
 
         if not reset_state:
             circuit.cx(control_qubit=0, target_qubit=2)

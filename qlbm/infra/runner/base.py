@@ -13,7 +13,8 @@ from qlbm.infra.reinitialize import (
     SpaceTimeReinitializer,
 )
 from qlbm.infra.result import CollisionlessResult, QBMResult, SpaceTimeResult
-from qlbm.lattice import CollisionlessLattice, Lattice, SpaceTimeLattice
+from qlbm.lattice import CollisionlessLattice, Lattice
+from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException, ResultsException
 
 from .simulation_config import SimulationConfig

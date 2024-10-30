@@ -3,7 +3,7 @@ from logging import Logger, getLogger
 from qiskit import QuantumCircuit
 
 from qlbm.components.base import LBMAlgorithm
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
 
 from .collision import SpaceTimeCollisionOperator
 from .streaming import SpaceTimeStreamingOperator

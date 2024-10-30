@@ -5,7 +5,7 @@ from typing import List
 from qiskit import QuantumCircuit
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException
 
 
@@ -75,16 +75,24 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
         circuit = self.lattice.circuit.copy()
 
         circuit = self.stream_lines(
-            self.lattice.get_streaming_lines(0, True, self.timestep), 0, circuit
+            self.lattice.properties.get_streaming_lines(0, True, self.timestep),
+            0,
+            circuit,
         )
         circuit = self.stream_lines(
-            self.lattice.get_streaming_lines(0, False, self.timestep), 2, circuit
+            self.lattice.properties.get_streaming_lines(0, False, self.timestep),
+            2,
+            circuit,
         )
         circuit = self.stream_lines(
-            self.lattice.get_streaming_lines(1, True, self.timestep), 1, circuit
+            self.lattice.properties.get_streaming_lines(1, True, self.timestep),
+            1,
+            circuit,
         )
         circuit = self.stream_lines(
-            self.lattice.get_streaming_lines(1, False, self.timestep), 3, circuit
+            self.lattice.properties.get_streaming_lines(1, False, self.timestep),
+            3,
+            circuit,
         )
 
         return circuit

@@ -9,7 +9,7 @@ from qulacs import QuantumCircuit as QulacsQC
 
 from qlbm.components.spacetime import SpaceTimeInitialConditions
 from qlbm.infra.compiler import CircuitCompiler
-from qlbm.lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
 
 from .base import Reinitializer
 
