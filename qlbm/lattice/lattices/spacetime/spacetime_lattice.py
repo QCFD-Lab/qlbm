@@ -10,6 +10,7 @@ from qlbm.tools.utils import flatten
 from .builder_base import (
     SpaceTimeLatticeBuilder,
 )
+from .d1q2 import D1Q2SpaceTimeLatticeBuilder
 from .d2q4 import D2Q4SpaceTimeLatticeBuilder
 
 
@@ -141,7 +142,7 @@ class SpaceTimeLattice(Lattice):
     def __get_builder(self) -> SpaceTimeLatticeBuilder:
         if self.num_dims == 1:
             if self.num_velocities[0] == 1:
-                return D2Q4SpaceTimeLatticeBuilder(
+                return D1Q2SpaceTimeLatticeBuilder(
                     self.num_timesteps, self.num_gridpoints, self.blocks, self.logger
                 )
             raise LatticeException(
