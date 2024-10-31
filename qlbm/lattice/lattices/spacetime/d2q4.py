@@ -92,13 +92,6 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             ),
         )
 
-    def get_num_total_qubits(self) -> int:
-        return (
-            self.get_num_ancilla_qubits()
-            + self.get_num_grid_qubits()
-            + self.get_num_velocity_qubits()
-        )
-
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         # Grid qubits
         grid_registers = [
@@ -117,31 +110,6 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         ]
 
         return (grid_registers, velocity_registers)
-
-    def get_neighbor_distance_indices(self, distance_from_origin: int) -> List[int]:
-        if distance_from_origin == 0:
-            return [0]
-
-        total_neighbors = int(
-            (
-                self.get_num_velocity_qubits(distance_from_origin)
-                / self.get_num_velocities_per_point()
-            )
-        )
-        neighbors_lower_distance = int(
-            (
-                self.get_num_velocity_qubits(distance_from_origin)
-                / self.get_num_velocities_per_point()
-            )
-        )
-
-        return list(range(neighbors_lower_distance, total_neighbors))
-
-    def get_num_gridpoints_within_distance(self, distance: int) -> int:
-        return (
-            self.get_num_velocity_qubits(distance)
-            // self.get_num_velocities_per_point()
-        )
 
     def get_index_of_neighbor(self, distance: Tuple[int, ...]) -> int:
         if distance[0] == 0 and distance[1] == 0:

@@ -94,21 +94,41 @@ class SpaceTimeLatticeBuilder(ABC):
     def get_num_velocity_qubits(self, num_timesteps: int | None = None) -> int:
         pass
 
-    @abstractmethod
     def get_num_total_qubits(self) -> int:
-        pass
+        return (
+            self.get_num_ancilla_qubits()
+            + self.get_num_grid_qubits()
+            + self.get_num_velocity_qubits()
+        )
 
     @abstractmethod
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         pass
 
-    @abstractmethod
     def get_neighbor_distance_indices(self, distance_from_origin: int) -> List[int]:
-        pass
+        if distance_from_origin == 0:
+            return [0]
 
-    @abstractmethod
+        total_neighbors = int(
+            (
+                self.get_num_velocity_qubits(distance_from_origin)
+                / self.get_num_velocities_per_point()
+            )
+        )
+        neighbors_lower_distance = int(
+            (
+                self.get_num_velocity_qubits(distance_from_origin)
+                / self.get_num_velocities_per_point()
+            )
+        )
+
+        return list(range(neighbors_lower_distance, total_neighbors))
+
     def get_num_gridpoints_within_distance(self, distance: int) -> int:
-        pass
+        return (
+            self.get_num_velocity_qubits(distance)
+            // self.get_num_velocities_per_point()
+        )
 
     @abstractmethod
     def get_index_of_neighbor(self, distance: Tuple[int, ...]) -> int:
