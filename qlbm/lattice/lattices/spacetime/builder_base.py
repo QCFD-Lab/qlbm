@@ -47,10 +47,10 @@ class VonNeumannNeighbor:
         )
 
     def get_absolute_values(
-        self, origin: Tuple[int, int], relative: bool
-    ) -> Tuple[int, int]:
+        self, origin: Tuple[int, ...], relative: bool
+    ) -> Tuple[int, ...]:
         return cast(
-            Tuple[int, int],
+            Tuple[int, ...],
             tuple(
                 c0 + c1
                 for c0, c1 in zip(

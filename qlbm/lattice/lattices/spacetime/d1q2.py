@@ -4,9 +4,7 @@ from typing import Dict, List, Tuple, cast
 from qiskit import QuantumRegister
 
 from qlbm.lattice.blocks import Block
-from qlbm.lattice.lattices.spacetime.builder_base import SpaceTimeLatticeBuilder
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import dimension_letter
 
 from .builder_base import (
     LatticeDiscretization,
@@ -27,9 +25,6 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
     ]
 
     # The origin point's neighbors all have higher Manhattan distances (1)
-    #   ^   |
-    # <   > |
-    #   v   |
     origin_point_class: List[int] = [0]
 
     def __init__(
