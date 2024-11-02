@@ -64,7 +64,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
     def __init__(
         self,
         lattice: SpaceTimeLattice,
-        grid_data: List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]] = [
+        grid_data: List[Tuple[Tuple[int, ...], Tuple[bool, ...]]] = [
             ((2, 5), (True, True, True, True)),
             ((3, 4), (False, True, False, True)),
         ],
@@ -117,7 +117,8 @@ class SpaceTimeInitialConditions(LBMPrimitive):
                     )
 
                 # No intermediate points at Manhattan distance 1
-                if manhattan_distance < 2:
+                # Or in 1D
+                if manhattan_distance < 2 or self.lattice.num_dims < 2:
                     continue
 
                 for neighbor in flatten(
@@ -136,7 +137,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
 
         return circuit
 
-    def set_grid_value(self, point_coordinates: Tuple[int, int]) -> QuantumCircuit:
+    def set_grid_value(self, point_coordinates: Tuple[int, ...]) -> QuantumCircuit:
         # ! TODO: rename, refactor into primitive
         circuit = self.lattice.circuit.copy()
 
@@ -149,8 +150,8 @@ class SpaceTimeInitialConditions(LBMPrimitive):
 
     def set_neighbor_velocity(
         self,
-        point_coordinates: Tuple[int, int],
-        velocity_values: Tuple[bool, bool, bool, bool],
+        point_coordinates: Tuple[int, ...],
+        velocity_values: Tuple[bool, ...],
         neighbor: VonNeumannNeighbor,
     ) -> QuantumCircuit:
         # ! TODO: rename, refactor into primitive

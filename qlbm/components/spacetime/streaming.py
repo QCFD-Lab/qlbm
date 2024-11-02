@@ -5,6 +5,7 @@ from typing import List
 from qiskit import QuantumCircuit
 
 from qlbm.components.base import SpaceTimeOperator
+from qlbm.lattice.lattices.spacetime.builder_base import LatticeDiscretization
 from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException
 
@@ -71,7 +72,32 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
-    def create_circuit(self):
+    def create_circuit(self) -> QuantumCircuit:
+        discretization = self.lattice.properties.get_discretization()
+        if discretization == LatticeDiscretization.D1Q2:
+            return self.__create_circuit_d1q2()
+        if discretization == LatticeDiscretization.D2Q4:
+            return self.__create_circuit_d2q4()
+
+        raise CircuitException(f"Streaming Operator unsupported for {discretization}.")
+
+    def __create_circuit_d1q2(self) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+
+        circuit = self.stream_lines(
+            self.lattice.properties.get_streaming_lines(0, True, self.timestep),
+            0,
+            circuit,
+        )
+        circuit = self.stream_lines(
+            self.lattice.properties.get_streaming_lines(0, False, self.timestep),
+            1,
+            circuit,
+        )
+
+        return circuit
+
+    def __create_circuit_d2q4(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
         circuit = self.stream_lines(

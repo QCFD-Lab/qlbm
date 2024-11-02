@@ -72,12 +72,14 @@ class SpaceTimeQLBM(LBMAlgorithm):
                 inplace=True,
             )
 
-            circuit.compose(
-                SpaceTimeCollisionOperator(
-                    self.lattice, timestep, logger=self.logger
-                ).circuit,
-                inplace=True,
-            )
+            # There is no collision in 1D
+            if self.lattice.num_dims > 1:
+                circuit.compose(
+                    SpaceTimeCollisionOperator(
+                        self.lattice, timestep, logger=self.logger
+                    ).circuit,
+                    inplace=True,
+                )
 
         return circuit
 
