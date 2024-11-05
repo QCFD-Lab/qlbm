@@ -6,7 +6,7 @@ import numpy as np
 import vtk
 from vtkmodules.util import numpy_support
 
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 from .base import QBMResult
 

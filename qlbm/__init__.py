@@ -6,7 +6,7 @@ from .components import (
 )
 from .infra import CircuitCompiler, CollisionlessResult, QiskitRunner, QulacsRunner
 from .lattice import CollisionlessLattice, Lattice
-from .lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from .lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 __all__ = [
     "Lattice",
