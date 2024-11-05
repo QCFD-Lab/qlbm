@@ -6,7 +6,7 @@ from .blocks import (
     ReflectionWall,
 )
 from .lattices import CollisionlessLattice, Lattice
-from .lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from .lattices.spacetime_lattice import SpaceTimeLattice
 
 __all__ = [
     "Lattice",
