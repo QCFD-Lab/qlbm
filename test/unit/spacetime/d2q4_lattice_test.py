@@ -1,10 +1,10 @@
 import pytest
 
-from qlbm.lattice.lattices.spacetime.builder_base import (
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.spacetime.properties_base import (
     VonNeumannNeighbor,
     VonNeumannNeighborType,
 )
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
 
 
 @pytest.fixture

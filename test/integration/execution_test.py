@@ -16,7 +16,7 @@ from qlbm.components.spacetime import (
 from qlbm.infra.runner import QiskitRunner
 from qlbm.infra.runner.simulation_config import SimulationConfig
 from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 OUTPUT_DIR = "test/artifacts"
 
