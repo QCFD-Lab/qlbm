@@ -4,14 +4,13 @@ from typing import Dict, List, Tuple, cast
 from qiskit import QuantumRegister
 
 from qlbm.lattice.blocks import Block
-from qlbm.tools.exceptions import LatticeException
-
-from .builder_base import (
+from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     SpaceTimeLatticeBuilder,
     VonNeumannNeighbor,
     VonNeumannNeighborType,
 )
+from qlbm.tools.exceptions import LatticeException
 
 
 class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
@@ -19,7 +18,7 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
     # And points to the left are marked as 1
     # This abstraction is more useful for more complex
     # Stencils in higher dimensions
-    extreme_point_classes: List[Tuple[int, Tuple[int, int]]] = [
+    extreme_point_classes: List[Tuple[int, Tuple[int, ...]]] = [
         (0, (1, 0)),
         (1, (-1, 0)),
     ]
@@ -164,3 +163,19 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             ]
 
         return extreme_point_neighbor_indices, {}
+
+    def get_reflected_index_of_velocity(self, velocity_index: int) -> int:
+        if velocity_index not in [0, 1]:
+            raise LatticeException(
+                f"D1Q2 discretization only supports velocities with indices [0, 1]. Index {velocity_index} unsupported."
+            )
+
+        return 1 - velocity_index
+
+    def get_reflection_increments(self, velocity_index: int) -> Tuple[int, ...]:
+        if velocity_index not in [0, 1]:
+            raise LatticeException(
+                f"D1Q2 discretization only supports velocities with indices [0, 1]. Index {velocity_index} unsupported."
+            )
+
+        return self.extreme_point_classes[velocity_index][1]

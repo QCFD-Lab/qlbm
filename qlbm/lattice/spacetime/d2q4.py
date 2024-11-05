@@ -4,14 +4,14 @@ from typing import Dict, List, Tuple, cast
 from qiskit import QuantumRegister
 
 from qlbm.lattice.blocks import Block
-from qlbm.tools.utils import dimension_letter
-
-from .builder_base import (
+from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     SpaceTimeLatticeBuilder,
     VonNeumannNeighbor,
     VonNeumannNeighborType,
 )
+from qlbm.tools.exceptions import LatticeException
+from qlbm.tools.utils import dimension_letter
 
 
 class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
@@ -44,6 +44,13 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
     # <   > |
     #   v   |
     origin_point_class: List[int] = [0]
+
+    velocity_reflection: Dict[int, int] = {
+        0: 2,
+        1: 3,
+        2: 0,
+        3: 1,
+    }
 
     def __init__(
         self,
@@ -307,3 +314,19 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         if distance[0] < 0:
             return 2
         return 3
+
+    def get_reflected_index_of_velocity(self, velocity_index: int) -> int:
+        if velocity_index not in list(range(4)):
+            raise LatticeException(
+                f"D1Q2 discretization only supports velocities with indices {list(range(4))}. Index {velocity_index} unsupported."
+            )
+
+        return self.velocity_reflection[velocity_index]
+
+    def get_reflection_increments(self, velocity_index: int) -> Tuple[int, ...]:
+        if velocity_index not in list(range(4)):
+            raise LatticeException(
+                f"D1Q2 discretization only supports velocities with indices {list(range(4))}. Index {velocity_index} unsupported."
+            )
+
+        return self.extreme_point_classes[velocity_index][1]

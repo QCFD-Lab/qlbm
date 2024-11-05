@@ -4,14 +4,11 @@ from typing import Dict, List, Tuple
 from qiskit import QuantumCircuit, QuantumRegister
 
 from qlbm.lattice.lattices.base import Lattice
+from qlbm.lattice.spacetime.d1q2 import D1Q2SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.d2q4 import D2Q4SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten
-
-from .builder_base import (
-    SpaceTimeLatticeBuilder,
-)
-from .d1q2 import D1Q2SpaceTimeLatticeBuilder
-from .d2q4 import D2Q4SpaceTimeLatticeBuilder
 
 
 class SpaceTimeLattice(Lattice):

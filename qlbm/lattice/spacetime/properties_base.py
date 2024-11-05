@@ -167,3 +167,11 @@ class SpaceTimeLatticeBuilder(ABC):
             The information encoding the lattice neighborhood structure.
         """
         pass
+
+    @abstractmethod
+    def get_reflected_index_of_velocity(self, velocity_index: int) -> int:
+        pass
+
+    @abstractmethod
+    def get_reflection_increments(self, velocity_index: int) -> Tuple[int, ...]:
+        pass
