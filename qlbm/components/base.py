@@ -7,7 +7,7 @@ from qiskit.qasm2 import dump as dump_qasm2
 from qiskit.qasm3 import dump as dump_qasm3
 
 from qlbm.lattice import CollisionlessLattice, Lattice
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
 class QuantumComponent(ABC):

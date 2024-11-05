@@ -3,7 +3,8 @@ from logging import Logger, getLogger
 from qiskit import QuantumCircuit
 
 from qlbm.components.base import LBMAlgorithm
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.components.spacetime.reflection import SpaceTimeReflectionOperator
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 from .collision import SpaceTimeCollisionOperator
 from .streaming import SpaceTimeStreamingOperator
@@ -69,6 +70,16 @@ class SpaceTimeQLBM(LBMAlgorithm):
         for timestep in range(self.lattice.num_timesteps, 0, -1):
             circuit.compose(
                 SpaceTimeStreamingOperator(self.lattice, timestep, self.logger).circuit,
+                inplace=True,
+            )
+
+            circuit.compose(
+                SpaceTimeReflectionOperator(
+                    self.lattice,
+                    timestep,
+                    self.lattice.blocks["bounceback"],
+                    self.logger,
+                ).circuit,
                 inplace=True,
             )
 

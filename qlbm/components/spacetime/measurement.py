@@ -3,7 +3,7 @@ from logging import Logger, getLogger
 from qiskit import ClassicalRegister
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
 class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):

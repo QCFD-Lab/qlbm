@@ -7,7 +7,7 @@ from qiskit.circuit import Gate
 from qiskit.circuit.library import MCMT, RYGate
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
 class SpaceTimeCollisionOperator(SpaceTimeOperator):

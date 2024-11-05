@@ -5,8 +5,8 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.lattice.lattices.spacetime.builder_base import VonNeumannNeighbor
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.spacetime.properties_base import VonNeumannNeighbor
 from qlbm.tools.utils import bit_value, flatten
 
 

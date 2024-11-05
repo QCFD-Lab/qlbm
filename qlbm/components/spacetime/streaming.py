@@ -5,8 +5,8 @@ from typing import List
 from qiskit import QuantumCircuit
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.lattice.lattices.spacetime.builder_base import LatticeDiscretization
-from qlbm.lattice.lattices.spacetime.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import CircuitException
 
 
