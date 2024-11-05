@@ -509,9 +509,18 @@ class Block:
                 increment = properties.get_reflection_increments(reflection_direction)
                 origin: Tuple[int, ...] = (reflection_bound, 0)
                 for t in range(num_steps):
+                    num_gps_in_dim = 2 ** self.num_qubits[0]
                     gridpoint_encoded = tuple(
                         a + (t + 1 if 1 - c == reflection_direction else t) * b
                         for a, b in zip(origin, increment)
+                    )
+
+                    # Add periodic boundary conditions
+                    gridpoint_encoded = tuple(
+                        x % num_gps_in_dim
+                        if num_gps_in_dim
+                        else (x + num_gps_in_dim if x < 0 else x)
+                        for x in gridpoint_encoded
                     )
                     distance_from_origin = tuple((t + 1) * x for x in increment)
                     qubits_to_invert = [
@@ -519,6 +528,7 @@ class Block:
                         for i in range(self.num_qubits[0])
                         if not bit_value(gridpoint_encoded[0], i)
                     ]
+
                     reflection_list.append(
                         SpaceTimeReflectionData(
                             gridpoint_encoded,
