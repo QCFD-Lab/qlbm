@@ -6,7 +6,58 @@ from typing import Callable, Dict, List, Tuple
 import numpy as np
 from stl import mesh
 
+from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.utils import bit_value, dimension_letter, flatten
+
+
+class SpaceTimeReflectionData:
+    def __init__(
+        self,
+        gridpoint_encoded: Tuple[int, ...],
+        qubits_to_invert: List[int],
+        velocity_index_to_reflect: int,
+        distance_from_boundary_point: Tuple[int, ...],
+        lattice_properties: SpaceTimeLatticeBuilder,
+    ) -> None:
+        self.gridpoint_encoded = gridpoint_encoded
+        self.qubits_to_invert = qubits_to_invert
+        self.velocity_index_to_reflect = velocity_index_to_reflect
+        self.distance_from_boundary_point = distance_from_boundary_point
+        self.reversed_distance_from_boundary_point = tuple(
+            -x for x in distance_from_boundary_point
+        )
+        self.lattice_properties = lattice_properties
+        self.neighbor_velocity_pairs: Tuple[Tuple[int, int], Tuple[int, int]] = (
+            self.__get_neighbor_velocity_pairs()
+        )
+
+    def __get_neighbor_velocity_pairs(
+        self,
+    ) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+        reflected_velocity_index = (
+            self.lattice_properties.get_reflected_index_of_velocity(
+                self.velocity_index_to_reflect
+            )
+        )
+        increment = self.lattice_properties.get_reflection_increments(
+            reflected_velocity_index
+        )
+
+        neighbor_of_reflection = self.lattice_properties.get_index_of_neighbor(
+            self.reversed_distance_from_boundary_point
+        )
+
+        neighbor_of_streamed_particle = self.lattice_properties.get_index_of_neighbor(
+            tuple(
+                a + b
+                for a, b in zip(self.reversed_distance_from_boundary_point, increment)
+            )
+        )
+
+        return (
+            (neighbor_of_streamed_particle, reflected_velocity_index),
+            (neighbor_of_reflection, self.velocity_index_to_reflect),
+        )
 
 
 class Block:
@@ -91,19 +142,36 @@ class Block:
         self.bounds = bounds
         self.num_dims = len(bounds)
         self.boundary_condition = boundary_condition
-        self.mesh_vertices = np.array(
-            list(
-                product(*bounds)  # All combinations of bounds for 3D
+        self.num_qubits = num_qubits
+        if self.num_dims == 3:
+            self.mesh_vertices = np.array(
+                list(
+                    product(*bounds)  # All combinations of bounds for 3D
+                )
             )
-            if self.num_dims > 2
-            else [
-                corner_point
-                + (1,)  # All combinations of bounds and (1) for the z dimension in 2D
-                for corner_point in list(product(*bounds))
-            ]
-        )
+        elif self.num_dims == 2:
+            self.mesh_vertices = np.array(
+                [
+                    corner_point
+                    + (
+                        1,
+                    )  # All combinations of bounds and (1) for the z dimension in 2D
+                    for corner_point in list(product(*bounds))
+                ]
+            )
+        else:  # 1D
+            # self.mesh_vertices = np.array([(bounds[0][0], 0, 1), (bounds[0][1], 1, 1)])
+            self.mesh_vertices = np.array(
+                [
+                    corner_point
+                    + (
+                        1,
+                    )  # All combinations of bounds and (1) for the z dimension in 2D
+                    for corner_point in list(product(*(bounds + [(0, 1)])))
+                ]
+            )
 
-        self.mesh_indices = self.mesh_indices_list[self.num_dims - 2]
+        self.mesh_indices = self.mesh_indices_list[max(0, self.num_dims - 2)]
 
         # The number of qubits used to offset "higher" dimensions
         previous_qubits: List[int] = [
@@ -427,6 +495,51 @@ class Block:
 
         return segments
 
+    def get_spacetime_reflection_data_d1q2(
+        self,
+        properties: SpaceTimeLatticeBuilder,
+        num_steps: int | None = None,
+    ) -> List[SpaceTimeReflectionData]:
+        if num_steps is None:
+            num_steps = properties.num_timesteps
+
+        reflection_list = []
+        for c, reflection_bound in enumerate(self.bounds[0]):
+            for reflection_direction in [1 - c, c]:
+                increment = properties.get_reflection_increments(reflection_direction)
+                origin: Tuple[int, ...] = (reflection_bound, 0)
+                for t in range(num_steps):
+                    num_gps_in_dim = 2 ** self.num_qubits[0]
+                    gridpoint_encoded = tuple(
+                        a + (t + 1 if 1 - c == reflection_direction else t) * b
+                        for a, b in zip(origin, increment)
+                    )
+
+                    # Add periodic boundary conditions
+                    gridpoint_encoded = tuple(
+                        x % num_gps_in_dim
+                        if num_gps_in_dim
+                        else (x + num_gps_in_dim if x < 0 else x)
+                        for x in gridpoint_encoded
+                    )
+                    distance_from_origin = tuple((t + 1) * x for x in increment)
+                    qubits_to_invert = [
+                        i
+                        for i in range(self.num_qubits[0])
+                        if not bit_value(gridpoint_encoded[0], i)
+                    ]
+
+                    reflection_list.append(
+                        SpaceTimeReflectionData(
+                            gridpoint_encoded,
+                            qubits_to_invert,
+                            not bool(reflection_direction),
+                            distance_from_origin,
+                            properties,
+                        )
+                    )
+        return reflection_list
+
     def stl_mesh(self) -> mesh.Mesh:
         """
         Provides the ``stl`` representation of the block.
@@ -582,7 +695,7 @@ class ReflectionWall:
     def __get_bounceback_wall_loose_bounds(self):
         # Whether to use comparator bounds (LE, GE - True) or (LT, GT - False)
         # When performing BB reflection on the inside walls.
-        # Oragnized as outer list -> dimension, inner list -> alignment dimensions
+        # Organized as outer list -> dimension, inner list -> alignment dimensions
         # Many combinations are possible here
         if self.num_dims == 2:
             return [[True], [False]]

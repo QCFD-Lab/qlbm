@@ -1,7 +1,7 @@
 import pytest
 
-from qlbm.lattice import SpaceTimeLattice
-from qlbm.lattice.lattices.spacetime_lattice import (
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.spacetime.properties_base import (
     VonNeumannNeighbor,
     VonNeumannNeighborType,
 )
@@ -65,22 +65,26 @@ def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
     )
 
 
-def test_lattice_num_qubis_1(
+def test_lattice_num_qubits_1(
     lattice_2d_16x16_1_obstacle_1_timestep: SpaceTimeLattice,
 ):
-    assert lattice_2d_16x16_1_obstacle_1_timestep.num_total_qubits == 28
+    assert (
+        lattice_2d_16x16_1_obstacle_1_timestep.properties.get_num_total_qubits() == 28
+    )
 
 
-def test_lattice_num_qubis_2(
+def test_lattice_num_qubits_2(
     lattice_2d_16x16_1_obstacle_2_timesteps: SpaceTimeLattice,
 ):
-    assert lattice_2d_16x16_1_obstacle_2_timesteps.num_total_qubits == 60
+    assert (
+        lattice_2d_16x16_1_obstacle_2_timesteps.properties.get_num_total_qubits() == 60
+    )
 
 
 def test_lattice_num_velocities(dummy_lattice: SpaceTimeLattice):
     for num_timesteps in range(10):
         assert (
-            dummy_lattice.num_required_velocity_qubits(num_timesteps)
+            dummy_lattice.properties.get_num_velocity_qubits(num_timesteps)
             == 8 * (num_timesteps * num_timesteps + num_timesteps) + 4
         )
 
@@ -91,7 +95,7 @@ def test_get_neighbor_indices_1_timestep(
     (
         extreme_points_dict,
         intermediate_points_dict,
-    ) = lattice_2d_16x16_1_obstacle_1_timestep.get_neighbor_indices()
+    ) = lattice_2d_16x16_1_obstacle_1_timestep.properties.get_neighbor_indices()
 
     assert len(extreme_points_dict) == 1
     assert len(intermediate_points_dict) == 0
@@ -110,7 +114,7 @@ def test_get_neighbor_indices_2_timesteps(
     (
         extreme_points_dict,
         intermediate_points_dict,
-    ) = lattice_2d_16x16_1_obstacle_2_timesteps.get_neighbor_indices()
+    ) = lattice_2d_16x16_1_obstacle_2_timesteps.properties.get_neighbor_indices()
 
     assert len(extreme_points_dict) == 2
     assert len(intermediate_points_dict) == 1
@@ -142,7 +146,7 @@ def test_get_neighbor_indices_extreme_5_timesteps(
     (
         extreme_points_dict,
         _,
-    ) = lattice_2d_16x16_1_obstacle_5_timesteps.get_neighbor_indices()
+    ) = lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_neighbor_indices()
 
     assert len(extreme_points_dict) == 5
     # assert len(intermediate_points_dict) == 1
@@ -184,7 +188,7 @@ def test_get_neighbor_indices_intermediate_5_timesteps(
     (
         _,
         intermediate_points_dict,
-    ) = lattice_2d_16x16_1_obstacle_5_timesteps.get_neighbor_indices()
+    ) = lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_neighbor_indices()
     assert intermediate_points_dict[2] == {
         0: [VonNeumannNeighbor((1, 1), 6, VonNeumannNeighborType.INTERMEDIATE)],
         1: [VonNeumannNeighbor((-1, 1), 8, VonNeumannNeighborType.INTERMEDIATE)],
@@ -260,27 +264,37 @@ def test_get_neighbor_indices_intermediate_5_timesteps(
 
 
 def test_num_gridpoints_within_distance(dummy_lattice: SpaceTimeLattice):
-    assert dummy_lattice.num_gridpoints_within_distance(1) == 5
-    assert dummy_lattice.num_gridpoints_within_distance(2) == 13
-    assert dummy_lattice.num_gridpoints_within_distance(3) == 25
-    assert dummy_lattice.num_gridpoints_within_distance(4) == 41
-    assert dummy_lattice.num_gridpoints_within_distance(5) == 61
+    assert dummy_lattice.properties.get_num_gridpoints_within_distance(1) == 5
+    assert dummy_lattice.properties.get_num_gridpoints_within_distance(2) == 13
+    assert dummy_lattice.properties.get_num_gridpoints_within_distance(3) == 25
+    assert dummy_lattice.properties.get_num_gridpoints_within_distance(4) == 41
+    assert dummy_lattice.properties.get_num_gridpoints_within_distance(5) == 61
 
 
 def test_quadrants_edges(lattice_2d_16x16_1_obstacle_5_timesteps):
     for x in range(1, 10):
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((x, 0)) == 0
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (x, 0)
+            )
+            == 0
         )
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((0, x)) == 1
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (0, x)
+            )
+            == 1
         )
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((-x, 0))
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (-x, 0)
+            )
             == 2
         )
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((0, -x))
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (0, -x)
+            )
             == 3
         )
 
@@ -288,135 +302,407 @@ def test_quadrants_edges(lattice_2d_16x16_1_obstacle_5_timesteps):
 def test_quadrants_diagonals(lattice_2d_16x16_1_obstacle_5_timesteps):
     for x in range(1, 10):
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((x, x)) == 0
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (x, x)
+            )
+            == 0
         )
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((-x, x))
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (-x, x)
+            )
             == 1
         )
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((-x, -x))
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (-x, -x)
+            )
             == 2
         )
         assert (
-            lattice_2d_16x16_1_obstacle_5_timesteps.coordinates_to_quadrant((x, -x))
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties.coordinates_to_quadrant(
+                (x, -x)
+            )
             == 3
         )
 
 
 def test_get_index_of_neighbor_origin(lattice_2d_16x16_1_obstacle_5_timesteps):
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, 0)) == 0
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((0, 0))
+        == 0
+    )
 
 
 def test_get_index_of_neighbor_dist_1(lattice_2d_16x16_1_obstacle_5_timesteps):
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, 0)) == 1
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, 1)) == 2
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, 0)) == 3
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, -1)) == 4
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((1, 0))
+        == 1
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((0, 1))
+        == 2
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, 0)
+        )
+        == 3
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (0, -1)
+        )
+        == 4
+    )
 
 
 def test_get_index_of_neighbor_dist_2(lattice_2d_16x16_1_obstacle_5_timesteps):
     # Extreme points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((2, 0)) == 5
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, 2)) == 7
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-2, 0)) == 9
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, -2)) == 11
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((2, 0))
+        == 5
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((0, 2))
+        == 7
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-2, 0)
+        )
+        == 9
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (0, -2)
+        )
+        == 11
+    )
 
     # Intermediate points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, 1)) == 6
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, 1)) == 8
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, -1)) == 10
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, -1)) == 12
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((1, 1))
+        == 6
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, 1)
+        )
+        == 8
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, -1)
+        )
+        == 10
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (1, -1)
+        )
+        == 12
+    )
 
 
 def test_get_index_of_neighbor_dist_3(lattice_2d_16x16_1_obstacle_5_timesteps):
     # Extreme points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((3, 0)) == 13
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, 3)) == 16
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-3, 0)) == 19
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, -3)) == 22
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((3, 0))
+        == 13
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((0, 3))
+        == 16
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-3, 0)
+        )
+        == 19
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (0, -3)
+        )
+        == 22
+    )
 
     # Intermediate points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((2, 1)) == 14
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, 2)) == 15
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((2, 1))
+        == 14
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((1, 2))
+        == 15
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, 2)) == 17
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-2, 1)) == 18
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, 2)
+        )
+        == 17
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-2, 1)
+        )
+        == 18
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-2, -1)) == 20
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, -2)) == 21
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-2, -1)
+        )
+        == 20
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, -2)
+        )
+        == 21
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, -2)) == 23
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((2, -1)) == 24
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (1, -2)
+        )
+        == 23
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (2, -1)
+        )
+        == 24
+    )
 
 
 def test_get_index_of_neighbor_dist_4(lattice_2d_16x16_1_obstacle_5_timesteps):
     # Extreme points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((4, 0)) == 25
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, 4)) == 29
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-4, 0)) == 33
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, -4)) == 37
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((4, 0))
+        == 25
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((0, 4))
+        == 29
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-4, 0)
+        )
+        == 33
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (0, -4)
+        )
+        == 37
+    )
 
     # Intermediate points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((3, 1)) == 26
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((2, 2)) == 27
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, 3)) == 28
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((3, 1))
+        == 26
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((2, 2))
+        == 27
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((1, 3))
+        == 28
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, 3)) == 30
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-2, 2)) == 31
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-3, 1)) == 32
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, 3)
+        )
+        == 30
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-2, 2)
+        )
+        == 31
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-3, 1)
+        )
+        == 32
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-3, -1)) == 34
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-2, -2)) == 35
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, -3)) == 36
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-3, -1)
+        )
+        == 34
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-2, -2)
+        )
+        == 35
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, -3)
+        )
+        == 36
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, -3)) == 38
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((2, -2)) == 39
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((3, -1)) == 40
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (1, -3)
+        )
+        == 38
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (2, -2)
+        )
+        == 39
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (3, -1)
+        )
+        == 40
+    )
 
 
 def test_get_index_of_neighbor_dist_5(lattice_2d_16x16_1_obstacle_5_timesteps):
     # Extreme points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((5, 0)) == 41
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, 5)) == 46
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-5, 0)) == 51
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((0, -5)) == 56
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((5, 0))
+        == 41
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((0, 5))
+        == 46
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-5, 0)
+        )
+        == 51
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (0, -5)
+        )
+        == 56
+    )
 
     # Intermediate points
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((4, 1)) == 42
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((3, 2)) == 43
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((2, 3)) == 44
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, 4)) == 45
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((4, 1))
+        == 42
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((3, 2))
+        == 43
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((2, 3))
+        == 44
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor((1, 4))
+        == 45
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, 4)) == 47
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-2, 3)) == 48
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-3, 2)) == 49
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-4, 1)) == 50
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, 4)
+        )
+        == 47
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-2, 3)
+        )
+        == 48
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-3, 2)
+        )
+        == 49
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-4, 1)
+        )
+        == 50
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-4, -1)) == 52
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-3, -2)) == 53
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-2, -3)) == 54
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((-1, -4)) == 55
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-4, -1)
+        )
+        == 52
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-3, -2)
+        )
+        == 53
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-2, -3)
+        )
+        == 54
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (-1, -4)
+        )
+        == 55
+    )
 
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((1, -4)) == 57
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((2, -3)) == 58
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((3, -2)) == 59
-    assert lattice_2d_16x16_1_obstacle_5_timesteps.get_index_of_neighbor((4, -1)) == 60
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (1, -4)
+        )
+        == 57
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (2, -3)
+        )
+        == 58
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (3, -2)
+        )
+        == 59
+    )
+    assert (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_index_of_neighbor(
+            (4, -1)
+        )
+        == 60
+    )
 
 
 def test_streaming_line_dist_1(lattice_2d_16x16_1_obstacle_1_timestep):
-    streaming_line_x_pos = lattice_2d_16x16_1_obstacle_1_timestep.get_streaming_lines(
-        0, True
+    streaming_line_x_pos = (
+        lattice_2d_16x16_1_obstacle_1_timestep.properties.get_streaming_lines(0, True)
     )
-    streaming_line_x_neg = lattice_2d_16x16_1_obstacle_1_timestep.get_streaming_lines(
-        0, False
+    streaming_line_x_neg = (
+        lattice_2d_16x16_1_obstacle_1_timestep.properties.get_streaming_lines(0, False)
     )
 
-    streaming_line_y_pos = lattice_2d_16x16_1_obstacle_1_timestep.get_streaming_lines(
-        1, True
+    streaming_line_y_pos = (
+        lattice_2d_16x16_1_obstacle_1_timestep.properties.get_streaming_lines(1, True)
     )
-    streaming_line_y_neg = lattice_2d_16x16_1_obstacle_1_timestep.get_streaming_lines(
-        1, False
+    streaming_line_y_neg = (
+        lattice_2d_16x16_1_obstacle_1_timestep.properties.get_streaming_lines(1, False)
     )
 
     assert streaming_line_x_pos == [[1, 0, 3]]
@@ -431,18 +717,18 @@ def test_streaming_line_dist_1(lattice_2d_16x16_1_obstacle_1_timestep):
 
 
 def test_streaming_line_dist_2(lattice_2d_16x16_1_obstacle_2_timesteps):
-    streaming_line_x_pos = lattice_2d_16x16_1_obstacle_2_timesteps.get_streaming_lines(
-        0, True
+    streaming_line_x_pos = (
+        lattice_2d_16x16_1_obstacle_2_timesteps.properties.get_streaming_lines(0, True)
     )
-    streaming_line_x_neg = lattice_2d_16x16_1_obstacle_2_timesteps.get_streaming_lines(
-        0, False
+    streaming_line_x_neg = (
+        lattice_2d_16x16_1_obstacle_2_timesteps.properties.get_streaming_lines(0, False)
     )
 
-    streaming_line_y_pos = lattice_2d_16x16_1_obstacle_2_timesteps.get_streaming_lines(
-        1, True
+    streaming_line_y_pos = (
+        lattice_2d_16x16_1_obstacle_2_timesteps.properties.get_streaming_lines(1, True)
     )
-    streaming_line_y_neg = lattice_2d_16x16_1_obstacle_2_timesteps.get_streaming_lines(
-        1, False
+    streaming_line_y_neg = (
+        lattice_2d_16x16_1_obstacle_2_timesteps.properties.get_streaming_lines(1, False)
     )
 
     assert streaming_line_x_pos == [[12, 4, 10], [5, 1, 0, 3, 9], [6, 2, 8]]
@@ -457,18 +743,18 @@ def test_streaming_line_dist_2(lattice_2d_16x16_1_obstacle_2_timesteps):
 
 
 def test_streaming_line_dist_5(lattice_2d_16x16_1_obstacle_5_timesteps):
-    streaming_line_x_pos = lattice_2d_16x16_1_obstacle_5_timesteps.get_streaming_lines(
-        0, True
+    streaming_line_x_pos = (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_streaming_lines(0, True)
     )
-    streaming_line_x_neg = lattice_2d_16x16_1_obstacle_5_timesteps.get_streaming_lines(
-        0, False
+    streaming_line_x_neg = (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_streaming_lines(0, False)
     )
 
-    streaming_line_y_pos = lattice_2d_16x16_1_obstacle_5_timesteps.get_streaming_lines(
-        1, True
+    streaming_line_y_pos = (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_streaming_lines(1, True)
     )
-    streaming_line_y_neg = lattice_2d_16x16_1_obstacle_5_timesteps.get_streaming_lines(
-        1, False
+    streaming_line_y_neg = (
+        lattice_2d_16x16_1_obstacle_5_timesteps.properties.get_streaming_lines(1, False)
     )
 
     assert streaming_line_x_pos == [

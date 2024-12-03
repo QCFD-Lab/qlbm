@@ -5,7 +5,8 @@ from .components import (
     SpecularReflectionOperator,
 )
 from .infra import CircuitCompiler, CollisionlessResult, QiskitRunner, QulacsRunner
-from .lattice import CollisionlessLattice, Lattice, SpaceTimeLattice
+from .lattice import CollisionlessLattice, Lattice
+from .lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 __all__ = [
     "Lattice",

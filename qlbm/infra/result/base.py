@@ -119,7 +119,7 @@ class QBMResult(ABC):
         img.GetPointData().SetScalars(vtk_data)
         img.SetDimensions(
             self.lattice.num_gridpoints[0] + 1,
-            self.lattice.num_gridpoints[1] + 1 if self.lattice.num_dims > 1 else 1,
+            self.lattice.num_gridpoints[1] + 1 if self.lattice.num_dims > 1 else 2,
             self.lattice.num_gridpoints[2] + 1 if self.lattice.num_dims > 2 else 1,
         )
 

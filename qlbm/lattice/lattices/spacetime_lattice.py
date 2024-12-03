@@ -1,74 +1,14 @@
-from enum import Enum
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
 
-from qlbm.lattice.blocks import Block
-from qlbm.tools.exceptions import CircuitException, LatticeException
-from qlbm.tools.utils import dimension_letter, flatten
-
-from .base import Lattice
-
-
-class VonNeumannNeighborType(Enum):
-    ORIGIN = (0,)
-    INTERMEDIATE = (1,)
-    EXTREME = (2,)
-
-
-class VonNeumannNeighbor:
-    def __init__(
-        self,
-        relative_coordinates: Tuple[int, int],
-        neighborhood_index: int,
-        neighbor_type: VonNeumannNeighborType,
-    ):
-        self.coordinates_relative = relative_coordinates
-        self.coordinates_inverse = [-1 * coord for coord in relative_coordinates]
-        self.neighbor_index = neighborhood_index
-        self.neighbor_type = neighbor_type
-
-    def __eq__(self, other):
-        if not isinstance(other, VonNeumannNeighbor):
-            return NotImplemented
-
-        return (
-            all(
-                c0 == c1
-                for c0, c1 in zip(self.coordinates_relative, other.coordinates_relative)
-            )
-            and all(
-                c0 == c1
-                for c0, c1 in zip(self.coordinates_inverse, other.coordinates_inverse)
-            )
-            and self.neighbor_index == other.neighbor_index
-            and self.neighbor_type == other.neighbor_type
-        )
-
-    def get_absolute_values(
-        self, origin: Tuple[int, int], relative: bool
-    ) -> Tuple[int, int]:
-        return cast(
-            Tuple[int, int],
-            tuple(
-                c0 + c1
-                for c0, c1 in zip(
-                    (
-                        self.coordinates_relative
-                        if relative
-                        else self.coordinates_inverse
-                    ),
-                    origin,
-                )
-            ),
-        )
-
-    def velocity_index_to_swap(self, point_class: int, timestep: int) -> int:
-        if timestep == 1:
-            return (point_class + 2) % 4
-        else:
-            raise CircuitException("Not implemented.")
+from qlbm.lattice.lattices.base import Lattice
+from qlbm.lattice.spacetime.d1q2 import D1Q2SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.d2q4 import D2Q4SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
+from qlbm.tools.exceptions import LatticeException
+from qlbm.tools.utils import flatten
 
 
 class SpaceTimeLattice(Lattice):
@@ -88,7 +28,7 @@ class SpaceTimeLattice(Lattice):
     :attr:`num_dims`            The number of dimensions of the lattice.
     :attr:`num_gridpoints`      A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
                                 **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
-                                specified in the input dicitionary is one larger than the one held in the ``Lattice``.
+                                specified in the input dictionary is one larger than the one held in the ``Lattice``.
                                 That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
     :attr:`num_grid_qubits`     The total number of qubits required to encode the lattice grid.
     :attr:`num_velocity_qubits` The total number of qubits required to encode the velocity discretization of the lattice.
@@ -165,66 +105,24 @@ class SpaceTimeLattice(Lattice):
         ).circuit.draw("mpl")
     """
 
-    # ! Only works for D2Q4
-
-    # Points with 3 neighbors with higher Manhattan distances
-    # In order:
-    #   ^   |   ^   |   ^   |   x   |
-    # x   > | <   > | <   x | <   > |
-    #   v   |   x   |   v   |   v   |
-    extreme_point_classes: List[Tuple[int, Tuple[int, int]]] = [
-        (0, (1, 0)),
-        (1, (0, 1)),
-        (2, (-1, 0)),
-        (3, (0, -1)),
-    ]
-
-    # Points with 2 neighbors with higher Manhattan distances
-    # In order:
-    #   ^   |   ^   |   x   |   x   |
-    # x   > | <   x | <   x | x   > |
-    #   x   |   x   |   v   |   v   |
-    intermediate_point_classes: List[Tuple[int, Tuple[int, int]]] = [
-        (0, (-1, 1)),
-        (1, (-1, -1)),
-        (2, (1, -1)),
-        (3, (1, 1)),
-    ]
-
-    # The origin point's neighbors all have higher Manhattan distances (1)
-    #   ^   |
-    # <   > |
-    #   v   |
-    origin_point_class: List[int] = [0]
-
     def __init__(
         self,
         num_timesteps: int,
         lattice_data: str | Dict,  # type: ignore
-        logger: Logger = getLogger("qlbm/"),
+        logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(lattice_data, logger)
         self.num_gridpoints, self.num_velocities, self.blocks = self.parse_input_data(
             lattice_data
         )  # type: ignore
-        # Adding the length corrects for the fact that the parser subtracts 1
-        # from the input to get the correct bit length.
-        self.total_gridpoints: int = (
-            sum(self.num_gridpoints) + len(self.num_gridpoints)
-        ) * (sum(self.num_gridpoints) + len(self.num_gridpoints))
-        self.num_velocities_per_point: int = sum(2**v for v in self.num_velocities)
+        self.num_dims = len(self.num_gridpoints)
         self.num_timesteps = num_timesteps
-        self.num_grid_qubits: int = sum(
-            num_gridpoints_in_dim.bit_length()
-            for num_gridpoints_in_dim in self.num_gridpoints
-        )
-        self.num_velocity_qubits: int = self.num_required_velocity_qubits(num_timesteps)
-        self.num_ancilla_qubits = 0
-        self.num_total_qubits = (
-            self.num_ancilla_qubits + self.num_grid_qubits + self.num_velocity_qubits
-        )
-        self.block_list: List[Block] = []
-        temporary_registers = self.get_registers()
+
+        self.properties: SpaceTimeLatticeBuilder = self.__get_builder()
+
+        self.num_velocities_per_point = self.properties.get_num_velocities_per_point()
+
+        temporary_registers = self.properties.get_registers()
         (
             self.grid_registers,
             self.velocity_registers,
@@ -234,10 +132,32 @@ class SpaceTimeLattice(Lattice):
         (
             self.extreme_point_indices,
             self.intermediate_point_indices,
-        ) = self.get_neighbor_indices()
-        self.num_dims = len(self.num_gridpoints)
+        ) = self.properties.get_neighbor_indices()
 
         logger.info(self.__str__())
+
+    def __get_builder(self) -> SpaceTimeLatticeBuilder:
+        if self.num_dims == 1:
+            if self.num_velocities[0] == 1:
+                return D1Q2SpaceTimeLatticeBuilder(
+                    self.num_timesteps, self.num_gridpoints, self.blocks, self.logger
+                )
+            raise LatticeException(
+                f"Unsupported number of velocities for 1D: {self.num_velocities[0]}. Only D1Q2 is supported at the moment."
+            )
+
+        if self.num_dims == 2:
+            if self.num_velocities[0] == 1 and self.num_velocities[1] == 1:
+                return D2Q4SpaceTimeLatticeBuilder(
+                    self.num_timesteps, self.num_gridpoints, self.blocks, self.logger
+                )
+            raise LatticeException(
+                f"Unsupported number of velocities for 2D: {self.num_velocities}. Only D2Q4 is supported at the moment."
+            )
+
+        raise LatticeException(
+            "Only 1D and 2D discretizations are currently available."
+        )
 
     def grid_index(self, dim: int | None = None) -> List[int]:
         """Get the indices of the qubits used that encode the grid values for the specified dimension.
@@ -259,7 +179,7 @@ class SpaceTimeLattice(Lattice):
             If the dimension does not exist.
         """
         if dim is None:
-            return list(range(self.num_grid_qubits))
+            return list(range(self.properties.get_num_grid_qubits()))
 
         if dim >= self.num_dims or dim < 0:
             raise LatticeException(
@@ -297,36 +217,21 @@ class SpaceTimeLattice(Lattice):
         if velocity_direction is None:
             return list(
                 range(
-                    self.num_grid_qubits
+                    self.properties.get_num_grid_qubits()
                     + point_neighborhood_index * self.num_velocities_per_point,
-                    self.num_grid_qubits
+                    self.properties.get_num_grid_qubits()
                     + (point_neighborhood_index + 1) * (self.num_velocities_per_point),
                 )
             )
         return [
-            self.num_grid_qubits
+            self.properties.get_num_grid_qubits()
             + point_neighborhood_index * self.num_velocities_per_point
             + velocity_direction
         ]
 
-    def grid_neighbors(
+    def __grid_neighbors(
         self, coordinates: Tuple[int, int], up_to_distance: int
     ) -> List[List[int]]:
-        """
-
-
-        Parameters
-        ----------
-        coordinates : Tuple[int, int]
-            _description_
-        up_to_distance : int
-            _description_
-
-        Returns
-        -------
-        List[List[int]]
-            _description_
-        """
         return [
             [
                 (coordinates[0] + x_offset) % (self.num_gridpoints[0] + 1),
@@ -338,368 +243,8 @@ class SpaceTimeLattice(Lattice):
             )
         ]
 
-    def num_required_velocity_qubits(
-        self,
-        num_timesteps: int,
-    ) -> int:
-        """
-        Computes the number of required velocity qubits for a number of time steps to be simulated, :math:`\min(N_g \cdot N_v, \\frac{N_v^2\cdot N_t \cdot (N_t + 1)}{2} + N_v)`.
-
-        Parameters
-        ----------
-        num_timesteps : int
-            The number of time steps to be simulated.
-
-        Returns
-        -------
-        int
-            The number of velocity qubits required.
-        """
-        # Generalization of equation 17 of the paper
-        # ! TODO generalize to 3D
-        return min(
-            self.total_gridpoints * self.num_velocities_per_point,
-            int(
-                self.num_velocities_per_point
-                * self.num_velocities_per_point
-                * num_timesteps
-                * (num_timesteps + 1)
-                * 0.5
-                + self.num_velocities_per_point
-            ),
-        )
-
-    def num_gridpoints_within_distance(self, manhattan_distance: int) -> int:
-        """
-        Calculate the number of grid points within a given Manhattan distance.
-
-        Parameters
-        ----------
-        manhattan_distance : int
-            The Manhattan distance up to which (and including) to include the gridpoints.
-
-        Returns
-        -------
-        int
-            The number of gridpoints, including the origin, within the given Manhattan distance.
-        """
-        return int(
-            self.num_required_velocity_qubits(manhattan_distance)
-            / self.num_velocities_per_point
-        )
-
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
-        # Grid qubits
-        grid_registers = [
-            QuantumRegister(gp.bit_length(), name=f"g_{dimension_letter(c)}")
-            for c, gp in enumerate(self.num_gridpoints)
-        ]
-
-        # Velocity qubits
-        velocity_registers = [
-            QuantumRegister(
-                self.num_required_velocity_qubits(
-                    self.num_timesteps,
-                ),  # The number of velocity qubits required at time t
-                name="v",
-            )
-        ]
-
-        return (grid_registers, velocity_registers)
-
-    def von_neumann_neighbor_indices(
-        self, manhattan_distance_from_origin: int
-    ) -> List[int]:
-        """
-        Get the indices of the neighbors up to a given Manhattan distance, in a von Neumann neighborhood structure.
-
-        Parameters
-        ----------
-        manhattan_distance_from_origin : int
-            The exact Manhattan distance from the origin for which to retrieve the indices.
-
-        Returns
-        -------
-        List[int]
-            The indices of the qubits encoding the velocity of neighboring gridpoints exactly ``manhattan_distance_from_origin`` away from the origin.
-        """
-        if manhattan_distance_from_origin == 0:
-            return [0]
-
-        total_neighbors = int(
-            (
-                self.num_required_velocity_qubits(manhattan_distance_from_origin)
-                / self.num_velocities_per_point
-            )
-        )
-        neighbors_lower_distance = int(
-            (
-                self.num_required_velocity_qubits(manhattan_distance_from_origin)
-                / self.num_velocities_per_point
-            )
-        )
-
-        return list(range(neighbors_lower_distance, total_neighbors))
-
-    def get_neighbor_indices(
-        self,
-    ) -> Tuple[
-        Dict[int, List[VonNeumannNeighbor]],
-        Dict[int, Dict[int, List[VonNeumannNeighbor]]],
-    ]:
-        """
-        Get all of the information encoding the neighborhood structure of the lattice grid.
-        We differentiate between two kinds of grid points, based on their relative position as neighbors relative to the origin.
-        `Extreme points` are grid points that, in the expanding Manhattan distance stencil, have 3 neighbors with higher Manhattan distances.
-        All other points (except the origin) are `intermediate points`, which have 2 neighbors with higher Manhattan distances and 2 neighbors with lower ones.
-        Both extreme and intermediate points are further broken down into `classes`, based on which side of the origin they are on.
-        The classes follow the same numerical ordering as the local :math:`D_2Q_4` discretization:
-        0 encodes right, 1 up, 2 left, 3 down.
-        These differences are relevant when constructing the :class:`.SpaceTimeStreamingOperator`.
-        The structure of the output of this function contains two dictionaries, one for each kind of neighbor:
-
-        #. A dictionary containing extreme points. The keys of the dictionary are Manhattan distances, and the entries are the indices of the neighbors, ordered by class.
-        #. A dictionary containing intermediate points. The keys of the dictionary are Manhattan distances, and the entries are themselves dictionaries. For each nested dictionary, the key is the class, and the value is a list consisting of the point indices belonging to that class.
-
-        Returns
-        -------
-        Tuple[ Dict[int, List[VonNeumannNeighbor]], Dict[int, Dict[int, List[VonNeumannNeighbor]]], ]
-            The information encoding the lattice neighborhood structure.
-        """
-        # ! This ONLY works for D2Q4!
-        extreme_point_neighbor_indices: Dict[int, List[VonNeumannNeighbor]] = {}
-        intermediate_point_neighbor_indices: Dict[
-            int, Dict[int, List[VonNeumannNeighbor]]
-        ] = {
-            manhattan_distance: {}
-            for manhattan_distance in range(2, self.num_timesteps + 1)
-        }
-
-        for manhattan_distance in range(1, self.num_timesteps + 1):
-            total_neighbors_within_distance: int = self.num_gridpoints_within_distance(
-                manhattan_distance
-            )
-
-            previous_extreme_point_neighbors: List[VonNeumannNeighbor] = (
-                extreme_point_neighbor_indices[manhattan_distance - 1]
-                if manhattan_distance > 1
-                else (
-                    [
-                        VonNeumannNeighbor(
-                            (0, 0),
-                            1,
-                            VonNeumannNeighborType.ORIGIN,
-                        )
-                        for _ in range(4)
-                    ]
-                )
-            )
-
-            extreme_point_neighbor_indices[manhattan_distance] = [
-                VonNeumannNeighbor(
-                    cast(
-                        Tuple[int, int],
-                        tuple(
-                            c0 + c1
-                            for c0, c1 in zip(
-                                previous_extreme_point_neighbors[
-                                    neighbor_class
-                                ].coordinates_relative,
-                                self.extreme_point_classes[neighbor_class][1],
-                            )
-                        ),
-                    ),
-                    extreme_point_index,
-                    VonNeumannNeighborType.EXTREME,
-                )
-                for neighbor_class, extreme_point_index in enumerate(
-                    range(
-                        previous_extreme_point_neighbors[0].neighbor_index
-                        + self.num_velocities_per_point * (manhattan_distance - 1),
-                        total_neighbors_within_distance,
-                        manhattan_distance,
-                    )
-                )
-            ]
-
-            if manhattan_distance < 2:
-                continue
-
-            intermediate_point_neighbor_indices[manhattan_distance] = {
-                intermediate_point_class[0]: [
-                    VonNeumannNeighbor(
-                        cast(
-                            Tuple[int, int],
-                            tuple(
-                                c0 + (relative_intermediate_point_index + 1) * c1
-                                for c0, c1 in zip(
-                                    extreme_point_neighbor_indices[manhattan_distance][
-                                        neighbor_class
-                                    ].coordinates_relative,
-                                    self.intermediate_point_classes[neighbor_class][1],
-                                )
-                            ),
-                        ),
-                        absolute_intermediate_point_index,
-                        VonNeumannNeighborType.INTERMEDIATE,
-                    )
-                    for relative_intermediate_point_index, absolute_intermediate_point_index in enumerate(
-                        range(
-                            extreme_point_neighbor_indices[manhattan_distance][
-                                intermediate_point_class[0]
-                            ].neighbor_index
-                            + 1,
-                            (
-                                extreme_point_neighbor_indices[manhattan_distance][
-                                    intermediate_point_class[0] + 1
-                                ].neighbor_index
-                                if neighbor_class
-                                != len(self.intermediate_point_classes) - 1
-                                else total_neighbors_within_distance
-                            ),
-                        )
-                    )
-                ]
-                for neighbor_class, intermediate_point_class in enumerate(
-                    self.intermediate_point_classes
-                )
-            }
-
-        return extreme_point_neighbor_indices, intermediate_point_neighbor_indices
-
-    def coordinates_to_quadrant(self, distance: Tuple[int, int]) -> int:
-        """
-        Maps a given point to the quadrant it belongs to.
-        Quadrants are ordered in counterclockwise fashion, starting on the top right at 0:
-         1 | 0
-        _______
-         2 | 3
-
-        Points along lines that intersect with the origin (i.e., (0, 5), (-8, 0)) belong to quadrants as well:
-
-        #. :math:`x>0,y=0 \to q_0`
-        #. :math:`x=0,y>0 \to q_1`
-        #. :math:`x=<0,y=0 \to q_2`
-        #. :math:`x=0,y<0 \to q_3`
-
-        Parameters
-        ----------
-        distance : Tuple[int, int]
-            The coordinates of the point to place in a quadrant, expressed as its distance from the origin in the x and y axes.
-
-        Returns
-        -------
-        int
-            The quadrant the point belongs to.
-        """
-
-        if distance[1] == 0:
-            if distance[0] > 0:
-                return 0
-            return 2
-
-        if distance[0] == 0:
-            if distance[1] > 0:
-                return 1
-            return 3
-
-        if distance[1] > 0:
-            if distance[0] > 0:
-                return 0
-            return 1
-
-        if distance[0] < 0:
-            return 2
-        return 3
-
-    def get_index_of_neighbor(self, distance: Tuple[int, int]) -> int:
-        """
-        Calculate the index of a given grid point within the von Neumann neighborhood.
-        The indices are assigned in counterclockwise fashion in increasing order of their
-        Manhattan distances from the origin, in the same way that velocity indices are typically
-        labelled within LBM :math:`D_dQ_q` discretizations.
-        This is helpful for determining the placements of :math:`SWAP` gates that perform streaming.
-
-        Parameters
-        ----------
-        distance : Tuple[int, int]
-            The coordinates of the point to place in a quadrant, expressed as its distance from the origin in the x and y axes.
-
-        Returns
-        -------
-        int
-            The index of the point.
-        """
-        if distance[0] == 0 and distance[1] == 0:
-            return 0
-
-        distance_from_origin = sum(map(abs, distance))
-        is_extreme_point = distance[0] == 0 or distance[1] == 0
-        num_points_lower_distances = self.num_gridpoints_within_distance(
-            distance_from_origin - 1
-        )
-        quadrant: int = self.coordinates_to_quadrant(distance)
-
-        if is_extreme_point:
-            return num_points_lower_distances + quadrant * distance_from_origin
-        else:
-            ordering_dim = 0 if quadrant in [1, 3] else 1
-            distance_across_ordering_dim = abs(distance[ordering_dim])
-            return (
-                num_points_lower_distances
-                + quadrant * distance_from_origin
-                + distance_across_ordering_dim
-            )
-
-    def get_streaming_lines(
-        self, dimension: int, direction: bool, timestep: int | None = None
-    ) -> List[List[int]]:
-        """
-        Returns the `stream line` for a given dimension, direction, and time step.
-        A stream line consists of all particles within the point's neighborhood, that
-        (1) have the same discrete velocity and (2) can "reach" each other
-        by only traveling across the same discrete velocity channel.
-        The streaming operator of the STQBM algorithm is sensitive to the order
-        in which particles in such stream lines are swapped.
-
-        Parameters
-        ----------
-        dimension : int
-            The dimension (``0`` or ``1``) that the stream line spans.
-        direction : bool
-            The direction (``False`` for negative, ``True`` for positive) that the stream line traverses.
-        timestep : int | None, optional
-            The time step for which to compute the stream lines, by default None. More time steps require larger neighborhoods and thus more (and longer) stream lines.
-
-        Returns
-        -------
-        List[List[int]]
-            A list of neighbor indices that are along the same stream lines.
-        """
-        neighbors_in_line = []
-        if timestep is None:
-            timestep = self.num_timesteps
-        for offset in range(-timestep + 1, timestep):
-            start = -self.num_timesteps + abs(offset)
-            end = self.num_timesteps - abs(offset)
-            step = 1
-
-            if (dimension == 0 and direction) or (dimension == 1 and not direction):
-                start, end = end, start
-                step *= -1
-
-            neighbors_in_line.append(
-                [
-                    self.get_index_of_neighbor(
-                        (
-                            i if dimension == 0 else offset,
-                            offset if dimension == 0 else i,
-                        )
-                    )
-                    for i in range(start, end + step, step)
-                ]
-            )
-        return neighbors_in_line
+        return self.properties.get_registers()
 
     def logger_name(self) -> str:
         gp_string = ""

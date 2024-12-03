@@ -28,4 +28,4 @@ jobs:
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
       - name: Run unit tests
-        run: pytest test/unit --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+        run: pytest test/unit --doctest-modules --junitxml=junit/test-results.xml --cov=qlbm --cov-report=xml --cov-report=html

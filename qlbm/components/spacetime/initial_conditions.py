@@ -5,7 +5,8 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice, VonNeumannNeighbor
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.lattice.spacetime.properties_base import VonNeumannNeighbor
 from qlbm.tools.utils import bit_value, flatten
 
 
@@ -14,11 +15,11 @@ class SpaceTimeInitialConditions(LBMPrimitive):
     Prepares the initial state for the :class:`.SpaceTimeQLBM`.
     Initial conditions are supplied in a ``List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]``
     containing, for each population to be initialized, two nested tuples.
-    
+
     The first tuple position of the population(s) on the grid (i.e., ``(2, 5)``).
     The second tuple contains velocity of the population(s) at that location.
     Since the maximum number of velocities is pre-determined and the computational basis state encoding favors boolean logic,
-    the input is provided as a tuple of ``boolean``\ s. 
+    the input is provided as a tuple of ``boolean``\ s.
     That is, ``(True, True, False, False)`` would mean there are two populations at the same gridpoint,
     with velocities :math:`q_0` and :math:`q_1` according to the :math:`D_2Q_4` discretization.
     Together, the ``grid_data`` argument of the constructor can be supplied as, for instance, ``[((3, 7), (False, True, False, True))]``.
@@ -30,7 +31,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
         #. Set each of the toggled velocities to :math:`\ket{1}` by means of :math:`MCX` gates, controlled on the qubits set in the previous step;
         #. Undo the operation of step 1 (i.e., repeat the :math:`X` gates);
         #. Repeat steps 1-3 for all neighboring velocity qubits, adjusting for grid position and relative velocity index.
-    
+
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
@@ -38,7 +39,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
     :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
-    
+
     Example usage:
 
     .. plot::
@@ -59,10 +60,11 @@ class SpaceTimeInitialConditions(LBMPrimitive):
         # Draw the initial conditions for two particles at (3, 7), traveling in the +y and -y directions
         SpaceTimeInitialConditions(lattice=lattice, grid_data=[((3, 7), (False, True, False, True))]).draw("mpl")
     """
+
     def __init__(
         self,
         lattice: SpaceTimeLattice,
-        grid_data: List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]] = [
+        grid_data: List[Tuple[Tuple[int, ...], Tuple[bool, ...]]] = [
             ((2, 5), (True, True, True, True)),
             ((3, 4), (False, True, False, True)),
         ],
@@ -85,7 +87,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
             circuit.compose(
                 MCMT(
                     XGate(),
-                    num_ctrl_qubits=self.lattice.num_grid_qubits,
+                    num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
                     num_target_qubits=sum(
                         grid_point_data[1]
                     ),  # The sum is equal to the number of velocities set to true
@@ -115,7 +117,8 @@ class SpaceTimeInitialConditions(LBMPrimitive):
                     )
 
                 # No intermediate points at Manhattan distance 1
-                if manhattan_distance < 2:
+                # Or in 1D
+                if manhattan_distance < 2 or self.lattice.num_dims < 2:
                     continue
 
                 for neighbor in flatten(
@@ -134,7 +137,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
 
         return circuit
 
-    def set_grid_value(self, point_coordinates: Tuple[int, int]) -> QuantumCircuit:
+    def set_grid_value(self, point_coordinates: Tuple[int, ...]) -> QuantumCircuit:
         # ! TODO: rename, refactor into primitive
         circuit = self.lattice.circuit.copy()
 
@@ -147,8 +150,8 @@ class SpaceTimeInitialConditions(LBMPrimitive):
 
     def set_neighbor_velocity(
         self,
-        point_coordinates: Tuple[int, int],
-        velocity_values: Tuple[bool, bool, bool, bool],
+        point_coordinates: Tuple[int, ...],
+        velocity_values: Tuple[bool, ...],
         neighbor: VonNeumannNeighbor,
     ) -> QuantumCircuit:
         # ! TODO: rename, refactor into primitive
@@ -162,7 +165,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
         circuit.compose(
             MCMT(
                 XGate(),
-                num_ctrl_qubits=self.lattice.num_grid_qubits,
+                num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
                 num_target_qubits=sum(
                     velocity_values
                 ),  # The sum is equal to the number of velocities set to true

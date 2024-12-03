@@ -3,6 +3,7 @@ from logging import Logger, getLogger
 from qiskit import QuantumCircuit
 
 from qlbm.components.base import LBMAlgorithm
+from qlbm.components.spacetime.reflection import SpaceTimeReflectionOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 from .collision import SpaceTimeCollisionOperator
@@ -73,11 +74,23 @@ class SpaceTimeQLBM(LBMAlgorithm):
             )
 
             circuit.compose(
-                SpaceTimeCollisionOperator(
-                    self.lattice, timestep, logger=self.logger
+                SpaceTimeReflectionOperator(
+                    self.lattice,
+                    timestep,
+                    self.lattice.blocks["bounceback"],
+                    self.logger,
                 ).circuit,
                 inplace=True,
             )
+
+            # There is no collision in 1D
+            if self.lattice.num_dims > 1:
+                circuit.compose(
+                    SpaceTimeCollisionOperator(
+                        self.lattice, timestep, logger=self.logger
+                    ).circuit,
+                    inplace=True,
+                )
 
         return circuit
 

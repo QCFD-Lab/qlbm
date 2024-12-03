@@ -3,7 +3,7 @@ from logging import Logger, getLogger
 from qiskit import ClassicalRegister
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
 class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
@@ -41,6 +41,7 @@ class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
         # Draw the measurement circuit
         SpaceTimeGridVelocityMeasurement(lattice=lattice).draw("mpl")
     """
+
     def __init__(
         self,
         lattice: SpaceTimeLattice,
@@ -57,7 +58,8 @@ class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
         qubits_to_measure = self.lattice.grid_index() + self.lattice.velocity_index(0)
         circuit.add_register(
             ClassicalRegister(
-                self.lattice.num_grid_qubits + self.lattice.num_velocities_per_point
+                self.lattice.properties.get_num_grid_qubits()
+                + self.lattice.properties.get_num_velocities_per_point()
             )
         )
 

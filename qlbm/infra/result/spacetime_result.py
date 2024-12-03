@@ -6,7 +6,7 @@ import numpy as np
 import vtk
 from vtkmodules.util import numpy_support
 
-from qlbm.lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 from .base import QBMResult
 
@@ -25,6 +25,7 @@ class SpaceTimeResult(QBMResult):
     :attr:`output_file_name`    The root name for files containing time step artifacts, by default "step".
     =========================== ======================================================================
     """
+
     num_steps: int
     directory: str
     output_file_name: str
@@ -55,7 +56,25 @@ class SpaceTimeResult(QBMResult):
             else 0,
         )
 
-        if self.lattice.num_dims == 2:
+        if self.lattice.num_dims == 1:
+            # The second dimension is a dirty rendering trick for VTK and Paraview
+            count_history = np.zeros((self.lattice.num_gridpoints[0] + 1, 2))
+            for count in counts:
+                count_inverse = count[::-1]
+                x = int(
+                    count_inverse[: dimension_bit_counts[0]][::-1],
+                    2,
+                )
+                num_populations = int(
+                    count_inverse[dimension_bit_counts[0] :].count(
+                        "1"
+                    )  # The number of 1s is the number of populations
+                )
+                # Another dirty rendering trick for VTK and Paraview
+                count_history[x][0] = count_history[x][1] = (
+                    counts[count] * num_populations
+                )
+        elif self.lattice.num_dims == 2:
             count_history = np.zeros(
                 (self.lattice.num_gridpoints[0] + 1, self.lattice.num_gridpoints[1] + 1)
             )
@@ -96,17 +115,13 @@ class SpaceTimeResult(QBMResult):
                 autostrip=True,
             )
             vtk_data = numpy_support.numpy_to_vtk(
-                num_array=data, deep=True, array_type=vtk.VTK_FLOAT
+                num_array=data.flatten, deep=True, array_type=vtk.VTK_FLOAT
             )
             img = vtk.vtkImageData()
             img.SetDimensions(
                 self.lattice.num_gridpoints[0] + 1,
-                self.lattice.num_gridpoints[1] + 1
-                if self.lattice.num_dims > 1
-                else 1,
-                self.lattice.num_gridpoints[2] + 1
-                if self.lattice.num_dims > 2
-                else 1,
+                self.lattice.num_gridpoints[1] + 1 if self.lattice.num_dims > 1 else 1,
+                self.lattice.num_gridpoints[2] + 1 if self.lattice.num_dims > 2 else 1,
             )
             img.GetPointData().SetScalars(vtk_data)
 

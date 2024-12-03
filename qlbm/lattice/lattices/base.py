@@ -1,6 +1,5 @@
 import json
 from abc import ABC, abstractmethod
-from enum import Enum
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple
 
@@ -9,10 +8,6 @@ from qiskit import QuantumCircuit, QuantumRegister
 from qlbm.lattice.blocks import Block
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
-
-
-class LatticeDiscretization(Enum):
-    D2Q4 = (1,)
 
 
 class Lattice(ABC):

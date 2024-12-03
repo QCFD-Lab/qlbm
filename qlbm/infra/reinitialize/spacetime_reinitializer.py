@@ -9,7 +9,8 @@ from qulacs import QuantumCircuit as QulacsQC
 
 from qlbm.components.spacetime import SpaceTimeInitialConditions
 from qlbm.infra.compiler import CircuitCompiler
-from qlbm.lattice import SpaceTimeLattice
+from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.tools.exceptions import ExecutionException
 
 from .base import Reinitializer
 
@@ -47,7 +48,11 @@ class SpaceTimeReinitializer(Reinitializer):
         self.lattice = lattice
         self.logger = logger
         self.x_grid_qubits = self.lattice.num_gridpoints[0].bit_length()
-        self.y_grid_qubits = self.lattice.num_gridpoints[1].bit_length()
+        self.y_grid_qubits = (
+            self.lattice.num_gridpoints[1].bit_length()
+            if self.lattice.num_dims > 1
+            else 0
+        )
 
     def reinitialize(
         self,
@@ -87,7 +92,7 @@ class SpaceTimeReinitializer(Reinitializer):
     def counts_to_velocity_pairs(
         self,
         counts: Counts,
-    ) -> List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]:
+    ) -> List[Tuple[Tuple[int, ...], Tuple[bool, ...]]]:
         """
         Converts all counts into their grid and velocity components.
 
@@ -101,11 +106,14 @@ class SpaceTimeReinitializer(Reinitializer):
         List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]
             The input counts split into their grid position and velocity profile.
         """
-        return [self.split_count(count) for count in counts if int(count[:4], 2) > 0]
+        return [
+            self.split_count(count)
+            for count in counts
+            if int(count[: self.lattice.properties.get_num_velocities_per_point()], 2)
+            > 0
+        ]
 
-    def split_count(
-        self, count: str
-    ) -> Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]:
+    def split_count(self, count: str) -> Tuple[Tuple[int, ...], Tuple[bool, ...]]:
         """
         Splits a given ``Count`` into its position and velocity components.
         Counts are assumed to be obtained from :class:`.SpacetimeGridVelocityMeasurement` objects,
@@ -122,23 +130,38 @@ class SpaceTimeReinitializer(Reinitializer):
             The input count split into its grid position and velocity profile.
         """
         inverse_count = count[::-1]
-        return (
-            (
-                int(inverse_count[: self.x_grid_qubits][::-1], 2),
-                int(
-                    inverse_count[
-                        self.x_grid_qubits : self.x_grid_qubits + self.y_grid_qubits
-                    ][::-1],
-                    2,
+        if self.lattice.num_dims == 1:
+            return (
+                (int(inverse_count[: self.x_grid_qubits][::-1], 2), 0),
+                cast(
+                    Tuple[bool, bool],
+                    tuple(bool(int(x, 2)) for x in inverse_count[self.x_grid_qubits :]),
                 ),
-            ),
-            cast(
-                Tuple[bool, bool, bool, bool],
-                tuple(
-                    bool(int(x, 2))
-                    for x in inverse_count[self.x_grid_qubits + self.y_grid_qubits :]
+            )
+        elif self.lattice.num_dims == 2:
+            return (
+                (
+                    int(inverse_count[: self.x_grid_qubits][::-1], 2),
+                    int(
+                        inverse_count[
+                            self.x_grid_qubits : self.x_grid_qubits + self.y_grid_qubits
+                        ][::-1],
+                        2,
+                    ),
                 ),
-            ),
+                cast(
+                    Tuple[bool, bool, bool, bool],
+                    tuple(
+                        bool(int(x, 2))
+                        for x in inverse_count[
+                            self.x_grid_qubits + self.y_grid_qubits :
+                        ]
+                    ),
+                ),
+            )
+
+        raise ExecutionException(
+            f"Reinitialization not supported for lattice with {self.lattice.num_dims} dimensions."
         )
 
     def requires_statevector(self) -> bool:
