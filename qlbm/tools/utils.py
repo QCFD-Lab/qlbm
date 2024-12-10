@@ -211,3 +211,7 @@ def get_time_series(
             break
 
     return speed_controls
+
+
+def get_qubits_to_invert(gridpoint_encoded: int, num_qubits: int) -> List[int]:
+    return [i for i in range(num_qubits) if not bit_value(gridpoint_encoded, i)]
