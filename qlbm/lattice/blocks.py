@@ -7,7 +7,7 @@ import numpy as np
 from stl import mesh
 
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
-from qlbm.tools.utils import bit_value, dimension_letter, flatten
+from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to_invert
 
 
 class SpaceTimeReflectionData:
@@ -58,6 +58,11 @@ class SpaceTimeReflectionData:
             (neighbor_of_streamed_particle, reflected_velocity_index),
             (neighbor_of_reflection, self.velocity_index_to_reflect),
         )
+
+    # def __get_neighbor_velocity_pairs_d1q2(
+    #     self,
+    # ) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+    #     return
 
 
 class Block:
@@ -174,7 +179,7 @@ class Block:
         self.mesh_indices = self.mesh_indices_list[max(0, self.num_dims - 2)]
 
         # The number of qubits used to offset "higher" dimensions
-        previous_qubits: List[int] = [
+        self.previous_qubits: List[int] = [
             sum(num_qubits[previous_dim] for previous_dim in range(dim))
             for dim in range(self.num_dims)
         ]
@@ -183,7 +188,7 @@ class Block:
             tuple(
                 DimensionalReflectionData(
                     [
-                        previous_qubits[dim] + i
+                        self.previous_qubits[dim] + i
                         for i in range(num_qubits[dim])
                         if not bit_value(bounds[dim][bound_type], i)
                     ],
@@ -202,7 +207,7 @@ class Block:
             tuple(
                 DimensionalReflectionData(
                     [
-                        previous_qubits[dim] + i
+                        self.previous_qubits[dim] + i
                         for i in range(num_qubits[dim])
                         if not bit_value(
                             bounds[dim][bound_type] + 2 * bound_type - 1, i
@@ -523,11 +528,9 @@ class Block:
                         for x in gridpoint_encoded
                     )
                     distance_from_origin = tuple((t + 1) * x for x in increment)
-                    qubits_to_invert = [
-                        i
-                        for i in range(self.num_qubits[0])
-                        if not bit_value(gridpoint_encoded[0], i)
-                    ]
+                    qubits_to_invert = get_qubits_to_invert(
+                        gridpoint_encoded[0], self.num_qubits[0]
+                    )
 
                     reflection_list.append(
                         SpaceTimeReflectionData(
@@ -539,6 +542,144 @@ class Block:
                         )
                     )
         return reflection_list
+
+    def get_spacetime_reflection_data_d2q4(
+        self,
+        properties: SpaceTimeLatticeBuilder,
+        num_steps: int | None = None,
+    ) -> List[SpaceTimeReflectionData]:
+        if num_steps is None:
+            num_steps = properties.num_timesteps
+
+        reflection_list = []
+        surfaces = self.get_d2q4_surfaces()
+
+        # Surfaces are stored by dimension first
+        for fixed_dim, surfaces_of_dim in enumerate(surfaces):
+            # Each dimension has a lower bound and an upper bound surface
+            for bound, wall_of_surface in enumerate(surfaces_of_dim):
+                # fixed_dim_qubits_to_invert = get_qubits_to_invert(
+                #     wall_of_surface[0][fixed_dim], self.num_qubits[fixed_dim]
+                # )
+                streaming_line_velocities = [0, 2] if fixed_dim == 0 else [1, 3]
+                if not bound:
+                    streaming_line_velocities = list(
+                        reversed(streaming_line_velocities)
+                    )
+                symmetric_non_reflection_dimension_increment: List[
+                    Tuple[int, Tuple[int, ...]]
+                ] = [(0, (0, 0))] + flatten(
+                    [
+                        [
+                            (
+                                direction_factor * t,
+                                tuple(
+                                    a * direction_factor * t
+                                    for a in properties.get_reflection_increments(
+                                        1 if fixed_dim == 0 else 0
+                                    )
+                                ),
+                            )
+                            for t in range(1, num_steps)
+                        ]
+                        for direction_factor in [1, -1]
+                    ]
+                )
+
+                # Each surface is made up of several gridpoints
+                for gp_in_wall in wall_of_surface:
+                    for reflection_direction in streaming_line_velocities:
+                        increment = properties.get_reflection_increments(
+                            reflection_direction
+                        )
+
+                        # Each gridpoint is part of the stencil of several others
+                        for (
+                            offset,
+                            starting_increment,
+                        ) in symmetric_non_reflection_dimension_increment:
+                            origin: Tuple[int, ...] = tuple(
+                                a + b for a, b in zip(gp_in_wall, starting_increment)
+                            )
+                            for t in range(num_steps - abs(offset)):
+                                num_gps_in_dim = [2**n for n in self.num_qubits]
+                                gridpoint_encoded = tuple(
+                                    a
+                                    + (
+                                        t + 1
+                                        if (
+                                            streaming_line_velocities[0]
+                                            == reflection_direction
+                                        )
+                                        else t
+                                    )
+                                    * b
+                                    for a, b in zip(origin, increment)
+                                )
+
+                                # Add periodic boundary conditions
+                                gridpoint_encoded = tuple(
+                                    x + num_gps_in_dim if x < 0 else x % num_gps_in_dim
+                                    for x, num_gps_in_dim in zip(
+                                        gridpoint_encoded, num_gps_in_dim
+                                    )
+                                )
+                                distance_from_origin = tuple(
+                                    (t + 1) * x + y
+                                    for x, y in zip(increment, starting_increment)
+                                )
+
+                                # The qubits to invert for this gridpoint
+                                qubits_to_invert = flatten(
+                                    [
+                                        [
+                                            self.previous_qubits[dim] + q
+                                            for q in get_qubits_to_invert(
+                                                gridpoint_encoded[dim],
+                                                self.num_qubits[dim],
+                                            )
+                                        ]
+                                        for dim in range(2)
+                                    ]
+                                )
+                                opposite_reflection_direction = (
+                                    streaming_line_velocities[1]
+                                    if reflection_direction
+                                    == streaming_line_velocities[0]
+                                    else streaming_line_velocities[0]
+                                )
+
+                                reflection_list.append(
+                                    SpaceTimeReflectionData(
+                                        gridpoint_encoded,
+                                        qubits_to_invert,
+                                        opposite_reflection_direction,
+                                        distance_from_origin,
+                                        properties,
+                                    )
+                                )
+
+        return reflection_list
+
+    def get_d2q4_surfaces(self) -> List[List[List[Tuple[int, ...]]]]:
+        surfaces: List[List[List[Tuple[int, ...]]]] = []
+
+        for d, walls in enumerate(self.walls_inside):
+            surfaces_of_dim: List[List[Tuple[int, ...]]] = []
+            for wall in walls:
+                surfaces_of_dim.append(
+                    [
+                        (wall.data.gridpoint_encoded, coordinate_across_wall)
+                        if d == 0
+                        else (coordinate_across_wall, wall.data.gridpoint_encoded)
+                        for coordinate_across_wall in range(
+                            wall.lower_bounds[0], wall.upper_bounds[0] + 1
+                        )
+                    ]
+                )
+            surfaces.append(surfaces_of_dim)
+
+        return surfaces
 
     def stl_mesh(self) -> mesh.Mesh:
         """
