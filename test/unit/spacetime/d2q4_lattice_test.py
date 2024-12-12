@@ -710,7 +710,7 @@ def test_streaming_line_dist_1(lattice_2d_16x16_1_obstacle_1_timestep):
         list(reversed(line)) for line in streaming_line_x_pos
     ]
 
-    assert streaming_line_y_pos == [[4, 0, 2]]
+    assert streaming_line_y_pos == [[2, 0, 4]]
     assert streaming_line_y_neg == [
         list(reversed(line)) for line in streaming_line_y_pos
     ]
@@ -736,7 +736,7 @@ def test_streaming_line_dist_2(lattice_2d_16x16_1_obstacle_2_timesteps):
         list(reversed(line)) for line in streaming_line_x_pos
     ]
 
-    assert streaming_line_y_pos == [[10, 3, 8], [11, 4, 0, 2, 7], [12, 1, 6]]
+    assert streaming_line_y_pos == [[8, 3, 10], [7, 2, 0, 4, 11], [6, 1, 12]]
     assert streaming_line_y_neg == [
         list(reversed(line)) for line in streaming_line_y_pos
     ]
@@ -772,7 +772,7 @@ def test_streaming_line_dist_5(lattice_2d_16x16_1_obstacle_5_timesteps):
         list(reversed(line)) for line in streaming_line_x_pos
     ]
 
-    assert streaming_line_y_pos == [
+    assert streaming_line_y_neg == [
         [52, 33, 50],
         [53, 34, 19, 32, 49],
         [54, 35, 20, 9, 18, 31, 48],
