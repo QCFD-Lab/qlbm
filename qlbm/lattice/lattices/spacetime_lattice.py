@@ -109,9 +109,12 @@ class SpaceTimeLattice(Lattice):
         self,
         num_timesteps: int,
         lattice_data: str | Dict,  # type: ignore
+        filter_inside_blocks: bool = True,
         logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(lattice_data, logger)
+        self.filter_inside_blocks = filter_inside_blocks
+
         self.num_gridpoints, self.num_velocities, self.blocks = self.parse_input_data(
             lattice_data
         )  # type: ignore
@@ -245,6 +248,12 @@ class SpaceTimeLattice(Lattice):
 
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         return self.properties.get_registers()
+
+    def is_inside_an_obstacle(self, gridpoint: Tuple[int, ...]) -> bool:
+        return any(
+            block.contains_gridpoint(gridpoint)
+            for block in flatten(self.blocks.values())
+        )
 
     def logger_name(self) -> str:
         gp_string = ""

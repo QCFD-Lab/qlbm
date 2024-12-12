@@ -681,6 +681,12 @@ class Block:
 
         return surfaces
 
+    def contains_gridpoint(self, gridpoint: Tuple[int, ...]) -> bool:
+        return all(
+            coord >= bound[0] and coord <= bound[1]
+            for coord, bound in zip(gridpoint, self.bounds)
+        )
+
     def stl_mesh(self) -> mesh.Mesh:
         """
         Provides the ``stl`` representation of the block.
