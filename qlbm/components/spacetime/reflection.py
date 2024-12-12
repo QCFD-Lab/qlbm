@@ -18,6 +18,7 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
         lattice: SpaceTimeLattice,
         timestep: int,
         blocks: List[Block],
+        filter_inside_blocks: bool = True,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
@@ -29,6 +30,7 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
             )
 
         self.blocks = blocks
+        self.filter_inside_blocks = filter_inside_blocks
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -90,9 +92,18 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
         circuit = self.lattice.circuit.copy()
 
         for block in self.blocks:
-            for reflection_data in block.get_spacetime_reflection_data_d2q4(
+            reflection_data_points = block.get_spacetime_reflection_data_d2q4(
                 self.lattice.properties, self.timestep
-            ):
+            )
+
+            if self.filter_inside_blocks:
+                reflection_data_points = [
+                    rdp
+                    for rdp in reflection_data_points
+                    if not self.lattice.is_inside_an_obstacle(rdp.gridpoint_encoded)
+                ]
+
+            for reflection_data in reflection_data_points:
                 grid_qubit_indices_to_invert = [
                     self.lattice.grid_index(0)[0] + qubit
                     for qubit in reflection_data.qubits_to_invert

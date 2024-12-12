@@ -56,12 +56,13 @@ class SpaceTimeQLBM(LBMAlgorithm):
     def __init__(
         self,
         lattice: SpaceTimeLattice,
+        filter_inside_blocks: bool = True,
         logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(lattice, logger)
 
         self.lattice = lattice
-
+        self.filter_inside_blocks = filter_inside_blocks
         self.circuit = self.create_circuit()
 
     def create_circuit(self) -> QuantumCircuit:
@@ -78,6 +79,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
                     self.lattice,
                     timestep,
                     self.lattice.blocks["bounceback"],
+                    self.filter_inside_blocks,
                     self.logger,
                 ).circuit,
                 inplace=True,
