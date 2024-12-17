@@ -151,7 +151,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             end = self.num_timesteps - abs(offset)
             step = 1
 
-            if (dimension == 0 and direction) or (dimension == 1 and not direction):
+            if direction:
                 start, end = end, start
                 step *= -1
 

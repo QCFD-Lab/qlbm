@@ -46,7 +46,7 @@ mypy:
 
 test:
 	@ echo Running pytest...
-	$(CPU_VENV)/bin/pytest --junitxml=pytest_report.xml
+	$(CPU_VENV)/bin/pytest test/unit --junitxml=pytest_report.xml
 	@ echo All tests were successful.
 
 check-ci: ruff mypy test

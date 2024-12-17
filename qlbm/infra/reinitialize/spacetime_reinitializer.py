@@ -83,7 +83,9 @@ class SpaceTimeReinitializer(Reinitializer):
         """
         return self.compiler.compile(
             SpaceTimeInitialConditions(
-                self.lattice, self.counts_to_velocity_pairs(counts)
+                self.lattice,
+                self.counts_to_velocity_pairs(counts),
+                self.lattice.filter_inside_blocks,
             ),
             backend=backend,
             optimization_level=optimization_level,

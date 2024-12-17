@@ -18,6 +18,7 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
         lattice: SpaceTimeLattice,
         timestep: int,
         blocks: List[Block],
+        filter_inside_blocks: bool = True,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
@@ -29,6 +30,7 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
             )
 
         self.blocks = blocks
+        self.filter_inside_blocks = filter_inside_blocks
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -84,11 +86,56 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
 
                 if grid_qubit_indices_to_invert:
                     circuit.x(grid_qubit_indices_to_invert)
-                circuit.barrier()
         return circuit
 
     def __create_circuit_d2q4(self) -> QuantumCircuit:
-        raise CircuitException("Reflection Operator unsupported for D2Q4.")
+        circuit = self.lattice.circuit.copy()
+
+        for block in self.blocks:
+            reflection_data_points = block.get_spacetime_reflection_data_d2q4(
+                self.lattice.properties, self.timestep
+            )
+
+            if self.filter_inside_blocks:
+                reflection_data_points = [
+                    rdp
+                    for rdp in reflection_data_points
+                    if not self.lattice.is_inside_an_obstacle(rdp.gridpoint_encoded)
+                ]
+
+            for reflection_data in reflection_data_points:
+                grid_qubit_indices_to_invert = [
+                    self.lattice.grid_index(0)[0] + qubit
+                    for qubit in reflection_data.qubits_to_invert
+                ]
+
+                if grid_qubit_indices_to_invert:
+                    # Inverting the qubits that are 0 turns the
+                    # Dimensional grid qubit state encoding this wall to |11...1>
+                    # Which in turn allows us to control on this row, in combination with the comparator
+                    circuit.x(grid_qubit_indices_to_invert)
+
+                control_qubits = self.lattice.grid_index()
+                target_qubits = [
+                    self.lattice.velocity_index(
+                        neighbor_velocity_pair[0],
+                        neighbor_velocity_pair[1],
+                    )[0]
+                    for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs
+                ]
+
+                # Controlled swap decompositions
+                circuit.cx(target_qubits[1], target_qubits[0])
+                circuit.compose(
+                    MCMT(XGate(), len(control_qubits) + 1, len(target_qubits) - 1),
+                    qubits=control_qubits + target_qubits,
+                    inplace=True,
+                )
+                circuit.cx(target_qubits[1], target_qubits[0])
+
+                if grid_qubit_indices_to_invert:
+                    circuit.x(grid_qubit_indices_to_invert)
+        return circuit
 
     def __str__(self) -> str:
         # TODO: Implement

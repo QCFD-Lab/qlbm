@@ -68,12 +68,14 @@ class SpaceTimeInitialConditions(LBMPrimitive):
             ((2, 5), (True, True, True, True)),
             ((3, 4), (False, True, False, True)),
         ],
+        filter_inside_blocks: bool = True,
         logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(logger)
 
         self.lattice = lattice
         self.grid_data = grid_data
+        self.filter_inside_blocks = filter_inside_blocks
 
         self.circuit = self.create_circuit()
 
@@ -83,6 +85,9 @@ class SpaceTimeInitialConditions(LBMPrimitive):
 
         # Set the state for the origin
         for grid_point_data in self.grid_data:
+            if self.filter_inside_blocks:
+                if self.lattice.is_inside_an_obstacle(grid_point_data[0]):
+                    continue
             circuit.compose(self.set_grid_value(grid_point_data[0]), inplace=True)
             circuit.compose(
                 MCMT(
@@ -159,6 +164,9 @@ class SpaceTimeInitialConditions(LBMPrimitive):
         absolute_neighbor_coordinates = neighbor.get_absolute_values(
             point_coordinates, relative=False
         )
+        if self.filter_inside_blocks:
+            if self.lattice.is_inside_an_obstacle(absolute_neighbor_coordinates):
+                return self.lattice.circuit.copy()
         circuit.compose(
             self.set_grid_value(absolute_neighbor_coordinates), inplace=True
         )
