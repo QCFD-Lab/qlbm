@@ -1,0 +1,1739 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Collisionless Circuits &#8212; qlbm 0.0.4 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!-- 
+    this give us a css class that will be invisible only if js is disabled 
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=26a4bc78f4c0ddb94549" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=a746c00c" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=b4fc2567" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=26a4bc78f4c0ddb94549"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549" />
+
+    <script src="../_static/documentation_options.js?v=8c5712d9"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/cqlbm_comps';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Space-Time Circuits" href="stqlbm_comps.html" />
+    <link rel="prev" title="Base Classes" href="base_comps.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">qlbm 0.0.4 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Internal Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/qcfd-lab/qlbm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/qlbm/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Internal Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/qcfd-lab/qlbm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/qlbm/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="base_comps.html">Base Classes</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Collisionless Circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="stqlbm_comps.html">Space-Time Circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices and Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infra.html">Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Other Tools</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Internal Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Collisionless Circuits</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="collisionless-circuits">
+<span id="cqlbm-components"></span><h1>Collisionless Circuits<a class="headerlink" href="#collisionless-circuits" title="Link to this heading">#</a></h1>
+<p>This page contains documentation about the quantum circuits that make up the
+<strong>C</strong>ollisionless <strong>Q</strong>uantum <strong>L</strong>attice <strong>B</strong>oltzmann <strong>M</strong>ethod (CQLBM)
+first described in <span id="id1">[<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span> and later expanded in <span id="id2">[<a class="reference internal" href="../index.html#id7" title="Merel A. Schalkers and Matthias Möller. Momentum exchange method for quantum boltzmann methods. arXiv, 2024. URL: https://arxiv.org/abs/2404.17618, arXiv:2404.17618.">3</a>]</span>.
+At its core, the CQLBM algorithm manipulates the particle probability distribution
+in an amplitude-based encoding of the quantum state.
+This happens in several distinct steps:</p>
+<ol class="arabic simple">
+<li><p>Initial conditions prepare the starting state of the probability distribution function.</p></li>
+<li><p><a class="reference internal" href="#cqlbm-streaming"><span class="std std-ref">Streaming</span></a> circuits increment or decrement the position of particles in physical space through QFT-based streaming.</p></li>
+<li><p><a class="reference internal" href="#cqlbm-reflection"><span class="std std-ref">Reflection</span></a> circuits apply boundary conditions that affect particles that come in contact with solid obstacles. Reflection places those particles back in the appropriate position of the fluid domain.</p></li>
+<li><p>Measurement operations extract information out of the quantum state, which can later be post-processed classically.</p></li>
+</ol>
+<p>This page documents the individual components that make up the CQLBM algorithm.
+Subsections follow a top-down approach, where end-to-end operators are introduced first,
+before being broken down into their constituent parts.</p>
+<section id="end-to-end-algorithms">
+<span id="e2e"></span><h2>End-to-end algorithms<a class="headerlink" href="#end-to-end-algorithms" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.cqlbm.CQLBM">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.cqlbm.</span></span><span class="sig-name descname"><span class="pre">CQLBM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/cqlbm.py#L15-L100"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.cqlbm.CQLBM" title="Link to this definition">#</a></dt>
+<dd><p>The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm
+first introduced in <span id="id3">Schalkers and Möller [<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span> and later extended in <span id="id4">Schalkers and Möller [<a class="reference internal" href="../index.html#id7" title="Merel A. Schalkers and Matthias Möller. Momentum exchange method for quantum boltzmann methods. arXiv, 2024. URL: https://arxiv.org/abs/2404.17618, arXiv:2404.17618.">3</a>]</span>.
+This implementation supports 2D and 3D simulations with with cuboid objects
+with either bounce-back or specular reflection boundary conditions.</p>
+<p>The algorithm is composed of three steps that are repeated according to a CFL counter:</p>
+<ol class="arabic simple">
+<li><p>Streaming performed by the <a class="reference internal" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator" title="qlbm.components.collisionless.streaming.CollisionlessStreamingOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessStreamingOperator</span></code></a> increments or decrements the positions of particles on the grid.</p></li>
+<li><p><a class="reference internal" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator" title="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BounceBackReflectionOperator</span></code></a> and <a class="reference internal" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator" title="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpecularReflectionOperator</span></code></a> reflect the particles that come in contact with <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> obstacles encoded in the <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a>.</p></li>
+<li><p>The <a class="reference internal" href="#qlbm.components.collisionless.streaming.StreamingAncillaPreparation" title="qlbm.components.collisionless.streaming.StreamingAncillaPreparation"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingAncillaPreparation</span></code></a> resets the state of the ancilla qubits for the next CFL counter substep.</p></li>
+</ol>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="base_comps.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><em>Lattice</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="streaming">
+<span id="cqlbm-streaming"></span><h2>Streaming<a class="headerlink" href="#streaming" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.streaming.CollisionlessStreamingOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.streaming.</span></span><span class="sig-name descname"><span class="pre">CollisionlessStreamingOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/streaming.py#L234-L318"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator" title="Link to this definition">#</a></dt>
+<dd><p>An operator that performs streaming in Fourier space as part of the <a class="reference internal" href="#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> algorithm.
+Streaming is broken down into the following steps:</p>
+<ol class="arabic simple">
+<li><p>A <a class="reference internal" href="#qlbm.components.collisionless.streaming.StreamingAncillaPreparation" title="qlbm.components.collisionless.streaming.StreamingAncillaPreparation"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingAncillaPreparation</span></code></a> object prepares the ancilla velocity qubits for CFL time step. This happens independently for all dimensions, and it is assumed the velocity discretization is uniform across dimensions.</p></li>
+<li><p>A <a class="reference internal" href="#qlbm.components.collisionless.streaming.ControlledIncrementer" title="qlbm.components.collisionless.streaming.ControlledIncrementer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ControlledIncrementer</span></code></a> performs incrementation or decrementation in the Fourier space, controlled on the ancilla qubits set in the previous steps.</p></li>
+<li><p>For efficiency reasons, the velocity qubits set in step 1 are <strong>not</strong> reset, as they will be re-used in the subsequent reflection step. Another instance of the <a class="reference internal" href="#qlbm.components.collisionless.streaming.StreamingAncillaPreparation" title="qlbm.components.collisionless.streaming.StreamingAncillaPreparation"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingAncillaPreparation</span></code></a> would be required to consistently end the step.</p></li>
+</ol>
+<p>For an in-depth mathematical explanation of the procedure, consult Section 4 of <span id="id5">Schalkers and Möller [<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">velocities</span></code></p></td>
+<td><p>A list of velocities to increment. This is computed according to CFL counter.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">CollisionlessStreamingOperator</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Streaming the velocity with index 2</span>
+<span class="n">CollisionlessStreamingOperator</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">,</span> <span class="n">velocities</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/a8e8952d2f149db2604e1430bd44f985/cqlbm_comps-1.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/95c18676cdd98b664bc1acde86881726/cqlbm_comps-1.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/1e0cb3fdefdcb40369e7e01ef8ada9c8/cqlbm_comps-1.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/645b6e4722dad9edabcc3733ae9579ba/cqlbm_comps-1.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-1.png" class="plot-directive" src="../_images/cqlbm_comps-1.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>velocities</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.streaming.StreamingAncillaPreparation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.streaming.</span></span><span class="sig-name descname"><span class="pre">StreamingAncillaPreparation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/streaming.py#L15-L106"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.streaming.StreamingAncillaPreparation" title="Link to this definition">#</a></dt>
+<dd><p>A primitive used in <a class="reference internal" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator" title="qlbm.components.collisionless.streaming.CollisionlessStreamingOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessStreamingOperator</span></code></a> that implements the preparatory step of
+streaming necessary for the <a class="reference internal" href="#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> method. Specifically
+this operator sets the ancilla qubits to <span class="math notranslate nohighlight">\(\ket{1}\)</span> for the velocities that
+will be streamed in the next CFL time step.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">velocities</span></code></p></td>
+<td><p>The velocities that need to be streamed within the next time step.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">dim</span></code></p></td>
+<td><p>The dimension to which the velocities correspond.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">StreamingAncillaPreparation</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Streaming velocities indexed 2 in the y (1) dimension</span>
+<span class="n">StreamingAncillaPreparation</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">,</span> <span class="n">velocities</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/12b3361025744a22e8fcf5fec685910f/cqlbm_comps-2.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/8e43b292bcedb46573a12d45d3621322/cqlbm_comps-2.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/1c2bf2f01f2b381d44edde443f0ce1da/cqlbm_comps-2.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/9a18c8ea9918ead797b81f801276df47/cqlbm_comps-2.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-2.png" class="plot-directive" src="../_images/cqlbm_comps-2.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>velocities</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.streaming.ControlledIncrementer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.streaming.</span></span><span class="sig-name descname"><span class="pre">ControlledIncrementer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reflection=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/streaming.py#L109-L231"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.streaming.ControlledIncrementer" title="Link to this definition">#</a></dt>
+<dd><p>A primitive used in <a class="reference internal" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator" title="qlbm.components.collisionless.streaming.CollisionlessStreamingOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessStreamingOperator</span></code></a> that implements the streaming operation
+on the states for which the ancilla qubits are in the state <span class="math notranslate nohighlight">\(\ket{1}\)</span>. This primitive is applied
+after the primitive <a class="reference internal" href="#qlbm.components.collisionless.streaming.StreamingAncillaPreparation" title="qlbm.components.collisionless.streaming.StreamingAncillaPreparation"><code class="xref py py-class docutils literal notranslate"><span class="pre">StreamingAncillaPreparation</span></code></a> to compose the streaming operator.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">reflection</span></code></p></td>
+<td><p>The reflection attribute decides the type of reflection that will take place. This should
+be either “specular”, “bounceback”, or <code class="docutils literal notranslate"><span class="pre">None</span></code>, and defaults to None. This parameter
+governs which qubits are used as controls for the Fourier space phase shifts.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">ControlledIncrementer</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Streaming velocities indexed 2 in the y (1) dimension</span>
+<span class="n">ControlledIncrementer</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/5cc587c7851d50d76dcdf3e91e29ad2e/cqlbm_comps-3.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/43df2846fca8cb2eea0332fd26a66016/cqlbm_comps-3.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/3f9e0a8296b37a46c60e1dbabce50658/cqlbm_comps-3.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/2e200af46e973c52ba85819b7a65b827/cqlbm_comps-3.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-3.png" class="plot-directive" src="../_images/cqlbm_comps-3.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>reflection</strong> (<em>str</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.primitives.SpeedSensitiveAdder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.primitives.</span></span><span class="sig-name descname"><span class="pre">SpeedSensitiveAdder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/primitives.py#L276-L340"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.primitives.SpeedSensitiveAdder" title="Link to this definition">#</a></dt>
+<dd><p>A QFT-based incrementer used to perform streaming in the CQLBM algorithm.
+Incrementation and decerementation are performed as rotations on grid qubits
+that have been previously mapped to the Fourier basis.
+This happens by nesting a <a class="reference internal" href="#qlbm.components.collisionless.streaming.SpeedSensitivePhaseShift" title="qlbm.components.collisionless.streaming.SpeedSensitivePhaseShift"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpeedSensitivePhaseShift</span></code></a> primitive
+between regular and inverse <span class="math notranslate nohighlight">\(QFT\)</span>s.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_qubits</span></code></p></td>
+<td><p>Number of qubits of the circuit.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">speed</span></code></p></td>
+<td><p>The index of the speed to increment.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">positive</span></code></p></td>
+<td><p>Whether to increment the particles traveling at this speed in the positive (T) or negative (F) direction.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default getLogger(“qlbm”)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">SpeedSensitiveAdder</span>
+
+<span class="n">SpeedSensitiveAdder</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/f6c24a52fd0597373cff2378148e209b/cqlbm_comps-4.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/ac5fba26f07bc2777eee8fdbdff25a34/cqlbm_comps-4.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/8bd05fe88c0d238a65394f07f92de714/cqlbm_comps-4.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/dabfc23d7b9e823d92cef9804669b89b/cqlbm_comps-4.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-4.png" class="plot-directive" src="../_images/cqlbm_comps-4.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_qubits</strong> (<em>int</em>)</p></li>
+<li><p><strong>speed</strong> (<em>int</em>)</p></li>
+<li><p><strong>positive</strong> (<em>bool</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.streaming.SpeedSensitivePhaseShift">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.streaming.</span></span><span class="sig-name descname"><span class="pre">SpeedSensitivePhaseShift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/streaming.py#L391-L462"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.streaming.SpeedSensitivePhaseShift" title="Link to this definition">#</a></dt>
+<dd><p>A primitive that applies the phase-shift as part of the <a class="reference internal" href="#qlbm.components.collisionless.primitives.SpeedSensitiveAdder" title="qlbm.components.collisionless.primitives.SpeedSensitiveAdder"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpeedSensitiveAdder</span></code></a> used in <a class="reference internal" href="#qlbm.components.collisionless.primitives.Comparator" title="qlbm.components.collisionless.primitives.Comparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Comparator</span></code></a>s.
+The rotation applied is <span class="math notranslate nohighlight">\(\pm \frac{\pi}{2^{n_q - 1 - j}}\)</span>, with <span class="math notranslate nohighlight">\(j\)</span> the position of the qubit (indexed starting with 0).
+Unlike the regular <a class="reference internal" href="#qlbm.components.collisionless.streaming.PhaseShift" title="qlbm.components.collisionless.streaming.PhaseShift"><code class="xref py py-class docutils literal notranslate"><span class="pre">PhaseShift</span></code></a>, the speed-sensitive version additionally depends on a specific speed index.
+For an in-depth mathematical explanation of the procedure, consult Sections 4 and 5.5 of <span id="id6">Schalkers and Möller [<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_qubits</span></code></p></td>
+<td><p>The number of qubits to perform the phase shift for.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">positive</span></code></p></td>
+<td><p>Whether the phase shift is applied to increment (T)
+or decrement (F) the position of the particles.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">speed</span></code></p></td>
+<td><p>The specific speed index to perform the phase shift for.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">SpeedSensitivePhaseShift</span>
+
+<span class="c1"># A phase shift of 5 qubits, controlled on speed index 2</span>
+<span class="n">SpeedSensitivePhaseShift</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/ae8faf8a6bb4cf2ecabd6a4c2157acfa/cqlbm_comps-5.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/7188d063524648e4843dbfa95f827097/cqlbm_comps-5.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/ee6e5c3d14f23c25c2a6c9ecd691acf8/cqlbm_comps-5.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/db9e6eabc5516ad135f5f5f1d1337f74/cqlbm_comps-5.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-5.png" class="plot-directive" src="../_images/cqlbm_comps-5.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_qubits</strong> (<em>int</em>)</p></li>
+<li><p><strong>speed</strong> (<em>int</em>)</p></li>
+<li><p><strong>positive</strong> (<em>bool</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.streaming.PhaseShift">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.streaming.</span></span><span class="sig-name descname"><span class="pre">PhaseShift</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positive=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/streaming.py#L321-L388"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.streaming.PhaseShift" title="Link to this definition">#</a></dt>
+<dd><p>A primitive that applies the phase-shift as part of the <a class="reference internal" href="#qlbm.components.collisionless.streaming.ControlledIncrementer" title="qlbm.components.collisionless.streaming.ControlledIncrementer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ControlledIncrementer</span></code></a> used in the <a class="reference internal" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator" title="qlbm.components.collisionless.streaming.CollisionlessStreamingOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessStreamingOperator</span></code></a>.
+The rotation applied is <span class="math notranslate nohighlight">\(\pm\frac{\pi}{2^{n_q - 1 - j}}\)</span>, with <span class="math notranslate nohighlight">\(j\)</span> the position of the qubit (indexed starting with 0).
+For an in-depth mathematical explanation of the procedure, consult Section 4 of <span id="id7">Schalkers and Möller [<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_qubits</span></code></p></td>
+<td><p>The number of qubits to perform the phase shift for.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">positive</span></code></p></td>
+<td><p>Whether the phase shift is applied to increment (T)
+or decrement (F) the position of the particles.
+Defaults to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">PhaseShift</span>
+
+<span class="c1"># A phase shift of 5 qubits</span>
+<span class="n">PhaseShift</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">positive</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/55f2bd119c621bf8142a6bea4a34fc1c/cqlbm_comps-6.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/10f4bc2a10cf483e37c22e6e6d44bc1e/cqlbm_comps-6.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/ff3ec129e05bbd31d667e07572db1763/cqlbm_comps-6.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/c3795eda4af6215e2d42f12b9e8db38b/cqlbm_comps-6.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-6.png" class="plot-directive" src="../_images/cqlbm_comps-6.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_qubits</strong> (<em>int</em>)</p></li>
+<li><p><strong>positive</strong> (<em>bool</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="reflection">
+<span id="cqlbm-reflection"></span><h2>Reflection<a class="headerlink" href="#reflection" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.bounceback_reflection.</span></span><span class="sig-name descname"><span class="pre">BounceBackReflectionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/bounceback_reflection.py#L126-L518"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator" title="Link to this definition">#</a></dt>
+<dd><p>Operator implementing the 2D and 3D Bounce-Back (BB) boundary conditions as described in <span id="id8">Schalkers and Möller [<a class="reference internal" href="../index.html#id7" title="Merel A. Schalkers and Matthias Möller. Momentum exchange method for quantum boltzmann methods. arXiv, 2024. URL: https://arxiv.org/abs/2404.17618, arXiv:2404.17618.">3</a>]</span>.
+The operator parses information encoded in <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> objects to detect particles that
+have virtually streamed into the solid domain before placing them back to their
+previous positions in the fluid domain.
+The pseudocode for this procedure is as follows:</p>
+<ol class="arabic simple">
+<li><p>Components of the quantum state that encode particles that have streamed inside the obstacle are identified with <a class="reference internal" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackWallComparator" title="qlbm.components.collisionless.bounceback_reflection.BounceBackWallComparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BounceBackWallComparator</span></code></a> objects;</p></li>
+<li><p>These components have their velocity direction qubits flipped in all three dimensions;</p></li>
+<li><p>Particles are streamed outside the solid domain with inverted velocity directions;</p></li>
+<li><p>Once streamed outside the solid domain, components encoding affected particles have their obstacle ancilla qubit reset based on grid position, velocity direction, and whether they have streamed in the CFL timestep.</p></li>
+</ol>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">blocks</span></code></p></td>
+<td><p>A list of  <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> objects for which to generate the BB boundary condition circuits.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">BounceBackReflectionOperator</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;bounceback&quot;</span><span class="p">}],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">BounceBackReflectionOperator</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">,</span> <span class="n">blocks</span><span class="o">=</span><span class="n">lattice</span><span class="o">.</span><span class="n">block_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/0a5045c9bd0acb9b293fd2b75c220ebc/cqlbm_comps-7.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><em>Block</em></a><em>]</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.create_circuit">
+<span class="sig-name descname"><span class="pre">create_circuit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/bounceback_reflection.py#L182-L235"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.create_circuit" title="Link to this definition">#</a></dt>
+<dd><p>Creates the <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> of this object.
+This method is called automatically at construction time for all quantum components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The generated QuantumCircuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reflect_wall">
+<span class="sig-name descname"><span class="pre">reflect_wall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wall</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/bounceback_reflection.py#L237-L332"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reflect_wall" title="Link to this definition">#</a></dt>
+<dd><p>Performs reflection based on information encoded in a <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a> as follows:</p>
+<ol class="arabic simple">
+<li><p>A series of <span class="math notranslate nohighlight">\(X\)</span> gates set the grid qubits to the <span class="math notranslate nohighlight">\(\ket{1}\)</span> state for the dimension that the wall spans.</p></li>
+<li><p>Comparator circuits set the comparator ancilla qubits to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the size of the wall in the other dimension(s).</p></li>
+<li><p>Depending on the use, the directional velocity qubits are also set to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the dimension that the wall spans.</p></li>
+<li><p>A multi-controlled <span class="math notranslate nohighlight">\(X\)</span> gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.</p></li>
+<li><p>The control qubits are set back to their previous state.</p></li>
+</ol>
+<p>The wall reflection operation is versatile and can be used to both set and re-set the state
+of the obstacle ancilla qubit at different stages of reflection.
+When performing BB reflection, this function is first used to flip the
+ancilla obstacle qubit from <span class="math notranslate nohighlight">\(\ket{0}\)</span> to <span class="math notranslate nohighlight">\(\ket{1}\)</span>, irrespective of how particles arrived there.
+Subsequently, an additional controls are placed on the velocity direction qubits to reset the
+ancilla obstacle qubit to <span class="math notranslate nohighlight">\(\ket{0}\)</span>, after particles have been streamed out of the solid domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform BB reflection of the wall.</p></li>
+<li><p><strong>wall</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><em>ReflectionWall</em></a>) – The wall encoding the reflection logic.</p></li>
+<li><p><strong>inside_obstacle</strong> (<em>bool</em>) – Whether the wall is inside the obstacle.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The circuit performing BB reflection of the wall.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reset_edge_state">
+<span class="sig-name descname"><span class="pre">reset_edge_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/bounceback_reflection.py#L334-L406"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reset_edge_state" title="Link to this definition">#</a></dt>
+<dd><p>Resets the state of an edge along the side of an obstacle in 3D as follows:</p>
+<ol class="arabic simple">
+<li><p>A series of <span class="math notranslate nohighlight">\(X\)</span> gates set the grid qubits to the <span class="math notranslate nohighlight">\(\ket{1}\)</span> state for the 2 dimensions that the edge spans.</p></li>
+<li><p>A comparator circuits sets the comparator ancilla qubits to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the size of the edge in the remaining dimension.</p></li>
+<li><p>The directional velocity qubits are also set to <span class="math notranslate nohighlight">\(\ket{1}\)</span> on the specific velocity profile of the targeted particles.</p></li>
+<li><p>A multi-controlled <span class="math notranslate nohighlight">\(X\)</span> gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.</p></li>
+<li><p>The control qubits are set back to their previous state.</p></li>
+</ol>
+<p>This function resets the ancilla obstacle qubit to <span class="math notranslate nohighlight">\(\ket{0}\)</span> for particles
+along 36 specific edges of a cube after those particles have been streamed out of the obstacle in the CFL time step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform resetting of the edge state.</p></li>
+<li><p><strong>edge</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionResetEdge" title="qlbm.lattice.blocks.ReflectionResetEdge"><em>ReflectionResetEdge</em></a>) – The edge on which to apply the reflection reset logic.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The circuit performing the resetting of the edge state.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reset_point_state">
+<span class="sig-name descname"><span class="pre">reset_point_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corner</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/bounceback_reflection.py#L408-L477"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reset_point_state" title="Link to this definition">#</a></dt>
+<dd><p>Resets the state of the ancilla obstacle qubit of a single point on the grid as follows:</p>
+<ol class="arabic simple">
+<li><p>A series of <span class="math notranslate nohighlight">\(X\)</span> gates set the grid qubits to the <span class="math notranslate nohighlight">\(\ket{1}\)</span> state for the dimension that the wall spans.</p></li>
+<li><p>The directional velocity qubits are also set to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the specific velocity profile of the targeted particles.</p></li>
+<li><p>A multi-controlled <span class="math notranslate nohighlight">\(X\)</span> gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.</p></li>
+<li><p>The control qubits are set back to their previous state.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform the resetting of the point state.</p></li>
+<li><p><strong>corner</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionPoint" title="qlbm.lattice.blocks.ReflectionPoint"><em>ReflectionPoint</em></a>) – The corner for which to reset the desired point states.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The circuit resetting the point state as desired.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.flip_and_stream">
+<span class="sig-name descname"><span class="pre">flip_and_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/bounceback_reflection.py#L479-L515"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.flip_and_stream" title="Link to this definition">#</a></dt>
+<dd><p>Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
+Unlike in the regular <a class="reference internal" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator" title="qlbm.components.collisionless.streaming.CollisionlessStreamingOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessStreamingOperator</span></code></a>, the <a class="reference internal" href="#qlbm.components.collisionless.streaming.ControlledIncrementer" title="qlbm.components.collisionless.streaming.ControlledIncrementer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ControlledIncrementer</span></code></a>
+phase shift circuit is additionally controlled on the ancilla obstacle qubit, which
+ensures that only particles whose grid position gets incremented (decremented) are those
+that have streamed inside the solid domain in this CFL time step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform the flip and stream operation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.specular_reflection.</span></span><span class="sig-name descname"><span class="pre">SpecularReflectionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocks</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/specular_reflection.py#L124-L512"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator" title="Link to this definition">#</a></dt>
+<dd><p>Operator implementing the 2D and 3D Specular Reflection (SR) boundary conditions as described <span id="id9">Schalkers and Möller [<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span>.
+The operator parses information encoded in <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> objects to detect particles that
+have virtually streamed into the solid domain before placing them back to their
+previous positions in the fluid domain.
+The pseudocode for this procedure is as follows:</p>
+<ol class="arabic simple">
+<li><p>Components of the quantum state that encode particles that have streamed inside the obstacle are identified with <a class="reference internal" href="#qlbm.components.collisionless.specular_reflection.SpecularWallComparator" title="qlbm.components.collisionless.specular_reflection.SpecularWallComparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpecularWallComparator</span></code></a> objects;</p></li>
+<li><p>These components have their velocity direction qubits flipped according to the wall they came in contact with. Where two or three walls come together, the two or three corresponding directions are inverted;</p></li>
+<li><p>Particles are streamed outside the solid domain with inverted velocity directions;</p></li>
+<li><p>Once streamed outside the solid domain, components encoding affected particles have their obstacle ancilla qubits reset based on grid position, velocity direction, and whether they have streamed in the CFL timestep.</p></li>
+</ol>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">blocks</span></code></p></td>
+<td><p>A list of  <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> objects for which to generate the BB boundary condition circuits.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">SpecularReflectionOperator</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;specular&quot;</span><span class="p">}],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">SpecularReflectionOperator</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">,</span> <span class="n">blocks</span><span class="o">=</span><span class="n">lattice</span><span class="o">.</span><span class="n">block_list</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/cebc4f0ba94ec8a6c4ab070e23be1776/cqlbm_comps-8.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>blocks</strong> (<em>List</em><em>[</em><a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><em>Block</em></a><em>]</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.create_circuit">
+<span class="sig-name descname"><span class="pre">create_circuit</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/specular_reflection.py#L180-L232"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.create_circuit" title="Link to this definition">#</a></dt>
+<dd><p>Creates the <code class="xref py py-class docutils literal notranslate"><span class="pre">qiskit.QuantumCircuit</span></code> of this object.
+This method is called automatically at construction time for all quantum components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The generated QuantumCircuit.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reflect_wall">
+<span class="sig-name descname"><span class="pre">reflect_wall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wall</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/specular_reflection.py#L234-L321"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reflect_wall" title="Link to this definition">#</a></dt>
+<dd><p>Performs reflection based on information encoded in a <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a> as follows:</p>
+<ol class="arabic simple">
+<li><p>A series of <span class="math notranslate nohighlight">\(X\)</span> gates set the grid qubits to the <span class="math notranslate nohighlight">\(\ket{1}\)</span> state for the dimension that the wall spans.</p></li>
+<li><p>Comparator circuits set the comparator ancilla qubits to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the size of the wall in the other dimension(s).</p></li>
+<li><p>Depending on the use, the directional velocity qubits are also set to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the dimension that the wall spans.</p></li>
+<li><p>A multi-controlled <span class="math notranslate nohighlight">\(X\)</span> gate flips the obstacle ancilla qubits of the particular dimension that the wall reflects, controlled on the qubits set in the previous steps.</p></li>
+<li><p>The control qubits are set back to their previous state.</p></li>
+</ol>
+<p>The wall reflection operation is versatile and can be used to both set and re-set the state
+of the obstacle ancilla qubit at different stages of reflection.
+When performing SR reflection, this function is first used to flip the
+ancilla obstacle qubit from <span class="math notranslate nohighlight">\(\ket{0}\)</span> to <span class="math notranslate nohighlight">\(\ket{1}\)</span>, irrespective of how particles arrived there.
+Subsequently, an additional controls are placed on the velocity direction qubits to reset the
+ancilla obstacle qubit to <span class="math notranslate nohighlight">\(\ket{0}\)</span>, after particles have been streamed out of the solid domain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform resetting of the edge state.</p></li>
+<li><p><strong>wall</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><em>ReflectionWall</em></a>) – The wall encoding the reflection logic.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The circuit performing specular reflection of the wall.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reset_edge_state">
+<span class="sig-name descname"><span class="pre">reset_edge_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/specular_reflection.py#L323-L400"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reset_edge_state" title="Link to this definition">#</a></dt>
+<dd><p>Resets the state of an edge along the side of an obstacle in 3D as follows:</p>
+<ol class="arabic simple">
+<li><p>A series of <span class="math notranslate nohighlight">\(X\)</span> gates set the grid qubits to the <span class="math notranslate nohighlight">\(\ket{1}\)</span> state for the 2 dimensions that the edge spans.</p></li>
+<li><p>A comparator circuits sets the comparator ancilla qubits to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the size of the edge in the remaining dimension.</p></li>
+<li><p>The directional velocity qubits are also set to <span class="math notranslate nohighlight">\(\ket{1}\)</span> on the specific velocity profile of the targeted particles.</p></li>
+<li><p>A multi-controlled <span class="math notranslate nohighlight">\(X\)</span> gate flips the obstacle ancilla qubits of the direction reflect by the wall(s) that the edge is next to, controlled on the qubits set in the previous steps.</p></li>
+<li><p>The control qubits are set back to their previous state.</p></li>
+</ol>
+<p>This function resets the ancilla obstacle qubit to <span class="math notranslate nohighlight">\(\ket{0}\)</span> for particles
+along 36 specific edges of a cube after those particles have been streamed out of the obstacle in the CFL time step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform resetting of the edge state.</p></li>
+<li><p><strong>edge</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionResetEdge" title="qlbm.lattice.blocks.ReflectionResetEdge"><em>ReflectionResetEdge</em></a>) – The edge on which to apply the reflection reset logic.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The circuit performing the resetting of the edge state.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reset_point_state">
+<span class="sig-name descname"><span class="pre">reset_point_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corner</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/specular_reflection.py#L402-L476"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reset_point_state" title="Link to this definition">#</a></dt>
+<dd><p>Resets the state of the ancilla obstacle qubit of a single point on the grid as follows:</p>
+<ol class="arabic simple">
+<li><p>A series of <span class="math notranslate nohighlight">\(X\)</span> gates set the grid qubits to the <span class="math notranslate nohighlight">\(\ket{1}\)</span> state for the dimension that the wall spans.</p></li>
+<li><p>The directional velocity qubits are also set to <span class="math notranslate nohighlight">\(\ket{1}\)</span> based on the specific velocity profile of the targeted particles.</p></li>
+<li><p>A multi-controlled <span class="math notranslate nohighlight">\(X\)</span> gate flips the obstacle ancilla qubits corresponding to the dimensions that particles would have traveled to arrive there via reflection, controlled on the qubits set in the previous steps.</p></li>
+<li><p>The control qubits are set back to their previous state.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform the resetting of the point state.</p></li>
+<li><p><strong>corner</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionPoint" title="qlbm.lattice.blocks.ReflectionPoint"><em>ReflectionPoint</em></a>) – The corner for which to reset the desired point states.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The circuit resetting the point state as desired.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QuantumCircuit</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.flip_and_stream">
+<span class="sig-name descname"><span class="pre">flip_and_stream</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/specular_reflection.py#L478-L507"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.flip_and_stream" title="Link to this definition">#</a></dt>
+<dd><p>Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
+Unlike in the regular <a class="reference internal" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator" title="qlbm.components.collisionless.streaming.CollisionlessStreamingOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessStreamingOperator</span></code></a>, the <a class="reference internal" href="#qlbm.components.collisionless.streaming.ControlledIncrementer" title="qlbm.components.collisionless.streaming.ControlledIncrementer"><code class="xref py py-class docutils literal notranslate"><span class="pre">ControlledIncrementer</span></code></a>
+phase shift circuit is additionally controlled on the ancilla obstacle qubit of the streaming dimension,
+which ensures that only particles whose grid position gets incremented (decremented) are those
+that have streamed inside the solid domain in this CFL time step.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>circuit</strong> (<em>QuantumCircuit</em>) – The circuit on which to perform the flip and stream operation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.bounceback_reflection.BounceBackWallComparator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.bounceback_reflection.</span></span><span class="sig-name descname"><span class="pre">BounceBackWallComparator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wall</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/bounceback_reflection.py#L23-L123"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackWallComparator" title="Link to this definition">#</a></dt>
+<dd><p>A primitive used in the collision <a class="reference internal" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator" title="qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">BounceBackReflectionOperator</span></code></a> that implements the
+comparator for the BB boundary conditions as described <span id="id10">Schalkers and Möller [<a class="reference internal" href="../index.html#id7" title="Merel A. Schalkers and Matthias Möller. Momentum exchange method for quantum boltzmann methods. arXiv, 2024. URL: https://arxiv.org/abs/2404.17618, arXiv:2404.17618.">3</a>]</span>.
+The comparator sets an ancilla qubit to <span class="math notranslate nohighlight">\(\ket{1}\)</span> for the components of
+the quantum state whose grid qubits fall within the range spanned by the wall.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">wall</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a> encoding the range spanned by the wall.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">BounceBackWallComparator</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;bounceback&quot;</span><span class="p">}],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Comparing on the indices of the inside x-wall on the lower-bound of the obstacle</span>
+<span class="n">BounceBackWallComparator</span><span class="p">(</span>
+    <span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">,</span> <span class="n">wall</span><span class="o">=</span><span class="n">lattice</span><span class="o">.</span><span class="n">block_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">walls_inside</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/317a06545104eadfb7fce2a26d065819/cqlbm_comps-9.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/cee53ecdeb6abce48d6197beb845cbd0/cqlbm_comps-9.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/c5f654bc45d9dd37b1393b55f2c6985e/cqlbm_comps-9.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/a454e7badf430c962b42ea880945d875/cqlbm_comps-9.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-9.png" class="plot-directive" src="../_images/cqlbm_comps-9.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>wall</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><em>ReflectionWall</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.specular_reflection.SpecularWallComparator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.specular_reflection.</span></span><span class="sig-name descname"><span class="pre">SpecularWallComparator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wall</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/specular_reflection.py#L27-L121"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.specular_reflection.SpecularWallComparator" title="Link to this definition">#</a></dt>
+<dd><p>A primitive used in the collisionless <a class="reference internal" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator" title="qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpecularReflectionOperator</span></code></a> that implements the
+comparator for the specular reflection boundary conditions around the wall as described <span id="id11">Schalkers and Möller [<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span>.
+The comparator sets the <cite>d</cite> ancilla qubits to <span class="math notranslate nohighlight">\(\ket{1}\)</span> for the components of
+the quantum state whose grid qubits fall within the range spanned by the wall.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">wall</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a> encoding the range spanned by the wall.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">SpecularWallComparator</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;specular&quot;</span><span class="p">}],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Comparing on the indices of the inside x-wall on the lower-bound of the obstacle</span>
+<span class="n">SpecularWallComparator</span><span class="p">(</span>
+    <span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">,</span> <span class="n">wall</span><span class="o">=</span><span class="n">lattice</span><span class="o">.</span><span class="n">block_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">walls_inside</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/3239be734e1657b7ac8d7fbf2c891965/cqlbm_comps-10.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/1e135ddf01fd7d2c0a6f06905fefd543/cqlbm_comps-10.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/eab71c2ec325d867423be0a5215aceff/cqlbm_comps-10.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/665bf724e80272f27dc57ade6fb33cb6/cqlbm_comps-10.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-10.png" class="plot-directive" src="../_images/cqlbm_comps-10.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>wall</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><em>ReflectionWall</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.primitives.EdgeComparator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.primitives.</span></span><span class="sig-name descname"><span class="pre">EdgeComparator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/primitives.py#L445-L531"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.primitives.EdgeComparator" title="Link to this definition">#</a></dt>
+<dd><p>A primitive used in the collisionless <code class="xref py py-class docutils literal notranslate"><span class="pre">SpecularReflectionOperator</span></code>
+and <code class="xref py py-class docutils literal notranslate"><span class="pre">BounceBackReflectionOperator</span></code> that implements the
+comparator for the specular reflection boundary conditions around the edge as described <span id="id12">Schalkers and Möller [<a class="reference internal" href="../index.html#id5" title="Merel A Schalkers and Matthias Möller. Efficient and fail-safe quantum algorithm for the transport equation. Journal of Computational Physics, 502:112816, 2024.">1</a>]</span>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">edge</span></code></p></td>
+<td><p>The coordinates of the edge within the grid.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">EdgeComparator</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span>
+            <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;specular&quot;</span><span class="p">}],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="c1"># Draw the edge comparator circuit for one specific corner edge</span>
+<span class="n">EdgeComparator</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">lattice</span><span class="o">.</span><span class="n">block_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">corner_edges_3d</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/afc6698447143abb09094d4c8358bd1c/cqlbm_comps-11.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/ff19adf364c8f90b9f9393dae5fd08a4/cqlbm_comps-11.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/f7b969887a1501f73bdbd327f13629bf/cqlbm_comps-11.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/7899a0d4b5970653ef0a44627478ecbb/cqlbm_comps-11.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-11.png" class="plot-directive" src="../_images/cqlbm_comps-11.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>edge</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.ReflectionResetEdge" title="qlbm.lattice.blocks.ReflectionResetEdge"><em>ReflectionResetEdge</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.primitives.Comparator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.primitives.</span></span><span class="sig-name descname"><span class="pre">Comparator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_to_compare</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/primitives.py#L343-L442"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.primitives.Comparator" title="Link to this definition">#</a></dt>
+<dd><p>Quantum comparator primitive that compares two
+a quantum state of <code class="docutils literal notranslate"><span class="pre">num_qubits</span></code> qubits and an integer
+<code class="docutils literal notranslate"><span class="pre">num_to_compare</span></code> with respect to a <a class="reference internal" href="#qlbm.components.collisionless.primitives.ComparatorMode" title="qlbm.components.collisionless.primitives.ComparatorMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparatorMode</span></code></a>.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_qubits</span></code></p></td>
+<td><p>Number of qubits encoding the integer to compare.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_to_compare</span></code></p></td>
+<td><p>The integer to compare against.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">mode</span></code></p></td>
+<td><p>The <a class="reference internal" href="#qlbm.components.collisionless.primitives.ComparatorMode" title="qlbm.components.collisionless.primitives.ComparatorMode"><code class="xref py py-class docutils literal notranslate"><span class="pre">ComparatorMode</span></code></a> used to compare the two numbers.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default getLogger(“qlbm”)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">Comparator</span><span class="p">,</span> <span class="n">ComparatorMode</span>
+
+<span class="c1"># On a 5 qubit register, compare the number 3</span>
+<span class="n">Comparator</span><span class="p">(</span><span class="n">num_qubits</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+           <span class="n">num_to_compare</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+           <span class="n">mode</span><span class="o">=</span><span class="n">ComparatorMode</span><span class="o">.</span><span class="n">LT</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/af6fe1ca6e0adadf7854b21ebab0a8e5/cqlbm_comps-12.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/a883b807333f82dfb72d38b5c0187c7d/cqlbm_comps-12.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/4601d845346ed9871bd79b29d9ebd17b/cqlbm_comps-12.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/b7ed41a010a672893761742382265285/cqlbm_comps-12.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-12.png" class="plot-directive" src="../_images/cqlbm_comps-12.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_qubits</strong> (<em>int</em>)</p></li>
+<li><p><strong>num_to_compare</strong> (<em>int</em>)</p></li>
+<li><p><strong>mode</strong> (<a class="reference internal" href="#qlbm.components.collisionless.primitives.ComparatorMode" title="qlbm.components.collisionless.primitives.ComparatorMode"><em>ComparatorMode</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.primitives.ComparatorMode">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.primitives.</span></span><span class="sig-name descname"><span class="pre">ComparatorMode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qualname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/primitives.py#L259-L273"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.primitives.ComparatorMode" title="Link to this definition">#</a></dt>
+<dd><p>Enumerator for the modes of quantum comparator circuits.
+The modes are as follows:</p>
+<ul class="simple">
+<li><p>(1, <code class="docutils literal notranslate"><span class="pre">ComparatorMode.LT</span></code>, <span class="math notranslate nohighlight">\(&lt;\)</span>);</p></li>
+<li><p>(2, <code class="docutils literal notranslate"><span class="pre">ComparatorMode.LE</span></code>, <span class="math notranslate nohighlight">\(\leq\)</span>);</p></li>
+<li><p>(3, <code class="docutils literal notranslate"><span class="pre">ComparatorMode.GT</span></code>, <span class="math notranslate nohighlight">\(&gt;\)</span>);</p></li>
+<li><p>(4, <code class="docutils literal notranslate"><span class="pre">ComparatorMode.GE</span></code>, <span class="math notranslate nohighlight">\(\geq\)</span>).</p></li>
+</ul>
+</dd></dl>
+
+</section>
+<section id="others">
+<span id="cqlbm-others"></span><h2>Others<a class="headerlink" href="#others" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.primitives.CollisionlessInitialConditions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.primitives.</span></span><span class="sig-name descname"><span class="pre">CollisionlessInitialConditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/primitives.py#L94-L174"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.primitives.CollisionlessInitialConditions" title="Link to this definition">#</a></dt>
+<dd><p>A primitive that creates the quantum circuit to prepare the flow field in its initial conditions.
+The initial conditions create a quantum state spanning half the grid
+in the x-axis, and the entirety of the y (and z)-axes (if 3D).
+All velocities are pointing in the positive direction.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">CollisionlessInitialConditions</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">({</span>
+    <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;specular&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">})</span>
+
+<span class="c1"># Draw the initial conditions circuit</span>
+<span class="n">CollisionlessInitialConditions</span><span class="p">(</span><span class="n">lattice</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/dc3f5eadc766a14633d0cbd05cdbd46b/cqlbm_comps-13.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/868261bcb9c133deefcab3eec7458bb1/cqlbm_comps-13.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/b212e87cb7d050be637c1738a600e726/cqlbm_comps-13.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/1efcfa09c6d068cdc3ed11d3a4102b19/cqlbm_comps-13.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-13.png" class="plot-directive" src="../_images/cqlbm_comps-13.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.primitives.CollisionlessInitialConditions3DSlim">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.primitives.</span></span><span class="sig-name descname"><span class="pre">CollisionlessInitialConditions3DSlim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/primitives.py#L177-L256"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.primitives.CollisionlessInitialConditions3DSlim" title="Link to this definition">#</a></dt>
+<dd><p>A primitive that creates the quantum circuit to prepare the flow field in its initial conditions for 3 dimensions.
+The initial conditions create the quantum state
+<span class="math notranslate nohighlight">\(\Sigma_{j}\ket{0}^{\otimes n_{g_x}}\ket{0}^{\otimes n_{g_y}}\ket{j}\)</span> over the grid qubits,
+that is, spanning the z-axis at the bottom of the x- and y-axes.
+This is helpful for debugging edge cases around the corners of 3D obstacles.
+All velocities are pointing in the positive direction.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">CollisionlessInitialConditions3DSlim</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">({</span>
+    <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">8</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;z&quot;</span><span class="p">:</span> <span class="mi">4</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[]</span>
+<span class="p">})</span>
+
+<span class="c1"># Draw the initial conditions circuit</span>
+<span class="n">CollisionlessInitialConditions3DSlim</span><span class="p">(</span><span class="n">lattice</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/004585b484814bada58037da12b48dea/cqlbm_comps-14.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/353ff263f031cc5fde4475af7e9985d7/cqlbm_comps-14.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/564a7d1b8b70497ae90849d3bb1088c5/cqlbm_comps-14.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/24dca980da8e654aec46b0ef029a75c8/cqlbm_comps-14.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-14.png" class="plot-directive" src="../_images/cqlbm_comps-14.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.collisionless.primitives.GridMeasurement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.collisionless.primitives.</span></span><span class="sig-name descname"><span class="pre">GridMeasurement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/collisionless/primitives.py#L16-L91"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.collisionless.primitives.GridMeasurement" title="Link to this definition">#</a></dt>
+<dd><p>A primitive that implements a measurement operation on the grid qubits.
+Used at the end of the time step circuit to extract information from the quantum state.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">CollisionlessLattice</span></code></a> based on which the properties of the operator are inferred.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">qlbm.components.collisionless</span> <span class="kn">import</span> <span class="n">GridMeasurement</span>
+<span class="kn">from</span> <span class="nn">qlbm.lattice</span> <span class="kn">import</span> <span class="n">CollisionlessLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">({</span>
+    <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span>
+        <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+        <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;specular&quot;</span>
+        <span class="p">}</span>
+    <span class="p">]</span>
+<span class="p">})</span>
+
+<span class="c1"># Draw the measurement circuit</span>
+<span class="n">GridMeasurement</span><span class="p">(</span><span class="n">lattice</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/9c77219791ed5a9017159e750eeea0de/cqlbm_comps-15.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/70c959a6fa1d7736a5a855fb769ae28e/cqlbm_comps-15.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/55c531d89a747c364fff5fd6eeb71ebb/cqlbm_comps-15.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/485dc53c1137fecbe3c978be864e1a0f/cqlbm_comps-15.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/cqlbm_comps-15.png" class="plot-directive" src="../_images/cqlbm_comps-15.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice"><em>CollisionlessLattice</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="base_comps.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Base Classes</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="stqlbm_comps.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Space-Time Circuits</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#end-to-end-algorithms">End-to-end algorithms</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.cqlbm.CQLBM"><code class="docutils literal notranslate"><span class="pre">CQLBM</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streaming">Streaming</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.streaming.CollisionlessStreamingOperator"><code class="docutils literal notranslate"><span class="pre">CollisionlessStreamingOperator</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.streaming.StreamingAncillaPreparation"><code class="docutils literal notranslate"><span class="pre">StreamingAncillaPreparation</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.streaming.ControlledIncrementer"><code class="docutils literal notranslate"><span class="pre">ControlledIncrementer</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.primitives.SpeedSensitiveAdder"><code class="docutils literal notranslate"><span class="pre">SpeedSensitiveAdder</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.streaming.SpeedSensitivePhaseShift"><code class="docutils literal notranslate"><span class="pre">SpeedSensitivePhaseShift</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.streaming.PhaseShift"><code class="docutils literal notranslate"><span class="pre">PhaseShift</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator"><code class="docutils literal notranslate"><span class="pre">BounceBackReflectionOperator</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.create_circuit"><code class="docutils literal notranslate"><span class="pre">BounceBackReflectionOperator.create_circuit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reflect_wall"><code class="docutils literal notranslate"><span class="pre">BounceBackReflectionOperator.reflect_wall()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reset_edge_state"><code class="docutils literal notranslate"><span class="pre">BounceBackReflectionOperator.reset_edge_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.reset_point_state"><code class="docutils literal notranslate"><span class="pre">BounceBackReflectionOperator.reset_point_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackReflectionOperator.flip_and_stream"><code class="docutils literal notranslate"><span class="pre">BounceBackReflectionOperator.flip_and_stream()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator"><code class="docutils literal notranslate"><span class="pre">SpecularReflectionOperator</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.create_circuit"><code class="docutils literal notranslate"><span class="pre">SpecularReflectionOperator.create_circuit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reflect_wall"><code class="docutils literal notranslate"><span class="pre">SpecularReflectionOperator.reflect_wall()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reset_edge_state"><code class="docutils literal notranslate"><span class="pre">SpecularReflectionOperator.reset_edge_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.reset_point_state"><code class="docutils literal notranslate"><span class="pre">SpecularReflectionOperator.reset_point_state()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.specular_reflection.SpecularReflectionOperator.flip_and_stream"><code class="docutils literal notranslate"><span class="pre">SpecularReflectionOperator.flip_and_stream()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.bounceback_reflection.BounceBackWallComparator"><code class="docutils literal notranslate"><span class="pre">BounceBackWallComparator</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.specular_reflection.SpecularWallComparator"><code class="docutils literal notranslate"><span class="pre">SpecularWallComparator</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.primitives.EdgeComparator"><code class="docutils literal notranslate"><span class="pre">EdgeComparator</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.primitives.Comparator"><code class="docutils literal notranslate"><span class="pre">Comparator</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.primitives.ComparatorMode"><code class="docutils literal notranslate"><span class="pre">ComparatorMode</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#others">Others</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.primitives.CollisionlessInitialConditions"><code class="docutils literal notranslate"><span class="pre">CollisionlessInitialConditions</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.primitives.CollisionlessInitialConditions3DSlim"><code class="docutils literal notranslate"><span class="pre">CollisionlessInitialConditions3DSlim</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.collisionless.primitives.GridMeasurement"><code class="docutils literal notranslate"><span class="pre">GridMeasurement</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+<div id="searchbox"></div></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/code/cqlbm_comps.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=26a4bc78f4c0ddb94549"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=26a4bc78f4c0ddb94549"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, qlbm authors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.0.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
