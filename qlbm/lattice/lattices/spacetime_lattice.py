@@ -122,14 +122,18 @@ class SpaceTimeLattice(Lattice):
         self.num_timesteps = num_timesteps
 
         self.properties: SpaceTimeLatticeBuilder = self.__get_builder()
+        self.num_total_qubits = (
+            self.properties.get_num_grid_qubits()
+            + self.properties.get_num_velocity_qubits()
+            + self.properties.get_num_ancilla_qubits()
+        )
 
         self.num_velocities_per_point = self.properties.get_num_velocities_per_point()
 
         temporary_registers = self.properties.get_registers()
-        (
-            self.grid_registers,
-            self.velocity_registers,
-        ) = temporary_registers
+        (self.grid_registers, self.velocity_registers, self.ancilla_registers) = (
+            temporary_registers
+        )
         self.registers = tuple(flatten(temporary_registers))
         self.circuit = QuantumCircuit(*self.registers)
         (
@@ -231,6 +235,9 @@ class SpaceTimeLattice(Lattice):
             + point_neighborhood_index * self.num_velocities_per_point
             + velocity_direction
         ]
+
+    def ancilla_mass_index(self) -> List[int]:
+        return [self.num_total_qubits - 1]
 
     def __grid_neighbors(
         self, coordinates: Tuple[int, int], up_to_distance: int

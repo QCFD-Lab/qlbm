@@ -75,6 +75,10 @@ class SpaceTimeLatticeBuilder(ABC):
         self.logger = logger
 
     @abstractmethod
+    def get_num_previous_grid_qubits(self, dim: int) -> int:
+        pass
+
+    @abstractmethod
     def get_discretization(self) -> LatticeDiscretization:
         pass
 
