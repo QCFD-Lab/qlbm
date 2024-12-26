@@ -31,9 +31,10 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         num_timesteps: int,
         num_gridpoints: List[int],
         blocks: Dict[str, List[Block]],
+        include_measurement_qubit: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
-        super().__init__(num_timesteps, logger)
+        super().__init__(num_timesteps, include_measurement_qubit, logger)
 
         self.num_gridpoints = num_gridpoints
         self.blocks = blocks
@@ -45,7 +46,7 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         return 2
 
     def get_num_ancilla_qubits(self) -> int:
-        return 0
+        return 1 if self.include_measurement_qubit else 0
 
     def get_num_grid_qubits(self) -> int:
         return self.num_gridpoints[0].bit_length()
@@ -61,6 +62,9 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             total_gridpoints * velocities_per_gp,
             velocities_per_gp * num_timesteps * 2 + velocities_per_gp,
         )
+
+    def get_num_previous_grid_qubits(self, dim: int) -> int:
+        return 0
 
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         # Grid qubits
@@ -78,7 +82,12 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             )
         ]
 
-        return (grid_registers, velocity_registers)
+        # Ancilla qubits
+        ancilla_registers = (
+            [QuantumRegister(1, "a_m")] if self.include_measurement_qubit else []
+        )
+
+        return (grid_registers, velocity_registers, ancilla_registers)
 
     def get_index_of_neighbor(self, distance: Tuple[int, ...]) -> int:
         if (d := distance[0]) == 0:

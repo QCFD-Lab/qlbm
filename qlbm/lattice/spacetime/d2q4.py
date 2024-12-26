@@ -57,9 +57,10 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         num_timesteps: int,
         num_gridpoints: List[int],
         blocks: Dict[str, List[Block]],
+        include_measurement_qubit: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
-        super().__init__(num_timesteps, logger)
+        super().__init__(num_timesteps, include_measurement_qubit, logger)
         self.num_gridpoints = num_gridpoints
         self.blocks = blocks
 
@@ -70,20 +71,17 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         return 4
 
     def get_num_ancilla_qubits(self) -> int:
-        return 1
+        return 1 if self.include_measurement_qubit else 0
 
     def get_num_grid_qubits(self) -> int:
         return sum(
             num_gridpoints_in_dim.bit_length()
             for num_gridpoints_in_dim in self.num_gridpoints
         )
-    
+
     def get_num_previous_grid_qubits(self, dim: int) -> int:
         # ! TODO add exception
-        return sum(
-            self.num_gridpoints[i].bit_length()
-            for i in range(dim)
-        )
+        return sum(self.num_gridpoints[i].bit_length() for i in range(dim))
 
     def get_num_velocity_qubits(self, num_timesteps: int | None = None) -> int:
         total_gridpoints = (sum(self.num_gridpoints) + len(self.num_gridpoints)) * (
@@ -124,7 +122,9 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         ]
 
         # Ancilla qubits
-        ancilla_registers = [QuantumRegister(1, "a_m")]
+        ancilla_registers = (
+            [QuantumRegister(1, "a_m")] if self.include_measurement_qubit else []
+        )
 
         return (grid_registers, velocity_registers, ancilla_registers)
 

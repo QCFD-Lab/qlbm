@@ -69,9 +69,11 @@ class SpaceTimeLatticeBuilder(ABC):
     def __init__(
         self,
         num_timesteps: int,
+        include_measurement_qubit: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         self.num_timesteps = num_timesteps
+        self.include_measurement_qubit = include_measurement_qubit
         self.logger = logger
 
     @abstractmethod
