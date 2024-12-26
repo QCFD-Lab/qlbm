@@ -786,3 +786,121 @@ def test_streaming_line_dist_5(lattice_2d_16x16_1_obstacle_5_timesteps):
     assert streaming_line_y_neg == [
         list(reversed(line)) for line in streaming_line_y_pos
     ]
+
+
+def test_comparator_period_volume_bounds_no_overflow(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(0, 5), (5, 15)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    for vb, nb in zip(volume_bounds, new_bound_list):
+        assert vb == nb[0]
+        assert nb[1] == (False, False)
+
+
+def test_comparator_period_volume_bounds_overflow_x_1(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(-5, 5), (5, 15)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (11, 5)
+    assert new_bound_list[0][1] == (True, False)
+    assert new_bound_list[1][0] == (5, 15)
+    assert new_bound_list[1][1] == (False, False)
+
+
+def test_comparator_period_volume_bounds_overflow_x_2(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(3, 18), (5, 15)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (3, 2)
+    assert new_bound_list[0][1] == (False, True)
+    assert new_bound_list[1][0] == (5, 15)
+    assert new_bound_list[1][1] == (False, False)
+
+
+def test_comparator_period_volume_bounds_overflow_y_1(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(3, 7), (-6, 5)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (3, 7)
+    assert new_bound_list[0][1] == (False, False)
+    assert new_bound_list[1][0] == (10, 5)
+    assert new_bound_list[1][1] == (True, False)
+
+
+def test_comparator_period_volume_bounds_overflow_y_2(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(3, 7), (9, 20)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (3, 7)
+    assert new_bound_list[0][1] == (False, False)
+    assert new_bound_list[1][0] == (9, 4)
+    assert new_bound_list[1][1] == (False, True)
+
+
+def test_comparator_period_volume_bounds_overflow_xy_1(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(-3, 7), (9, 20)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (13, 7)
+    assert new_bound_list[0][1] == (True, False)
+    assert new_bound_list[1][0] == (9, 4)
+    assert new_bound_list[1][1] == (False, True)
+
+
+def test_comparator_period_volume_bounds_overflow_xy_2(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(7, 17), (-4, 6)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (7, 1)
+    assert new_bound_list[0][1] == (False, True)
+    assert new_bound_list[1][0] == (12, 6)
+    assert new_bound_list[1][1] == (True, False)
