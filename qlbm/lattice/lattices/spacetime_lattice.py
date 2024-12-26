@@ -111,11 +111,13 @@ class SpaceTimeLattice(Lattice):
         lattice_data: str | Dict,  # type: ignore
         filter_inside_blocks: bool = True,
         include_measurement_qubit: bool = False,
+        use_volumetric_ops: bool = False,
         logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(lattice_data, logger)
         self.filter_inside_blocks = filter_inside_blocks
         self.include_measurement_qubit = include_measurement_qubit
+        self.use_volumetric_ops = use_volumetric_ops
 
         self.num_gridpoints, self.num_velocities, self.blocks = self.parse_input_data(
             lattice_data
@@ -153,6 +155,7 @@ class SpaceTimeLattice(Lattice):
                     self.num_gridpoints,
                     self.blocks,
                     include_measurement_qubit=self.include_measurement_qubit,
+                    use_volumetric_ops=self.use_volumetric_ops,
                     logger=self.logger,
                 )
             raise LatticeException(
@@ -166,6 +169,7 @@ class SpaceTimeLattice(Lattice):
                     self.num_gridpoints,
                     self.blocks,
                     include_measurement_qubit=self.include_measurement_qubit,
+                    use_volumetric_ops=self.use_volumetric_ops,
                     logger=self.logger,
                 )
             raise LatticeException(
@@ -310,7 +314,6 @@ class SpaceTimeLattice(Lattice):
         adjusted_bounds: List[Tuple[Tuple[int, int], Tuple[bool, bool]]] = []
 
         for dim, bs in enumerate(bounds):
-            print(self.num_gridpoints[dim])
             new_bounds: Tuple[int, int] = cast(
                 Tuple[int, int],
                 tuple(

@@ -1,3 +1,4 @@
+from itertools import product
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple, cast
 
@@ -58,9 +59,15 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         num_gridpoints: List[int],
         blocks: Dict[str, List[Block]],
         include_measurement_qubit: bool = False,
+        use_volumetric_ops: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
-        super().__init__(num_timesteps, include_measurement_qubit, logger)
+        super().__init__(
+            num_timesteps,
+            include_measurement_qubit=include_measurement_qubit,
+            use_volumetric_ops=use_volumetric_ops,
+            logger=logger,
+        )
         self.num_gridpoints = num_gridpoints
         self.blocks = blocks
 
@@ -71,7 +78,9 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         return 4
 
     def get_num_ancilla_qubits(self) -> int:
-        return 1 if self.include_measurement_qubit else 0
+        return (4 if self.use_volumetric_ops else 0) + (
+            1 if self.include_measurement_qubit else 0
+        )
 
     def get_num_grid_qubits(self) -> int:
         return sum(
@@ -121,10 +130,21 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             )
         ]
 
-        # Ancilla qubits
-        ancilla_registers = (
+        ancilla_measurement_register = (
             [QuantumRegister(1, "a_m")] if self.include_measurement_qubit else []
         )
+        
+        ancilla_comparator_registers = (
+            [
+                QuantumRegister(1, f"a_{bound}{dimension_letter(dim)}")
+                for dim, bound in product([0, 1], ["l", "u"])
+            ]
+            if self.use_volumetric_ops
+            else []
+        )
+
+        # Ancilla qubits
+        ancilla_registers = ancilla_measurement_register + ancilla_comparator_registers
 
         return (grid_registers, velocity_registers, ancilla_registers)
 

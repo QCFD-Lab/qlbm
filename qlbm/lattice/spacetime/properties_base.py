@@ -70,10 +70,12 @@ class SpaceTimeLatticeBuilder(ABC):
         self,
         num_timesteps: int,
         include_measurement_qubit: bool = False,
+        use_volumetric_ops: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         self.num_timesteps = num_timesteps
         self.include_measurement_qubit = include_measurement_qubit
+        self.use_volumetric_ops = use_volumetric_ops
         self.logger = logger
 
     @abstractmethod
