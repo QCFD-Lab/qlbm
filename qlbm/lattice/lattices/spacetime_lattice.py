@@ -1,5 +1,5 @@
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, cast
 
 from qiskit import QuantumCircuit, QuantumRegister
 
@@ -110,10 +110,12 @@ class SpaceTimeLattice(Lattice):
         num_timesteps: int,
         lattice_data: str | Dict,  # type: ignore
         filter_inside_blocks: bool = True,
+        include_measurement_qubit: bool = False,
         logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(lattice_data, logger)
         self.filter_inside_blocks = filter_inside_blocks
+        self.include_measurement_qubit = include_measurement_qubit
 
         self.num_gridpoints, self.num_velocities, self.blocks = self.parse_input_data(
             lattice_data
@@ -147,7 +149,11 @@ class SpaceTimeLattice(Lattice):
         if self.num_dims == 1:
             if self.num_velocities[0] == 1:
                 return D1Q2SpaceTimeLatticeBuilder(
-                    self.num_timesteps, self.num_gridpoints, self.blocks, self.logger
+                    self.num_timesteps,
+                    self.num_gridpoints,
+                    self.blocks,
+                    include_measurement_qubit=self.include_measurement_qubit,
+                    logger=self.logger,
                 )
             raise LatticeException(
                 f"Unsupported number of velocities for 1D: {self.num_velocities[0]}. Only D1Q2 is supported at the moment."
@@ -156,7 +162,11 @@ class SpaceTimeLattice(Lattice):
         if self.num_dims == 2:
             if self.num_velocities[0] == 1 and self.num_velocities[1] == 1:
                 return D2Q4SpaceTimeLatticeBuilder(
-                    self.num_timesteps, self.num_gridpoints, self.blocks, self.logger
+                    self.num_timesteps,
+                    self.num_gridpoints,
+                    self.blocks,
+                    include_measurement_qubit=self.include_measurement_qubit,
+                    logger=self.logger,
                 )
             raise LatticeException(
                 f"Unsupported number of velocities for 2D: {self.num_velocities}. Only D2Q4 is supported at the moment."
@@ -269,3 +279,52 @@ class SpaceTimeLattice(Lattice):
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
         return f"{self.num_dims}d-{gp_string}-q4"
+
+    def comparator_periodic_volume_bounds(
+        self, bounds: List[Tuple[int, int]]
+    ) -> List[Tuple[Tuple[int, int], Tuple[bool, bool]]]:
+        """
+        Computes the lower and upper bounds for the :class:`.Comparator`\ s
+        used to perform volumetric operations in the :class:`.SpaceTimeQLBM`.
+        For any given lower and upper bounds in 1, 2, or 3 dimensions,
+        modulo operations are applied that detect whether periodic boundary conditions
+        are required.
+        If that is the case, the directions in which the bounds overflow
+        becomes the opposite kind of bound.
+        For instance, a :math:`-2 \leq x \leq 7` interval that would require
+        a :math:`-2 \leq x \leq 7` on a :math:`16 \\times 16` would require a :math:`\geq 2` comparator
+        and a :math:`\leq 7` comparator.
+        Since :math:`-2` is not part of the domain, it gets mapped to :math:`14`,
+        and a different operation, based on two :math:`\geq` comparators is required.
+
+        Parameters
+        ----------
+        bounds : List[Tuple[int, int]]
+            The absolute bounds of the volume in each dimensions.
+
+        Returns
+        -------
+        List[Tuple[Tuple[int, int], Tuple[bool, bool]]]
+            The bounds adjusted for periodicity and whether overflow occurs for each bound.
+        """
+        adjusted_bounds: List[Tuple[Tuple[int, int], Tuple[bool, bool]]] = []
+
+        for dim, bs in enumerate(bounds):
+            print(self.num_gridpoints[dim])
+            new_bounds: Tuple[int, int] = cast(
+                Tuple[int, int],
+                tuple(
+                    (
+                        b % (self.num_gridpoints[dim] + 1)
+                        if b > self.num_gridpoints[dim]
+                        else (b + self.num_gridpoints[dim] + 1 if b < 0 else b)
+                    )
+                    for b in bs
+                ),
+            )
+            overflow_occurred: Tuple[bool, bool] = cast(
+                Tuple[bool, bool], tuple((x != y for x, y in zip(new_bounds, bs)))
+            )
+            adjusted_bounds.append((new_bounds, overflow_occurred))
+
+        return adjusted_bounds
