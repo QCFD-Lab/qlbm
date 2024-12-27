@@ -159,7 +159,7 @@ class SpaceTimeLattice(Lattice):
                     logger=self.logger,
                 )
             raise LatticeException(
-                f"Unsupported number of velocities for 1D: {self.num_velocities[0]}. Only D1Q2 is supported at the moment."
+                f"Unsupported number of velocities for 1D: {self.num_velocities[0] + 1}. Only D1Q2 is supported at the moment."
             )
 
         if self.num_dims == 2:
@@ -173,7 +173,7 @@ class SpaceTimeLattice(Lattice):
                     logger=self.logger,
                 )
             raise LatticeException(
-                f"Unsupported number of velocities for 2D: {self.num_velocities}. Only D2Q4 is supported at the moment."
+                f"Unsupported number of velocities for 2D: {(self.num_velocities[0] + 1, self.num_velocities[1] + 1)}. Only D2Q4 is supported at the moment."
             )
 
         raise LatticeException(
@@ -251,21 +251,98 @@ class SpaceTimeLattice(Lattice):
         ]
 
     def ancilla_mass_index(self) -> List[int]:
-        return [self.num_total_qubits - 1]
+        """
+        Get the index of the qubit used as the mass measurement ancilla.
 
-    def __grid_neighbors(
-        self, coordinates: Tuple[int, int], up_to_distance: int
-    ) -> List[List[int]]:
-        return [
-            [
-                (coordinates[0] + x_offset) % (self.num_gridpoints[0] + 1),
-                (coordinates[1] + y_offset) % (self.num_gridpoints[1] + 1),
-            ]
-            for x_offset in range(-up_to_distance, up_to_distance + 1)
-            for y_offset in range(
-                abs(x_offset) - up_to_distance, up_to_distance + 1 - abs(x_offset)
+        Returns
+        -------
+        List[int]
+            The index of the mass measurement qubit.
+
+        Raises
+        ------
+        LatticeException
+            If the mass measurement qubit is toggled off.
+        """
+        if not self.include_measurement_qubit:
+            raise LatticeException(
+                "Lattice contains no mass ancilla qubits. To enable the mass ancilla qubit, construct the Lattice with include_measurement_qubit=True."
             )
+
+        # Ahead of this register
+        # All grid qubits
+        # All velocity qubits
+        return [
+            self.properties.get_num_grid_qubits()
+            + self.properties.get_num_velocity_qubits()
         ]
+
+    def ancilla_comparator_index(self, index: int | None = None) -> List[int]:
+        """Get the indices of the qubits used as comparator ancillae for the specified index.
+
+        Parameters
+        ----------
+        index : int | None, optional
+            The index for which to retrieve the comparator qubit indices, by default ``None``.
+            There are `num_dims-1` available indices (i.e., 1 for 2D and 2 for 3D).
+            When `index` is ``None``, the indices of ancillae qubits for all dimensions are returned.
+
+        Returns
+        -------
+        List[int]
+            A list of indices of the qubits used as obstacle ancilla for the given dimension.
+            By convention, the 0th qubit in the returned list is used
+            for lower bound comparison and the 1st is used for upper bound comparisons.
+
+        Raises
+        ------
+        LatticeException
+            If the dimension does not exist or if the lattice is set up such that it contains no ancilla qubits for volumetric operations.
+        """
+        if not self.use_volumetric_ops:
+            raise LatticeException(
+                "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
+            )
+        # Ahead of this register
+        # All grid qubits
+        # All velocity qubits
+        # `1` ancilla mass qubit (if toggled)
+        # 2 * `d` ancillae comparator qubits for "lower" dimensions
+        # These are ordered as follows: lx, ux, ly, uy, lz, uz
+        start_index = (
+            self.properties.get_num_grid_qubits()
+            + self.properties.get_num_velocity_qubits()
+            + (1 if self.include_measurement_qubit else 0)
+        )
+
+        if index is None:
+            return list(
+                range(
+                    start_index,
+                    start_index + 2 * self.num_dims,
+                )
+            )
+
+        if index >= self.num_dims or index < 0:
+            raise LatticeException(
+                f"Cannot index ancilla comparator register for index {index} in {self.num_dims}-dimensional lattice. Maximum is {self.num_dims - 1}."
+            )
+        previous_qubits = start_index + 2 * index
+        return list(range(previous_qubits, previous_qubits + 2))
+
+    # def __grid_neighbors(
+    #     self, coordinates: Tuple[int, int], up_to_distance: int
+    # ) -> List[List[int]]:
+    #     return [
+    #         [
+    #             (coordinates[0] + x_offset) % (self.num_gridpoints[0] + 1),
+    #             (coordinates[1] + y_offset) % (self.num_gridpoints[1] + 1),
+    #         ]
+    #         for x_offset in range(-up_to_distance, up_to_distance + 1)
+    #         for y_offset in range(
+    #             abs(x_offset) - up_to_distance, up_to_distance + 1 - abs(x_offset)
+    #         )
+    #     ]
 
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         return self.properties.get_registers()
