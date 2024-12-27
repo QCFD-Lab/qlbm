@@ -282,3 +282,20 @@ def test_streaming_line_bad_dimension(lattice_1d_16_1_obstacle_5_timesteps):
             f"Dimension {dim} unsupported, D1Q2 lattices only support dimension 0."
             == str(excinfo.value)
         )
+
+def test_bad_lattice_specification_velocities():
+    with pytest.raises(LatticeException) as excinfo_measure:
+        SpaceTimeLattice(
+            2,
+            {
+                "lattice": {
+                    "dim": {"x": 16},
+                    "velocities": {"x": 4},
+                },
+            },
+        )
+
+    assert (
+        "Unsupported number of velocities for 1D: 4. Only D1Q2 is supported at the moment."
+        == str(excinfo_measure.value)
+    )
