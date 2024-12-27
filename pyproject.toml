@@ -97,6 +97,14 @@ module = [
 ]
 ignore_missing_imports = true
 
+# Exclude abstract methods from coverage report
+[tool.coverage.report]
+exclude_also = [
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "@(abc\\.)?abstractmethod",
+    ]
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
