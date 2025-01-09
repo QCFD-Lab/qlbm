@@ -10,8 +10,10 @@ from qlbm.components.collisionless import (
 from qlbm.components.common import EmptyPrimitive
 from qlbm.components.spacetime import (
     SpaceTimeGridVelocityMeasurement,
-    SpaceTimeInitialConditions,
     SpaceTimeQLBM,
+)
+from qlbm.components.spacetime.initial.pointwise import (
+    PointWiseSpaceTimeInitialConditions,
 )
 from qlbm.infra.runner import QiskitRunner
 from qlbm.infra.runner.simulation_config import SimulationConfig
@@ -39,7 +41,7 @@ def spacetime_circuits():
     lattice = SpaceTimeLattice(1, "test/resources/symmetric_2d_1_obstacle_q4.json")
 
     return {
-        "initial_conditions": SpaceTimeInitialConditions(lattice),
+        "initial_conditions": PointWiseSpaceTimeInitialConditions(lattice),
         "algorithm": SpaceTimeQLBM(lattice),
         "postprocessing": EmptyPrimitive(lattice),
         "measurement": SpaceTimeGridVelocityMeasurement(lattice),
