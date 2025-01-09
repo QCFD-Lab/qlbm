@@ -44,6 +44,11 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
 
         self.num_gridpoints = num_gridpoints
         self.blocks = blocks
+        self.origin = VonNeumannNeighbor(
+            (0, 0),
+            0,
+            VonNeumannNeighborType.ORIGIN,
+        )
 
     def get_discretization(self) -> LatticeDiscretization:
         return LatticeDiscretization.D1Q2

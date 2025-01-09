@@ -70,6 +70,11 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         )
         self.num_gridpoints = num_gridpoints
         self.blocks = blocks
+        self.origin = VonNeumannNeighbor(
+            (0, 0),
+            0,
+            VonNeumannNeighborType.ORIGIN,
+        )
 
     def get_discretization(self) -> LatticeDiscretization:
         return LatticeDiscretization.D2Q4
@@ -133,7 +138,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         ancilla_measurement_register = (
             [QuantumRegister(1, "a_m")] if self.include_measurement_qubit else []
         )
-        
+
         ancilla_comparator_registers = (
             [
                 QuantumRegister(1, f"a_{bound}{dimension_letter(dim)}")
