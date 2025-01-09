@@ -66,6 +66,8 @@ class VonNeumannNeighbor:
 
 
 class SpaceTimeLatticeBuilder(ABC):
+    origin: VonNeumannNeighbor
+
     def __init__(
         self,
         num_timesteps: int,

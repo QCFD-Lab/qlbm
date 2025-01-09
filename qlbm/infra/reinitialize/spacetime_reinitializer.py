@@ -7,7 +7,9 @@ from qiskit.result import Counts
 from qiskit_aer.backends.aer_simulator import AerBackend
 from qulacs import QuantumCircuit as QulacsQC
 
-from qlbm.components.spacetime import SpaceTimeInitialConditions
+from qlbm.components.spacetime.initial.pointwise import (
+    PointWiseSpaceTimeInitialConditions,
+)
 from qlbm.infra.compiler import CircuitCompiler
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import ExecutionException
@@ -82,7 +84,7 @@ class SpaceTimeReinitializer(Reinitializer):
             The suitably compiles initial conditions circuit.
         """
         return self.compiler.compile(
-            SpaceTimeInitialConditions(
+            PointWiseSpaceTimeInitialConditions(
                 self.lattice,
                 self.counts_to_velocity_pairs(counts),
                 self.lattice.filter_inside_blocks,

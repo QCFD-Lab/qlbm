@@ -10,7 +10,7 @@ from qlbm.lattice.spacetime.properties_base import VonNeumannNeighbor
 from qlbm.tools.utils import bit_value, flatten
 
 
-class SpaceTimeInitialConditions(LBMPrimitive):
+class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
     """
     Prepares the initial state for the :class:`.SpaceTimeQLBM`.
     Initial conditions are supplied in a ``List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]``
@@ -45,7 +45,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.spacetime import SpaceTimeInitialConditions
+        from qlbm.components.spacetime.initial import PointWiseSpaceTimeInitialConditions
         from qlbm.lattice import SpaceTimeLattice
 
         # Build an example lattice
@@ -58,7 +58,7 @@ class SpaceTimeInitialConditions(LBMPrimitive):
         )
 
         # Draw the initial conditions for two particles at (3, 7), traveling in the +y and -y directions
-        SpaceTimeInitialConditions(lattice=lattice, grid_data=[((3, 7), (False, True, False, True))]).draw("mpl")
+        PointWiseSpaceTimeInitialConditions(lattice=lattice, grid_data=[((3, 7), (False, True, False, True))]).draw("mpl")
     """
 
     def __init__(

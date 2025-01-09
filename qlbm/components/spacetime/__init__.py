@@ -1,5 +1,6 @@
 from .collision import SpaceTimeCollisionOperator
-from .initial_conditions import SpaceTimeInitialConditions
+from .initial.pointwise import PointWiseSpaceTimeInitialConditions
+from .initial.volumetric import VolumetricSpaceTimeInitialConditions
 from .measurement import SpaceTimeGridVelocityMeasurement
 from .reflection import SpaceTimeReflectionOperator
 from .spacetime import SpaceTimeQLBM
@@ -7,7 +8,8 @@ from .streaming import SpaceTimeStreamingOperator
 
 __all__ = [
     "SpaceTimeCollisionOperator",
-    "SpaceTimeInitialConditions",
+    "PointWiseSpaceTimeInitialConditions",
+    "VolumetricSpaceTimeInitialConditions",
     "SpaceTimeStreamingOperator",
     "SpaceTimeQLBM",
     "SpaceTimeGridVelocityMeasurement",
