@@ -74,25 +74,27 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                     )[0]
                 )
 
+                comparators = [
+                    Comparator(
+                        self.lattice.properties.get_num_grid_qubits() + 1,
+                        periodic_volume_bounds[0][bound],
+                        self.__adjusted_comparator_mode(bound, False),
+                        logger=self.logger,
+                    ).circuit
+                    for bound in [True, False]
+                ]
+
+                for comparator_bound, comp in enumerate(comparators):
+                    circuit.compose(
+                        comp,
+                        qubits=self.lattice.grid_index()
+                        + [self.lattice.ancilla_comparator_index(0)[comparator_bound]],
+                        inplace=True,
+                    )
+
                 # If overflow occurs, perform settings sequentially
                 if any(periodic_volume_bounds[1]):
                     for bound in [False, True]:
-                        comparator = Comparator(
-                            self.lattice.properties.get_num_grid_qubits() + 1,
-                            periodic_volume_bounds[0][bound],
-                            self.__adjusted_comparator_mode(
-                                bound, periodic_volume_bounds[1][bound]
-                            ),
-                            logger=self.logger,
-                        ).circuit
-
-                        circuit.compose(
-                            comparator,
-                            qubits=self.lattice.grid_index()
-                            + [self.lattice.ancilla_comparator_index(0)[0]],
-                            inplace=True,
-                        )
-
                         circuit.compose(
                             MCMT(
                                 XGate(),
@@ -117,36 +119,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                             ),
                             inplace=True,
                         )
-
-                        circuit.compose(
-                            comparator,
-                            qubits=self.lattice.grid_index()
-                            + [self.lattice.ancilla_comparator_index(0)[0]],
-                            inplace=True,
-                        )
                 else:
-                    comparators = [
-                        Comparator(
-                            self.lattice.properties.get_num_grid_qubits() + 1,
-                            periodic_volume_bounds[0][bound],
-                            self.__adjusted_comparator_mode(bound, False),
-                            logger=self.logger,
-                        ).circuit
-                        for bound in [True, False]
-                    ]
-
-                    for comparator_bound, comp in enumerate(comparators):
-                        circuit.compose(
-                            comp,
-                            qubits=self.lattice.grid_index()
-                            + [
-                                self.lattice.ancilla_comparator_index(0)[
-                                    comparator_bound
-                                ]
-                            ],
-                            inplace=True,
-                        )
-
                     circuit.compose(
                         MCMT(
                             XGate(),
@@ -172,17 +145,13 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                         inplace=True,
                     )
 
-                    for comparator_bound, comp in enumerate(comparators):
-                        circuit.compose(
-                            comp,
-                            qubits=self.lattice.grid_index()
-                            + [
-                                self.lattice.ancilla_comparator_index(0)[
-                                    comparator_bound
-                                ]
-                            ],
-                            inplace=True,
-                        )
+                for comparator_bound, comp in enumerate(comparators):
+                    circuit.compose(
+                        comp,
+                        qubits=self.lattice.grid_index()
+                        + [self.lattice.ancilla_comparator_index(0)[comparator_bound]],
+                        inplace=True,
+                    )
 
         return circuit
 
