@@ -51,7 +51,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
         circuit.h(self.lattice.grid_index())
 
         for manhattan_distance in range(self.lattice.num_timesteps + 1):
-            for neighbor_offset in (
+            for neighbor in (
                 self.lattice.extreme_point_indices[manhattan_distance]
                 if manhattan_distance > 0
                 else [self.lattice.properties.origin]
@@ -63,7 +63,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                             [
                                 tuple(
                                     dim_bound[i]
-                                    + neighbor_offset.coordinates_relative[
+                                    + neighbor.coordinates_relative[
                                         dim
                                     ]  # Add the offset to the bound in each dimension
                                     for i in range(len(dim_bound))
@@ -77,16 +77,14 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                 # If overflow occurs, perform settings sequentially
                 if any(periodic_volume_bounds[1]):
                     for bound in [False, True]:
-                        comparator = (
-                            Comparator(
-                                self.lattice.properties.get_num_grid_qubits() + 1,
-                                periodic_volume_bounds[0][bound],
-                                self.__adjusted_comparator_mode(
-                                    bound, periodic_volume_bounds[1][bound]
-                                ),
-                                logger=self.logger,
-                            ).circuit,
-                        )
+                        comparator = Comparator(
+                            self.lattice.properties.get_num_grid_qubits() + 1,
+                            periodic_volume_bounds[0][bound],
+                            self.__adjusted_comparator_mode(
+                                bound, periodic_volume_bounds[1][bound]
+                            ),
+                            logger=self.logger,
+                        ).circuit
 
                         circuit.compose(
                             comparator,
@@ -107,7 +105,9 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                                 [self.lattice.ancilla_comparator_index(0)[0]]
                                 + flatten(
                                     [
-                                        self.lattice.velocity_index(0, c)
+                                        self.lattice.velocity_index(
+                                            neighbor.neighbor_index, c
+                                        )
                                         for c, is_velocity_enabled in enumerate(
                                             self.velocity_profile
                                         )
@@ -159,7 +159,9 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                             self.lattice.ancilla_comparator_index()
                             + flatten(
                                 [
-                                    self.lattice.velocity_index(0, c)
+                                    self.lattice.velocity_index(
+                                        neighbor.neighbor_index, c
+                                    )
                                     for c, is_velocity_enabled in enumerate(
                                         self.velocity_profile
                                     )
@@ -186,56 +188,98 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
 
     def __create_circuit_d2q4(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
-        # circuit.h(self.lattice.grid_index())
+        circuit.h(self.lattice.grid_index())
 
-        # for dim in range(self.lattice.num_dims):
-        #     circuit.compose(
-        #         Comparator(
-        #             self.lattice.num_gridpoints[dim].bit_length() + 1,
-        #             self.cuboid_bounds[dim][0],
-        #             ComparatorMode.GE,
-        #             logger=self.logger,
-        #         ).circuit,
-        #         qubits=self.lattice.grid_index()
-        #         + [self.lattice.ancilla_comparator_index(dim)[0]],
-        #         inplace=True,
-        #     )
+        for manhattan_distance in range(self.lattice.num_timesteps + 1):
+            for neighbor_offset in (
+                self.lattice.extreme_point_indices[manhattan_distance]
+                + flatten(
+                    list(
+                        self.lattice.intermediate_point_indices[
+                            manhattan_distance
+                        ].values()
+                    )
+                )
+                if manhattan_distance > 0
+                else [self.lattice.properties.origin]
+            ):
+                periodic_volume_bounds: List[
+                    Tuple[Tuple[int, int], Tuple[bool, bool]]
+                ] = self.lattice.comparator_periodic_volume_bounds(
+                    cast(
+                        List[Tuple[int, int]],
+                        [
+                            tuple(
+                                dim_bound[i]
+                                + neighbor_offset.coordinates_relative[
+                                    dim
+                                ]  # Add the offset to the bound in each dimension
+                                for i in range(len(dim_bound))
+                            )
+                            for dim, dim_bound in enumerate(self.cuboid_bounds)
+                        ],
+                    )
+                )
 
-        #     circuit.compose(
-        #         Comparator(
-        #             self.lattice.num_gridpoints[dim].bit_length() + 1,
-        #             self.cuboid_bounds[dim][1],
-        #             ComparatorMode.LE,
-        #             logger=self.logger,
-        #         ).circuit,
-        #         qubits=self.lattice.grid_index()
-        #         + [self.lattice.ancilla_comparator_index(dim)[0]],
-        #         inplace=True,
-        #     )
+                num_overflows = any(periodic_volume_bounds[0][1]) + any(
+                    periodic_volume_bounds[1][1]
+                )
 
-        # circuit.compose(self.set_grid_value(grid_point_data[0]), inplace=True)
-        # circuit.compose(
-        #     MCMT(
-        #         XGate(),
-        #         num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
-        #         num_target_qubits=sum(
-        #             grid_point_data[1]
-        #         ),  # The sum is equal to the number of velocities set to true
-        #     ),
-        #     qubits=list(
-        #         self.lattice.grid_index()
-        #         + flatten(
-        #             [
-        #                 self.lattice.velocity_index(0, c)
-        #                 for c, is_velocity_enabled in enumerate(grid_point_data[1])
-        #                 if is_velocity_enabled
-        #             ]
-        #         )
-        #     ),
-        #     inplace=True,
-        # )
-        # circuit.compose(self.set_grid_value(grid_point_data[0]), inplace=True)
+                comparators = [
+                    [
+                        Comparator(
+                            self.lattice.properties.get_num_grid_qubits() + 1,
+                            pvb[0][bound],
+                            self.__adjusted_comparator_mode(bound, pvb[1][bound]),
+                            logger=self.logger,
+                        )
+                        for bound in [False, True]
+                    ]
+                    for pvb in periodic_volume_bounds
+                ]
 
+                for dim in [0, 1]:
+                    for bound in [False, True]:
+                        circuit.compose(
+                            comparators[dim][bound].circuit,
+                            qubits=self.lattice.grid_index()
+                            + [self.lattice.ancilla_comparator_index(dim)[bound]],
+                            inplace=True,
+                        )
+
+                if num_overflows == 0:
+                    circuit.compose(
+                        MCMT(
+                            XGate(),
+                            num_ctrl_qubits=4,
+                            num_target_qubits=sum(
+                                self.velocity_profile
+                            ),  # The sum is equal to the number of velocities set to true
+                        ),
+                        qubits=self.lattice.ancilla_comparator_index()
+                        + flatten(
+                            [
+                                self.lattice.velocity_index(0, c)
+                                for c, is_velocity_enabled in enumerate(
+                                    self.velocity_profile
+                                )
+                                if is_velocity_enabled
+                            ]
+                        ),
+                        inplace=True,
+                    )
+
+                elif num_overflows == 1:
+                    dim_overflow = 1 - periodic_volume_bounds[0][1]
+
+                for dim in [0, 1]:
+                    for bound in [False, True]:
+                        circuit.compose(
+                            comparators[dim][bound].circuit,
+                            qubits=self.lattice.grid_index()
+                            + [self.lattice.ancilla_comparator_index(dim)[bound]],
+                            inplace=True,
+                        )
         return circuit
 
     def __str__(self) -> str:
