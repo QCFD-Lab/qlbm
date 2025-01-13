@@ -43,8 +43,8 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
 
         raise CircuitException(f"Reflection Operator unsupported for {discretization}.")
 
-    def __adjusted_comparator_mode(self, bound: bool, overflow: bool) -> ComparatorMode:
-        return ComparatorMode.LE if (bound ^ overflow) else ComparatorMode.GE
+    def __adjusted_comparator_mode(self, bound: bool) -> ComparatorMode:
+        return ComparatorMode.LE if (bound) else ComparatorMode.GE
 
     def __create_circuit_d1q2(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
@@ -78,7 +78,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                     Comparator(
                         self.lattice.properties.get_num_grid_qubits() + 1,
                         periodic_volume_bounds[0][bound],
-                        self.__adjusted_comparator_mode(bound, False),
+                        self.__adjusted_comparator_mode(bound),
                         logger=self.logger,
                     ).circuit
                     for bound in [True, False]
@@ -199,7 +199,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                         Comparator(
                             self.lattice.properties.get_num_grid_qubits() + 1,
                             pvb[0][bound],
-                            self.__adjusted_comparator_mode(bound, pvb[1][bound]),
+                            self.__adjusted_comparator_mode(bound),
                             logger=self.logger,
                         )
                         for bound in [False, True]
