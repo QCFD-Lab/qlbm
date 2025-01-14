@@ -355,20 +355,6 @@ class SpaceTimeLattice(Lattice):
 
         return sequences
 
-    # def __grid_neighbors(
-    #     self, coordinates: Tuple[int, int], up_to_distance: int
-    # ) -> List[List[int]]:
-    #     return [
-    #         [
-    #             (coordinates[0] + x_offset) % (self.num_gridpoints[0] + 1),
-    #             (coordinates[1] + y_offset) % (self.num_gridpoints[1] + 1),
-    #         ]
-    #         for x_offset in range(-up_to_distance, up_to_distance + 1)
-    #         for y_offset in range(
-    #             abs(x_offset) - up_to_distance, up_to_distance + 1 - abs(x_offset)
-    #         )
-    #     ]
-
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         return self.properties.get_registers()
 
