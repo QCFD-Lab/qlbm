@@ -332,7 +332,7 @@ class SpaceTimeLattice(Lattice):
         return list(range(previous_qubits, previous_qubits + 2))
 
     def volumetric_ancilla_qubit_combinations(
-        self, overflow_occurred: Tuple[bool, ...]
+        self, overflow_occurred: List[bool]
     ) -> List[List[int]]:
         if not self.use_volumetric_ops:
             raise LatticeException(
@@ -346,7 +346,7 @@ class SpaceTimeLattice(Lattice):
                     seq + self.ancilla_comparator_index(dim) for seq in sequences
                 ]
             else:
-                sequences = 2 * len(sequences), sequences * 2
+                sequences = sequences * 2
                 sequences = [
                     seq
                     + [self.ancilla_comparator_index(dim)[c >= (len(sequences) // 2)]]
