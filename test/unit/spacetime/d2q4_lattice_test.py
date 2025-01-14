@@ -66,6 +66,20 @@ def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
     )
 
 
+@pytest.fixture
+def volumetric_lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
+    return SpaceTimeLattice(
+        1,
+        {
+            "lattice": {
+                "dim": {"x": 16, "y": 16},
+                "velocities": {"x": 2, "y": 2},
+            },
+        },
+        use_volumetric_ops=True,
+    )
+
+
 def test_lattice_num_qubits_1(
     lattice_2d_16x16_1_obstacle_1_timestep: SpaceTimeLattice,
 ):
@@ -1095,7 +1109,7 @@ def test_is_inside_obstacle(lattice_2d_16x16_1_obstacle_1_timestep):
         (5, 12),
         (5, 8),
         (5, 9),
-        (4, 11 ),
+        (4, 11),
     ]
     gps_not_in_obstacle = [
         (3, 3),
@@ -1117,4 +1131,61 @@ def test_is_inside_obstacle(lattice_2d_16x16_1_obstacle_1_timestep):
     assert all(
         not lattice_2d_16x16_1_obstacle_1_timestep.is_inside_an_obstacle(gp)
         for gp in gps_not_in_obstacle
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_no_overflow(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [False, False]
+        )
+        == [[28, 29, 30, 31]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_overflow_x(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True, False]
+        )
+        == [[28, 30, 31], [29, 30, 31]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_overflow_y(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [False, True]
+        )
+        == [[28, 29, 30], [28, 29, 31]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_overflow_xy(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True, True]
+        )
+        == [[28, 30], [29, 30], [28, 31], [29, 31]]
+    )
+
+def test_volumetric_ancilla_qubit_combinations_exception_overflow(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    with pytest.raises(LatticeException) as excinfo_measure:
+        lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True, False]
+        )
+
+    assert (
+        "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
+        == str(excinfo_measure.value)
     )
