@@ -66,6 +66,20 @@ def lattice_1d_16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
     )
 
 
+@pytest.fixture
+def volumetric_lattice_1d_16_1_obstacle_1_timestep() -> SpaceTimeLattice:
+    return SpaceTimeLattice(
+        1,
+        {
+            "lattice": {
+                "dim": {"x": 16},
+                "velocities": {"x": 2},
+            },
+        },
+        use_volumetric_ops=True,
+    )
+
+
 def test_lattice_num_qubits_1(
     lattice_1d_16_1_obstacle_1_timestep: SpaceTimeLattice,
 ):
@@ -283,6 +297,7 @@ def test_streaming_line_bad_dimension(lattice_1d_16_1_obstacle_5_timesteps):
             == str(excinfo.value)
         )
 
+
 def test_bad_lattice_specification_velocities():
     with pytest.raises(LatticeException) as excinfo_measure:
         SpaceTimeLattice(
@@ -297,5 +312,41 @@ def test_bad_lattice_specification_velocities():
 
     assert (
         "Unsupported number of velocities for 1D: 4. Only D1Q2 is supported at the moment."
+        == str(excinfo_measure.value)
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_no_overflow(
+    volumetric_lattice_1d_16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_1d_16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [False]
+        )
+        == [[10, 11]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_overflow(
+    volumetric_lattice_1d_16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_1d_16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True]
+        )
+        == [[10], [11]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_exception_overflow(
+    lattice_1d_16_1_obstacle_1_timestep,
+):
+    with pytest.raises(LatticeException) as excinfo_measure:
+        lattice_1d_16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True]
+        )
+
+    assert (
+        "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
         == str(excinfo_measure.value)
     )
