@@ -1,3 +1,4 @@
+from itertools import product
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple, cast
 
@@ -329,6 +330,30 @@ class SpaceTimeLattice(Lattice):
             )
         previous_qubits = start_index + 2 * index
         return list(range(previous_qubits, previous_qubits + 2))
+
+    def volumetric_ancilla_qubit_combinations(
+        self, overflow_occurred: Tuple[bool, ...]
+    ) -> List[List[int]]:
+        if not self.use_volumetric_ops:
+            raise LatticeException(
+                "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
+            )
+
+        sequences = [[]]
+        for dim, overflow in enumerate(overflow_occurred):
+            if not overflow:
+                sequences = [
+                    seq + self.ancilla_comparator_index(dim) for seq in sequences
+                ]
+            else:
+                sequences = 2 * len(sequences), sequences * 2
+                sequences = [
+                    seq
+                    + [self.ancilla_comparator_index(dim)[c >= (len(sequences) // 2)]]
+                    for c, seq in enumerate(sequences)
+                ]
+
+        return sequences
 
     # def __grid_neighbors(
     #     self, coordinates: Tuple[int, int], up_to_distance: int
