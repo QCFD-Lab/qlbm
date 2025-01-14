@@ -1,4 +1,3 @@
-from itertools import product
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple, cast
 

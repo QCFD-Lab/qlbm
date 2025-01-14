@@ -8,8 +8,6 @@ from qiskit.circuit.library import MCMT, XGate
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.collisionless.primitives import Comparator, ComparatorMode
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
-from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
-from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
 
