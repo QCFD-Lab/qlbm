@@ -26,15 +26,18 @@ def create_directory_and_parents(directory: str) -> None:
 
 def qiskit_circuit_to_qulacs(circuit: QiskitQC) -> QulacsQC:
     """Converts a Qiskit QuantumCircuit to a Qulacs QuantumCircuit.
+
     Conversion takes place by first converting the Qiskit circuit into
     its OpenQASM 2 representation. This representation is then parsed
     into a Qulacs circuit.
 
-    Args:
-        circuit (QiskitQC): The Qiskit QuantumCircuit to convert.
+    Parameters
+    ----------
+    circuit (QiskitQC): The Qiskit QuantumCircuit to convert.
 
-    Returns:
-        QulacsQC: The Qulacs counterpart to the QuantumCircuit.
+    Returns
+    -------
+    QulacsQC: The Qulacs counterpart to the QuantumCircuit.
     """
     formatted_qulacs_qasm_circuit = evaluate_qasm_rotation_string(dumps(circuit))
     return convert_QASM_to_qulacs_circuit(formatted_qulacs_qasm_circuit.split("\n"))
@@ -77,6 +80,21 @@ def bit_value(num: int, position: int) -> int:
 
 
 def evaluate_qasm_rotation_string(qasm_repr: str) -> str:
+    """
+    Evaluate the symbolic values in a given qasm representation numerically.
+
+    Used a hacky way to convert between Qiskit and Qulacs representations.
+
+    Parameters
+    ----------
+    qasm_repr : str
+        A QASM string possibly containing symbolic values.
+
+    Returns
+    -------
+    str
+        The QASM string with symbolic values evaluated numerically.
+    """
     return re.sub(
         r"(r[xyz]|p)(\([-]?[\d]*[*]?pi[/]?[\d]*\))",  # Replace all  (r[xyz]/p(...)) rotation matrix notations by evaluating occurrances of pi
         lambda m: f"{m.group(1)}({str(eval(m.group(2).replace('pi', str(pi))))})",  # Replace pi by the numeric value and evaluate
@@ -90,7 +108,8 @@ def get_circuit_properties(circuit: QiskitQC | QulacsQC) -> Tuple[str, int, int,
     Args:
         circuit (QiskitQC | QulacsQC): The circuit for which to compile the properties.
 
-    Returns:
+    Returns
+    -------
         Tuple[str, int, int, int]: The circuit's platform, the number of qubits, depth, and number of gates of the circuit.
     """
     if isinstance(circuit, QiskitQC):
@@ -129,10 +148,12 @@ def qiskit_to_qulacs(circuit: QiskitQC) -> QulacsQC:
 def dimension_letter(dim: int) -> str:
     """Maps [0, 1, 2] to [x, y, z].
 
-    Args:
-        dim (int): The dimension to represent.
+    Parameters
+    ----------
+    dim (int): The dimension to represent.
 
-    Returns:
+    Returns
+    -------
         str: The letter associated with the dimension.
     """
     return chr(120 + dim)
@@ -141,10 +162,12 @@ def dimension_letter(dim: int) -> str:
 def is_two_pow(num: int) -> bool:
     """Whether a number is a power of 2.
 
-    Args:
-        num (int): The number to evaluate.
+    Parameters
+    ----------
+    num (int): The number to evaluate.
 
-    Returns:
+    Returns
+    -------
         bool: Whether the input is a power of 2.
     """
     # Powers of two have only one bit equal to 1.
@@ -158,6 +181,23 @@ def get_time_series(
     max_allowed_iters: int = 10000,
     tolerance: float = 1e-6,
 ) -> List[List[int]]:
+    """
+    Compute a time series of the streaming velocities for a given number of discrete velocities.
+
+    Parameters
+    ----------
+    num_discrete_velocities : int
+        The number of discrete velocities in the time series.
+    max_allowed_iters : int, optional
+        The number of iterations before truncating the time series, by default 10000
+    tolerance : float, optional
+        The level of precision required to truncate the time sries, by default 1e-6
+
+    Returns
+    -------
+    List[List[int]]
+        The order in which velocities have to be streamed before all particles have reached discrete gridpoints exactly
+    """
     # Used for debugging
     steps = 0
 
@@ -214,4 +254,19 @@ def get_time_series(
 
 
 def get_qubits_to_invert(gridpoint_encoded: int, num_qubits: int) -> List[int]:
+    r"""
+    Returns the indices at which a given gridpoint encoded value has a 0. Inverting these indices results in a :math:`\ket{1}^{\otimes n}` state.
+
+    Parameters
+    ----------
+    gridpoint_encoded : int
+        The integer representation of the gridpoint.
+    num_qubits : int
+        The total nuimber of grid qubits.
+
+    Returns
+    -------
+    List[int]
+        The indices of the (qu)bits that have value 0.
+    """
     return [i for i in range(num_qubits) if not bit_value(gridpoint_encoded, i)]
