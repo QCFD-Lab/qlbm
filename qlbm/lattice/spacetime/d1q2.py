@@ -1,5 +1,7 @@
+""":math:`D_2Q_4` STQBM builder."""
+
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, Tuple, cast, override
 
 from qiskit import QuantumRegister
 
@@ -14,6 +16,8 @@ from qlbm.tools.exceptions import LatticeException
 
 
 class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
+    """:math:`D_2Q_4` STQBM builder."""
+
     # Points to the right of the origin are marked as 0
     # And points to the left are marked as 1
     # This abstraction is more useful for more complex
@@ -50,20 +54,25 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             VonNeumannNeighborType.ORIGIN,
         )
 
+    @override
     def get_discretization(self) -> LatticeDiscretization:
         return LatticeDiscretization.D1Q2
 
+    @override
     def get_num_velocities_per_point(self) -> int:
         return 2
 
+    @override
     def get_num_ancilla_qubits(self) -> int:
         return (2 if self.use_volumetric_ops else 0) + (
             1 if self.include_measurement_qubit else 0
         )
 
+    @override
     def get_num_grid_qubits(self) -> int:
         return self.num_gridpoints[0].bit_length()
 
+    @override
     def get_num_velocity_qubits(self, num_timesteps: int | None = None) -> int:
         total_gridpoints = self.num_gridpoints[0] + 1
         velocities_per_gp = self.get_num_velocities_per_point()
@@ -76,9 +85,11 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             velocities_per_gp * num_timesteps * 2 + velocities_per_gp,
         )
 
+    @override
     def get_num_previous_grid_qubits(self, dim: int) -> int:
         return 0
 
+    @override
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         # Grid qubits
         grid_registers = [
@@ -109,12 +120,14 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         ancilla_registers = ancilla_measurement_register + ancilla_comparator_registers
         return (grid_registers, velocity_registers, ancilla_registers)
 
+    @override
     def get_index_of_neighbor(self, distance: Tuple[int, ...]) -> int:
         if (d := distance[0]) == 0:
             return 0
 
         return self.get_num_gridpoints_within_distance(abs(d) - 1) + (d < 0)
 
+    @override
     def get_streaming_lines(
         self, dimension: int, direction: bool, timestep: int | None = None
     ) -> List[List[int]]:
@@ -142,6 +155,7 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             [self.get_index_of_neighbor((i, 0)) for i in range(start, end + step, step)]
         ]
 
+    @override
     def get_neighbor_indices(
         self,
     ) -> Tuple[
@@ -193,6 +207,7 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
 
         return extreme_point_neighbor_indices, {}
 
+    @override
     def get_reflected_index_of_velocity(self, velocity_index: int) -> int:
         if velocity_index not in [0, 1]:
             raise LatticeException(
@@ -201,6 +216,7 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
 
         return 1 - velocity_index
 
+    @override
     def get_reflection_increments(self, velocity_index: int) -> Tuple[int, ...]:
         if velocity_index not in [0, 1]:
             raise LatticeException(
