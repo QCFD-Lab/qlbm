@@ -5,7 +5,6 @@ from typing import Dict, List, Tuple, cast, override
 
 from qiskit import QuantumRegister
 
-from qlbm.lattice.blocks import Block
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     SpaceTimeLatticeBuilder,
@@ -34,7 +33,6 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         self,
         num_timesteps: int,
         num_gridpoints: List[int],
-        blocks: Dict[str, List[Block]],
         include_measurement_qubit: bool = False,
         use_volumetric_ops: bool = False,
         logger: Logger = getLogger("qlbm"),
@@ -47,7 +45,6 @@ class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         )
 
         self.num_gridpoints = num_gridpoints
-        self.blocks = blocks
         self.origin = VonNeumannNeighbor(
             (0, 0),
             0,
