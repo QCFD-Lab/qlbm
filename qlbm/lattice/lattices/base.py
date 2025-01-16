@@ -1,3 +1,5 @@
+"""Base class for all algorithm-specific Lattices."""
+
 import json
 from abc import ABC, abstractmethod
 from logging import Logger, getLogger
@@ -11,7 +13,8 @@ from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 
 
 class Lattice(ABC):
-    """Base class for all algorithm-specific Lattices.
+    r"""Base class for all algorithm-specific Lattices.
+
     A ``Lattice`` object performs the following functions:
 
     #. Parse high-level input from JSON files or Python dictionaries into appropriate quantum registers and other information used to infer quantum circuits.
@@ -96,7 +99,7 @@ class Lattice(ABC):
         self,
         lattice_data: str | Dict,  # type: ignore
     ) -> Tuple[List[int], List[int], Dict[str, List[Block]]]:
-        """
+        r"""
         Parses the lattice input data, provided in either a file path or a dictionary.
 
         Parameters
@@ -133,7 +136,7 @@ class Lattice(ABC):
         self,
         input_dict: Dict,  # type: ignore
     ) -> Tuple[List[int], List[int], Dict[str, List[Block]]]:
-        """
+        r"""
         Parses the lattice input data, provided as a dictionary.
 
         Parameters
@@ -276,6 +279,14 @@ class Lattice(ABC):
         return grid_list, velocity_list, parsed_obstacles
 
     def to_json(self) -> str:
+        """
+        Serialize the lattice specification to JSON format.
+
+        Returns
+        -------
+        str
+            The JSON representation of the lattice.
+        """
         lattice_dict: Dict = {  # type: ignore
             "lattice": {
                 "dim": {

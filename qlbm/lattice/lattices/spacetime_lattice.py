@@ -1,5 +1,7 @@
+"""Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.SpaceTimeQLBM` algorithm developed by :cite:t:`spacetime`."""
+
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, Tuple, cast, override
 
 from qiskit import QuantumCircuit, QuantumRegister
 
@@ -12,7 +14,7 @@ from qlbm.tools.utils import flatten
 
 
 class SpaceTimeLattice(Lattice):
-    """
+    r"""
     Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.SpaceTimeQLBM` algorithm developed by :cite:t:`spacetime`.
 
     .. warning::
@@ -153,7 +155,6 @@ class SpaceTimeLattice(Lattice):
                 return D1Q2SpaceTimeLatticeBuilder(
                     self.num_timesteps,
                     self.num_gridpoints,
-                    self.blocks,
                     include_measurement_qubit=self.include_measurement_qubit,
                     use_volumetric_ops=self.use_volumetric_ops,
                     logger=self.logger,
@@ -167,7 +168,6 @@ class SpaceTimeLattice(Lattice):
                 return D2Q4SpaceTimeLatticeBuilder(
                     self.num_timesteps,
                     self.num_gridpoints,
-                    self.blocks,
                     include_measurement_qubit=self.include_measurement_qubit,
                     use_volumetric_ops=self.use_volumetric_ops,
                     logger=self.logger,
@@ -333,6 +333,31 @@ class SpaceTimeLattice(Lattice):
     def volumetric_ancilla_qubit_combinations(
         self, overflow_occurred: List[bool]
     ) -> List[List[int]]:
+        """
+        Get all combinations of ancilla qubit indices required for volumetric operations.
+
+        Volumetric operations perform actions on contiguous volumes of space in the lattice.
+        These volumes are defined by lower and upper bounds in each dimension.
+        Since the locality of the data structure may be affected by periodic boundary conditions,
+        volumetrics must be adjusted to account for all possible overflow scenarios.
+        This is done by performing the operations in different orders on the adjusted bounds.
+        This method returns the sequence of ancilla qubit indices required to perform the operations soundly.
+
+        Parameters
+        ----------
+        overflow_occurred : List[bool]
+            A :math:`d`-length list of booleans indicating whether overflow occurred in each dimension.
+
+        Returns
+        -------
+        List[List[int]]
+            The sequence of ancilla qubit indices required to perform the volumetric operations.
+
+        Raises
+        ------
+        LatticeException
+            If volumetric operations are not enabled in the lattice.
+        """
         if not self.use_volumetric_ops:
             raise LatticeException(
                 "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
@@ -354,15 +379,30 @@ class SpaceTimeLattice(Lattice):
 
         return sequences
 
+    @override
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         return self.properties.get_registers()
 
     def is_inside_an_obstacle(self, gridpoint: Tuple[int, ...]) -> bool:
+        """
+        Whether a gridpoint is inside the volume of any obstacle in the lattice.
+
+        Parameters
+        ----------
+        gridpoint : Tuple[int, ...]
+            The :math:`d`-dimensional gridpoint to check.
+
+        Returns
+        -------
+        bool
+            Whether the gridpoint is inside any obstacle.
+        """
         return any(
             block.contains_gridpoint(gridpoint)
             for block in flatten(self.blocks.values())
         )
 
+    @override
     def logger_name(self) -> str:
         gp_string = ""
         for c, gp in enumerate(self.num_gridpoints):
@@ -374,9 +414,9 @@ class SpaceTimeLattice(Lattice):
     def comparator_periodic_volume_bounds(
         self, bounds: List[Tuple[int, int]]
     ) -> List[Tuple[Tuple[int, int], Tuple[bool, bool]]]:
-        """
-        Computes the lower and upper bounds for the :class:`.Comparator`\ s
-        used to perform volumetric operations in the :class:`.SpaceTimeQLBM`.
+        r"""
+        Computes the lower and upper bounds for the :class:`.Comparator`\ s used to perform volumetric operations in the :class:`.SpaceTimeQLBM`.
+
         For any given lower and upper bounds in 1, 2, or 3 dimensions,
         modulo operations are applied that detect whether periodic boundary conditions
         are required.
