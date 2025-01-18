@@ -1,3 +1,5 @@
+"""A ``SimulationConfig`` ties together algorithmic quantum components, circuit compilers, runners, and performance optimizations."""
+
 from logging import Logger, getLogger
 from typing import Any, List
 
@@ -14,8 +16,8 @@ from qlbm.tools.exceptions import ExecutionException
 
 class SimulationConfig:
     """
-    A ``SimulationConfig`` ties together algorithmic quantum
-    components, circuit compilers, runners, and performance optimizations.
+    A ``SimulationConfig`` ties together algorithmic quantum components, circuit compilers, runners, and performance optimizations.
+
     This is the most convenient access point for performing simulations with ``qlbm``.
     In total, the config contains 11 relevant class attributes that together
     allow users to customize their simulations in a declarative manner.
@@ -247,7 +249,8 @@ class SimulationConfig:
     ):
         """
         Validates the configuration.
-        This includes the following checks
+
+        This includes the following checks:
 
         #. The algorithmic attributes are of compatible types.
         #. The target platform is available.
@@ -322,9 +325,7 @@ class SimulationConfig:
     def prepare_for_simulation(
         self,
     ) -> None:
-        """
-        Converts all algorithmic components to the target platform according to the specification, in place.
-        """
+        """Converts all algorithmic components to the target platform according to the specification, in place."""
         self.__perpare_circuits(
             self.get_execution_compiler(),
             self.get_sampling_compiler(),
@@ -332,8 +333,7 @@ class SimulationConfig:
 
     def get_execution_compiler(self) -> CircuitCompiler:
         """
-        Get the :class:`CircuitCompiler` that can converts the
-        algorithmic attributes to the target ``sampling_backend`` simulator.
+        Get the :class:`CircuitCompiler` that can converts the algorithmic attributes to the target ``sampling_backend`` simulator.
 
         Returns
         -------
@@ -348,8 +348,7 @@ class SimulationConfig:
 
     def get_sampling_compiler(self) -> CircuitCompiler:
         """
-        Get the :class:`CircuitCompiler` that can converts the
-        algorithmic attributes to the target ``execution_backend`` simulator.
+        Get the :class:`CircuitCompiler` that can converts the algorithmic attributes to the target ``execution_backend`` simulator.
 
         Returns
         -------
