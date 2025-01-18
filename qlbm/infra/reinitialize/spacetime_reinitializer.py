@@ -1,5 +1,7 @@
+""":class:`.SpaceTimeQLBM`-specific implementation of the :class:`.Reinitializer`."""
+
 from logging import Logger, getLogger
-from typing import List, Tuple, cast
+from typing import List, Tuple, cast, override
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.quantum_info import Statevector
@@ -18,8 +20,9 @@ from .base import Reinitializer
 
 
 class SpaceTimeReinitializer(Reinitializer):
-    """
+    r"""
     :class:`.SpaceTimeQLBM`-specific implementation of the :class:`.Reinitializer`.
+
     Compatible with both :class:`.QiskitRunner`\ s and :class:`.QulacsRunner`\ s.
     To generate a new set of initial conditions for the CQLBM algorithm,
     the reinitializer simply returns the quantum state computed
@@ -64,8 +67,7 @@ class SpaceTimeReinitializer(Reinitializer):
         optimization_level: int = 0,
     ) -> QiskitQC | QulacsQC:
         """
-        Converts the input ``counts`` into a new :class:`.SpaceTimeInitialConditions`
-        object that can be prepended to the time step circuit to resume simulation.
+        Converts the input ``counts`` into a new :class:`.SpaceTimeInitialConditions` object that can be prepended to the time step circuit to resume simulation.
 
         Parameters
         ----------
@@ -120,6 +122,7 @@ class SpaceTimeReinitializer(Reinitializer):
     def split_count(self, count: str) -> Tuple[Tuple[int, ...], Tuple[bool, ...]]:
         """
         Splits a given ``Count`` into its position and velocity components.
+
         Counts are assumed to be obtained from :class:`.SpacetimeGridVelocityMeasurement` objects,
         and split format is the same as the input to :class:`.SpaceTimeInitialConditions`.
 
@@ -168,5 +171,6 @@ class SpaceTimeReinitializer(Reinitializer):
             f"Reinitialization not supported for lattice with {self.lattice.num_dims} dimensions."
         )
 
+    @override
     def requires_statevector(self) -> bool:
         return False

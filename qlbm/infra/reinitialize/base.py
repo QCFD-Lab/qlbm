@@ -1,3 +1,5 @@
+"""Base class for all algorithm-specific reinitializers."""
+
 from abc import ABC, abstractmethod
 from logging import Logger, getLogger
 
@@ -14,6 +16,7 @@ from qlbm.lattice import Lattice
 class Reinitializer(ABC):
     """
     Base class for all algorithm-specific reinitializers.
+
     A ``Reinitializer`` uses the information at information available
     at the end of the simulation of 1 or more time steps
     to new initial conditions for the following time steps.
@@ -81,6 +84,7 @@ class Reinitializer(ABC):
     def requires_statevector(self) -> bool:
         """
         Whether the reinitializer requires a copy of the statevector.
+
         Omotting the statevector may significantly increase the perfomance of reinitialization.
 
         Returns

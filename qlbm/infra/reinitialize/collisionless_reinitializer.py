@@ -1,4 +1,7 @@
+""":class:`.CQLBM`-specific implementation of the :class:`.Reinitializer`."""
+
 from logging import Logger, getLogger
+from typing import override
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.circuit.library import Initialize
@@ -14,8 +17,9 @@ from .base import Reinitializer
 
 
 class CollisionlessReinitializer(Reinitializer):
-    """
+    r"""
     :class:`.CQLBM`-specific implementation of the :class:`.Reinitializer`.
+
     Compatible with both :class:`.QiskitRunner`\ s and :class:`.QulacsRunner`\ s.
     To generate a new set of initial conditions for the CQLBM algorithm,
     the reinitializer simply returns the quantum state computed
@@ -55,8 +59,7 @@ class CollisionlessReinitializer(Reinitializer):
         optimization_level: int = 0,
     ) -> QiskitQC | QulacsQC:
         """
-        Returns the provided ``statevector`` as a new Qiskit ``Initialize`` object
-        that can be prepended to the time step circuit to resume simulation.
+        Returns the provided ``statevector`` as a new Qiskit ``Initialize`` object that can be prepended to the time step circuit to resume simulation.
 
         Parameters
         ----------
@@ -82,5 +85,6 @@ class CollisionlessReinitializer(Reinitializer):
         )
         return circuit
 
+    @override
     def requires_statevector(self) -> bool:
         return True
