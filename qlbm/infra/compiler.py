@@ -1,3 +1,5 @@
+"""Wrapper for Qiskit and Tket transpilers with flexible targets."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
@@ -19,8 +21,9 @@ from qlbm.tools.utils import get_circuit_properties
 
 
 class CircuitCompiler:
-    """
+    r"""
     Wrapper for Qiskit and Tket transpilers with flexible targets.
+
     This class provides a uniform interface for compiling ``qlbm`` circuits
     to any Qiskit backend, as well as Qulacs.
 
@@ -75,7 +78,7 @@ class CircuitCompiler:
         compiler = CircuitCompiler("TKET", "QISKIT")
 
     Compilation takes a single call to the :meth:`compile` method:
-        
+
     .. plot::
         :include-source:
         :context:
@@ -87,7 +90,7 @@ class CircuitCompiler:
         compiled_circuit = compiler.compile(component, backend=AerSimulator())
 
     The result is a Qiskit quantum circuit, which we can visualize the same way we would any ``qlbm`` component:
-        
+
     .. plot::
         :include-source:
         :context:
@@ -247,6 +250,14 @@ class CircuitCompiler:
         return compiled_circuit
 
     def __str__(self) -> str:
+        """
+        String representation of the compiler.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
         return (
             f"[Compiler using {self.compiler_type} with target {self.compiler_target}]"
         )
