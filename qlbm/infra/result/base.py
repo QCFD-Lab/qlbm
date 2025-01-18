@@ -1,3 +1,5 @@
+"""Base class for all algorithm-specific results."""
+
 from abc import ABC, abstractmethod
 from os.path import isdir
 from typing import Dict
@@ -11,8 +13,8 @@ from qlbm.tools.utils import create_directory_and_parents, flatten
 
 
 class QBMResult(ABC):
-    """
-    Base class for all algorithm-specific results.
+    """Base class for all algorithm-specific results.
+
     A ``Result`` object parses the counts extracted from the quantum state
     at the end of the simulation of some number of time steps.
     This information is then either translated into a visual representation
@@ -58,6 +60,7 @@ class QBMResult(ABC):
     def visualize_geometry(self):
         """
         Creates ``stl`` files for each block in the lattice.
+
         Output files are formatted as ``output_dir/paraview_dir/cube_<x>.stl``.
         The output is created through the :class:`.Block`'s :meth:`.Block.stl_mesh` method.
         """
@@ -154,7 +157,5 @@ class QBMResult(ABC):
 
     @abstractmethod
     def visualize_all_numpy_data(self):
-        """
-        Converts all numpy data saved to disk to ``vti`` files.
-        """
+        """Converts all numpy data saved to disk to ``vti`` files."""
         pass

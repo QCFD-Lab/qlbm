@@ -1,6 +1,8 @@
+""":class:`.SpaceTimeQLBM`-specific implementation of the :class:`.QBMResult`."""
+
 import re
 from os import listdir
-from typing import Dict
+from typing import Dict, override
 
 import numpy as np
 import vtk
@@ -14,6 +16,7 @@ from .base import QBMResult
 class SpaceTimeResult(QBMResult):
     """
     :class:`.SpaceTimeQLBM`-specific implementation of the :class:`.QBMResult`.
+
     Processes counts sampled from :class:`.SpaceTimeGridVelocityMeasurement` primitives.
 
     =========================== ======================================================================
@@ -39,6 +42,7 @@ class SpaceTimeResult(QBMResult):
     ) -> None:
         super().__init__(lattice, directory, output_file_name)
 
+    @override
     def save_timestep_counts(
         self,
         counts: Dict[str, float],
@@ -104,6 +108,7 @@ class SpaceTimeResult(QBMResult):
             save_counts_array=save_array,
         )
 
+    @override
     def visualize_all_numpy_data(self):
         # Filter the algorithm output files
         r = re.compile("[a-zA-Z0-9]+_[0-9]+.csv")
