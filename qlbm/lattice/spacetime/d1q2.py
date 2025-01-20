@@ -1,9 +1,10 @@
 """:math:`D_2Q_4` STQBM builder."""
 
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple, cast, override
+from typing import Dict, List, Tuple, cast
 
 from qiskit import QuantumRegister
+from typing_extensions import override
 
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,

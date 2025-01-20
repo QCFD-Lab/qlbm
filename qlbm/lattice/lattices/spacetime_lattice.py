@@ -1,9 +1,10 @@
 """Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.SpaceTimeQLBM` algorithm developed by :cite:t:`spacetime`."""
 
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple, cast, override
+from typing import Dict, List, Tuple, cast
 
 from qiskit import QuantumCircuit, QuantumRegister
+from typing_extensions import override
 
 from qlbm.lattice.lattices.base import Lattice
 from qlbm.lattice.spacetime.d1q2 import D1Q2SpaceTimeLatticeBuilder
@@ -363,7 +364,7 @@ class SpaceTimeLattice(Lattice):
                 "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
             )
 
-        sequences = [[]]
+        sequences: List[List[int]] = [[]]
         for dim, overflow in enumerate(overflow_occurred):
             if not overflow:
                 sequences = [
@@ -406,7 +407,7 @@ class SpaceTimeLattice(Lattice):
     def logger_name(self) -> str:
         gp_string = ""
         for c, gp in enumerate(self.num_gridpoints):
-            gp_string += f"{gp+1}"
+            gp_string += f"{gp + 1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
         return f"{self.num_dims}d-{gp_string}-q4"
