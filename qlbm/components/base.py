@@ -1,3 +1,5 @@
+"""Base classes for quantum primitives, operators, and algorithms."""
+
 from abc import ABC, abstractmethod
 from io import TextIOBase
 from logging import Logger, getLogger
@@ -5,6 +7,7 @@ from logging import Logger, getLogger
 from qiskit import QuantumCircuit
 from qiskit.qasm2 import dump as dump_qasm2
 from qiskit.qasm3 import dump as dump_qasm3
+from typing_extensions import override
 
 from qlbm.lattice import CollisionlessLattice, Lattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
@@ -13,6 +16,7 @@ from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 class QuantumComponent(ABC):
     """
     Base class for all quantum circuits implementing QLBM functionality.
+
     This class wraps a :class:`qiskit.QuantumCircuit` object constructed
     through the parameters supplied to the constructor.
     The :meth:`create_circuit` is automatically called at construct time
@@ -42,6 +46,7 @@ class QuantumComponent(ABC):
     def create_circuit(self) -> QuantumCircuit:
         """
         Creates the :class:`qiskit.QuantumCircuit` of this object.
+
         This method is called automatically at construction time for all quantum components.
 
         Returns
@@ -51,11 +56,20 @@ class QuantumComponent(ABC):
         """
         pass
 
+    @override
     def __repr__(self) -> str:
         return self.circuit.__repr__()
 
     @abstractmethod
     def __str__(self) -> str:
+        """
+        The string representation of a quantum component.
+
+        Returns
+        -------
+        str
+            The string representation of a quantum component.
+        """
         return self.circuit.__str__()
 
     def width(self) -> int:
@@ -119,6 +133,7 @@ class QuantumComponent(ABC):
 class LBMPrimitive(QuantumComponent):
     """
     Base class for all primitive-level quantum components.
+
     A primitive component is a small, isolated, and structurally parameterizable
     quantum circuit that can be reused throughout one or multiple algorithms.
 
@@ -142,6 +157,7 @@ class LBMPrimitive(QuantumComponent):
 class LBMOperator(QuantumComponent):
     """
     Base class for all operator-level quantum components.
+
     An operator component implements a specific physical operation
     corresponding to the classical LBM (streaming, collision, etc.).
     Operators are inferred based on the structure of a :class:`.Lattice`
@@ -169,9 +185,8 @@ class LBMOperator(QuantumComponent):
 
 class CQLBMOperator(LBMOperator):
     """
-    Specialization of the :class:`.LBMOperator` operator class
-    for the Collisionless Quantum Transport Method algorithm by
-    :cite:t:`collisionless`.
+    Specialization of the :class:`.LBMOperator` operator class for the Collisionless Quantum Transport Method algorithm by :cite:t:`collisionless`.
+
     Specializaitons of this class infer their properties
     based on a :class:`.CollisionlessLattice`.
 
@@ -197,9 +212,8 @@ class CQLBMOperator(LBMOperator):
 
 class SpaceTimeOperator(LBMOperator):
     """
-    Specialization of the :class:`.LBMOperator` operator class
-    for the Space-Time QBM algorithm by
-    :cite:t:`spacetime`.
+    Specialization of the :class:`.LBMOperator` operator class for the Space-Time QBM algorithm by :cite:t:`spacetime`.
+
     Specializaitons of this class infer their properties
     based on a :class:`.SpaceTimeLattice`.
 
@@ -226,6 +240,7 @@ class SpaceTimeOperator(LBMOperator):
 class LBMAlgorithm(QuantumComponent):
     """
     Base class for all end-to-end Quantum Boltzmann Methods.
+
     An end-to-end algorithm consists of a
     series of :class:`.LBMOperator` that perform
     the physical operations of the appropriate algorithm.
