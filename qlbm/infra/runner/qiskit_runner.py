@@ -2,11 +2,11 @@
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import override
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.circuit.library import Initialize
 from qiskit.quantum_info import Statevector
+from typing_extensions import override
 
 from qlbm.infra.result import QBMResult
 from qlbm.lattice import Lattice

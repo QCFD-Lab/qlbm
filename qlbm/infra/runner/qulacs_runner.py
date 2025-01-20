@@ -2,7 +2,7 @@
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List, override
+from typing import List
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.circuit.library import Initialize
@@ -10,6 +10,7 @@ from qiskit.quantum_info import Statevector
 from qiskit.result import Counts
 from qulacs import QuantumCircuit as QulacsQC
 from qulacs import QuantumCircuitSimulator, QuantumState
+from typing_extensions import override
 
 from qlbm.infra.result import QBMResult
 from qlbm.lattice import Lattice
