@@ -1,3 +1,5 @@
+"""General qlbm utilities."""
+
 import re
 from math import pi
 from pathlib import Path
@@ -250,7 +252,7 @@ def get_time_series(
         ):
             break
 
-    return speed_controls
+    return speed_controls  # type: ignore
 
 
 def get_qubits_to_invert(gridpoint_encoded: int, num_qubits: int) -> List[int]:
