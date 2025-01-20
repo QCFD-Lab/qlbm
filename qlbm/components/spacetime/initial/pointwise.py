@@ -1,8 +1,11 @@
+"""Prepares the initial state for the :class:`.SpaceTimeQLBM` one gridpoint at a time."""
+
 from logging import Logger, getLogger
 from typing import List, Tuple
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
+from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
@@ -11,8 +14,8 @@ from qlbm.tools.utils import bit_value, flatten
 
 
 class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
-    """
-    Prepares the initial state for the :class:`.SpaceTimeQLBM`.
+    r"""Prepares the initial state for the :class:`.SpaceTimeQLBM`.
+
     Initial conditions are supplied in a ``List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]``
     containing, for each population to be initialized, two nested tuples.
 
@@ -79,6 +82,7 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
 
         self.circuit = self.create_circuit()
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
         circuit.h(self.lattice.grid_index())
@@ -143,6 +147,18 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
         return circuit
 
     def set_grid_value(self, point_coordinates: Tuple[int, ...]) -> QuantumCircuit:
+        r"""Applies :math:`X` gates to that convert the coordinates of a given gridpoint to :math:`\ket{1}^{\otimes n}`.
+
+        Parameters
+        ----------
+        point_coordinates : Tuple[int, ...]
+            The tuple encoding the gridpoint to convert to `\ket{1}^{\otimes n}`
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit that sets the gridpoint to the desired state.
+        """
         # ! TODO: rename, refactor into primitive
         circuit = self.lattice.circuit.copy()
 
@@ -159,6 +175,23 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
         velocity_values: Tuple[bool, ...],
         neighbor: VonNeumannNeighbor,
     ) -> QuantumCircuit:
+        """
+        Sets the velocity state of the neighbor of a particular grid location to a given state.
+
+        Parameters
+        ----------
+        point_coordinates : Tuple[int, ...]
+            THe coordinates of the origin.
+        velocity_values : Tuple[bool, ...]
+            The velocity values to set, encoded as whether the velocity is enabled.
+        neighbor : VonNeumannNeighbor
+            The neighbor relative to the origin for which to set the velocity value.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit that sets the velocity state.
+        """
         # ! TODO: rename, refactor into primitive
         circuit = self.lattice.circuit.copy()
         absolute_neighbor_coordinates = neighbor.get_absolute_values(
@@ -196,5 +229,6 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive SpaceTimeInitialConditions with data={self.grid_data} and lattice={self.lattice}]"

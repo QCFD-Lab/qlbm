@@ -1,9 +1,12 @@
+"""Reflection operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
+from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.lattice.blocks import Block
@@ -13,6 +16,22 @@ from qlbm.tools.exceptions import CircuitException
 
 
 class SpaceTimeReflectionOperator(SpaceTimeOperator):
+    """Operator implementing reflection in the :class:`.SpaceTimeQLBM` algorithm.
+
+    Work in progress.
+
+    ============================ ======================================================================
+    Attribute                     Summary
+    ============================ ======================================================================
+    :attr:`lattice`              The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
+    :attr:`timestep`             The timestep for to which to perform reflection.
+    :attr:`blocks`               A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
+    :attr:`filter_inside_blocks` A ``bool`` that, when enabled, disregards operations that would have happened inside blocks.
+    :attr:`logger`               The performance logger, by default ``getLogger("qlbm")``.
+    ============================ ======================================================================
+
+    """
+
     def __init__(
         self,
         lattice: SpaceTimeLattice,
@@ -39,6 +58,7 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         discretization = self.lattice.properties.get_discretization()
         if discretization == LatticeDiscretization.D1Q2:
@@ -137,6 +157,7 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
                     circuit.x(grid_qubit_indices_to_invert)
         return circuit
 
+    @override
     def __str__(self) -> str:
         # TODO: Implement
         return "Space Time Reflection Operator"

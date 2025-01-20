@@ -1,6 +1,9 @@
+"""The end-to-end algorithm of the Space-Time Quantum Lattice Boltzmann Algorithm described in :cite:`spacetime`."""
+
 from logging import Logger, getLogger
 
 from qiskit import QuantumCircuit
+from typing_extensions import override
 
 from qlbm.components.base import LBMAlgorithm
 from qlbm.components.spacetime.reflection import SpaceTimeReflectionOperator
@@ -11,9 +14,8 @@ from .streaming import SpaceTimeStreamingOperator
 
 
 class SpaceTimeQLBM(LBMAlgorithm):
-    """
-    The end-to-end algorithm of the Space-Time Quantum Lattice Boltzmann Algorithm
-    described in :cite:`spacetime`.
+    """The end-to-end algorithm of the Space-Time Quantum Lattice Boltzmann Algorithm described in :cite:`spacetime`.
+
     This implementation currently only supports 1 time step on the :math:`D_2Q_4`
     lattice discretization.
     Additional steps are possible by means of reinitialization.
@@ -65,6 +67,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
         self.filter_inside_blocks = filter_inside_blocks
         self.circuit = self.create_circuit()
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
@@ -96,5 +99,6 @@ class SpaceTimeQLBM(LBMAlgorithm):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Space Time QLBM on lattice={self.lattice}]"

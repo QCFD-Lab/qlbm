@@ -1,8 +1,11 @@
+"""Streaming operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
 
 from qiskit import QuantumCircuit
+from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
@@ -11,8 +14,8 @@ from qlbm.tools.exceptions import CircuitException
 
 
 class SpaceTimeStreamingOperator(SpaceTimeOperator):
-    """
-    An operator that performs streaming as a series of :math:`SWAP` gates as part of the :class:`.SpaceTimeQLBM` algorithm.
+    """An operator that performs streaming as a series of :math:`SWAP` gates as part of the :class:`.SpaceTimeQLBM` algorithm.
+
     The velocities corresponding to neighboring gridpoints are streamed "into" the gridpoint affected relative to the ``timestep``.
     The register setup of the :class:`.SpaceTimeLattice` is such that following each
     time step, an additional "layer" neighboring velocity qubits can be discarded,
@@ -72,6 +75,7 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         discretization = self.lattice.properties.get_discretization()
         if discretization == LatticeDiscretization.D1Q2:
@@ -129,6 +133,23 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
         velocity_direction: int,
         circuit: QuantumCircuit,
     ) -> QuantumCircuit:
+        """
+        Apply the swap gates that move the velocity qubits to their neighboring gridpoints along a line.
+
+        Parameters
+        ----------
+        streaming_lines : List[List[int]]
+            The lines to stream, formatted as ordered lists of neighbor indices to swap.
+        velocity_direction : int
+            The number of the velocity qubit to swap for each neighbor.
+        circuit : QuantumCircuit
+            The circuit to extend.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit containing the line streaming operations.
+        """
         for streaming_line in streaming_lines:
             for c, neighbor in enumerate(streaming_line):
                 if c == len(streaming_line) - 1:
@@ -142,6 +163,7 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         # TODO: Implement
         return "Space Time Streaming Operator"

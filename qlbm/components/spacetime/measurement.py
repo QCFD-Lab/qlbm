@@ -1,8 +1,11 @@
+"""Measurement operator for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
+
 from logging import Logger, getLogger
 from typing import Tuple
 
 from qiskit import ClassicalRegister
 from qiskit.circuit.library import MCMT, XGate
+from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
@@ -10,8 +13,8 @@ from qlbm.tools.utils import flatten, get_qubits_to_invert
 
 
 class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
-    """
-    A primitive that implements a measurement operation on the grid and the local velocity qubits.
+    """A primitive that implements a measurement operation on the grid and the local velocity qubits.
+
     Used at the end of the simulation to extract information from the quantum state.
     Together, the information from the local and grid qubits can be used for on-the-fly reinitialization.
 
@@ -55,6 +58,7 @@ class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
 
         self.circuit = self.create_circuit()
 
+    @override
     def create_circuit(self):
         circuit = self.lattice.circuit.copy()
 
@@ -73,12 +77,19 @@ class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         # TODO: Implement
         return "Space Gird Measurement"
 
 
 class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
+    """
+    A primitive that performs mass measurement.
+
+    WIP.
+    """
+
     def __init__(
         self,
         lattice: SpaceTimeLattice,
@@ -93,6 +104,7 @@ class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
 
         self.circuit = self.create_circuit()
 
+    @override
     def create_circuit(self):
         circuit = self.lattice.circuit.copy()
 
@@ -136,6 +148,7 @@ class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         # TODO: Implement
         return "SpaceTimePointWiseMassMeasurement"

@@ -1,3 +1,5 @@
+"""Collision operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
+
 from logging import Logger, getLogger
 from math import pi
 from time import perf_counter_ns
@@ -5,14 +7,15 @@ from time import perf_counter_ns
 from qiskit import QuantumCircuit
 from qiskit.circuit import Gate
 from qiskit.circuit.library import MCMT, RYGate
+from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
 class SpaceTimeCollisionOperator(SpaceTimeOperator):
-    """
-    An operator that performs collision part of the :class:`.SpaceTimeQLBM` algorithm.
+    r"""An operator that performs collision part of the :class:`.SpaceTimeQLBM` algorithm.
+
     Collision is a local operation that is performed simultaneously on all velocity qubits corresponding to a grid location.
     In practice, this means the same circuit is repeated across all "local" qubit register chunks.
     Collision can be understood as follows:
@@ -78,6 +81,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
@@ -115,6 +119,19 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
         return circuit
 
     def local_collision_circuit(self, reset_state: bool) -> QuantumCircuit:
+        """
+        Sets the state for the collision circuit one local gridpoint and its corresponding velocity qubits.
+
+        Parameters
+        ----------
+        reset_state : bool
+            Whether the circuit sets or re-sets the state past the application of the rotation operator.
+
+        Returns
+        -------
+        QuantumCircuit
+            The collision (re-)set circuit for a single gridpoint.
+        """
         circuit = QuantumCircuit(self.lattice.properties.get_num_velocities_per_point())
 
         if not reset_state:
@@ -133,6 +150,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         # TODO: Implement
         return "Space Time Collision Operator"

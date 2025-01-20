@@ -1,9 +1,12 @@
+"""Prepares the initial state for the :class:`.SpaceTimeQLBM` for a volumetric region."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List, Tuple, cast
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
+from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.collisionless.primitives import Comparator, ComparatorMode
@@ -12,6 +15,12 @@ from qlbm.tools.utils import flatten
 
 
 class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
+    """
+    Prepares the initial state for the :class:`.SpaceTimeQLBM` for a volumetric region.
+
+    Work in progress.
+    """
+
     def __init__(
         self,
         lattice: SpaceTimeLattice,
@@ -32,6 +41,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
         circuit.h(self.lattice.grid_index())
@@ -133,5 +143,6 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
     def __adjusted_comparator_mode(self, bound: bool) -> ComparatorMode:
         return ComparatorMode.LE if (bound) else ComparatorMode.GE
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive VolumetricSpaceTimeInitialConditions with range={self.cuboid_bounds}, profile = {self.velocity_profile}, and lattice={self.lattice}]"
