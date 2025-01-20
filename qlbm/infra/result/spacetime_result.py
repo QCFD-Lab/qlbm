@@ -2,10 +2,11 @@
 
 import re
 from os import listdir
-from typing import Dict, override
+from typing import Dict
 
 import numpy as np
 import vtk
+from typing_extensions import override
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice

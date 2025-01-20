@@ -2,10 +2,11 @@
 
 import re
 from os import listdir
-from typing import Dict, override
+from typing import Dict
 
 import numpy as np
 import vtk
+from typing_extensions import override
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice import CollisionlessLattice
@@ -77,7 +78,7 @@ class CollisionlessResult(QBMResult):
                 count_history[x][y] = counts[count]
 
         elif self.lattice.num_dims == 3:
-            count_history = np.zeros(
+            count_history = np.zeros(  # type: ignore
                 (
                     self.lattice.num_gridpoints[0] + 1,
                     self.lattice.num_gridpoints[1] + 1,
