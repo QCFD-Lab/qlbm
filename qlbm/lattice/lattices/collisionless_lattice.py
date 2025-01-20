@@ -1,9 +1,10 @@
 """Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`."""
 
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple, override
+from typing import Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
+from typing_extensions import override
 
 from qlbm.lattice.blocks import Block
 from qlbm.tools.exceptions import LatticeException
