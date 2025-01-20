@@ -1,9 +1,12 @@
+"""Quantum comparator circuits for the implementation of bounce-back boundary conditions as described in :cite:t:`qmem`."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMT, XGate
+from typing_extensions import override
 
 from qlbm.components.base import CQLBMOperator, LBMPrimitive
 from qlbm.components.collisionless.primitives import (
@@ -21,9 +24,9 @@ from .streaming import ControlledIncrementer
 
 
 class BounceBackWallComparator(LBMPrimitive):
-    """
-    A primitive used in the collision :class:`BounceBackReflectionOperator` that implements the
-    comparator for the BB boundary conditions as described :cite:t:`qmem`.
+    r"""
+    A primitive used in the collision :class:`BounceBackReflectionOperator` that implements the comparator for the BB boundary conditions as described in :cite:t:`qmem`.
+
     The comparator sets an ancilla qubit to :math:`\ket{1}` for the components of
     the quantum state whose grid qubits fall within the range spanned by the wall.
 
@@ -69,6 +72,7 @@ class BounceBackWallComparator(LBMPrimitive):
 
         self.circuit = self.create_circuit()
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
@@ -119,6 +123,7 @@ class BounceBackWallComparator(LBMPrimitive):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive BounceBackWallComparator on wall={self.wall}]"
 
@@ -126,6 +131,7 @@ class BounceBackWallComparator(LBMPrimitive):
 class BounceBackReflectionOperator(CQLBMOperator):
     """
     Operator implementing the 2D and 3D Bounce-Back (BB) boundary conditions as described in :cite:t:`qmem`.
+
     The operator parses information encoded in :class:`.Block` objects to detect particles that
     have virtually streamed into the solid domain before placing them back to their
     previous positions in the fluid domain.
@@ -143,7 +149,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
     :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
-    
+
     Example usage:
 
     .. plot::
@@ -179,6 +185,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
@@ -239,7 +246,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
         circuit: QuantumCircuit,
         wall: ReflectionWall,
     ) -> QuantumCircuit:
-        """Performs reflection based on information encoded in a :class:`.ReflectionWall` as follows:
+        r"""Performs reflection based on information encoded in a :class:`.ReflectionWall` as follows.
 
         #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
         #. Comparator circuits set the comparator ancilla qubits to :math:`\ket{1}` based on the size of the wall in the other dimension(s).
@@ -334,7 +341,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
     def reset_edge_state(
         self, circuit: QuantumCircuit, edge: ReflectionResetEdge
     ) -> QuantumCircuit:
-        """Resets the state of an edge along the side of an obstacle in 3D as follows:
+        r"""Resets the state of an edge along the side of an obstacle in 3D as follows.
 
         #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the 2 dimensions that the edge spans.
         #. A comparator circuits sets the comparator ancilla qubits to :math:`\ket{1}` based on the size of the edge in the remaining dimension.
@@ -410,7 +417,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
         circuit: QuantumCircuit,
         corner: ReflectionPoint,
     ) -> QuantumCircuit:
-        """Resets the state of the ancilla obstacle qubit of a single point on the grid as follows:
+        r"""Resets the state of the ancilla obstacle qubit of a single point on the grid as follows.
 
         #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
         #. The directional velocity qubits are also set to :math:`\ket{1}` based on the specific velocity profile of the targeted particles.
@@ -481,6 +488,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
         circuit: QuantumCircuit,
     ):
         """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
+
         Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
         phase shift circuit is additionally controlled on the ancilla obstacle qubit, which
         ensures that only particles whose grid position gets incremented (decremented) are those
@@ -514,5 +522,6 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Operator BounceBackReflectionOperator against block {self.lattice.blocks}]"

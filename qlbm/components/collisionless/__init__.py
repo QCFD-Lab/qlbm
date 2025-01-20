@@ -1,3 +1,5 @@
+"""Modular qlbm quantum circuit components for the CQLBM algorithm :cite:p:`collisionless`."""
+
 from .bounceback_reflection import (
     BounceBackReflectionOperator,
     BounceBackWallComparator,

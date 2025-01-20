@@ -1,3 +1,5 @@
+"""Primitives for the implementation of the Collisionless Quantum Lattice Boltzmann Method introduced in :cite:t:`collisionless`."""
+
 from enum import Enum
 from logging import Logger, getLogger
 from time import perf_counter_ns
@@ -5,6 +7,7 @@ from typing import List
 
 from qiskit import ClassicalRegister, QuantumCircuit
 from qiskit.circuit.library import QFT
+from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.collisionless.streaming import SpeedSensitivePhaseShift
@@ -14,8 +17,8 @@ from qlbm.tools import flatten
 
 
 class GridMeasurement(LBMPrimitive):
-    """
-    A primitive that implements a measurement operation on the grid qubits.
+    """A primitive that implements a measurement operation on the grid qubits.
+
     Used at the end of the time step circuit to extract information from the quantum state.
 
     ========================= ======================================================================
@@ -73,6 +76,7 @@ class GridMeasurement(LBMPrimitive):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(*self.lattice.registers)
         all_grid_qubits: List[int] = flatten(
@@ -87,13 +91,14 @@ class GridMeasurement(LBMPrimitive):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive InitialConditions with lattice {self.lattice}]"
 
 
 class CollisionlessInitialConditions(LBMPrimitive):
-    """
-    A primitive that creates the quantum circuit to prepare the flow field in its initial conditions.
+    """A primitive that creates the quantum circuit to prepare the flow field in its initial conditions.
+
     The initial conditions create a quantum state spanning half the grid
     in the x-axis, and the entirety of the y (and z)-axes (if 3D).
     All velocities are pointing in the positive direction.
@@ -153,6 +158,7 @@ class CollisionlessInitialConditions(LBMPrimitive):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(*self.lattice.registers)
 
@@ -170,13 +176,15 @@ class CollisionlessInitialConditions(LBMPrimitive):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive InitialConditions with lattice {self.lattice}]"
 
 
 class CollisionlessInitialConditions3DSlim(LBMPrimitive):
-    """
+    r"""
     A primitive that creates the quantum circuit to prepare the flow field in its initial conditions for 3 dimensions.
+
     The initial conditions create the quantum state
     :math:`\Sigma_{j}\ket{0}^{\otimes n_{g_x}}\ket{0}^{\otimes n_{g_y}}\ket{j}` over the grid qubits,
     that is, spanning the z-axis at the bottom of the x- and y-axes.
@@ -234,6 +242,7 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(*self.lattice.registers)
 
@@ -252,13 +261,14 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive InitialConditions with lattice {self.lattice}]"
 
 
 class ComparatorMode(Enum):
-    """
-    Enumerator for the modes of quantum comparator circuits.
+    r"""Enumerator for the modes of quantum comparator circuits.
+
     The modes are as follows:
 
     * (1, ``ComparatorMode.LT``, :math:`<`);
@@ -274,8 +284,8 @@ class ComparatorMode(Enum):
 
 
 class SpeedSensitiveAdder(LBMPrimitive):
-    """
-    A QFT-based incrementer used to perform streaming in the CQLBM algorithm.
+    r"""A QFT-based incrementer used to perform streaming in the CQLBM algorithm.
+
     Incrementation and decerementation are performed as rotations on grid qubits
     that have been previously mapped to the Fourier basis.
     This happens by nesting a :class:`.SpeedSensitivePhaseShift` primitive
@@ -319,6 +329,7 @@ class SpeedSensitiveAdder(LBMPrimitive):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(self.num_qubits)
 
@@ -336,15 +347,14 @@ class SpeedSensitiveAdder(LBMPrimitive):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive SimpleAdder on {self.num_qubits} qubits, on velocity {self.speed}, in direction {self.positive}]"
 
 
 class Comparator(LBMPrimitive):
     """
-    Quantum comparator primitive that compares two
-    a quantum state of ``num_qubits`` qubits and an integer
-    ``num_to_compare`` with respect to a :class:`.ComparatorMode`.
+    Quantum comparator primitive that compares two a quantum state of ``num_qubits`` qubits and an integer ``num_to_compare`` with respect to a :class:`.ComparatorMode`.
 
     ========================= ======================================================================
     Attribute                  Summary
@@ -388,6 +398,7 @@ class Comparator(LBMPrimitive):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         return self.__create_circuit(self.num_qubits, self.num_to_compare, self.mode)
 
@@ -438,15 +449,14 @@ class Comparator(LBMPrimitive):
             case _:
                 raise ValueError("Invalid Comparator Mode")
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive Comparator of {self.num_qubits} and {self.num_to_compare}, mode={self.mode}]"
 
 
 class EdgeComparator(LBMPrimitive):
     """
-    A primitive used in the collisionless :class:`SpecularReflectionOperator`
-    and :class:`BounceBackReflectionOperator` that implements the
-    comparator for the specular reflection boundary conditions around the edge as described :cite:t:`collisionless`.
+    A primitive used in the 3D collisionless :class:`SpecularReflectionOperator` and :class:`BounceBackReflectionOperator` described in :cite:t:`collisionless`.
 
     ========================= ======================================================================
     Attribute                  Summary
@@ -491,6 +501,7 @@ class EdgeComparator(LBMPrimitive):
 
         self.circuit = self.create_circuit()
 
+    @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
         lb_comparator = Comparator(
@@ -527,5 +538,6 @@ class EdgeComparator(LBMPrimitive):
 
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Primitive SpecularEdgeComparator on edge={self.edge}]"
