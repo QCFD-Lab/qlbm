@@ -1,7 +1,6 @@
 """:class:`.CQLBM`-specific implementation of the :class:`.Reinitializer`."""
 
 from logging import Logger, getLogger
-from typing import override
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.circuit.library import Initialize
@@ -9,6 +8,7 @@ from qiskit.quantum_info import Statevector
 from qiskit.result import Counts
 from qiskit_aer.backends.aer_simulator import AerBackend
 from qulacs import QuantumCircuit as QulacsQC
+from typing_extensions import override
 
 from qlbm.infra.compiler import CircuitCompiler
 from qlbm.lattice import CollisionlessLattice

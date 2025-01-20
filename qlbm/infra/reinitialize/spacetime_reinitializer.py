@@ -1,13 +1,14 @@
 """:class:`.SpaceTimeQLBM`-specific implementation of the :class:`.Reinitializer`."""
 
 from logging import Logger, getLogger
-from typing import List, Tuple, cast, override
+from typing import List, Tuple, cast
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.quantum_info import Statevector
 from qiskit.result import Counts
 from qiskit_aer.backends.aer_simulator import AerBackend
 from qulacs import QuantumCircuit as QulacsQC
+from typing_extensions import override
 
 from qlbm.components.spacetime.initial.pointwise import (
     PointWiseSpaceTimeInitialConditions,
