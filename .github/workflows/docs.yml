@@ -28,7 +28,7 @@ jobs:
         run: |
           python -m pip install -U .[cpu,dev,docs]
 
-      - name: Build docs
+      - name: Doctest
         run: |
           make -C docs doctest
 
