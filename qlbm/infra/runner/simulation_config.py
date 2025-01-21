@@ -35,7 +35,7 @@ class SimulationConfig:
         * - Attribute
           - Description
         * - :attr:`initial_conditions`
-          - The initial conditions of the simulations. For example, :class:`.CollisionlessInitialConditions` or :class:`.SpaceTimeInitialConditions`.
+          - The initial conditions of the simulations. For example, :class:`.CollisionlessInitialConditions` or :class:`.PointWiseSpaceTimeInitialConditions`.
         * - :attr:`algorithm`
           - The algorithm that performs the QLBM time step computation. For example, :class:`.CQLBM` or :class:`.SpaceTimeQLBM`.
         * - :attr:`postprocessing`

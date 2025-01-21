@@ -68,7 +68,7 @@ class SpaceTimeReinitializer(Reinitializer):
         optimization_level: int = 0,
     ) -> QiskitQC | QulacsQC:
         """
-        Converts the input ``counts`` into a new :class:`.SpaceTimeInitialConditions` object that can be prepended to the time step circuit to resume simulation.
+        Converts the input ``counts`` into a new :class:`.PointWiseSpaceTimeInitialConditions` object that can be prepended to the time step circuit to resume simulation.
 
         Parameters
         ----------
@@ -125,7 +125,7 @@ class SpaceTimeReinitializer(Reinitializer):
         Splits a given ``Count`` into its position and velocity components.
 
         Counts are assumed to be obtained from :class:`.SpacetimeGridVelocityMeasurement` objects,
-        and split format is the same as the input to :class:`.SpaceTimeInitialConditions`.
+        and split format is the same as the input to :class:`.PointWiseSpaceTimeInitialConditions`.
 
         Parameters
         ----------

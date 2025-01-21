@@ -231,4 +231,4 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
 
     @override
     def __str__(self) -> str:
-        return f"[Primitive SpaceTimeInitialConditions with data={self.grid_data} and lattice={self.lattice}]"
+        return f"[Primitive PointWiseSpaceTimeInitialConditions with data={self.grid_data} and lattice={self.lattice}]"
