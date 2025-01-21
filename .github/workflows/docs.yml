@@ -3,6 +3,8 @@ name: Build and deploy documentation
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
   docs:
@@ -20,7 +22,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: 3.11.9
+          python-version: 3.12.5
 
       - name: Install dependencies
         run: |
@@ -28,9 +30,14 @@ jobs:
 
       - name: Build docs
         run: |
+          make -C docs doctest
+
+      - name: Build docs
+        run: |
           sphinx-build docs/source _build
 
       - name: Deploy to GitHub Pages
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
