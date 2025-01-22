@@ -1,3 +1,5 @@
+"""Lattice and Block utilitites."""
+
 from .blocks import (
     Block,
     DimensionalReflectionData,

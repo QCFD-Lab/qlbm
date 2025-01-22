@@ -1,9 +1,12 @@
+"""Qiskit-specific implementation of the :class:`CircuitRunner`."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.circuit.library import Initialize
 from qiskit.quantum_info import Statevector
+from typing_extensions import override
 
 from qlbm.infra.result import QBMResult
 from qlbm.lattice import Lattice
@@ -17,6 +20,7 @@ from .simulation_config import SimulationConfig
 class QiskitRunner(CircuitRunner):
     """
     Qiskit-specific implementation of the :class:`CircuitRunner`.
+
     A provided simulation configuration is compatible with this runner if the following conditions are met:
 
     #. The ``initial_conditions`` is either a ``qlbm`` :class:`.QuantumComponent`, a Qiskit ``Statevector`` or a Qiskit``QuantumCircuit``.
@@ -50,6 +54,7 @@ class QiskitRunner(CircuitRunner):
         self.execution_backend = self.config.execution_backend
         self.sampling_backend = self.config.sampling_backend
 
+    @override
     def run(
         self,
         num_steps: int,

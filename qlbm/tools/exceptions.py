@@ -1,3 +1,6 @@
+"""Contains custom exceptions for the QLBM package."""
+
+
 class LatticeException(BaseException):
     """Exception raised when encountering invalid or misaligned lattice properties."""
 
@@ -7,6 +10,8 @@ class LatticeException(BaseException):
 
 
 class ResultsException(BaseException):
+    """Exception raised during the processing of :class:`QBMResults` objects."""
+
     def __init__(self, message: str) -> None:
         self.message = message
         super().__init__(self.message)

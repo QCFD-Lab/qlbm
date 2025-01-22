@@ -1,7 +1,10 @@
+"""The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 
 from qiskit import QuantumCircuit
+from typing_extensions import override
 
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice import CollisionlessLattice
@@ -13,9 +16,8 @@ from .streaming import CollisionlessStreamingOperator, StreamingAncillaPreparati
 
 
 class CQLBM(LBMAlgorithm):
-    """
-    The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm
-    first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
+    """The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
+
     This implementation supports 2D and 3D simulations with with cuboid objects
     with either bounce-back or specular reflection boundary conditions.
 
@@ -32,6 +34,7 @@ class CQLBM(LBMAlgorithm):
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -47,6 +50,7 @@ class CQLBM(LBMAlgorithm):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self):
         # Assumes equal velocities in all dimensions
         # ! TODO adapt to DnQm discretization
@@ -96,5 +100,6 @@ class CQLBM(LBMAlgorithm):
                 )
         return circuit
 
+    @override
     def __str__(self) -> str:
         return f"[Algorithm CQLBM with lattice {self.lattice}]"

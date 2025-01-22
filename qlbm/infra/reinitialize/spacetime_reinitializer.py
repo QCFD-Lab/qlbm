@@ -1,3 +1,5 @@
+""":class:`.SpaceTimeQLBM`-specific implementation of the :class:`.Reinitializer`."""
+
 from logging import Logger, getLogger
 from typing import List, Tuple, cast
 
@@ -6,8 +8,11 @@ from qiskit.quantum_info import Statevector
 from qiskit.result import Counts
 from qiskit_aer.backends.aer_simulator import AerBackend
 from qulacs import QuantumCircuit as QulacsQC
+from typing_extensions import override
 
-from qlbm.components.spacetime import SpaceTimeInitialConditions
+from qlbm.components.spacetime.initial.pointwise import (
+    PointWiseSpaceTimeInitialConditions,
+)
 from qlbm.infra.compiler import CircuitCompiler
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import ExecutionException
@@ -16,8 +21,9 @@ from .base import Reinitializer
 
 
 class SpaceTimeReinitializer(Reinitializer):
-    """
+    r"""
     :class:`.SpaceTimeQLBM`-specific implementation of the :class:`.Reinitializer`.
+
     Compatible with both :class:`.QiskitRunner`\ s and :class:`.QulacsRunner`\ s.
     To generate a new set of initial conditions for the CQLBM algorithm,
     the reinitializer simply returns the quantum state computed
@@ -62,8 +68,7 @@ class SpaceTimeReinitializer(Reinitializer):
         optimization_level: int = 0,
     ) -> QiskitQC | QulacsQC:
         """
-        Converts the input ``counts`` into a new :class:`.SpaceTimeInitialConditions`
-        object that can be prepended to the time step circuit to resume simulation.
+        Converts the input ``counts`` into a new :class:`.PointWiseSpaceTimeInitialConditions` object that can be prepended to the time step circuit to resume simulation.
 
         Parameters
         ----------
@@ -82,7 +87,7 @@ class SpaceTimeReinitializer(Reinitializer):
             The suitably compiles initial conditions circuit.
         """
         return self.compiler.compile(
-            SpaceTimeInitialConditions(
+            PointWiseSpaceTimeInitialConditions(
                 self.lattice,
                 self.counts_to_velocity_pairs(counts),
                 self.lattice.filter_inside_blocks,
@@ -118,8 +123,9 @@ class SpaceTimeReinitializer(Reinitializer):
     def split_count(self, count: str) -> Tuple[Tuple[int, ...], Tuple[bool, ...]]:
         """
         Splits a given ``Count`` into its position and velocity components.
+
         Counts are assumed to be obtained from :class:`.SpacetimeGridVelocityMeasurement` objects,
-        and split format is the same as the input to :class:`.SpaceTimeInitialConditions`.
+        and split format is the same as the input to :class:`.PointWiseSpaceTimeInitialConditions`.
 
         Parameters
         ----------
@@ -166,5 +172,6 @@ class SpaceTimeReinitializer(Reinitializer):
             f"Reinitialization not supported for lattice with {self.lattice.num_dims} dimensions."
         )
 
+    @override
     def requires_statevector(self) -> bool:
         return False

@@ -1,3 +1,5 @@
+"""Modular and extendible quantum circuits that perform parts of the QLBM algorithm."""
+
 from .base import (
     CQLBMOperator,
     LBMAlgorithm,

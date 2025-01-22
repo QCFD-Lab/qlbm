@@ -6,6 +6,7 @@ quantum computers running on a heterogeneous quantum-classical high-performance 
 Currently, the primary aim of ``qlbm`` is to accelerate
 and improve the research surrounding  **Q**\ uantum **L**\ attice **B**\ oltzmann **M**\ ethods (QLBMs).
 On this website, you can find the :ref:`internal_docs` of the source code components that make up ``qlbm``.
+A preprint describing `qlbm` in detail is available on `arXiv <https://arxiv.org/abs/2411.19439>`_ :cite:p:`qlbm`.
 
 ``qlbm`` is made up of 4 main modules.
 Together, the :ref:`base_components`, :ref:`cqlbm_components`, and :ref:`stqlbm_components`

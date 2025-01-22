@@ -1,3 +1,5 @@
+"""Qulacs-specific implementation of the :class:`CircuitRunner`."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
@@ -8,6 +10,7 @@ from qiskit.quantum_info import Statevector
 from qiskit.result import Counts
 from qulacs import QuantumCircuit as QulacsQC
 from qulacs import QuantumCircuitSimulator, QuantumState
+from typing_extensions import override
 
 from qlbm.infra.result import QBMResult
 from qlbm.lattice import Lattice
@@ -21,6 +24,7 @@ from .simulation_config import SimulationConfig
 class QulacsRunner(CircuitRunner):
     """
     Qulacs-specific implementation of the :class:`CircuitRunner`.
+
     A provided simulation configuration is compatible with this runner if the following conditions are met:
 
     #. The ``initial_conditions`` is either a ``qlbm`` :class:`.QuantumComponent`, a Qulacs ``QuantumState`` or a Qulacs ``QuantumCircuit``.
@@ -50,6 +54,7 @@ class QulacsRunner(CircuitRunner):
         self.execution_backend = self.config.execution_backend
         self.sampling_backend = self.config.sampling_backend
 
+    @override
     def run(
         self,
         num_steps: int,
@@ -229,11 +234,27 @@ class QulacsRunner(CircuitRunner):
         return simulation_result
 
     def get_counts(self, qulacs_samples: List[int], num_bits: int) -> Counts:
+        """
+        Converts qulacs samples to qiskit ``Counts``.
+
+        Parameters
+        ----------
+        qulacs_samples : List[int]
+            The samples generated through qulacs sampling.
+        num_bits : int
+            The number of bits each sample contains.
+
+        Returns
+        -------
+        Counts
+            The qiskit ``Counts`` representation of the object.
+        """
         return {
             format(measurement, f"0{num_bits}b"): qulacs_samples.count(measurement)
             / len(qulacs_samples)
             for measurement in sorted(set(qulacs_samples))
         }
 
+    @override
     def __str__(self) -> str:
         return f"[QulacsRunner on device {self.device}] and sampling backend {self.sampling_backend}"

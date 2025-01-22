@@ -1,9 +1,13 @@
+""":math:`D_2Q_4` STQBM builder."""
+
+
+from itertools import product
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple, cast
 
 from qiskit import QuantumRegister
+from typing_extensions import override
 
-from qlbm.lattice.blocks import Block
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     SpaceTimeLatticeBuilder,
@@ -15,6 +19,8 @@ from qlbm.tools.utils import dimension_letter
 
 
 class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
+    """:math:`D_2Q_4` STQBM builder."""
+
     # Points with 3 neighbors with higher Manhattan distances
     # In order:
     #   ^   |   ^   |   ^   |   x   |
@@ -56,28 +62,50 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         self,
         num_timesteps: int,
         num_gridpoints: List[int],
-        blocks: Dict[str, List[Block]],
+        include_measurement_qubit: bool = False,
+        use_volumetric_ops: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
-        super().__init__(num_timesteps, logger)
+        super().__init__(
+            num_timesteps,
+            include_measurement_qubit=include_measurement_qubit,
+            use_volumetric_ops=use_volumetric_ops,
+            logger=logger,
+        )
         self.num_gridpoints = num_gridpoints
-        self.blocks = blocks
+        self.origin = VonNeumannNeighbor(
+            (0, 0),
+            0,
+            VonNeumannNeighborType.ORIGIN,
+        )
 
+    @override
     def get_discretization(self) -> LatticeDiscretization:
         return LatticeDiscretization.D2Q4
 
+    @override
     def get_num_velocities_per_point(self) -> int:
         return 4
 
+    @override
     def get_num_ancilla_qubits(self) -> int:
-        return 0
+        return (4 if self.use_volumetric_ops else 0) + (
+            1 if self.include_measurement_qubit else 0
+        )
 
+    @override
     def get_num_grid_qubits(self) -> int:
         return sum(
             num_gridpoints_in_dim.bit_length()
             for num_gridpoints_in_dim in self.num_gridpoints
         )
 
+    @override
+    def get_num_previous_grid_qubits(self, dim: int) -> int:
+        # ! TODO add exception
+        return sum(self.num_gridpoints[i].bit_length() for i in range(dim))
+
+    @override
     def get_num_velocity_qubits(self, num_timesteps: int | None = None) -> int:
         total_gridpoints = (sum(self.num_gridpoints) + len(self.num_gridpoints)) * (
             sum(self.num_gridpoints) + len(self.num_gridpoints)
@@ -99,6 +127,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             ),
         )
 
+    @override
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         # Grid qubits
         grid_registers = [
@@ -116,8 +145,25 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             )
         ]
 
-        return (grid_registers, velocity_registers)
+        ancilla_measurement_register = (
+            [QuantumRegister(1, "a_m")] if self.include_measurement_qubit else []
+        )
 
+        ancilla_comparator_registers = (
+            [
+                QuantumRegister(1, f"a_{bound}{dimension_letter(dim)}")
+                for dim, bound in product([0, 1], ["l", "u"])
+            ]
+            if self.use_volumetric_ops
+            else []
+        )
+
+        # Ancilla qubits
+        ancilla_registers = ancilla_measurement_register + ancilla_comparator_registers
+
+        return (grid_registers, velocity_registers, ancilla_registers)
+
+    @override
     def get_index_of_neighbor(self, distance: Tuple[int, ...]) -> int:
         if distance[0] == 0 and distance[1] == 0:
             return 0
@@ -140,6 +186,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
                 + distance_across_ordering_dim
             )
 
+    @override
     def get_streaming_lines(
         self, dimension: int, direction: bool, timestep: int | None = None
     ) -> List[List[int]]:
@@ -168,6 +215,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             )
         return neighbors_in_line
 
+    @override
     def get_neighbor_indices(self):
         extreme_point_neighbor_indices: Dict[int, List[VonNeumannNeighbor]] = {}
         intermediate_point_neighbor_indices: Dict[
@@ -271,8 +319,9 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         return extreme_point_neighbor_indices, intermediate_point_neighbor_indices
 
     def coordinates_to_quadrant(self, distance: Tuple[int, int]) -> int:
-        """
+        r"""
         Maps a given point to the quadrant it belongs to.
+
         Quadrants are ordered in counterclockwise fashion, starting on the top right at 0:
          1 | 0
         _______
@@ -295,7 +344,6 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
         int
             The quadrant the point belongs to.
         """
-
         if distance[1] == 0:
             if distance[0] > 0:
                 return 0
@@ -315,6 +363,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
             return 2
         return 3
 
+    @override
     def get_reflected_index_of_velocity(self, velocity_index: int) -> int:
         if velocity_index not in list(range(4)):
             raise LatticeException(
@@ -323,6 +372,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
 
         return self.velocity_reflection[velocity_index]
 
+    @override
     def get_reflection_increments(self, velocity_index: int) -> Tuple[int, ...]:
         if velocity_index not in list(range(4)):
             raise LatticeException(

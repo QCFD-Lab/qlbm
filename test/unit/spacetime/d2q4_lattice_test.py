@@ -5,6 +5,7 @@ from qlbm.lattice.spacetime.properties_base import (
     VonNeumannNeighbor,
     VonNeumannNeighborType,
 )
+from qlbm.tools.exceptions import LatticeException
 
 
 @pytest.fixture
@@ -65,6 +66,20 @@ def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
     )
 
 
+@pytest.fixture
+def volumetric_lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
+    return SpaceTimeLattice(
+        1,
+        {
+            "lattice": {
+                "dim": {"x": 16, "y": 16},
+                "velocities": {"x": 2, "y": 2},
+            },
+        },
+        use_volumetric_ops=True,
+    )
+
+
 def test_lattice_num_qubits_1(
     lattice_2d_16x16_1_obstacle_1_timestep: SpaceTimeLattice,
 ):
@@ -87,6 +102,98 @@ def test_lattice_num_velocities(dummy_lattice: SpaceTimeLattice):
             dummy_lattice.properties.get_num_velocity_qubits(num_timesteps)
             == 8 * (num_timesteps * num_timesteps + num_timesteps) + 4
         )
+
+
+def test_adaptable_qubit_register_indexing_measure_off_volume_off():
+    lattice = SpaceTimeLattice(
+        2,
+        {
+            "lattice": {
+                "dim": {"x": 16, "y": 16},
+                "velocities": {"x": 2, "y": 2},
+            },
+        },
+    )
+
+    assert lattice.properties.get_num_total_qubits() == 60
+
+    with pytest.raises(LatticeException) as excinfo_measure:
+        lattice.ancilla_mass_index()
+
+    assert (
+        "Lattice contains no mass ancilla qubits. To enable the mass ancilla qubit, construct the Lattice with include_measurement_qubit=True."
+        == str(excinfo_measure.value)
+    )
+
+    with pytest.raises(LatticeException) as excinfo_comparator:
+        lattice.ancilla_comparator_index(0)
+
+    assert (
+        "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
+        == str(excinfo_comparator.value)
+    )
+
+
+def test_adaptable_qubit_register_indexing_measure_on_volume_off():
+    lattice = SpaceTimeLattice(
+        2,
+        {
+            "lattice": {
+                "dim": {"x": 16, "y": 16},
+                "velocities": {"x": 2, "y": 2},
+            },
+        },
+        include_measurement_qubit=True,
+    )
+
+    assert lattice.properties.get_num_total_qubits() == 61
+    assert lattice.properties.get_num_ancilla_qubits() == 1
+    assert lattice.ancilla_mass_index() == [60]
+
+    with pytest.raises(LatticeException) as excinfo:
+        lattice.ancilla_comparator_index(0)
+
+    assert (
+        "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
+        == str(excinfo.value)
+    )
+
+
+def test_adaptable_qubit_register_indexing_measure_on_volume_on():
+    lattice = SpaceTimeLattice(
+        2,
+        {
+            "lattice": {
+                "dim": {"x": 16, "y": 16},
+                "velocities": {"x": 2, "y": 2},
+            },
+        },
+        include_measurement_qubit=True,
+        use_volumetric_ops=True,
+    )
+
+    assert lattice.properties.get_num_total_qubits() == 65
+    assert lattice.properties.get_num_ancilla_qubits() == 5
+    assert lattice.ancilla_mass_index() == [60]
+    assert lattice.ancilla_comparator_index() == [61, 62, 63, 64]
+    assert lattice.ancilla_comparator_index(0) == [61, 62]
+    assert lattice.ancilla_comparator_index(1) == [63, 64]
+
+    with pytest.raises(LatticeException) as excinfo_over:
+        lattice.ancilla_comparator_index(2)
+
+    assert (
+        "Cannot index ancilla comparator register for index 2 in 2-dimensional lattice. Maximum is 1."
+        == str(excinfo_over.value)
+    )
+
+    with pytest.raises(LatticeException) as excinfo_negative:
+        lattice.ancilla_comparator_index(-1)
+
+    assert (
+        "Cannot index ancilla comparator register for index -1 in 2-dimensional lattice. Maximum is 1."
+        == str(excinfo_negative.value)
+    )
 
 
 def test_get_neighbor_indices_1_timestep(
@@ -786,3 +893,299 @@ def test_streaming_line_dist_5(lattice_2d_16x16_1_obstacle_5_timesteps):
     assert streaming_line_y_neg == [
         list(reversed(line)) for line in streaming_line_y_pos
     ]
+
+
+def test_comparator_period_volume_bounds_no_overflow(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(0, 5), (5, 15)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    for vb, nb in zip(volume_bounds, new_bound_list):
+        assert vb == nb[0]
+        assert nb[1] == (False, False)
+
+
+def test_comparator_period_volume_bounds_overflow_x_1(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(-5, 5), (5, 15)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (11, 5)
+    assert new_bound_list[0][1] == (True, False)
+    assert new_bound_list[1][0] == (5, 15)
+    assert new_bound_list[1][1] == (False, False)
+
+
+def test_comparator_period_volume_bounds_overflow_x_2(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(3, 18), (5, 15)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (3, 2)
+    assert new_bound_list[0][1] == (False, True)
+    assert new_bound_list[1][0] == (5, 15)
+    assert new_bound_list[1][1] == (False, False)
+
+
+def test_comparator_period_volume_bounds_overflow_y_1(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(3, 7), (-6, 5)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (3, 7)
+    assert new_bound_list[0][1] == (False, False)
+    assert new_bound_list[1][0] == (10, 5)
+    assert new_bound_list[1][1] == (True, False)
+
+
+def test_comparator_period_volume_bounds_overflow_y_2(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(3, 7), (9, 20)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (3, 7)
+    assert new_bound_list[0][1] == (False, False)
+    assert new_bound_list[1][0] == (9, 4)
+    assert new_bound_list[1][1] == (False, True)
+
+
+def test_comparator_period_volume_bounds_overflow_xy_1(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(-3, 7), (9, 20)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (13, 7)
+    assert new_bound_list[0][1] == (True, False)
+    assert new_bound_list[1][0] == (9, 4)
+    assert new_bound_list[1][1] == (False, True)
+
+
+def test_comparator_period_volume_bounds_overflow_xy_2(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    volume_bounds = [(7, 17), (-4, 6)]
+
+    new_bound_list = (
+        lattice_2d_16x16_1_obstacle_1_timestep.comparator_periodic_volume_bounds(
+            volume_bounds
+        )
+    )
+
+    assert new_bound_list[0][0] == (7, 1)
+    assert new_bound_list[0][1] == (False, True)
+    assert new_bound_list[1][0] == (12, 6)
+    assert new_bound_list[1][1] == (True, False)
+
+
+def test_bad_lattice_specification_velocities():
+    with pytest.raises(LatticeException) as excinfo_measure:
+        SpaceTimeLattice(
+            2,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 4, "y": 2},
+                },
+            },
+        )
+
+    assert (
+        "Unsupported number of velocities for 2D: (4, 2). Only D2Q4 is supported at the moment."
+        == str(excinfo_measure.value)
+    )
+
+
+def test_bad_lattice_specification_velocities_3d():
+    with pytest.raises(LatticeException) as excinfo_measure:
+        SpaceTimeLattice(
+            2,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16, "z": 16},
+                    "velocities": {"x": 2, "y": 2, "z": 2},
+                },
+            },
+        )
+
+    assert "Only 1D and 2D discretizations are currently available." == str(
+        excinfo_measure.value
+    )
+
+
+def test_2d_lattice_grid_register(dummy_lattice):
+    assert dummy_lattice.grid_index(0) == list(range(8))
+    assert dummy_lattice.grid_index(1) == list(range(8, 16))
+    assert dummy_lattice.grid_index() == list(range(16))
+
+    with pytest.raises(LatticeException) as excinfo_over:
+        dummy_lattice.grid_index(2)
+
+    assert (
+        "Cannot index grid register for dimension 2 in 2-dimensional lattice."
+        == str(excinfo_over.value)
+    )
+
+    with pytest.raises(LatticeException) as excinfo_under:
+        dummy_lattice.grid_index(-1)
+
+    assert (
+        "Cannot index grid register for dimension -1 in 2-dimensional lattice."
+        == str(excinfo_under.value)
+    )
+
+
+def test_2d_lattice_velocity_index(lattice_2d_16x16_1_obstacle_2_timesteps):
+    assert lattice_2d_16x16_1_obstacle_2_timesteps.velocity_index(0) == list(
+        range(8, 12)
+    )
+    assert lattice_2d_16x16_1_obstacle_2_timesteps.velocity_index(4) == list(
+        range(24, 28)
+    )
+    assert lattice_2d_16x16_1_obstacle_2_timesteps.velocity_index(4, 3) == [27]
+    assert lattice_2d_16x16_1_obstacle_2_timesteps.velocity_index(2, 2) == [18]
+
+
+def test_get_registers(lattice_2d_16x16_1_obstacle_2_timesteps):
+    # Register sizes are tested separately
+    regs = lattice_2d_16x16_1_obstacle_2_timesteps.get_registers()
+
+    assert len(regs) == 3
+
+    # No ancilla in this lattice
+    assert len(regs[2]) == 0
+
+    assert len(regs[0]) == 2
+    assert len(regs[1]) == 1
+
+
+def test_lattice_logger_name(lattice_2d_16x16_1_obstacle_2_timesteps):
+    assert lattice_2d_16x16_1_obstacle_2_timesteps.logger_name() == "2d-16x16-q4"
+
+
+def test_is_inside_obstacle(lattice_2d_16x16_1_obstacle_1_timestep):
+    # "x": [4, 6], "y": [3, 12]
+    gps_in_obstacle = [
+        (4, 3),
+        (6, 12),
+        (4, 12),
+        (6, 3),
+        (5, 7),
+        (5, 12),
+        (5, 8),
+        (5, 9),
+        (4, 11),
+    ]
+    gps_not_in_obstacle = [
+        (3, 3),
+        (3, 12),
+        (4, 13),
+        (4, 2),
+        (7, 3),
+        (7, 2),
+        (7, 12),
+        (7, 13),
+        (15, 15),
+        (0, 0),
+    ]
+
+    assert all(
+        lattice_2d_16x16_1_obstacle_1_timestep.is_inside_an_obstacle(gp)
+        for gp in gps_in_obstacle
+    )
+    assert all(
+        not lattice_2d_16x16_1_obstacle_1_timestep.is_inside_an_obstacle(gp)
+        for gp in gps_not_in_obstacle
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_no_overflow(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [False, False]
+        )
+        == [[28, 29, 30, 31]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_overflow_x(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True, False]
+        )
+        == [[28, 30, 31], [29, 30, 31]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_overflow_y(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [False, True]
+        )
+        == [[28, 29, 30], [28, 29, 31]]
+    )
+
+
+def test_volumetric_ancilla_qubit_combinations_overflow_xy(
+    volumetric_lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    assert (
+        volumetric_lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True, True]
+        )
+        == [[28, 30], [29, 30], [28, 31], [29, 31]]
+    )
+
+def test_volumetric_ancilla_qubit_combinations_exception_overflow(
+    lattice_2d_16x16_1_obstacle_1_timestep,
+):
+    with pytest.raises(LatticeException) as excinfo_measure:
+        lattice_2d_16x16_1_obstacle_1_timestep.volumetric_ancilla_qubit_combinations(
+            [True, False]
+        )
+
+    assert (
+        "Lattice contains no comparator ancilla qubits. To enable comparator (volumetric) operations, construct the Lattice with use_volumetric_ops=True."
+        == str(excinfo_measure.value)
+    )

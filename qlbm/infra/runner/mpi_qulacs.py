@@ -1,3 +1,5 @@
+"""MPIQulacs-specific variant of the :class:`CircuitRunner`."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
@@ -23,6 +25,8 @@ from qlbm.tools.utils import get_circuit_properties, qiskit_to_qulacs
 
 
 class MPIQulacsRunner:
+    """MPIQulacs-specific variant of the :class:`CircuitRunner`."""
+
     def __init__(
         self,
         lattice: CollisionlessLattice,
@@ -49,6 +53,32 @@ class MPIQulacsRunner:
         snapshot_execution: bool = False,
         statevector_sampling: bool = False,
     ) -> CollisionlessResult:
+        """Simualtes the provided algorithm configuration.
+
+        Parameters
+        ----------
+        initial_condition : Statevector | QiskitQC | QuantumState | QulacsQC
+            The state to evolve.
+        algorithm : QulacsQC
+            The algorithm that evolves the state.
+        postprocessing : QulacsQC
+            The postprocessing circuit.
+        measurement : QiskitQC
+            The measurement circuit.
+        num_steps : int
+            The number of steps to simulate.
+        num_shots : int
+            The number of shots to perform for each measurement circuit.
+        snapshot_execution : bool, optional
+            Whether to use snapshots, by default False
+        statevector_sampling : bool, optional
+            Whether to perfoprm sampling, by default False
+
+        Returns
+        -------
+        CollisionlessResult
+            The result of the simulation.
+        """
         measurement = CircuitCompiler("QISKIT", "QISKIT").compile(
             measurement, self.sampling_backend
         )
@@ -75,6 +105,33 @@ class MPIQulacsRunner:
         snapshot_execution: bool = False,
         statevector_sampling: bool = False,
     ) -> CollisionlessResult:
+        """
+        Simualtes the provided algorithm configuration.
+
+        Parameters
+        ----------
+        timestep_state : QuantumState | QulacsQC
+            The state to simulate.
+        algorithm : QulacsQC
+            The algorithm that evolves the state.
+        postprocessing : QulacsQC
+            The postprocessing circuit.
+        measurement : QiskitQC
+            The measurement circuit.
+        num_steps : int
+            The number of steps to simulate.
+        num_shots : int
+            The number of shots to perform for each measurement circuit.
+        snapshot_execution : bool, optional
+            Whether to use snapshots, by default False
+        statevector_sampling : bool, optional
+            Whether to perfoprm sampling, by default False
+
+        Returns
+        -------
+        CollisionlessResult
+            The result of the simulation.
+        """
         simulation_result = CollisionlessResult(
             self.lattice, self.output_directory, self.output_file_name
         )
@@ -181,6 +238,21 @@ class MPIQulacsRunner:
         return simulation_result
 
     def get_counts(self, qulacs_samples: List[int], num_bits: int) -> Counts:
+        """
+        Converts qulacs samples to qiskit ``Counts``.
+
+        Parameters
+        ----------
+        qulacs_samples : List[int]
+            The samples generated through qulacs sampling.
+        num_bits : int
+            The number of bits each sample contains.
+
+        Returns
+        -------
+        Counts
+            The qiskit ``Counts`` representation of the object.
+        """
         return {
             format(measurement, f"0{num_bits}b"): qulacs_samples.count(measurement)
             / len(qulacs_samples)

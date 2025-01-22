@@ -1,6 +1,6 @@
 # `qlbm` demos
 
-This directory contains contains several examples of how users can use `qlbm` for simulating, visualizing, and analyzing QLBM algorithms. We recommend that each notebook is executed in a **python3.11** virtual environment from this (`demos`) directory. You can create a new virtual environment as follows:
+This directory contains contains several examples of how users can use `qlbm` for simulating, visualizing, and analyzing QLBM algorithms. We recommend that each notebook is executed in a **python3.12** or **python3.13** virtual environment from this (`demos`) directory. You can create a new virtual environment as follows:
 
 ```bash
 python -m venv qlbm-cpu-venv

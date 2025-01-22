@@ -4,6 +4,25 @@
 Collisionless Circuits
 ====================================
 
+.. testcode::
+    :hide:
+
+    from qlbm.components import (
+        CQLBM,
+        CollisionlessStreamingOperator,
+        ControlledIncrementer,
+        SpecularReflectionOperator,
+        SpeedSensitivePhaseShift,
+    )
+    from qlbm.lattice import CollisionlessLattice
+    print("ok")
+
+.. testoutput::
+    :hide:
+
+    ok
+
+
 This page contains documentation about the quantum circuits that make up the
 **C**\ ollisionless **Q**\ uantum **L**\ attice **B**\ oltzmann **M**\ ethod (CQLBM)
 first described in :cite:p:`collisionless` and later expanded in :cite:p:`qmem`.

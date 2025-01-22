@@ -1,10 +1,12 @@
-# qlbm
+# `qlbm`
+
+![GitHub License](https://img.shields.io/github/license/qcfd-lab/qlbm?color=%2300A6D6) ![GitHub top language](https://img.shields.io/github/languages/top/qcfd-lab/qlbm?color=%2300A6D6) ![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2FQCFD-Lab%2Fqlbm%2Frefs%2Fheads%2Fdev%2Fpyproject.toml?color=%2300A6D6) ![PyPI - Version](https://img.shields.io/pypi/v/qlbm?color=%2300A6D6) ![GitHub commits since latest release](https://img.shields.io/github/commits-since/qcfd-lab/qlbm/latest?color=%2300A6D6) ![GitHub branch check runs](https://img.shields.io/github/check-runs/qcfd-lab/qlbm/main?color=%2300A6D6) <a href="https://arxiv.org/abs/2411.19439">![Static Badge](https://img.shields.io/badge/preprint-blue?style=flat&label=arXiv&color=%2300A6D6)</a>
 
 `qlbm` is a package for the development, simulation, and analysis of **Q**uantum **L**attice **B**oltzmann **M**ethods.
 
+---
 
-
-This library contains building blocks for constructing quantum circuits for LBMs and connects the circuits with quantum software infrastructure. `qlbm` provides a platform for an end-to-end development environment, including:
+`qlbm` is a rapidly evolving, research-oriented piece of software. It contains building blocks for constructing quantum circuits for quantum LBMs and connects these with quantum software infrastructure. `qlbm` is built with end-to-end development environment in mind, including:
 
 - Parsing human-readable `JSON` specifications for QLBMs
 - Constructing quantum circuits in [Qiskit](https://www.ibm.com/quantum/qiskit) that implement QLBMs
@@ -13,35 +15,36 @@ This library contains building blocks for constructing quantum circuits for LBMs
 - Visualizing results in [Paraview](https://www.paraview.org/)
 - Analyzing the properties , scalability, and performance of quantum algorithms
 
-`qlbm` is a rapidly evolving, research-oriented piece of software, written almost entirely in Python. A detailed documentation of `qlbm` is available at [here](https://qcfd-lab.github.io/qlbm/).
+<p align="center">
+<a href="https://qcfd-lab.github.io/qlbm/">
+<img width=400 centered alt="Static Badge" src="https://img.shields.io/badge/Documentation-00A6D6%20?style=flat&logo=BookStack&logoColor=%23FFFFFF&logoSize=10&label=Web&color=%2300A6D6&">
+</a>
+</p>
+
 
 ## PyPI installation
 
-`qlbm` can be installed through `pip`. We recommend th euse of a **Python 3.11** virtual environment:
+`qlbm` can be installed through `pip`. We recommend the use of a Python 3.12 or 3.13 virtual environment:
 
 ```bash
-python3.11 -m venv qlbm-cpu-venv
+python -m venv qlbm-cpu-venv
 pip install --upgrade pip
 pip install qlbm
 ```
 
 ## Local installation
 
-To install from source, first clone the repository:
+Alternatively, you can also install the latest version of `qlbm` by cloning the repository and installing from source as follows (again using Python 3.12 or 3.13):
 
 ```bash
 git clone git@github.com:QCFD-Lab/qlbm.git
-```
-
-We again recommend to install and use the current version of `qlbm` in a **Python 3.11** virtual environment. To set up the virtual environment, you can run following installation:
-
-```bash
-python3.11 -m venv qlbm-cpu-venv
+cd qlbm
+python -m venv qlbm-cpu-venv
 source qlbm-cpu-venv/bin/activate
-pip install -e .[cpu,dev]
+pip install --upgrade pip
+pip install -e .[cpu,dev,docs]
 ```
-
-Alternatively, you can use the `make` script provided for this purpose, which will create the environment from scratch as well:
+We also provide a `make` script for this purpose, which will create the environment from scratch:
 
 ```
 make install-cpu
@@ -96,3 +99,7 @@ The `demos` directory contains several use cases for simulating and analyzing th
   ]
 }
 ```
+
+## Citation
+
+A preprint describing `qlbm` in detail is currently available on [arXiv](https://arxiv.org/abs/2411.19439). If you use `qlbm`, you can cite it as per the [CITATION.bib file](CITATION.bib).

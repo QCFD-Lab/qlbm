@@ -1,3 +1,8 @@
+"""Circuits, utilitites, and benchmarks for Quantum Lattice Boltzmann Methods.
+
+The full internal documentation is available at https://qcfd-lab.github.io/qlbm/code/index.html#internal-docs.
+"""
+
 from .components import (
     CQLBM,
     BounceBackReflectionOperator,

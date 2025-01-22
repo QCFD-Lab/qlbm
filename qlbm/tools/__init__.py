@@ -1,3 +1,5 @@
+"""Miscellaneous qlbm utilities and exceptions."""
+
 from .exceptions import (
     CircuitException,
     CompilerException,

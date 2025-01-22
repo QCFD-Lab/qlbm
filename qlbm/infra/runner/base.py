@@ -1,3 +1,5 @@
+"""Base class for all simulator-specific runners."""
+
 from abc import ABC, abstractmethod
 from logging import Logger, getLogger
 from typing import List, cast
@@ -23,6 +25,7 @@ from .simulation_config import SimulationConfig
 class CircuitRunner(ABC):
     """
     Base class for all simulator-specific runners.
+
     A ``CircuitRunner`` object uses the information provided in a :class:`.SimulationConfig`
     to efficiently simulate the QLBM circuit.
     This includes converting the initial conditions into a suitable
@@ -94,6 +97,26 @@ class CircuitRunner(ABC):
         pass
 
     def new_result(self, output_directory: str, output_file_name: str) -> QBMResult:
+        """
+        Get a new result object for the current runner.
+
+        Parameters
+        ----------
+        output_directory : str
+            The directory where the result data will be stored.
+        output_file_name : str
+            The file name of the result data within the directory.
+
+        Returns
+        -------
+        QBMResult
+            An empty result object.
+
+        Raises
+        ------
+        ResultsException
+            If there is no matching result object for the runner's lattice.
+        """
         if isinstance(self.lattice, CollisionlessLattice):
             return CollisionlessResult(
                 cast(CollisionlessLattice, self.lattice),

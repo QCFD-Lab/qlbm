@@ -1,9 +1,12 @@
+""":class:`.CQLBM`-specific implementation of the :class:`.QBMResult`."""
+
 import re
 from os import listdir
 from typing import Dict
 
 import numpy as np
 import vtk
+from typing_extensions import override
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice import CollisionlessLattice
@@ -14,6 +17,7 @@ from .base import QBMResult
 class CollisionlessResult(QBMResult):
     """
     :class:`.CQLBM`-specific implementation of the :class:`.QBMResult`.
+
     Processes counts sampled from :class:`.GridMeasurement` primitives.
 
     =========================== ======================================================================
@@ -39,6 +43,7 @@ class CollisionlessResult(QBMResult):
     ) -> None:
         super().__init__(lattice, directory, output_file_name)
 
+    @override
     def save_timestep_counts(
         self,
         counts: Dict[str, float],
@@ -73,7 +78,7 @@ class CollisionlessResult(QBMResult):
                 count_history[x][y] = counts[count]
 
         elif self.lattice.num_dims == 3:
-            count_history = np.zeros(
+            count_history = np.zeros(  # type: ignore
                 (
                     self.lattice.num_gridpoints[0] + 1,
                     self.lattice.num_gridpoints[1] + 1,
@@ -97,6 +102,7 @@ class CollisionlessResult(QBMResult):
             count_history, timestep, create_vis=create_vis, save_counts_array=save_array
         )
 
+    @override
     def visualize_all_numpy_data(self):
         # Filter the algorithm output files
         r = re.compile("[a-zA-Z0-9]+_[0-9]+.csv")

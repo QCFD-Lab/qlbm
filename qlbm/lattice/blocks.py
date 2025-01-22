@@ -1,3 +1,5 @@
+"""Block class implementation for lattice geometry."""
+
 from functools import cmp_to_key
 from itertools import product
 from json import dumps
@@ -11,6 +13,20 @@ from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to
 
 
 class SpaceTimeReflectionData:
+    r"""
+    Class encoding the necessary information for the reflection of a particle in the :class:`.STQBLM` algorithm.
+
+    ==================================== =======================================================================
+    Attribute                            Summary
+    ==================================== =======================================================================
+    :attr:`gridpoint_encoded`            The gridpoint encoded in the data.
+    :attr:`qubits_to_invert`             The grid qubit indices that have the value :math:`\ket{0}`.
+    :attr:`velocity_index_to_reflect`    The index of the qubit encoding the discrete velocity that should be reflected.
+    :attr:`distance_from_boundary_point` The total number of ancilla (non-velocity, non-grid) qubits required for the quantum circuit to simulate this lattice.
+    :attr:`lattice_properties`           The properties of the lattice in which reflection takes place.
+    ==================================== =======================================================================
+    """
+
     def __init__(
         self,
         gridpoint_encoded: Tuple[int, ...],
@@ -66,8 +82,9 @@ class SpaceTimeReflectionData:
 
 
 class Block:
-    """
+    r"""
     Contains information required for the generation of bounce-back and specular reflection boundary conditions for the :class:`.CQLBM` algorithm.
+
     A block can be constructed from minimal information, see the Table below.
 
     .. list-table:: Constructor parameters
@@ -505,6 +522,20 @@ class Block:
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
     ) -> List[SpaceTimeReflectionData]:
+        """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.STQLBM` lattice.
+
+        Parameters
+        ----------
+        properties : SpaceTimeLatticeBuilder
+            The lattice discretization properties.
+        num_steps int | None, optional
+            Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.
+
+        Returns
+        -------
+        List[SpaceTimeReflectionData]
+            The information encoding the reflections to be performed.
+        """
         if num_steps is None:
             num_steps = properties.num_timesteps
 
@@ -548,6 +579,21 @@ class Block:
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
     ) -> List[SpaceTimeReflectionData]:
+        """
+        Calculate space-time reflection data for :math:`D_2Q_4` :class:`.STQLBM` lattice.
+
+        Parameters
+        ----------
+        properties : SpaceTimeLatticeBuilder
+            The lattice discretization properties.
+        num_steps : int | None, optional
+            Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.
+
+        Returns
+        -------
+        List[SpaceTimeReflectionData]
+            The information encoding the reflections to be performed.
+        """
         if num_steps is None:
             num_steps = properties.num_timesteps
 
@@ -662,6 +708,19 @@ class Block:
         return reflection_list
 
     def get_d2q4_surfaces(self) -> List[List[List[Tuple[int, ...]]]]:
+        """
+        Get all surfaces of the block in 2 dimensions.
+
+        The information is formatted as ``List[List[List[Tuple[int, ...]]]]``.
+        The outermost list is by dimension.
+        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimenison.
+        The innermost list contains the gridpoints that make up the surface encoded as tuples.
+
+        Returns
+        -------
+        List[List[List[Tuple[int, ...]]]]
+            _description_
+        """
         surfaces: List[List[List[Tuple[int, ...]]]] = []
 
         for d, walls in enumerate(self.walls_inside):
@@ -682,6 +741,19 @@ class Block:
         return surfaces
 
     def contains_gridpoint(self, gridpoint: Tuple[int, ...]) -> bool:
+        """
+        Whether the block contains a given gridpoint within its volume.
+
+        Parameters
+        ----------
+        gridpoint : Tuple[int, ...]
+            The gridpoint to check for.
+
+        Returns
+        -------
+        bool
+            Whether the gridpoint is within the block.
+        """
         return all(
             coord >= bound[0] and coord <= bound[1]
             for coord, bound in zip(gridpoint, self.bounds)
@@ -733,8 +805,9 @@ class Block:
 
 
 class DimensionalReflectionData:
-    """
+    r"""
     Contains one-dimensional information about the position of a grid point relevant to the obstacle.
+
     Used for edge cases relating to either inside or outside corner points.
 
     .. list-table:: Class attributes
@@ -793,8 +866,9 @@ class DimensionalReflectionData:
 
 
 class ReflectionWall:
-    """
+    r"""
     Encodes the information required to perform reflection on a wall.
+
     Each wall is encoded as fixed over one dimensions and spanning one or two `alignment` dimensions.
     This in turn models which qubits are used for the comparator operations of the reflection operators.
     The information required for the alignment dimensions only consists of bounds,
@@ -851,8 +925,9 @@ class ReflectionWall:
 
 
 class ReflectionPoint:
-    """
+    r"""
     Encodes the information required to perform reflection on a single point.
+
     A point is encoded as 2 or 3 fixed :class:`DimensionalReflectionData` objects, one per dimension.
     This classes processes the information encoded in the reflection data
     objects into boolean valued attributes that determine
@@ -902,8 +977,9 @@ class ReflectionPoint:
 
 
 class ReflectionResetEdge:
-    """
+    r"""
     Encodes the information required to perform reflection on an edge in 3D.
+
     An edge is encoded as 2 fixed points as :class:`DimensionalReflectionData` objects, and one spanning dimension.
     This classes processes the information encoded in the reflection data
     object into boolean valued attributes that determine

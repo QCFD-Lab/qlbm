@@ -4,6 +4,25 @@
 Space-Time Circuits
 ====================================
 
+.. testcode::
+    :hide:
+
+    from qlbm.components import (
+        CQLBM,
+        CollisionlessStreamingOperator,
+        ControlledIncrementer,
+        SpecularReflectionOperator,
+        SpeedSensitivePhaseShift,
+    )
+    from qlbm.lattice import CollisionlessLattice
+    print("ok")
+
+.. testoutput::
+    :hide:
+
+    ok
+
+
 This page contains documentation about the quantum circuits that make up the
 **S**\ pace-\ **T**\ ime **Q**\ uantum **L**\ attice **B**\ oltzmann **M**\ ethod (STQLBM)
 described in :cite:p:`spacetime`.
@@ -54,6 +73,6 @@ Collision
 Others
 -----------------------------------
 
-.. autoclass:: qlbm.components.spacetime.initial_conditions.SpaceTimeInitialConditions
+.. autoclass:: qlbm.components.spacetime.initial.PointWiseSpaceTimeInitialConditions
 
 .. autoclass:: qlbm.components.spacetime.measurement.SpaceTimeGridVelocityMeasurement

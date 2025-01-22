@@ -1,7 +1,10 @@
+"""Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`."""
+
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
+from typing_extensions import override
 
 from qlbm.lattice.blocks import Block
 from qlbm.tools.exceptions import LatticeException
@@ -11,7 +14,7 @@ from .base import Lattice
 
 
 class CollisionlessLattice(Lattice):
-    """
+    r"""
     Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`.
 
     =========================== ======================================================================
@@ -203,7 +206,6 @@ class CollisionlessLattice(Lattice):
         LatticeException
             If the dimension does not exist.
         """
-
         if dim is None:
             return list(range(self.num_dims))
 
@@ -237,7 +239,6 @@ class CollisionlessLattice(Lattice):
         LatticeException
             If the dimension does not exist.
         """
-
         if index is None:
             return list(range(self.num_dims, self.num_dims + self.num_obstacle_qubits))
 
@@ -310,7 +311,6 @@ class CollisionlessLattice(Lattice):
         LatticeException
             If the dimension does not exist.
         """
-
         if dim is None:
             return list(
                 range(
@@ -443,17 +443,16 @@ class CollisionlessLattice(Lattice):
 
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         """Generates the encoding-specific register required for the streaming step.
+
         For this encoding, different registers encode (i) the velocity direction,
         (ii) the velocity discretization, (iii) the velocity ancillae,
         and (iv) the grid encoding.
-
 
         Returns
         -------
         List[int]
             Tuple[QuantumRegister]: The 4-tuple of qubit registers encoding the streaming step.
         """
-
         # d ancilla qubits tracking whether a velocity is to be streamed
         ancilla_vel_register = [QuantumRegister(self.num_dims, name="a_v")]
 
@@ -507,9 +506,11 @@ class CollisionlessLattice(Lattice):
         else:
             return self.num_dims
 
+    @override
     def __str__(self) -> str:
         return f"[Lattice with {self.num_gridpoints} gps, {self.num_velocities} vels, and {str(self.blocks)} blocks with {self.num_total_qubits} qubits]"
 
+    @override
     def logger_name(self) -> str:
         gp_string = ""
         for c, gp in enumerate(self.num_gridpoints):
