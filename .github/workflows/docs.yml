@@ -26,6 +26,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          apt-get install -y -qq pandoc
           python -m pip install -U .[cpu,dev,docs]
 
       - name: Doctest
