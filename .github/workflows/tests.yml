@@ -23,7 +23,7 @@ jobs:
           cache: "pip" # caching pip dependencies
       - name: Install dependencies
         run: |
-          apt-get install -y -qq libboost-all-dev cmake
+          sudo apt-get install -y -qq libboost-all-dev cmake
       - name: Install qlbm
         run: |
           pip install --upgrade pip 
