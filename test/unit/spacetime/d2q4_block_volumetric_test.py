@@ -161,6 +161,7 @@ def test_get_spacetime_volumetric_reflection_data_2_steps_left_wall(
     assert data[0].range_dimension_bounds == [simple_2d_block.bounds[1]]
     assert data[0].neighbor_velocity_pairs == ((0, 2), (1, 0))
     assert data[0].distance_from_boundary_point == (-1, 0)
+
     assert data[1].fixed_gridpoint == 3
     assert data[1].range_dimension_bounds == [simple_2d_block.bounds[1]]
     assert data[1].neighbor_velocity_pairs == ((1, 2), (5, 0))
@@ -311,6 +312,7 @@ def test_get_spacetime_volumetric_reflection_data_2_steps_bottom_wall(
     assert data[7].neighbor_velocity_pairs == ((1, 1), (12, 3))
     assert data[7].distance_from_boundary_point == (-1, 1)
 
+
 def test_get_spacetime_volumetric_reflection_data_2_steps_top_wall(
     simple_2d_block, lattice_2d_16x16_1_obstacle_2_timesteps
 ):
@@ -367,3 +369,112 @@ def test_get_spacetime_volumetric_reflection_data_2_steps_top_wall(
     assert data[7].range_dimension_bounds == [(4, 5)]
     assert data[7].neighbor_velocity_pairs == ((1, 3), (6, 1))
     assert data[7].distance_from_boundary_point == (-1, -1)
+
+
+def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d1_left_wall(
+    simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
+):
+    data: List[SpaceTimeVolumetricReflectionData] = (
+        simple_2d_block.get_d2q4_volumetric_reflection_data(
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties
+        )
+    )
+
+    assert len(data) == 50 * 4  # 4 walls, 50 gridpoints relevant per wall (2t^2)
+    one_distance_data = [
+        d
+        for d in data[:50]
+        if (sum(abs(x) for x in d.distance_from_boundary_point) == 1)
+    ]
+    assert len(one_distance_data) == 2
+
+    assert one_distance_data[0].fixed_gridpoint == 4
+    assert one_distance_data[0].range_dimension_bounds == [(2, 10)]
+    assert one_distance_data[0].neighbor_velocity_pairs == ((0, 2), (1, 0))
+    assert one_distance_data[0].distance_from_boundary_point == (-1, 0)
+
+    assert one_distance_data[1].fixed_gridpoint == 5
+    assert one_distance_data[1].range_dimension_bounds == [(2, 10)]
+    assert one_distance_data[1].neighbor_velocity_pairs == ((0, 0), (3, 2))
+    assert one_distance_data[1].distance_from_boundary_point == (1, 0)
+
+def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d1_right_wall(
+    simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
+):
+    data: List[SpaceTimeVolumetricReflectionData] = (
+        simple_2d_block.get_d2q4_volumetric_reflection_data(
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties
+        )
+    )
+
+    assert len(data) == 50 * 4  # 4 walls, 50 gridpoints relevant per wall (2t^2)
+    one_distance_data = [
+        d
+        for d in data[50:100]
+        if (sum(abs(x) for x in d.distance_from_boundary_point) == 1)
+    ]
+    assert len(one_distance_data) == 2
+
+    assert one_distance_data[0].fixed_gridpoint == 7
+    assert one_distance_data[0].range_dimension_bounds == [(2, 10)]
+    assert one_distance_data[0].neighbor_velocity_pairs == ((0, 0), (3, 2))
+    assert one_distance_data[0].distance_from_boundary_point == (1, 0)
+
+    assert one_distance_data[1].fixed_gridpoint == 6
+    assert one_distance_data[1].range_dimension_bounds == [(2, 10)]
+    assert one_distance_data[1].neighbor_velocity_pairs == ((0, 2), (1, 0))
+    assert one_distance_data[1].distance_from_boundary_point == (-1, 0)
+
+def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d1_bottom_wall(
+    simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
+):
+    data: List[SpaceTimeVolumetricReflectionData] = (
+        simple_2d_block.get_d2q4_volumetric_reflection_data(
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties
+        )
+    )
+
+    assert len(data) == 50 * 4  # 4 walls, 50 gridpoints relevant per wall (2t^2)
+    one_distance_data = [
+        d
+        for d in data[100:150]
+        if (sum(abs(x) for x in d.distance_from_boundary_point) == 1)
+    ]
+    assert len(one_distance_data) == 2
+
+    assert one_distance_data[0].fixed_gridpoint == 1
+    assert one_distance_data[0].range_dimension_bounds == [(5, 6)]
+    assert one_distance_data[0].neighbor_velocity_pairs == ((0, 3), (2, 1))
+    assert one_distance_data[0].distance_from_boundary_point == (0, -1)
+
+    assert one_distance_data[1].fixed_gridpoint == 2
+    assert one_distance_data[1].range_dimension_bounds == [(5, 6)]
+    assert one_distance_data[1].neighbor_velocity_pairs == ((0, 1), (4, 3))
+    assert one_distance_data[1].distance_from_boundary_point == (0, 1)
+
+def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d1_top_wall(
+    simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
+):
+    data: List[SpaceTimeVolumetricReflectionData] = (
+        simple_2d_block.get_d2q4_volumetric_reflection_data(
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties
+        )
+    )
+
+    assert len(data) == 50 * 4  # 4 walls, 50 gridpoints relevant per wall (2t^2)
+    one_distance_data = [
+        d
+        for d in data[150:]
+        if (sum(abs(x) for x in d.distance_from_boundary_point) == 1)
+    ]
+    assert len(one_distance_data) == 2
+
+    assert one_distance_data[0].fixed_gridpoint == 11
+    assert one_distance_data[0].range_dimension_bounds == [(5, 6)]
+    assert one_distance_data[0].neighbor_velocity_pairs == ((0, 1), (4, 3))
+    assert one_distance_data[0].distance_from_boundary_point == (0, 1)
+
+    assert one_distance_data[1].fixed_gridpoint == 10
+    assert one_distance_data[1].range_dimension_bounds == [(5, 6)]
+    assert one_distance_data[1].neighbor_velocity_pairs == ((0, 3), (2, 1))
+    assert one_distance_data[1].distance_from_boundary_point == (0, -1)
