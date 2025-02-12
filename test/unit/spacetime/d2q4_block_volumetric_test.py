@@ -758,6 +758,219 @@ def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d3_le
     assert three_distance_data[9].distance_from_boundary_point == (1, -2)
 
 
+def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d3_right_wall(
+    simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
+):
+    data: List[SpaceTimeVolumetricReflectionData] = (
+        simple_2d_block.get_d2q4_volumetric_reflection_data(
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties
+        )
+    )
+
+    assert len(data) == 50 * 4  # 4 walls, 50 gridpoints relevant per wall (2t^2)
+    three_distance_data = [
+        d
+        for d in data[:50]
+        if (sum(abs(x) for x in d.distance_from_boundary_point) == 3)
+    ]
+    assert len(three_distance_data) == 10
+
+    assert all(d.fixed_dim == 0 for d in three_distance_data)
+    assert all(d.ranged_dims == [1] for d in three_distance_data)
+
+    assert three_distance_data[0].fixed_gridpoint == 2
+    assert three_distance_data[0].range_dimension_bounds == [(2, 10)]
+    assert three_distance_data[0].neighbor_velocity_pairs == ((5, 2), (13, 0))
+    assert three_distance_data[0].distance_from_boundary_point == (-3, 0)
+
+    assert three_distance_data[1].fixed_gridpoint == 3
+    assert three_distance_data[1].range_dimension_bounds == [(3, 11)]
+    assert three_distance_data[1].neighbor_velocity_pairs == ((12, 2), (24, 0))
+    assert three_distance_data[1].distance_from_boundary_point == (-2, 1)
+
+    assert three_distance_data[2].fixed_gridpoint == 4
+    assert three_distance_data[2].range_dimension_bounds == [(4, 12)]
+    assert three_distance_data[2].neighbor_velocity_pairs == ((11, 2), (23, 0))
+    assert three_distance_data[2].distance_from_boundary_point == (-1, 2)
+
+    assert three_distance_data[3].fixed_gridpoint == 3
+    assert three_distance_data[3].range_dimension_bounds == [(1, 9)]
+    assert three_distance_data[3].neighbor_velocity_pairs == ((6, 2), (14, 0))
+    assert three_distance_data[3].distance_from_boundary_point == (-2, -1)
+
+    assert three_distance_data[4].fixed_gridpoint == 4
+    assert three_distance_data[4].range_dimension_bounds == [(0, 8)]
+    assert three_distance_data[4].neighbor_velocity_pairs == ((7, 2), (15, 0))
+    assert three_distance_data[4].distance_from_boundary_point == (-1, -2)
+
+    assert three_distance_data[5].fixed_gridpoint == 7
+    assert three_distance_data[5].range_dimension_bounds == [(2, 10)]
+    assert three_distance_data[5].neighbor_velocity_pairs == ((9, 0), (19, 2))
+    assert three_distance_data[5].distance_from_boundary_point == (3, 0)
+
+    assert three_distance_data[6].fixed_gridpoint == 6
+    assert three_distance_data[6].range_dimension_bounds == [(3, 11)]
+    assert three_distance_data[6].neighbor_velocity_pairs == ((10, 0), (20, 2))
+    assert three_distance_data[6].distance_from_boundary_point == (2, 1)
+
+    assert three_distance_data[7].fixed_gridpoint == 5
+    assert three_distance_data[7].range_dimension_bounds == [(4, 12)]
+    assert three_distance_data[7].neighbor_velocity_pairs == ((11, 0), (21, 2))
+    assert three_distance_data[7].distance_from_boundary_point == (1, 2)
+
+    assert three_distance_data[8].fixed_gridpoint == 6
+    assert three_distance_data[8].range_dimension_bounds == [(1, 9)]
+    assert three_distance_data[8].neighbor_velocity_pairs == ((8, 0), (18, 2))
+    assert three_distance_data[8].distance_from_boundary_point == (2, -1)
+
+    assert three_distance_data[9].fixed_gridpoint == 5
+    assert three_distance_data[9].range_dimension_bounds == [(0, 8)]
+    assert three_distance_data[9].neighbor_velocity_pairs == ((7, 0), (17, 2))
+    assert three_distance_data[9].distance_from_boundary_point == (1, -2)
+
+
+def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d3_bottom_wall(
+    simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
+):
+    data: List[SpaceTimeVolumetricReflectionData] = (
+        simple_2d_block.get_d2q4_volumetric_reflection_data(
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties
+        )
+    )
+
+    assert len(data) == 50 * 4  # 4 walls, 50 gridpoints relevant per wall (2t^2)
+    three_distance_data = [
+        d
+        for d in data[:50]
+        if (sum(abs(x) for x in d.distance_from_boundary_point) == 3)
+    ]
+    assert len(three_distance_data) == 10
+
+    assert all(d.fixed_dim == 0 for d in three_distance_data)
+    assert all(d.ranged_dims == [1] for d in three_distance_data)
+
+    assert three_distance_data[0].fixed_gridpoint == 2
+    assert three_distance_data[0].range_dimension_bounds == [(2, 10)]
+    assert three_distance_data[0].neighbor_velocity_pairs == ((5, 2), (13, 0))
+    assert three_distance_data[0].distance_from_boundary_point == (-3, 0)
+
+    assert three_distance_data[1].fixed_gridpoint == 3
+    assert three_distance_data[1].range_dimension_bounds == [(3, 11)]
+    assert three_distance_data[1].neighbor_velocity_pairs == ((12, 2), (24, 0))
+    assert three_distance_data[1].distance_from_boundary_point == (-2, 1)
+
+    assert three_distance_data[2].fixed_gridpoint == 4
+    assert three_distance_data[2].range_dimension_bounds == [(4, 12)]
+    assert three_distance_data[2].neighbor_velocity_pairs == ((11, 2), (23, 0))
+    assert three_distance_data[2].distance_from_boundary_point == (-1, 2)
+
+    assert three_distance_data[3].fixed_gridpoint == 3
+    assert three_distance_data[3].range_dimension_bounds == [(1, 9)]
+    assert three_distance_data[3].neighbor_velocity_pairs == ((6, 2), (14, 0))
+    assert three_distance_data[3].distance_from_boundary_point == (-2, -1)
+
+    assert three_distance_data[4].fixed_gridpoint == 4
+    assert three_distance_data[4].range_dimension_bounds == [(0, 8)]
+    assert three_distance_data[4].neighbor_velocity_pairs == ((7, 2), (15, 0))
+    assert three_distance_data[4].distance_from_boundary_point == (-1, -2)
+
+    assert three_distance_data[5].fixed_gridpoint == 7
+    assert three_distance_data[5].range_dimension_bounds == [(2, 10)]
+    assert three_distance_data[5].neighbor_velocity_pairs == ((9, 0), (19, 2))
+    assert three_distance_data[5].distance_from_boundary_point == (3, 0)
+
+    assert three_distance_data[6].fixed_gridpoint == 6
+    assert three_distance_data[6].range_dimension_bounds == [(3, 11)]
+    assert three_distance_data[6].neighbor_velocity_pairs == ((10, 0), (20, 2))
+    assert three_distance_data[6].distance_from_boundary_point == (2, 1)
+
+    assert three_distance_data[7].fixed_gridpoint == 5
+    assert three_distance_data[7].range_dimension_bounds == [(4, 12)]
+    assert three_distance_data[7].neighbor_velocity_pairs == ((11, 0), (21, 2))
+    assert three_distance_data[7].distance_from_boundary_point == (1, 2)
+
+    assert three_distance_data[8].fixed_gridpoint == 6
+    assert three_distance_data[8].range_dimension_bounds == [(1, 9)]
+    assert three_distance_data[8].neighbor_velocity_pairs == ((8, 0), (18, 2))
+    assert three_distance_data[8].distance_from_boundary_point == (2, -1)
+
+    assert three_distance_data[9].fixed_gridpoint == 5
+    assert three_distance_data[9].range_dimension_bounds == [(0, 8)]
+    assert three_distance_data[9].neighbor_velocity_pairs == ((7, 0), (17, 2))
+    assert three_distance_data[9].distance_from_boundary_point == (1, -2)
+
+
+def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d3_top_wall(
+    simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
+):
+    data: List[SpaceTimeVolumetricReflectionData] = (
+        simple_2d_block.get_d2q4_volumetric_reflection_data(
+            lattice_2d_16x16_1_obstacle_5_timesteps.properties
+        )
+    )
+
+    assert len(data) == 50 * 4  # 4 walls, 50 gridpoints relevant per wall (2t^2)
+    three_distance_data = [
+        d
+        for d in data[:50]
+        if (sum(abs(x) for x in d.distance_from_boundary_point) == 3)
+    ]
+    assert len(three_distance_data) == 10
+
+    assert all(d.fixed_dim == 0 for d in three_distance_data)
+    assert all(d.ranged_dims == [1] for d in three_distance_data)
+
+    assert three_distance_data[0].fixed_gridpoint == 2
+    assert three_distance_data[0].range_dimension_bounds == [(2, 10)]
+    assert three_distance_data[0].neighbor_velocity_pairs == ((5, 2), (13, 0))
+    assert three_distance_data[0].distance_from_boundary_point == (-3, 0)
+
+    assert three_distance_data[1].fixed_gridpoint == 3
+    assert three_distance_data[1].range_dimension_bounds == [(3, 11)]
+    assert three_distance_data[1].neighbor_velocity_pairs == ((12, 2), (24, 0))
+    assert three_distance_data[1].distance_from_boundary_point == (-2, 1)
+
+    assert three_distance_data[2].fixed_gridpoint == 4
+    assert three_distance_data[2].range_dimension_bounds == [(4, 12)]
+    assert three_distance_data[2].neighbor_velocity_pairs == ((11, 2), (23, 0))
+    assert three_distance_data[2].distance_from_boundary_point == (-1, 2)
+
+    assert three_distance_data[3].fixed_gridpoint == 3
+    assert three_distance_data[3].range_dimension_bounds == [(1, 9)]
+    assert three_distance_data[3].neighbor_velocity_pairs == ((6, 2), (14, 0))
+    assert three_distance_data[3].distance_from_boundary_point == (-2, -1)
+
+    assert three_distance_data[4].fixed_gridpoint == 4
+    assert three_distance_data[4].range_dimension_bounds == [(0, 8)]
+    assert three_distance_data[4].neighbor_velocity_pairs == ((7, 2), (15, 0))
+    assert three_distance_data[4].distance_from_boundary_point == (-1, -2)
+
+    assert three_distance_data[5].fixed_gridpoint == 7
+    assert three_distance_data[5].range_dimension_bounds == [(2, 10)]
+    assert three_distance_data[5].neighbor_velocity_pairs == ((9, 0), (19, 2))
+    assert three_distance_data[5].distance_from_boundary_point == (3, 0)
+
+    assert three_distance_data[6].fixed_gridpoint == 6
+    assert three_distance_data[6].range_dimension_bounds == [(3, 11)]
+    assert three_distance_data[6].neighbor_velocity_pairs == ((10, 0), (20, 2))
+    assert three_distance_data[6].distance_from_boundary_point == (2, 1)
+
+    assert three_distance_data[7].fixed_gridpoint == 5
+    assert three_distance_data[7].range_dimension_bounds == [(4, 12)]
+    assert three_distance_data[7].neighbor_velocity_pairs == ((11, 0), (21, 2))
+    assert three_distance_data[7].distance_from_boundary_point == (1, 2)
+
+    assert three_distance_data[8].fixed_gridpoint == 6
+    assert three_distance_data[8].range_dimension_bounds == [(1, 9)]
+    assert three_distance_data[8].neighbor_velocity_pairs == ((8, 0), (18, 2))
+    assert three_distance_data[8].distance_from_boundary_point == (2, -1)
+
+    assert three_distance_data[9].fixed_gridpoint == 5
+    assert three_distance_data[9].range_dimension_bounds == [(0, 8)]
+    assert three_distance_data[9].neighbor_velocity_pairs == ((7, 0), (17, 2))
+    assert three_distance_data[9].distance_from_boundary_point == (1, -2)
+
+
 def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d4_left_wall(
     simple_2d_block, lattice_2d_16x16_1_obstacle_5_timesteps
 ):
