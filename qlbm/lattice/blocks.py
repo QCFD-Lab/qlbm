@@ -597,7 +597,7 @@ class Block:
         properties : SpaceTimeLatticeBuilder
             The lattice discretization properties.
         num_steps int | None, optional
-            Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.
+            Number of timesteps to calculate reflections for. If None, uses ``properties.num_timesteps``. Defaults to None.
 
         Returns
         -------
@@ -655,7 +655,7 @@ class Block:
         properties : SpaceTimeLatticeBuilder
             The lattice discretization properties.
         num_steps : int | None, optional
-            Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.
+            Number of timesteps to calculate reflections for. If None, uses ``properties.num_timesteps``. Defaults to None.
 
         Returns
         -------
@@ -784,7 +784,7 @@ class Block:
         properties : SpaceTimeLatticeBuilder
             The lattice discretization properties.
         num_steps int | None, optional
-            Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.
+            Number of timesteps to calculate reflections for. If None, uses ``properties.num_timesteps``. Defaults to None.
 
         Returns
         -------

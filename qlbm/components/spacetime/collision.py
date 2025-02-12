@@ -36,7 +36,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
     :attr:`timestep`          The time step for which to perform streaming.
-    :attr:`gate_to_apply`     The gate to apply to the velocities matching equivalence classes. Defaults to :math:`R_y(\\frac{\pi}{2})`.
+    :attr:`gate_to_apply`     The gate to apply to the velocities matching equivalence classes. Defaults to :math:`R_y(\frac{\pi}{2})`.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
 
