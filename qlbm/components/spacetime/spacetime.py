@@ -6,7 +6,7 @@ from qiskit import QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import LBMAlgorithm
-from qlbm.components.spacetime.reflection import SpaceTimeReflectionOperator
+from qlbm.components.spacetime.reflection import PointWiseSpaceTimeReflectionOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 from .collision import SpaceTimeCollisionOperator
@@ -78,7 +78,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
             )
 
             circuit.compose(
-                SpaceTimeReflectionOperator(
+                PointWiseSpaceTimeReflectionOperator(
                     self.lattice,
                     timestep,
                     self.lattice.blocks["bounceback"],

@@ -1,4 +1,3 @@
-
 import pytest
 
 from qlbm.lattice.blocks import Block
