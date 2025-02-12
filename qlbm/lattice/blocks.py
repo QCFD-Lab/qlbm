@@ -3,7 +3,7 @@
 from functools import cmp_to_key
 from itertools import product
 from json import dumps
-from typing import Callable, Dict, List, Tuple
+from typing import Callable, Dict, List, Tuple, cast
 
 import numpy as np
 from stl import mesh
@@ -22,7 +22,7 @@ class SpaceTimeReflectionData:
     :attr:`gridpoint_encoded`            The gridpoint encoded in the data.
     :attr:`qubits_to_invert`             The grid qubit indices that have the value :math:`\ket{0}`.
     :attr:`velocity_index_to_reflect`    The index of the qubit encoding the discrete velocity that should be reflected.
-    :attr:`distance_from_boundary_point` The total number of ancilla (non-velocity, non-grid) qubits required for the quantum circuit to simulate this lattice.
+    :attr:`distance_from_boundary_point` The distance from the gridpoints where reflection takes place.
     :attr:`lattice_properties`           The properties of the lattice in which reflection takes place.
     ==================================== =======================================================================
     """
@@ -75,10 +75,78 @@ class SpaceTimeReflectionData:
             (neighbor_of_reflection, self.velocity_index_to_reflect),
         )
 
-    # def __get_neighbor_velocity_pairs_d1q2(
-    #     self,
-    # ) -> Tuple[Tuple[int, int], Tuple[int, int]]:
-    #     return
+
+class SpaceTimeVolumetricReflectionData:
+    r"""
+    Class encoding the necessary information for the reflection of a volumetric split of particles in the :class:`.STQBLM` algorithm.
+
+    ========================================= =======================================================================
+    Attribute                                 Summary
+    ========================================= =======================================================================
+    :attr:`fixed_dim`                         The physical dimension that the volume does not span.
+    :attr:`ranged_dims`                       The physical dimension(s) that the volume does span.
+    :attr:`range_dimension_bounds`            The bounds of the volume in each ranged dimension.
+    :attr:`fixed_dimension_qubits_to_invert`  The grid qubit indices that have the value :math:`\ket{0}` for the fixed dimension.
+    :attr:`fixed_gridpoint`                   The numerical value of the fixed gridpoint. Used for debugging purposes.
+    :attr:`velocity_index_to_reflect`         The index of the qubit encoding the discrete velocity that should be reflected.
+    :attr:`distance_from_boundary_wall`       The distance from the gridpoints where reflection takes place.
+    :attr:`lattice_properties`                The properties of the lattice in which reflection takes place.
+    ========================================= =======================================================================
+    """
+
+    def __init__(
+        self,
+        fixed_dim: int,
+        ranged_dims: List[int],
+        range_dimension_bounds: List[Tuple[int, int]],
+        fixed_dimension_qubits_to_invert: List[int],
+        fixed_gridpoint: int,
+        velocity_index_to_reflect: int,
+        distance_from_boundary_wall: Tuple[int, ...],
+        lattice_properties: SpaceTimeLatticeBuilder,
+    ) -> None:
+        self.fixed_dim = fixed_dim
+        self.ranged_dims = ranged_dims
+        self.range_dimension_bounds = range_dimension_bounds
+        self.fixed_dimension_qubits_to_invert = fixed_dimension_qubits_to_invert
+        self.fixed_gridpoint = fixed_gridpoint
+        self.velocity_index_to_reflect = velocity_index_to_reflect
+        self.distance_from_boundary_point = distance_from_boundary_wall
+        self.reversed_distance_from_boundary_point = tuple(
+            -x for x in distance_from_boundary_wall
+        )
+        self.lattice_properties = lattice_properties
+        self.neighbor_velocity_pairs: Tuple[Tuple[int, int], Tuple[int, int]] = (
+            self.__get_neighbor_velocity_pairs()
+        )
+
+    def __get_neighbor_velocity_pairs(
+        self,
+    ) -> Tuple[Tuple[int, int], Tuple[int, int]]:
+        reflected_velocity_index = (
+            self.lattice_properties.get_reflected_index_of_velocity(
+                self.velocity_index_to_reflect
+            )
+        )
+        increment = self.lattice_properties.get_reflection_increments(
+            reflected_velocity_index
+        )
+
+        neighbor_of_reflection = self.lattice_properties.get_index_of_neighbor(
+            self.reversed_distance_from_boundary_point
+        )
+
+        neighbor_of_streamed_particle = self.lattice_properties.get_index_of_neighbor(
+            tuple(
+                a + b
+                for a, b in zip(self.reversed_distance_from_boundary_point, increment)
+            )
+        )
+
+        return (
+            (neighbor_of_streamed_particle, reflected_velocity_index),
+            (neighbor_of_reflection, self.velocity_index_to_reflect),
+        )
 
 
 class Block:
@@ -161,7 +229,7 @@ class Block:
         boundary_condition: str,
     ) -> None:
         # TODO: check whether the number of dimensions is consistent
-        self.bounds = bounds
+        self.bounds: List[Tuple[int, int]] = bounds
         self.num_dims = len(bounds)
         self.boundary_condition = boundary_condition
         self.num_qubits = num_qubits
@@ -604,9 +672,6 @@ class Block:
         for fixed_dim, surfaces_of_dim in enumerate(surfaces):
             # Each dimension has a lower bound and an upper bound surface
             for bound, wall_of_surface in enumerate(surfaces_of_dim):
-                # fixed_dim_qubits_to_invert = get_qubits_to_invert(
-                #     wall_of_surface[0][fixed_dim], self.num_qubits[fixed_dim]
-                # )
                 streaming_line_velocities = [0, 2] if fixed_dim == 0 else [1, 3]
                 if not bound:
                     streaming_line_velocities = list(
@@ -707,6 +772,144 @@ class Block:
 
         return reflection_list
 
+    def get_d2q4_volumetric_reflection_data(
+        self,
+        properties: SpaceTimeLatticeBuilder,
+        num_steps: int | None = None,
+    ) -> List[SpaceTimeVolumetricReflectionData]:
+        """Calculate volumetric reflection data for :math:`D_2Q_4` :class:`.STQLBM` lattice.
+
+        Parameters
+        ----------
+        properties : SpaceTimeLatticeBuilder
+            The lattice discretization properties.
+        num_steps int | None, optional
+            Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.
+
+        Returns
+        -------
+        List[SpaceTimeVolumetricReflectionData]
+            The information encoding the reflections to be performed.
+        """
+        if num_steps is None:
+            num_steps = properties.num_timesteps
+
+        reflection_list = []
+        num_gps_in_dim = [2**n for n in self.num_qubits]
+        for fixed_dim, bounds_of_fixed_dim in enumerate(self.bounds):
+            ranged_dim = 1 - fixed_dim
+            bounds_ranged_dim: Tuple[int, int] = self.bounds[ranged_dim]
+            for bound in [False, True]:
+                streaming_line_velocities = [0, 2] if fixed_dim == 0 else [1, 3]
+                fixed_dimension_gp = bounds_of_fixed_dim[bound]
+                if not bound:
+                    streaming_line_velocities = list(
+                        reversed(streaming_line_velocities)
+                    )
+
+                symmetric_non_reflection_dimension_increment: List[
+                    Tuple[int, Tuple[int, ...]]
+                ] = [(0, (0, 0))] + flatten(
+                    [
+                        [
+                            (
+                                direction_factor * t,
+                                tuple(
+                                    a * direction_factor * t
+                                    for a in properties.get_reflection_increments(
+                                        1 if fixed_dim == 0 else 0
+                                    )
+                                ),
+                            )
+                            for t in range(1, num_steps)
+                        ]
+                        for direction_factor in [1, -1]
+                    ]
+                )
+
+                for reflection_direction in streaming_line_velocities:
+                    increment = properties.get_reflection_increments(
+                        reflection_direction
+                    )
+
+                    opposite_reflection_direction = (
+                        streaming_line_velocities[1]
+                        if reflection_direction == streaming_line_velocities[0]
+                        else streaming_line_velocities[0]
+                    )
+                    for (
+                        offset,
+                        starting_increment,
+                    ) in symmetric_non_reflection_dimension_increment:
+                        fixed_dimension_gp_adjusted = (
+                            fixed_dimension_gp + starting_increment[fixed_dim]
+                        )
+                        bounds_ranged_dim_adjusted = [
+                            b + starting_increment[ranged_dim]
+                            for b in bounds_ranged_dim
+                        ]
+                        for t in range(num_steps - abs(offset)):
+                            fixed_dim_reflection = (
+                                fixed_dimension_gp_adjusted
+                                + (
+                                    t + 1
+                                    if (
+                                        streaming_line_velocities[0]
+                                        == reflection_direction
+                                    )
+                                    else t
+                                )
+                                * increment[fixed_dim]
+                            )
+                            fixed_dim_reflection = (
+                                fixed_dim_reflection + num_gps_in_dim[fixed_dim]
+                                if fixed_dim_reflection < 0
+                                else fixed_dim_reflection % num_gps_in_dim[fixed_dim]
+                            )
+
+                            # Ranged dimension bounds are left unadjusted
+                            # As they are corrected in the quantum component
+                            # Responsible for placing the comparators and controls
+                            bounds_ranged_dim_reflection = cast(
+                                Tuple[int, int],
+                                tuple(
+                                    b
+                                    + (
+                                        t + 1
+                                        if (
+                                            streaming_line_velocities[0]
+                                            == reflection_direction
+                                        )
+                                        else t
+                                    )
+                                    * increment[ranged_dim]
+                                    for b in bounds_ranged_dim_adjusted
+                                ),
+                            )
+                            opposite_reflection_direction = (
+                                streaming_line_velocities[1]
+                                if reflection_direction == streaming_line_velocities[0]
+                                else streaming_line_velocities[0]
+                            )
+                            reflection_list.append(
+                                SpaceTimeVolumetricReflectionData(
+                                    fixed_dim,
+                                    [ranged_dim],
+                                    [bounds_ranged_dim_reflection],
+                                    get_qubits_to_invert(
+                                        fixed_dim_reflection, self.num_qubits[fixed_dim]
+                                    ),
+                                    fixed_dim_reflection,
+                                    opposite_reflection_direction,
+                                    tuple(
+                                        (t + 1) * x + y
+                                        for x, y in zip(increment, starting_increment)
+                                    ),
+                                    properties,
+                                )
+                            )
+        return reflection_list
+
     def get_d2q4_surfaces(self) -> List[List[List[Tuple[int, ...]]]]:
         """
         Get all surfaces of the block in 2 dimensions.
@@ -719,7 +922,7 @@ class Block:
         Returns
         -------
         List[List[List[Tuple[int, ...]]]]
-            _description_
+            The block surfaces in two dimensions.
         """
         surfaces: List[List[List[Tuple[int, ...]]]] = []
 
