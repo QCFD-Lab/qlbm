@@ -331,7 +331,7 @@ class PhaseShift(LBMPrimitive):
     r"""
     A primitive that applies the phase-shift as part of the :class:`.ControlledIncrementer` used in the :class:`.CollisionlessStreamingOperator`.
 
-    The rotation applied is :math:`\pm\\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
+    The rotation applied is :math:`\pm\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
     For an in-depth mathematical explanation of the procedure, consult Section 4 of :cite:t:`collisionless`.
 
     ========================= ======================================================================
@@ -393,7 +393,7 @@ class PhaseShift(LBMPrimitive):
 class SpeedSensitivePhaseShift(LBMPrimitive):
     r"""A primitive that applies the phase-shift as part of the :class:`.SpeedSensitiveAdder` used in :class:`.Comparator`\ s.
 
-    The rotation applied is :math:`\pm \\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
+    The rotation applied is :math:`\pm \frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
     Unlike the regular :class:`.PhaseShift`, the speed-sensitive version additionally depends on a specific speed index.
     For an in-depth mathematical explanation of the procedure, consult Sections 4 and 5.5 of :cite:t:`collisionless`.
 

@@ -66,11 +66,11 @@ class CollisionlessLattice(Lattice):
           - :meth:`ancillae_comparator_index`
           - The qubits used to for :class:`.Comparator`\ s. Used for reflection.
         * - :attr:`grid_registers`
-          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \\right \\rceil`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \right \rceil`
           - :meth:`grid_index`
           - The qubits encoding the physical grid.
         * - :attr:`velocity_registers`
-          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \\right \\rceil - 1`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \right \rceil - 1`
           - :meth:`velocity_index`
           - The qubits encoding speeds.
         * - :attr:`velocity_dir_registers`
