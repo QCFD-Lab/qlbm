@@ -7,7 +7,7 @@ from typing import Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
 
-from qlbm.lattice.blocks import Block
+from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 

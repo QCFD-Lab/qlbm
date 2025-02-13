@@ -1,11 +1,13 @@
 """Lattice and Block utilitites."""
 
-from .blocks import (
-    Block,
+from .geometry.encodings.collisionless import (
     DimensionalReflectionData,
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
+)
+from .geometry.shapes.block import (
+    Block,
 )
 from .lattices import CollisionlessLattice, Lattice
 from .lattices.spacetime_lattice import SpaceTimeLattice
