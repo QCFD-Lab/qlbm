@@ -1,7 +1,8 @@
 from typing import List
 import pytest
 
-from qlbm.lattice.blocks import Block, SpaceTimeVolumetricReflectionData
+from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.lattice.geometry.encodings.spacetime import SpaceTimeVolumetricReflectionData
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.utils import flatten, get_qubits_to_invert
 
