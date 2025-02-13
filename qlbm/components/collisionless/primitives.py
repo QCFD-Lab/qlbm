@@ -12,7 +12,7 @@ from typing_extensions import override
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.collisionless.streaming import SpeedSensitivePhaseShift
 from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.blocks import ReflectionResetEdge
+from qlbm.lattice.geometry.encodings.collisionless import ReflectionResetEdge
 from qlbm.tools import flatten
 
 

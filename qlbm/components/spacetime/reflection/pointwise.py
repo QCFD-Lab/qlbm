@@ -9,7 +9,7 @@ from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.components.common.primitives import MCSwap
-from qlbm.lattice.blocks import Block
+from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import CircuitException

@@ -14,12 +14,14 @@ from qlbm.components.collisionless.primitives import (
     ComparatorMode,
 )
 from qlbm.lattice import (
-    Block,
     CollisionlessLattice,
+)
+from qlbm.lattice.geometry.encodings.collisionless import (
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
 )
+from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
