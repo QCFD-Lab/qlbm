@@ -8,78 +8,6 @@ from qlbm.lattice.spacetime.properties_base import (
 from qlbm.tools.exceptions import LatticeException
 
 
-@pytest.fixture
-def dummy_lattice() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        0,
-        {
-            "lattice": {
-                "dim": {"x": 256},
-                "velocities": {"x": 2},
-            },
-        },
-    )
-
-
-@pytest.fixture
-def lattice_1d_16_1_obstacle_1_timestep() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        1,
-        {
-            "lattice": {
-                "dim": {"x": 16},
-                "velocities": {"x": 2},
-            },
-            "geometry": [
-                {"x": [4, 6], "boundary": "bounceback"},
-            ],
-        },
-    )
-
-
-@pytest.fixture
-def lattice_1d_16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        2,
-        {
-            "lattice": {
-                "dim": {"x": 16},
-                "velocities": {"x": 2},
-            },
-            "geometry": [
-                {"x": [4, 6], "boundary": "bounceback"},
-            ],
-        },
-    )
-
-
-@pytest.fixture
-def lattice_1d_16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        5,
-        {
-            "lattice": {
-                "dim": {"x": 16},
-                "velocities": {"x": 2},
-            },
-        },
-    )
-
-
-@pytest.fixture
-def volumetric_lattice_1d_16_1_obstacle_1_timestep() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        1,
-        {
-            "lattice": {
-                "dim": {"x": 16},
-                "velocities": {"x": 2},
-            },
-        },
-        use_volumetric_ops=True,
-    )
-
-
 def test_lattice_num_qubits_1(
     lattice_1d_16_1_obstacle_1_timestep: SpaceTimeLattice,
 ):
@@ -92,10 +20,10 @@ def test_lattice_num_qubits_2(
     assert lattice_1d_16_1_obstacle_2_timesteps.properties.get_num_total_qubits() == 14
 
 
-def test_lattice_num_velocities(dummy_lattice: SpaceTimeLattice):
+def test_lattice_num_velocities(dummy_1d_lattice: SpaceTimeLattice):
     for num_timesteps in range(10):
         assert (
-            dummy_lattice.properties.get_num_velocity_qubits(num_timesteps)
+            dummy_1d_lattice.properties.get_num_velocity_qubits(num_timesteps)
             == 4 * num_timesteps + 2
         )
 
@@ -171,12 +99,12 @@ def test_lattice_1d_16_1_obstacle_5_timesteps(
     ]
 
 
-def test_num_gridpoints_within_distance(dummy_lattice: SpaceTimeLattice):
-    assert dummy_lattice.properties.get_num_gridpoints_within_distance(1) == 3
-    assert dummy_lattice.properties.get_num_gridpoints_within_distance(2) == 5
-    assert dummy_lattice.properties.get_num_gridpoints_within_distance(3) == 7
-    assert dummy_lattice.properties.get_num_gridpoints_within_distance(4) == 9
-    assert dummy_lattice.properties.get_num_gridpoints_within_distance(5) == 11
+def test_num_gridpoints_within_distance(dummy_1d_lattice: SpaceTimeLattice):
+    assert dummy_1d_lattice.properties.get_num_gridpoints_within_distance(1) == 3
+    assert dummy_1d_lattice.properties.get_num_gridpoints_within_distance(2) == 5
+    assert dummy_1d_lattice.properties.get_num_gridpoints_within_distance(3) == 7
+    assert dummy_1d_lattice.properties.get_num_gridpoints_within_distance(4) == 9
+    assert dummy_1d_lattice.properties.get_num_gridpoints_within_distance(5) == 11
 
 
 def test_get_index_of_neighbor_origin(lattice_1d_16_1_obstacle_5_timesteps):

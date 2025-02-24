@@ -9,19 +9,6 @@ from qlbm.tools.exceptions import LatticeException
 
 
 @pytest.fixture
-def dummy_lattice() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        0,
-        {
-            "lattice": {
-                "dim": {"x": 256, "y": 256},
-                "velocities": {"x": 2, "y": 2},
-            },
-        },
-    )
-
-
-@pytest.fixture
 def lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
     return SpaceTimeLattice(
         1,
@@ -52,18 +39,6 @@ def lattice_2d_16x16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
         },
     )
 
-
-@pytest.fixture
-def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        5,
-        {
-            "lattice": {
-                "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
-            },
-        },
-    )
 
 
 @pytest.fixture
