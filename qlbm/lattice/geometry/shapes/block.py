@@ -3,7 +3,7 @@
 from functools import cmp_to_key
 from itertools import product
 from json import dumps
-from typing import Dict, List, Tuple, cast
+from typing import Dict, List, Tuple, cast, override
 
 import numpy as np
 from stl import mesh
@@ -15,14 +15,15 @@ from qlbm.lattice.geometry.encodings.collisionless import (
     ReflectionWall,
 )
 from qlbm.lattice.geometry.encodings.spacetime import (
-    SpaceTimeReflectionData,
+    SpaceTimePWReflectionData,
     SpaceTimeVolumetricReflectionData,
 )
+from qlbm.lattice.geometry.shapes.base import SpaceTimeShape
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to_invert
 
 
-class Block:
+class Block(SpaceTimeShape):
     r"""
     Contains information required for the generation of bounce-back and specular reflection boundary conditions for the :class:`.CQLBM` algorithm.
 
@@ -458,25 +459,12 @@ class Block:
 
         return segments
 
+    @override
     def get_spacetime_reflection_data_d1q2(
         self,
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
-    ) -> List[SpaceTimeReflectionData]:
-        """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.STQLBM` lattice.
-
-        Parameters
-        ----------
-        properties : SpaceTimeLatticeBuilder
-            The lattice discretization properties.
-        num_steps int | None, optional
-            Number of timesteps to calculate reflections for. If None, uses ``properties.num_timesteps``. Defaults to None.
-
-        Returns
-        -------
-        List[SpaceTimeReflectionData]
-            The information encoding the reflections to be performed.
-        """
+    ) -> List[SpaceTimePWReflectionData]:
         if num_steps is None:
             num_steps = properties.num_timesteps
 
@@ -505,7 +493,7 @@ class Block:
                     )
 
                     reflection_list.append(
-                        SpaceTimeReflectionData(
+                        SpaceTimePWReflectionData(
                             gridpoint_encoded,
                             qubits_to_invert,
                             not bool(reflection_direction),
@@ -515,26 +503,12 @@ class Block:
                     )
         return reflection_list
 
+    @override
     def get_spacetime_reflection_data_d2q4(
         self,
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
-    ) -> List[SpaceTimeReflectionData]:
-        """
-        Calculate space-time reflection data for :math:`D_2Q_4` :class:`.STQLBM` lattice.
-
-        Parameters
-        ----------
-        properties : SpaceTimeLatticeBuilder
-            The lattice discretization properties.
-        num_steps : int | None, optional
-            Number of timesteps to calculate reflections for. If None, uses ``properties.num_timesteps``. Defaults to None.
-
-        Returns
-        -------
-        List[SpaceTimeReflectionData]
-            The information encoding the reflections to be performed.
-        """
+    ) -> List[SpaceTimePWReflectionData]:
         if num_steps is None:
             num_steps = properties.num_timesteps
 
@@ -634,7 +608,7 @@ class Block:
                                 )
 
                                 reflection_list.append(
-                                    SpaceTimeReflectionData(
+                                    SpaceTimePWReflectionData(
                                         gridpoint_encoded,
                                         qubits_to_invert,
                                         opposite_reflection_direction,
@@ -645,25 +619,12 @@ class Block:
 
         return reflection_list
 
+    @override
     def get_d2q4_volumetric_reflection_data(
         self,
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
     ) -> List[SpaceTimeVolumetricReflectionData]:
-        """Calculate volumetric reflection data for :math:`D_2Q_4` :class:`.STQLBM` lattice.
-
-        Parameters
-        ----------
-        properties : SpaceTimeLatticeBuilder
-            The lattice discretization properties.
-        num_steps int | None, optional
-            Number of timesteps to calculate reflections for. If None, uses ``properties.num_timesteps``. Defaults to None.
-
-        Returns
-        -------
-        List[SpaceTimeVolumetricReflectionData]
-            The information encoding the reflections to be performed.
-        """
         if num_steps is None:
             num_steps = properties.num_timesteps
 
@@ -783,20 +744,8 @@ class Block:
                             )
         return reflection_list
 
+    @override
     def get_d2q4_surfaces(self) -> List[List[List[Tuple[int, ...]]]]:
-        """
-        Get all surfaces of the block in 2 dimensions.
-
-        The information is formatted as ``List[List[List[Tuple[int, ...]]]]``.
-        The outermost list is by dimension.
-        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimenison.
-        The innermost list contains the gridpoints that make up the surface encoded as tuples.
-
-        Returns
-        -------
-        List[List[List[Tuple[int, ...]]]]
-            The block surfaces in two dimensions.
-        """
         surfaces: List[List[List[Tuple[int, ...]]]] = []
 
         for d, walls in enumerate(self.walls_inside):
@@ -816,34 +765,15 @@ class Block:
 
         return surfaces
 
+    @override
     def contains_gridpoint(self, gridpoint: Tuple[int, ...]) -> bool:
-        """
-        Whether the block contains a given gridpoint within its volume.
-
-        Parameters
-        ----------
-        gridpoint : Tuple[int, ...]
-            The gridpoint to check for.
-
-        Returns
-        -------
-        bool
-            Whether the gridpoint is within the block.
-        """
         return all(
             coord >= bound[0] and coord <= bound[1]
             for coord, bound in zip(gridpoint, self.bounds)
         )
 
+    @override
     def stl_mesh(self) -> mesh.Mesh:
-        """
-        Provides the ``stl`` representation of the block.
-
-        Returns
-        -------
-        ``stl.mesh.Mesh``
-            The mesh representing the block.
-        """
         block = mesh.Mesh(np.zeros(self.mesh_indices.shape[0], dtype=mesh.Mesh.dtype))
         for i, triangle_face in enumerate(self.mesh_indices):
             for j in range(3):
@@ -851,26 +781,12 @@ class Block:
 
         return block
 
+    @override
     def to_json(self) -> str:
-        """
-        Serializes the block to JSON format.
-
-        Returns
-        -------
-        str
-            The JSON representation of the block.
-        """
         return dumps(self.to_dict())
 
+    @override
     def to_dict(self) -> Dict[str, List[int] | str]:
-        """
-        Produces a dictionary representation of the block.
-
-        Returns
-        -------
-        Dict[str, List[int] | str]
-            A dictionary representation of the bounds and boundary conditions of the block.
-        """
         block_dict: Dict[str, List[int] | str] = {
             dimension_letter(numeric_dim_index): list(self.bounds[numeric_dim_index])
             for numeric_dim_index in range(self.num_dims)

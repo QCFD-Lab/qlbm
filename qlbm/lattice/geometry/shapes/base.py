@@ -6,7 +6,7 @@ from typing import List, Tuple
 from stl import mesh
 
 from qlbm.lattice.geometry.encodings.spacetime import (
-    SpaceTimeReflectionData,
+    SpaceTimePWReflectionData,
     SpaceTimeVolumetricReflectionData,
 )
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
@@ -93,7 +93,7 @@ class SpaceTimeShape(Shape):
         self,
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
-    ) -> List[SpaceTimeReflectionData]:
+    ) -> List[SpaceTimePWReflectionData]:
         """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.STQLBM` lattice.
 
         Parameters
@@ -115,7 +115,7 @@ class SpaceTimeShape(Shape):
         self,
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
-    ) -> List[SpaceTimeReflectionData]:
+    ) -> List[SpaceTimePWReflectionData]:
         """
         Calculate space-time reflection data for :math:`D_2Q_4` :class:`.STQLBM` lattice.
 
