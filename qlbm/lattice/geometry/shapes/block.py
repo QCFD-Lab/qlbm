@@ -99,14 +99,12 @@ class Block(SpaceTimeShape):
     def __init__(
         self,
         bounds: List[Tuple[int, int]],
-        num_qubits: List[int],
+        num_grid_qubits: List[int],
         boundary_condition: str,
     ) -> None:
+        super().__init__(num_grid_qubits, boundary_condition)
         # TODO: check whether the number of dimensions is consistent
         self.bounds: List[Tuple[int, int]] = bounds
-        self.num_dims = len(bounds)
-        self.boundary_condition = boundary_condition
-        self.num_qubits = num_qubits
         if self.num_dims == 3:
             self.mesh_vertices = np.array(
                 list(
@@ -137,18 +135,12 @@ class Block(SpaceTimeShape):
 
         self.mesh_indices = self.mesh_indices_list[max(0, self.num_dims - 2)]
 
-        # The number of qubits used to offset "higher" dimensions
-        self.previous_qubits: List[int] = [
-            sum(num_qubits[previous_dim] for previous_dim in range(dim))
-            for dim in range(self.num_dims)
-        ]
-
         self.inside_points_data: List[Tuple[DimensionalReflectionData, ...]] = [
             tuple(
                 DimensionalReflectionData(
                     [
                         self.previous_qubits[dim] + i
-                        for i in range(num_qubits[dim])
+                        for i in range(num_grid_qubits[dim])
                         if not bit_value(bounds[dim][bound_type], i)
                     ],
                     bound_type=bound_type,
@@ -167,7 +159,7 @@ class Block(SpaceTimeShape):
                 DimensionalReflectionData(
                     [
                         self.previous_qubits[dim] + i
-                        for i in range(num_qubits[dim])
+                        for i in range(num_grid_qubits[dim])
                         if not bit_value(
                             bounds[dim][bound_type] + 2 * bound_type - 1, i
                         )  # 2 * bound - 1 results in +1 for upper bound (True) and -1 for lower bounds (False)
@@ -474,7 +466,7 @@ class Block(SpaceTimeShape):
                 increment = properties.get_reflection_increments(reflection_direction)
                 origin: Tuple[int, ...] = (reflection_bound, 0)
                 for t in range(num_steps):
-                    num_gps_in_dim = 2 ** self.num_qubits[0]
+                    num_gps_in_dim = 2 ** self.num_grid_qubits[0]
                     gridpoint_encoded = tuple(
                         a + (t + 1 if 1 - c == reflection_direction else t) * b
                         for a, b in zip(origin, increment)
@@ -489,7 +481,7 @@ class Block(SpaceTimeShape):
                     )
                     distance_from_origin = tuple((t + 1) * x for x in increment)
                     qubits_to_invert = get_qubits_to_invert(
-                        gridpoint_encoded[0], self.num_qubits[0]
+                        gridpoint_encoded[0], self.num_grid_qubits[0]
                     )
 
                     reflection_list.append(
@@ -511,8 +503,7 @@ class Block(SpaceTimeShape):
     ) -> List[SpaceTimePWReflectionData]:
         if num_steps is None:
             num_steps = properties.num_timesteps
-
-        reflection_list = []
+        reflection_list: List[SpaceTimePWReflectionData] = []
         surfaces = self.get_d2q4_surfaces()
 
         # Surfaces are stored by dimension first
@@ -544,78 +535,15 @@ class Block(SpaceTimeShape):
                     ]
                 )
 
-                # Each surface is made up of several gridpoints
-                for gp_in_wall in wall_of_surface:
-                    for reflection_direction in streaming_line_velocities:
-                        increment = properties.get_reflection_increments(
-                            reflection_direction
-                        )
-
-                        # Each gridpoint is part of the stencil of several others
-                        for (
-                            offset,
-                            starting_increment,
-                        ) in symmetric_non_reflection_dimension_increment:
-                            origin: Tuple[int, ...] = tuple(
-                                a + b for a, b in zip(gp_in_wall, starting_increment)
-                            )
-                            for t in range(num_steps - abs(offset)):
-                                num_gps_in_dim = [2**n for n in self.num_qubits]
-                                gridpoint_encoded = tuple(
-                                    a
-                                    + (
-                                        t + 1
-                                        if (
-                                            streaming_line_velocities[0]
-                                            == reflection_direction
-                                        )
-                                        else t
-                                    )
-                                    * b
-                                    for a, b in zip(origin, increment)
-                                )
-
-                                # Add periodic boundary conditions
-                                gridpoint_encoded = tuple(
-                                    x + num_gps_in_dim if x < 0 else x % num_gps_in_dim
-                                    for x, num_gps_in_dim in zip(
-                                        gridpoint_encoded, num_gps_in_dim
-                                    )
-                                )
-                                distance_from_origin = tuple(
-                                    (t + 1) * x + y
-                                    for x, y in zip(increment, starting_increment)
-                                )
-
-                                # The qubits to invert for this gridpoint
-                                qubits_to_invert = flatten(
-                                    [
-                                        [
-                                            self.previous_qubits[dim] + q
-                                            for q in get_qubits_to_invert(
-                                                gridpoint_encoded[dim],
-                                                self.num_qubits[dim],
-                                            )
-                                        ]
-                                        for dim in range(2)
-                                    ]
-                                )
-                                opposite_reflection_direction = (
-                                    streaming_line_velocities[1]
-                                    if reflection_direction
-                                    == streaming_line_velocities[0]
-                                    else streaming_line_velocities[0]
-                                )
-
-                                reflection_list.append(
-                                    SpaceTimePWReflectionData(
-                                        gridpoint_encoded,
-                                        qubits_to_invert,
-                                        opposite_reflection_direction,
-                                        distance_from_origin,
-                                        properties,
-                                    )
-                                )
+                reflection_list.extend(
+                    self.get_spacetime_reflection_data_d2q4_from_points(
+                        properties,
+                        wall_of_surface,
+                        streaming_line_velocities,
+                        symmetric_non_reflection_dimension_increment,
+                        num_steps,
+                    )
+                )
 
         return reflection_list
 
@@ -629,7 +557,7 @@ class Block(SpaceTimeShape):
             num_steps = properties.num_timesteps
 
         reflection_list = []
-        num_gps_in_dim = [2**n for n in self.num_qubits]
+        num_gps_in_dim = [2**n for n in self.num_grid_qubits]
         for fixed_dim, bounds_of_fixed_dim in enumerate(self.bounds):
             ranged_dim = 1 - fixed_dim
             bounds_ranged_dim: Tuple[int, int] = self.bounds[ranged_dim]
@@ -731,7 +659,8 @@ class Block(SpaceTimeShape):
                                     [ranged_dim],
                                     [bounds_ranged_dim_reflection],
                                     get_qubits_to_invert(
-                                        fixed_dim_reflection, self.num_qubits[fixed_dim]
+                                        fixed_dim_reflection,
+                                        self.num_grid_qubits[fixed_dim],
                                     ),
                                     fixed_dim_reflection,
                                     opposite_reflection_direction,
