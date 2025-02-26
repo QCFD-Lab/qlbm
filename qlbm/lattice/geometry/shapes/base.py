@@ -11,6 +11,7 @@ from qlbm.lattice.geometry.encodings.spacetime import (
 )
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.utils import flatten, get_qubits_to_invert
+from collections.abc import Callable
 
 
 class Shape(ABC):
@@ -143,29 +144,13 @@ class SpaceTimeShape(Shape):
                             SpaceTimePWReflectionData(
                                 gridpoint_encoded,
                                 qubits_to_invert,
-                                opposite_reflection_direction,
+                                [opposite_reflection_direction],
                                 distance_from_origin,
                                 properties,
                             )
                         )
 
         return reflection_list
-
-    @abstractmethod
-    def get_d2q4_surfaces(self) -> List[List[List[Tuple[int, ...]]]]:
-        """
-        Get all surfaces of the block in 2 dimensions.
-
-        The information is formatted as ``List[List[List[Tuple[int, ...]]]]``.
-        The outermost list is by dimension.
-        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimenison.
-        The innermost list contains the gridpoints that make up the surface encoded as tuples.
-
-        Returns
-        -------
-        List[List[List[Tuple[int, ...]]]]
-            The block surfaces in two dimensions.
-        """
 
     @abstractmethod
     def contains_gridpoint(self, gridpoint: Tuple[int, ...]) -> bool:

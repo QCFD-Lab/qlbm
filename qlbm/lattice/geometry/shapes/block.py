@@ -488,7 +488,7 @@ class Block(SpaceTimeShape):
                         SpaceTimePWReflectionData(
                             gridpoint_encoded,
                             qubits_to_invert,
-                            not bool(reflection_direction),
+                            [not bool(reflection_direction)],
                             distance_from_origin,
                             properties,
                         )
@@ -673,8 +673,20 @@ class Block(SpaceTimeShape):
                             )
         return reflection_list
 
-    @override
     def get_d2q4_surfaces(self) -> List[List[List[Tuple[int, ...]]]]:
+        """
+        Get all surfaces of the block in 2 dimensions.
+
+        The information is formatted as ``List[List[List[Tuple[int, ...]]]]``.
+        The outermost list is by dimension.
+        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimenison.
+        The innermost list contains the gridpoints that make up the surface encoded as tuples.
+
+        Returns
+        -------
+        List[List[List[Tuple[int, ...]]]]
+            The block surfaces in two dimensions.
+        """
         surfaces: List[List[List[Tuple[int, ...]]]] = []
 
         for d, walls in enumerate(self.walls_inside):
