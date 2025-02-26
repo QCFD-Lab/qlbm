@@ -2,6 +2,7 @@ import pytest
 
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.tools.utils import flatten
 
 
 def test_get_spacetime_reflection_data_constructor_1_timestep(
@@ -20,9 +21,9 @@ def test_get_spacetime_reflection_data_constructor_1_timestep(
     assert qubits_to_invert == [[0, 1, 3], [1, 3], [0, 1], [2]]
 
     velocities_indices_to_invert = [
-        rd.velocity_index_to_reflect for rd in stqbm_reflection_data
+        rd.velocity_indices_to_reflect for rd in stqbm_reflection_data
     ]
-    assert velocities_indices_to_invert == [0, 1, 1, 0]
+    assert flatten(velocities_indices_to_invert) == [0, 1, 1, 0]
 
     distances_from_boundary_points = [
         rd.distance_from_boundary_point for rd in stqbm_reflection_data
@@ -40,7 +41,7 @@ def test_get_spacetime_reflection_data_neighbor_velocity_pairs_1_timestep(
     neighbor_velocity_pairs = [
         rd.neighbor_velocity_pairs for rd in stqbm_reflection_data
     ]
-    assert neighbor_velocity_pairs == [
+    assert flatten(neighbor_velocity_pairs) == [
         ((0, 1), (1, 0)),
         ((0, 0), (2, 1)),
         ((0, 0), (2, 1)),
@@ -82,9 +83,9 @@ def test_get_spacetime_reflection_data_constructor_2_timesteps(
     ]
 
     velocities_indices_to_invert = [
-        rd.velocity_index_to_reflect for rd in stqbm_reflection_data
+        rd.velocity_indices_to_reflect for rd in stqbm_reflection_data
     ]
-    assert velocities_indices_to_invert == [0] * 2 + [1] * 4 + [0] * 2
+    assert flatten(velocities_indices_to_invert) == [0] * 2 + [1] * 4 + [0] * 2
 
     distances_from_boundary_points = [
         rd.distance_from_boundary_point for rd in stqbm_reflection_data
@@ -111,7 +112,7 @@ def test_get_spacetime_reflection_data_neighbor_velocity_pairs_2_timesteps(
     neighbor_velocity_pairs = [
         rd.neighbor_velocity_pairs for rd in stqbm_reflection_data
     ]
-    assert neighbor_velocity_pairs == [
+    assert flatten(neighbor_velocity_pairs) == [
         ((0, 1), (1, 0)),  # 4
         ((1, 1), (3, 0)),  # 3
         ((0, 0), (2, 1)),  # 5
@@ -173,9 +174,9 @@ def test_get_spacetime_reflection_data_constructor_4_timesteps(
     ]
 
     velocities_indices_to_invert = [
-        rd.velocity_index_to_reflect for rd in stqbm_reflection_data
+        rd.velocity_indices_to_reflect for rd in stqbm_reflection_data
     ]
-    assert velocities_indices_to_invert == [0] * 4 + [1] * 8 + [0] * 4
+    assert flatten(velocities_indices_to_invert) == [0] * 4 + [1] * 8 + [0] * 4
 
     distances_from_boundary_points = [
         rd.distance_from_boundary_point for rd in stqbm_reflection_data
@@ -210,7 +211,7 @@ def test_get_spacetime_reflection_data_neighbor_velocity_pairs_4_timesteps(
     neighbor_velocity_pairs = [
         rd.neighbor_velocity_pairs for rd in stqbm_reflection_data
     ]
-    assert neighbor_velocity_pairs == [
+    assert flatten(neighbor_velocity_pairs) == [
         ((0, 1), (1, 0)),  # 4
         ((1, 1), (3, 0)),  # 3
         ((3, 1), (5, 0)),  # 2
@@ -280,9 +281,9 @@ def test_get_spacetime_reflection_data_constructor_4_timesteps_outside_bounds(
     ]
 
     velocities_indices_to_invert = [
-        rd.velocity_index_to_reflect for rd in stqbm_reflection_data
+        rd.velocity_indices_to_reflect for rd in stqbm_reflection_data
     ]
-    assert velocities_indices_to_invert == [0] * 4 + [1] * 8 + [0] * 4
+    assert flatten(velocities_indices_to_invert) == [0] * 4 + [1] * 8 + [0] * 4
 
     distances_from_boundary_points = [
         rd.distance_from_boundary_point for rd in stqbm_reflection_data

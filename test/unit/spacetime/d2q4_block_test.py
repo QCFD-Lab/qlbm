@@ -599,23 +599,23 @@ def test_get_spacetime_reflection_data_1_timestep_neighbor_velocity_pairs(
 
     ### X walls
     negative_x_walls_points = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 2), (1, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 2), (1, 0))
     ]
     assert len(negative_x_walls_points) == 2 * 9
 
     positive_x_walls_points = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 0), (3, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 0), (3, 2))
     ]
     assert len(positive_x_walls_points) == 2 * 9
 
     ### Y walls
     negative_y_walls_points = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 1), (4, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 1), (4, 3))
     ]
     assert len(negative_y_walls_points) == 2 * 2
 
     positive_y_walls_points = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 3), (2, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 3), (2, 1))
     ]
     assert len(positive_y_walls_points) == 2 * 2
 
@@ -635,23 +635,23 @@ def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d1(
 
     ### X walls, distance 1
     negative_x_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 2), (1, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 2), (1, 0))
     ]
     assert len(negative_x_walls_points_d1) == 2 * 9
 
     positive_x_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 0), (3, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 0), (3, 2))
     ]
     assert len(positive_x_walls_points_d1) == 2 * 9
 
     ### Y walls, distance 1
     negative_y_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 1), (4, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 1), (4, 3))
     ]
     assert len(negative_y_walls_points_d1) == 2 * 2
 
     positive_y_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 3), (2, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 3), (2, 1))
     ]
     assert len(positive_y_walls_points_d1) == 2 * 2
 
@@ -671,63 +671,63 @@ def test_get_spacetime_reflection_data_2_timesteps_neighbor_velocity_pairs_d2(
 
     ### X walls, distance 2
     negative_x_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((1, 2), (5, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((1, 2), (5, 0))
     ]
     assert len(negative_x_walls_points_d2_lvl_0) == 2 * 9
 
     positive_x_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((3, 0), (9, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((3, 0), (9, 2))
     ]
     assert len(positive_x_walls_points_d2_lvl_0) == 2 * 9
 
     negative_x_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((2, 2), (6, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((2, 2), (6, 0))
     ]
     assert len(negative_x_walls_points_d2_lvl_1_pos) == 2 * 9
 
     positive_x_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((2, 0), (8, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((2, 0), (8, 2))
     ]
     assert len(positive_x_walls_points_d2_lvl_1_pos) == 2 * 9
 
     negative_x_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((4, 2), (12, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((4, 2), (12, 0))
     ]
     assert len(negative_x_walls_points_d2_lvl_1_neg) == 2 * 9
 
     positive_x_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((4, 0), (10, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((4, 0), (10, 2))
     ]
     assert len(positive_x_walls_points_d2_lvl_1_neg) == 2 * 9
 
     ### Y walls, distance 2
     negative_y_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((4, 1), (11, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((4, 1), (11, 3))
     ]
     assert len(negative_y_walls_points_d2_lvl_0) == 2 * 2
 
     positive_y_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((2, 3), (7, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((2, 3), (7, 1))
     ]
     assert len(positive_y_walls_points_d2_lvl_0) == 2 * 2
 
     negative_y_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((1, 1), (12, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((1, 1), (12, 3))
     ]
     assert len(negative_y_walls_points_d2_lvl_1_pos) == 2 * 2
 
     positive_y_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((1, 3), (6, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((1, 3), (6, 1))
     ]
     assert len(positive_y_walls_points_d2_lvl_1_pos) == 2 * 2
 
     negative_y_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((3, 1), (10, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((3, 1), (10, 3))
     ]
     assert len(negative_y_walls_points_d2_lvl_1_neg) == 2 * 2
 
     positive_y_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((3, 3), (8, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((3, 3), (8, 1))
     ]
     assert len(positive_y_walls_points_d2_lvl_1_neg) == 2 * 2
 
@@ -747,23 +747,23 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d1(
 
     ### X walls, distance 1
     negative_x_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 2), (1, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 2), (1, 0))
     ]
     assert len(negative_x_walls_points_d1) == 2 * 9
 
     positive_x_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 0), (3, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 0), (3, 2))
     ]
     assert len(positive_x_walls_points_d1) == 2 * 9
 
     ### Y walls, distance 1
     negative_y_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 1), (4, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 1), (4, 3))
     ]
     assert len(negative_y_walls_points_d1) == 2 * 2
 
     positive_y_walls_points_d1 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((0, 3), (2, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 3), (2, 1))
     ]
     assert len(positive_y_walls_points_d1) == 2 * 2
 
@@ -783,63 +783,63 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d2(
 
     ### X walls, distance 2
     negative_x_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((1, 2), (5, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((1, 2), (5, 0))
     ]
     assert len(negative_x_walls_points_d2_lvl_0) == 2 * 9
 
     positive_x_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((3, 0), (9, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((3, 0), (9, 2))
     ]
     assert len(positive_x_walls_points_d2_lvl_0) == 2 * 9
 
     negative_x_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((2, 2), (6, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((2, 2), (6, 0))
     ]
     assert len(negative_x_walls_points_d2_lvl_1_pos) == 2 * 9
 
     positive_x_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((2, 0), (8, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((2, 0), (8, 2))
     ]
     assert len(positive_x_walls_points_d2_lvl_1_pos) == 2 * 9
 
     negative_x_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((4, 2), (12, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((4, 2), (12, 0))
     ]
     assert len(negative_x_walls_points_d2_lvl_1_neg) == 2 * 9
 
     positive_x_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((4, 0), (10, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((4, 0), (10, 2))
     ]
     assert len(positive_x_walls_points_d2_lvl_1_neg) == 2 * 9
 
     ### Y walls, distance 2
     negative_y_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((4, 1), (11, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((4, 1), (11, 3))
     ]
     assert len(negative_y_walls_points_d2_lvl_0) == 2 * 2
 
     positive_y_walls_points_d2_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((2, 3), (7, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((2, 3), (7, 1))
     ]
     assert len(positive_y_walls_points_d2_lvl_0) == 2 * 2
 
     negative_y_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((1, 1), (12, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((1, 1), (12, 3))
     ]
     assert len(negative_y_walls_points_d2_lvl_1_pos) == 2 * 2
 
     positive_y_walls_points_d2_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((1, 3), (6, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((1, 3), (6, 1))
     ]
     assert len(positive_y_walls_points_d2_lvl_1_pos) == 2 * 2
 
     negative_y_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((3, 1), (10, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((3, 1), (10, 3))
     ]
     assert len(negative_y_walls_points_d2_lvl_1_neg) == 2 * 2
 
     positive_y_walls_points_d2_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((3, 3), (8, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((3, 3), (8, 1))
     ]
     assert len(positive_y_walls_points_d2_lvl_1_neg) == 2 * 2
 
@@ -859,23 +859,23 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d3_lv
 
     ### X walls, distance 3
     negative_x_walls_points_d3_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((5, 2), (13, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((5, 2), (13, 0))
     ]
     assert len(negative_x_walls_points_d3_lvl_0) == 2 * 9
 
     positive_x_walls_points_d3_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((9, 0), (19, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((9, 0), (19, 2))
     ]
     assert len(positive_x_walls_points_d3_lvl_0) == 2 * 9
 
     ### Y walls, distance 3, level 0
     negative_y_walls_points_d3_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((11, 1), (22, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((11, 1), (22, 3))
     ]
     assert len(negative_y_walls_points_d3_lvl_0) == 2 * 2
 
     positive_y_walls_points_d3_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((7, 3), (16, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((7, 3), (16, 1))
     ]
     assert len(positive_y_walls_points_d3_lvl_0) == 2 * 2
 
@@ -895,43 +895,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d3_lv
 
     ### D3, X wall, Level 1
     negative_x_walls_points_d3_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((6, 2), (14, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((6, 2), (14, 0))
     ]
     assert len(negative_x_walls_points_d3_lvl_1_pos) == 2 * 9
 
     positive_x_walls_points_d3_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((8, 0), (18, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((8, 0), (18, 2))
     ]
     assert len(positive_x_walls_points_d3_lvl_1_pos) == 2 * 9
 
     negative_x_walls_points_d3_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((12, 2), (24, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((12, 2), (24, 0))
     ]
     assert len(negative_x_walls_points_d3_lvl_1_neg) == 2 * 9
 
     positive_x_walls_points_d3_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((10, 0), (20, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((10, 0), (20, 2))
     ]
     assert len(positive_x_walls_points_d3_lvl_1_neg) == 2 * 9
 
     ### D3, Y Walls, Level 1
     negative_y_walls_points_d3_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((12, 1), (23, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((12, 1), (23, 3))
     ]
     assert len(negative_y_walls_points_d3_lvl_1_pos) == 2 * 2
 
     positive_y_walls_points_d3_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((6, 3), (15, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((6, 3), (15, 1))
     ]
     assert len(positive_y_walls_points_d3_lvl_1_pos) == 2 * 2
 
     negative_y_walls_points_d3_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((10, 1), (21, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((10, 1), (21, 3))
     ]
     assert len(negative_y_walls_points_d3_lvl_1_neg) == 2 * 2
 
     positive_y_walls_points_d3_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((8, 3), (17, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((8, 3), (17, 1))
     ]
     assert len(positive_y_walls_points_d3_lvl_1_neg) == 2 * 2
 
@@ -951,43 +951,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d3_lv
 
     ### D3, X Walls, Level 2
     negative_x_walls_points_d3_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((7, 2), (15, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((7, 2), (15, 0))
     ]
     assert len(negative_x_walls_points_d3_lvl_2_pos) == 2 * 9
 
     positive_x_walls_points_d3_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((7, 0), (17, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((7, 0), (17, 2))
     ]
     assert len(positive_x_walls_points_d3_lvl_2_pos) == 2 * 9
 
     negative_x_walls_points_d3_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((11, 2), (23, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((11, 2), (23, 0))
     ]
     assert len(negative_x_walls_points_d3_lvl_2_neg) == 2 * 9
 
     positive_x_walls_points_d3_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((11, 0), (21, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((11, 0), (21, 2))
     ]
     assert len(positive_x_walls_points_d3_lvl_2_neg) == 2 * 9
 
     ### D3, Y Walls, Level 2
     negative_y_walls_points_d3_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((5, 1), (24, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((5, 1), (24, 3))
     ]
     assert len(negative_y_walls_points_d3_lvl_2_pos) == 2 * 2
 
     positive_y_walls_points_d3_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((5, 3), (14, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((5, 3), (14, 1))
     ]
     assert len(positive_y_walls_points_d3_lvl_2_pos) == 2 * 2
 
     negative_y_walls_points_d3_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((9, 1), (20, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((9, 1), (20, 3))
     ]
     assert len(negative_y_walls_points_d3_lvl_2_neg) == 2 * 2
 
     positive_y_walls_points_d3_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((9, 3), (18, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((9, 3), (18, 1))
     ]
     assert len(positive_y_walls_points_d3_lvl_2_neg) == 2 * 2
 
@@ -1010,23 +1010,23 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d4_lv
 
     ### X walls, distance 4, level 0
     negative_x_walls_points_d4_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((13, 2), (25, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((13, 2), (25, 0))
     ]
     assert len(negative_x_walls_points_d4_lvl_0) == 2 * 9
 
     positive_x_walls_points_d4_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((19, 0), (33, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((19, 0), (33, 2))
     ]
     assert len(positive_x_walls_points_d4_lvl_0) == 2 * 9
 
     ### Y walls, distance 4, level 0
     negative_y_walls_points_d4_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((22, 1), (37, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((22, 1), (37, 3))
     ]
     assert len(negative_y_walls_points_d4_lvl_0) == 2 * 2
 
     positive_y_walls_points_d4_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((16, 3), (29, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((16, 3), (29, 1))
     ]
     assert len(positive_y_walls_points_d4_lvl_0) == 2 * 2
 
@@ -1046,43 +1046,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d4_lv
 
     ### D4, X wall, Level 1
     negative_x_walls_points_d4_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((14, 2), (26, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((14, 2), (26, 0))
     ]
     assert len(negative_x_walls_points_d4_lvl_1_pos) == 2 * 9
 
     positive_x_walls_points_d4_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((18, 0), (32, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((18, 0), (32, 2))
     ]
     assert len(positive_x_walls_points_d4_lvl_1_pos) == 2 * 9
 
     negative_x_walls_points_d4_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((24, 2), (40, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((24, 2), (40, 0))
     ]
     assert len(negative_x_walls_points_d4_lvl_1_neg) == 2 * 9
 
     positive_x_walls_points_d4_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((20, 0), (34, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((20, 0), (34, 2))
     ]
     assert len(positive_x_walls_points_d4_lvl_1_neg) == 2 * 9
 
     ### D4, Y Walls, Level 1
     negative_y_walls_points_d4_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((23, 1), (38, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((23, 1), (38, 3))
     ]
     assert len(negative_y_walls_points_d4_lvl_1_pos) == 2 * 2
 
     positive_y_walls_points_d4_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((15, 3), (28, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((15, 3), (28, 1))
     ]
     assert len(positive_y_walls_points_d4_lvl_1_pos) == 2 * 2
 
     negative_y_walls_points_d4_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((21, 1), (36, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((21, 1), (36, 3))
     ]
     assert len(negative_y_walls_points_d4_lvl_1_neg) == 2 * 2
 
     positive_y_walls_points_d4_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((17, 3), (30, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((17, 3), (30, 1))
     ]
     assert len(positive_y_walls_points_d4_lvl_1_neg) == 2 * 2
 
@@ -1102,43 +1102,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d4_lv
 
     ### D4, X Walls, Level 2
     negative_x_walls_points_d4_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((15, 2), (27, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((15, 2), (27, 0))
     ]
     assert len(negative_x_walls_points_d4_lvl_2_pos) == 2 * 9
 
     positive_x_walls_points_d4_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((17, 0), (31, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((17, 0), (31, 2))
     ]
     assert len(positive_x_walls_points_d4_lvl_2_pos) == 2 * 9
 
     negative_x_walls_points_d4_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((23, 2), (39, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((23, 2), (39, 0))
     ]
     assert len(negative_x_walls_points_d4_lvl_2_neg) == 2 * 9
 
     positive_x_walls_points_d4_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((21, 0), (35, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((21, 0), (35, 2))
     ]
     assert len(positive_x_walls_points_d4_lvl_2_neg) == 2 * 9
 
     ### D4, Y Walls, Level 2
     negative_y_walls_points_d4_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((24, 1), (39, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((24, 1), (39, 3))
     ]
     assert len(negative_y_walls_points_d4_lvl_2_pos) == 2 * 2
 
     positive_y_walls_points_d4_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((14, 3), (27, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((14, 3), (27, 1))
     ]
     assert len(positive_y_walls_points_d4_lvl_2_pos) == 2 * 2
 
     negative_y_walls_points_d4_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((20, 1), (35, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((20, 1), (35, 3))
     ]
     assert len(negative_y_walls_points_d4_lvl_2_neg) == 2 * 2
 
     positive_y_walls_points_d4_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((18, 3), (31, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((18, 3), (31, 1))
     ]
     assert len(positive_y_walls_points_d4_lvl_2_neg) == 2 * 2
 
@@ -1158,43 +1158,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d4_lv
 
     ### D4, X Walls, Level 3
     negative_x_walls_points_d4_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((16, 2), (28, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((16, 2), (28, 0))
     ]
     assert len(negative_x_walls_points_d4_lvl_3_pos) == 2 * 9
 
     positive_x_walls_points_d4_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((16, 0), (30, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((16, 0), (30, 2))
     ]
     assert len(positive_x_walls_points_d4_lvl_3_pos) == 2 * 9
 
     negative_x_walls_points_d4_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((22, 2), (38, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((22, 2), (38, 0))
     ]
     assert len(negative_x_walls_points_d4_lvl_3_neg) == 2 * 9
 
     positive_x_walls_points_d4_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((22, 0), (36, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((22, 0), (36, 2))
     ]
     assert len(positive_x_walls_points_d4_lvl_3_neg) == 2 * 9
 
     ### D4, Y Walls, Level 3
     negative_y_walls_points_d4_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((13, 1), (40, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((13, 1), (40, 3))
     ]
     assert len(negative_y_walls_points_d4_lvl_3_pos) == 2 * 2
 
     positive_y_walls_points_d4_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((13, 3), (26, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((13, 3), (26, 1))
     ]
     assert len(positive_y_walls_points_d4_lvl_3_pos) == 2 * 2
 
     negative_y_walls_points_d4_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((19, 1), (34, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((19, 1), (34, 3))
     ]
     assert len(negative_y_walls_points_d4_lvl_3_neg) == 2 * 2
 
     positive_y_walls_points_d4_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((19, 3), (32, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((19, 3), (32, 1))
     ]
     assert len(positive_y_walls_points_d4_lvl_3_neg) == 2 * 2
 
@@ -1217,23 +1217,23 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d5_lv
 
     ### X walls, distance 5, level 0
     negative_x_walls_points_d5_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((25, 2), (41, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((25, 2), (41, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_0) == 2 * 9
 
     positive_x_walls_points_d5_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((33, 0), (51, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((33, 0), (51, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_0) == 2 * 9
 
     ### Y walls, distance 5, level 0
     negative_y_walls_points_d5_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((37, 1), (56, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((37, 1), (56, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_0) == 2 * 2
 
     positive_y_walls_points_d5_lvl_0 = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((29, 3), (46, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((29, 3), (46, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_0) == 2 * 2
 
@@ -1253,43 +1253,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d5_lv
 
     ### D5, X wall, Level 1
     negative_x_walls_points_d5_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((26, 2), (42, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((26, 2), (42, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_1_pos) == 2 * 9
 
     positive_x_walls_points_d5_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((32, 0), (50, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((32, 0), (50, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_1_pos) == 2 * 9
 
     negative_x_walls_points_d5_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((40, 2), (60, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((40, 2), (60, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_1_neg) == 2 * 9
 
     positive_x_walls_points_d5_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((34, 0), (52, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((34, 0), (52, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_1_neg) == 2 * 9
 
     ### D5, Y Walls, Level 1
     negative_y_walls_points_d5_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((38, 1), (57, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((38, 1), (57, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_1_pos) == 2 * 2
 
     positive_y_walls_points_d5_lvl_1_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((28, 3), (45, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((28, 3), (45, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_1_pos) == 2 * 2
 
     negative_y_walls_points_d5_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((36, 1), (55, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((36, 1), (55, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_1_neg) == 2 * 2
 
     positive_y_walls_points_d5_lvl_1_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((30, 3), (47, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((30, 3), (47, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_1_neg) == 2 * 2
 
@@ -1309,43 +1309,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d5_lv
 
     ### D5, X Walls, Level 2
     negative_x_walls_points_d5_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((27, 2), (43, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((27, 2), (43, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_2_pos) == 2 * 9
 
     positive_x_walls_points_d5_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((31, 0), (49, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((31, 0), (49, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_2_pos) == 2 * 9
 
     negative_x_walls_points_d5_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((39, 2), (59, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((39, 2), (59, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_2_neg) == 2 * 9
 
     positive_x_walls_points_d5_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((35, 0), (53, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((35, 0), (53, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_2_neg) == 2 * 9
 
     ### D5, Y Walls, Level 2
     negative_y_walls_points_d5_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((39, 1), (58, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((39, 1), (58, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_2_pos) == 2 * 2
 
     positive_y_walls_points_d5_lvl_2_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((27, 3), (44, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((27, 3), (44, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_2_pos) == 2 * 2
 
     negative_y_walls_points_d5_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((35, 1), (54, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((35, 1), (54, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_2_neg) == 2 * 2
 
     positive_y_walls_points_d5_lvl_2_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((31, 3), (48, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((31, 3), (48, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_2_neg) == 2 * 2
 
@@ -1365,43 +1365,43 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d5_lv
 
     ### D5, X Walls, Level 3
     negative_x_walls_points_d5_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((28, 2), (44, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((28, 2), (44, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_3_pos) == 2 * 9
 
     positive_x_walls_points_d5_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((30, 0), (48, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((30, 0), (48, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_3_pos) == 2 * 9
 
     negative_x_walls_points_d5_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((38, 2), (58, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((38, 2), (58, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_3_neg) == 2 * 9
 
     positive_x_walls_points_d5_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((36, 0), (54, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((36, 0), (54, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_3_neg) == 2 * 9
 
     ### D5, Y Walls, Level 3
     negative_y_walls_points_d5_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((40, 1), (59, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((40, 1), (59, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_3_pos) == 2 * 2
 
     positive_y_walls_points_d5_lvl_3_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((26, 3), (43, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((26, 3), (43, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_3_pos) == 2 * 2
 
     negative_y_walls_points_d5_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((34, 1), (53, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((34, 1), (53, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_3_neg) == 2 * 2
 
     positive_y_walls_points_d5_lvl_3_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((32, 3), (49, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((32, 3), (49, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_3_neg) == 2 * 2
 
@@ -1421,42 +1421,42 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d5_lv
 
     ### D5, X Walls, Level 4
     negative_x_walls_points_d5_lvl_4_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((29, 2), (45, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((29, 2), (45, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_4_pos) == 2 * 9
 
     positive_x_walls_points_d5_lvl_4_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((29, 0), (47, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((29, 0), (47, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_4_pos) == 2 * 9
 
     negative_x_walls_points_d5_lvl_4_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((37, 2), (57, 0))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((37, 2), (57, 0))
     ]
     assert len(negative_x_walls_points_d5_lvl_4_neg) == 2 * 9
 
     positive_x_walls_points_d5_lvl_4_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((37, 0), (55, 2))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((37, 0), (55, 2))
     ]
     assert len(positive_x_walls_points_d5_lvl_4_neg) == 2 * 9
 
     ### D5, Y Walls, Level 4
     negative_y_walls_points_d5_lvl_4_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((25, 1), (60, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((25, 1), (60, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_4_pos) == 2 * 2
 
     positive_y_walls_points_d5_lvl_4_pos = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((25, 3), (42, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((25, 3), (42, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_4_pos) == 2 * 2
 
     negative_y_walls_points_d5_lvl_4_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((33, 1), (52, 3))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((33, 1), (52, 3))
     ]
     assert len(negative_y_walls_points_d5_lvl_4_neg) == 2 * 2
 
     positive_y_walls_points_d5_lvl_4_neg = [
-        nvp for nvp in neighbor_velocity_pairs if nvp == ((33, 3), (50, 1))
+        nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((33, 3), (50, 1))
     ]
     assert len(positive_y_walls_points_d5_lvl_4_neg) == 2 * 2
