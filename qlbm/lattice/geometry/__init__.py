@@ -5,17 +5,18 @@ from .encodings import (
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
-    SpaceTimeReflectionData,
+    SpaceTimePWReflectionData,
     SpaceTimeVolumetricReflectionData,
 )
-from .shapes import Block
+from .shapes import Block, Circle
 
 __all__ = [
     "DimensionalReflectionData",
     "ReflectionPoint",
     "ReflectionWall",
     "ReflectionResetEdge",
-    "SpaceTimeReflectionData",
+    "SpaceTimePWReflectionData",
     "SpaceTimeVolumetricReflectionData",
     "Block",
+    "Circle",
 ]

@@ -6,13 +6,13 @@ from .collisionless import (
     ReflectionResetEdge,
     ReflectionWall,
 )
-from .spacetime import SpaceTimeReflectionData, SpaceTimeVolumetricReflectionData
+from .spacetime import SpaceTimePWReflectionData, SpaceTimeVolumetricReflectionData
 
 __all__ = [
     "DimensionalReflectionData",
     "ReflectionPoint",
     "ReflectionWall",
     "ReflectionResetEdge",
-    "SpaceTimeReflectionData",
+    "SpaceTimePWReflectionData",
     "SpaceTimeVolumetricReflectionData",
 ]
