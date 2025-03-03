@@ -1,6 +1,7 @@
 import pytest
 
 from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.lattice.geometry.shapes.circle import Circle
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.utils import flatten, get_qubits_to_invert
 
@@ -139,6 +140,7 @@ def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
         },
     )
 
+
 @pytest.fixture
 def lattice_1d_16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
     return SpaceTimeLattice(
@@ -170,6 +172,7 @@ def lattice_1d_16_1_obstacle_5_timesteps_large_obstacle() -> SpaceTimeLattice:
         },
     )
 
+
 # Shapes
 @pytest.fixture
 def simple_1d_block() -> Block:
@@ -180,6 +183,36 @@ def simple_1d_block() -> Block:
 def simple_large_1d_block() -> Block:
     return Block([(2, 14)], [4], "bounceback")
 
+
 @pytest.fixture
 def simple_2d_block():
     return Block([(5, 6), (2, 10)], [4, 4], "bounceback")
+
+
+@pytest.fixture
+def small_circle():
+    return Circle((8, 8), 4, [4, 4], "bounceback")
+
+@pytest.fixture
+def circle_2():
+    return Circle((16, 16), 10, [8, 8], "bounceback")
+
+@pytest.fixture
+def circle_3():
+    return Circle((128, 70), 65, [8, 8], "bounceback")
+
+@pytest.fixture
+def circle_4():
+    return Circle((128, 32), 31, [8, 6], "bounceback")
+
+@pytest.fixture
+def circle_5():
+    return Circle((1024, 1024), 246, [11, 11], "bounceback")
+
+@pytest.fixture
+def circle_6():
+    return Circle((3, 3), 3, [11, 11], "bounceback")
+
+@pytest.fixture
+def circle_7():
+    return Circle((2040, 2024), 7, [11, 11], "bounceback")
