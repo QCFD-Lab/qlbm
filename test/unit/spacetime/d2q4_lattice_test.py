@@ -40,7 +40,6 @@ def lattice_2d_16x16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
     )
 
 
-
 @pytest.fixture
 def volumetric_lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
     return SpaceTimeLattice(
@@ -1023,7 +1022,16 @@ def test_bad_lattice_specification_velocities_3d():
     )
 
 
-def test_2d_lattice_grid_register(dummy_lattice):
+def test_2d_lattice_grid_register():
+    dummy_lattice = SpaceTimeLattice(
+        0,
+        {
+            "lattice": {
+                "dim": {"x": 256, "y": 256},
+                "velocities": {"x": 2, "y": 2},
+            },
+        },
+    )
     assert dummy_lattice.grid_index(0) == list(range(8))
     assert dummy_lattice.grid_index(1) == list(range(8, 16))
     assert dummy_lattice.grid_index() == list(range(16))
@@ -1151,6 +1159,7 @@ def test_volumetric_ancilla_qubit_combinations_overflow_xy(
         )
         == [[28, 30], [29, 30], [28, 31], [29, 31]]
     )
+
 
 def test_volumetric_ancilla_qubit_combinations_exception_overflow(
     lattice_2d_16x16_1_obstacle_1_timestep,

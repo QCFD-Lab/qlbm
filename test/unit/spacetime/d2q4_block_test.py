@@ -744,7 +744,7 @@ def test_get_spacetime_reflection_data_5_timesteps_neighbor_velocity_pairs_d1(
     neighbor_velocity_pairs = [
         rd.neighbor_velocity_pairs for rd in stqbm_reflection_data
     ]
-
+ 
     ### X walls, distance 1
     negative_x_walls_points_d1 = [
         nvp for nvp in neighbor_velocity_pairs if nvp[0] == ((0, 2), (1, 0))
