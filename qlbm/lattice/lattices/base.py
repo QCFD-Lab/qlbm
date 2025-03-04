@@ -7,7 +7,9 @@ from typing import Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
 
+from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.lattice.geometry.shapes.circle import Circle
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 
@@ -135,7 +137,7 @@ class Lattice(ABC):
     def __parse_input_dict(
         self,
         input_dict: Dict,  # type: ignore
-    ) -> Tuple[List[int], List[int], Dict[str, List[Block]]]:
+    ) -> Tuple[List[int], List[int], Dict[str, List[Shape]]]:
         r"""
         Parses the lattice input data, provided as a dictionary.
 
@@ -146,11 +148,11 @@ class Lattice(ABC):
 
         Returns
         -------
-        Tuple[List[int], List[int], Dict[str, List[Block]]]
+        Tuple[List[int], List[int], Dict[str, List[Shape]]]
             A tuple containing
             (i) a list of the number of gridpoints per dimension,
             (ii) a list of the number of velicities per dimension,
-            and (iii) a dictionary containing the solid :class:`.Block`\ s.
+            and (iii) a dictionary containing the solid :class:`.Shape`\ s.
             The key of the dictionary is the specific kind of
             boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
 
@@ -211,7 +213,7 @@ class Lattice(ABC):
             for dim in range(num_dimensions)
         ]
 
-        parsed_obstacles: Dict[str, List[Block]] = {"specular": [], "bounceback": []}
+        parsed_obstacles: Dict[str, List[Shape]] = {"specular": [], "bounceback": []}
 
         if "geometry" not in input_dict:
             return grid_list, velocity_list, parsed_obstacles
@@ -225,56 +227,93 @@ class Lattice(ABC):
                     f"Obstacle {c + 1} specification includes no boundary conditions."
                 )
 
-            if (
-                len(obstacle_dict) - 1 != num_dimensions
-            ):  # -1 to account for the boundary specification
-                raise LatticeException(
-                    f"Obstacle {c+1} has {len(obstacle_dict) - 1} dimensions whereas the lattice has {num_dimensions}."
-                )
-
-            for dim in range(num_dimensions):
-                dim_index = dimension_letter(dim)
-
-                if len(obstacle_dict[dim_index]) != 2:
-                    raise LatticeException(
-                        f"Obstacle {c + 1} is ill-formed in dimension {dim_index}."
-                    )
-
-                if sorted(obstacle_dict[dim_index]) != obstacle_dict[dim_index]:
-                    raise LatticeException(
-                        f"Obstacle {c + 1} {dim_index}-dimension bounds are not increasing."
-                    )
-
-                if (
-                    obstacle_dict[dim_index][0] < 0
-                    or obstacle_dict[dim_index][-1] > lattice_dict["dim"][dim_index]
-                ):
-                    raise LatticeException(
-                        f"Obstacle {c + 1} is out of bounds in the {dim_index}-dimension."
-                    )
-
             if obstacle_dict["boundary"] not in parsed_obstacles:
                 raise LatticeException(
                     f"Obstacle {c + 1} boundary conditions ('{obstacle_dict['boundary']}') are not supported. Supported boundary conditions are {list(parsed_obstacles)}."
                 )
 
-            # TODO check overlap
-            parsed_obstacles[obstacle_dict["boundary"]].append(  # type: ignore
-                Block(
-                    [
-                        (
-                            obstacle_dict[dimension_letter(numeric_dim_index)][0],
-                            obstacle_dict[dimension_letter(numeric_dim_index)][1],
-                        )
-                        for numeric_dim_index in range(num_dimensions)
-                    ],
-                    [
-                        (grid_list[numeric_dim_index]).bit_length()
-                        for numeric_dim_index in range(num_dimensions)
-                    ],
-                    obstacle_dict["boundary"],  # type: ignore
+            if "shape" not in obstacle_dict:
+                raise LatticeException(
+                    f"Obstacle {c + 1} specification includes no shape."
                 )
-            )
+
+            if obstacle_dict["shape"] not in ["cuboid", "sphere"]:
+                raise LatticeException(
+                    f'Obstacle {c + 1} has unsupported shape "{obstacle_dict["shape"]}". Supported shapes are cuboid and sphere.'
+                )
+            # Parsing blocks
+            if obstacle_dict["shape"] == "cuboid":
+                if (
+                    len(obstacle_dict) - 2 != num_dimensions
+                ):  # -1 to account for the boundary specification
+                    raise LatticeException(
+                        f"Obstacle {c + 1} has {len(obstacle_dict) - 2} dimensions whereas the lattice has {num_dimensions}."
+                    )
+                for dim in range(num_dimensions):
+                    dim_index = dimension_letter(dim)
+
+                    if len(obstacle_dict[dim_index]) != 2:
+                        raise LatticeException(
+                            f"Obstacle {c + 1} is ill-formed in dimension {dim_index}."
+                        )
+
+                    if sorted(obstacle_dict[dim_index]) != obstacle_dict[dim_index]:
+                        raise LatticeException(
+                            f"Obstacle {c + 1} {dim_index}-dimension bounds are not increasing."
+                        )
+
+                    if (
+                        obstacle_dict[dim_index][0] < 0
+                        or obstacle_dict[dim_index][-1] > lattice_dict["dim"][dim_index]
+                    ):
+                        raise LatticeException(
+                            f"Obstacle {c + 1} is out of bounds in the {dim_index}-dimension."
+                        )
+
+                parsed_obstacles[obstacle_dict["boundary"]].append(  # type: ignore
+                    Block(
+                        [
+                            (
+                                obstacle_dict[dimension_letter(numeric_dim_index)][0],
+                                obstacle_dict[dimension_letter(numeric_dim_index)][1],
+                            )
+                            for numeric_dim_index in range(num_dimensions)
+                        ],
+                        [
+                            (grid_list[numeric_dim_index]).bit_length()
+                            for numeric_dim_index in range(num_dimensions)
+                        ],
+                        obstacle_dict["boundary"],  # type: ignore
+                    )
+                )
+            elif obstacle_dict["shape"] == "sphere":
+                if "center" not in obstacle_dict:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: sphere obstacle does not specify a center."
+                    )
+                if "radius" not in obstacle_dict:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: sphere obstacle does not specify a radius."
+                    )
+                if len(obstacle_dict["center"]) != num_dimensions:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: center is {len(obstacle_dict['center'])}-dimensional whereas the lattice is {num_dimensions}-dimensional."
+                    )
+                if int(obstacle_dict["radius"]) <= 0:  # type: ignore
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: radius {obstacle_dict['radius']} is not a natural number."
+                    )
+                parsed_obstacles[obstacle_dict["boundary"]].append(  # type: ignore
+                    Circle(
+                        tuple(int(coord) for coord in obstacle_dict["center"]),
+                        int(obstacle_dict["radius"]),  # type: ignore
+                        [
+                            (grid_list[numeric_dim_index]).bit_length()
+                            for numeric_dim_index in range(num_dimensions)
+                        ],
+                        obstacle_dict["boundary"],  # type: ignore
+                    )
+                )
 
         return grid_list, velocity_list, parsed_obstacles
 
