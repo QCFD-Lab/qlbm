@@ -87,26 +87,27 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
                     circuit.x(grid_qubit_indices_to_invert)
 
                 # Controlled on the gird qubits, swap the velocities affected by reflection
-                circuit.compose(
-                    MCSwap(
-                        self.lattice,
-                        self.lattice.grid_index(),
-                        cast(
-                            Tuple[int, int],
-                            tuple(
-                                [
-                                    self.lattice.velocity_index(
-                                        neighbor_velocity_pair[0],
-                                        neighbor_velocity_pair[1],
-                                    )[0]
-                                    for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs
-                                ]
+                for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs:
+                    circuit.compose(
+                        MCSwap(
+                            self.lattice,
+                            self.lattice.grid_index(),
+                            cast(
+                                Tuple[int, int],
+                                tuple(
+                                    [
+                                        self.lattice.velocity_index(
+                                            nvp[0],
+                                            nvp[1],
+                                        )[0]
+                                        for nvp in neighbor_velocity_pair
+                                    ]
+                                ),
                             ),
-                        ),
-                        self.logger,
-                    ).circuit,
-                    inplace=True,
-                )
+                            self.logger,
+                        ).circuit,
+                        inplace=True,
+                    )
 
                 if grid_qubit_indices_to_invert:
                     circuit.x(grid_qubit_indices_to_invert)
@@ -140,26 +141,27 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
                     circuit.x(grid_qubit_indices_to_invert)
 
                 # Controlled on the gird qubits, swap the velocities affected by reflection
-                circuit.compose(
-                    MCSwap(
-                        self.lattice,
-                        self.lattice.grid_index(),
-                        cast(
-                            Tuple[int, int],
-                            tuple(
-                                [
-                                    self.lattice.velocity_index(
-                                        neighbor_velocity_pair[0],
-                                        neighbor_velocity_pair[1],
-                                    )[0]
-                                    for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs
-                                ]
+                for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs:
+                    circuit.compose(
+                        MCSwap(
+                            self.lattice,
+                            self.lattice.grid_index(),
+                            cast(
+                                Tuple[int, int],
+                                tuple(
+                                    [
+                                        self.lattice.velocity_index(
+                                            nvp[0],
+                                            nvp[1],
+                                        )[0]
+                                        for nvp in neighbor_velocity_pair
+                                    ]
+                                ),
                             ),
-                        ),
-                        self.logger,
-                    ).circuit,
-                    inplace=True,
-                )
+                            self.logger,
+                        ).circuit,
+                        inplace=True,
+                    )
 
                 if grid_qubit_indices_to_invert:
                     circuit.x(grid_qubit_indices_to_invert)
