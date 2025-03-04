@@ -13,7 +13,7 @@ def lattice_2d_16x16_1_obstacle() -> CollisionlessLattice:
                 "velocities": {"x": 4, "y": 4},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 12], "boundary": "specular"},
+                {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
             ],
         }
     )
@@ -28,7 +28,7 @@ def lattice_2d_16x16_1_obstacle_asymmetric() -> CollisionlessLattice:
                 "velocities": {"x": 16, "y": 4},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 12], "boundary": "specular"},
+                {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
             ],
         }
     )
@@ -43,7 +43,12 @@ def lattice_2d_16x16_1_obstacle_bounceback() -> CollisionlessLattice:
                 "velocities": {"x": 4, "y": 4},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 12], "boundary": "bounceback"},
+                {
+                    "shape": "cuboid",
+                    "x": [4, 6],
+                    "y": [3, 12],
+                    "boundary": "bounceback",
+                },
             ],
         }
     )
@@ -58,8 +63,13 @@ def lattice_2d_16x16_2_obstacle_mixed() -> CollisionlessLattice:
                 "velocities": {"x": 4, "y": 4},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 5], "boundary": "specular"},
-                {"x": [4, 6], "y": [7, 12], "boundary": "bounceback"},
+                {"shape": "cuboid", "x": [4, 6], "y": [3, 5], "boundary": "specular"},
+                {
+                    "shape": "cuboid",
+                    "x": [4, 6],
+                    "y": [7, 12],
+                    "boundary": "bounceback",
+                },
             ],
         }
     )
@@ -74,8 +84,20 @@ def lattice_3d_8x8x8_2_obstacle_mixed() -> CollisionlessLattice:
                 "velocities": {"x": 4, "y": 4, "z": 4},
             },
             "geometry": [
-                {"x": [4, 6], "y": [1, 3], "z": [1, 5], "boundary": "specular"},
-                {"x": [4, 6], "y": [5, 7], "z": [1, 5], "boundary": "bounceback"},
+                {
+                    "shape": "cuboid",
+                    "x": [4, 6],
+                    "y": [1, 3],
+                    "z": [1, 5],
+                    "boundary": "specular",
+                },
+                {
+                    "shape": "cuboid",
+                    "x": [4, 6],
+                    "y": [5, 7],
+                    "z": [1, 5],
+                    "boundary": "bounceback",
+                },
             ],
         }
     )
@@ -90,7 +112,13 @@ def lattice_3d_8x8x8_1_obstacle_bounceback() -> CollisionlessLattice:
                 "velocities": {"x": 4, "y": 4, "z": 4},
             },
             "geometry": [
-                {"x": [4, 6], "y": [5, 7], "z": [1, 5], "boundary": "bounceback"},
+                {
+                    "shape": "cuboid",
+                    "x": [4, 6],
+                    "y": [5, 7],
+                    "z": [1, 5],
+                    "boundary": "bounceback",
+                },
             ],
         }
     )
@@ -186,7 +214,13 @@ def test_lattice_exception_mismatched_bad_object_dimensions():
                     "velocities": {"x": 4, "y": 4},
                 },
                 "geometry": [
-                    {"x": [5, 6], "y": [1, 2], "z": [1, 2], "boundary": "specular"},
+                    {
+                        "shape": "cuboid",
+                        "x": [5, 6],
+                        "y": [1, 2],
+                        "z": [1, 2],
+                        "boundary": "specular",
+                    },
                 ],
             }
         )
@@ -205,7 +239,12 @@ def test_lattice_exception_mismatched_bad_object_bound_specification():
                     "velocities": {"x": 4, "y": 4},
                 },
                 "geometry": [
-                    {"x": [5, 6, 7], "y": [1, 2], "boundary": "bounceback"},
+                    {
+                        "shape": "cuboid",
+                        "x": [5, 6, 7],
+                        "y": [1, 2],
+                        "boundary": "bounceback",
+                    },
                 ],
             }
         )
@@ -222,7 +261,12 @@ def test_lattice_exception_mismatched_bad_object_bound_decreasing():
                     "velocities": {"x": 4, "y": 4},
                 },
                 "geometry": [
-                    {"x": [5, 6], "y": [2, 1], "boundary": "specular"},
+                    {
+                        "shape": "cuboid",
+                        "x": [5, 6],
+                        "y": [2, 1],
+                        "boundary": "specular",
+                    },
                 ],
             }
         )
@@ -239,7 +283,12 @@ def test_lattice_exception_mismatched_bad_object_out_of_bounds():
                     "velocities": {"x": 4, "y": 4},
                 },
                 "geometry": [
-                    {"x": [-1, 6], "y": [1, 2], "boundary": "bounceback"},
+                    {
+                        "shape": "cuboid",
+                        "x": [-1, 6],
+                        "y": [1, 2],
+                        "boundary": "bounceback",
+                    },
                 ],
             }
         )
@@ -254,7 +303,12 @@ def test_lattice_exception_mismatched_bad_object_out_of_bounds():
                     "velocities": {"x": 4, "y": 4},
                 },
                 "geometry": [
-                    {"x": [4, 6], "y": [1, 128], "boundary": "specular"},
+                    {
+                        "shape": "cuboid",
+                        "x": [4, 6],
+                        "y": [1, 128],
+                        "boundary": "specular",
+                    },
                 ],
             }
         )
@@ -305,6 +359,48 @@ def test_lattice_exception_no_object_boundary_conditions():
 
     assert "Obstacle 1 specification includes no boundary conditions." == str(
         excinfo.value
+    )
+
+
+def test_lattice_exception_missing_shape():
+    with pytest.raises(LatticeException) as excinfo:
+        CollisionlessLattice(
+            {
+                "lattice": {
+                    "dim": {"x": 64, "y": 64},
+                    "velocities": {"x": 4, "y": 4},
+                },
+                "geometry": [
+                    {"x": [5, 6, 7], "y": [1, 2], "boundary": "bounceback"},
+                ],
+            }
+        )
+
+    assert "Obstacle 1 specification includes no shape." == str(excinfo.value)
+
+
+def test_lattice_exception_unsupported_shape():
+    with pytest.raises(LatticeException) as excinfo:
+        CollisionlessLattice(
+            {
+                "lattice": {
+                    "dim": {"x": 64, "y": 64},
+                    "velocities": {"x": 4, "y": 4},
+                },
+                "geometry": [
+                    {
+                        "shape": "cuboidz",
+                        "x": [5, 6, 7],
+                        "y": [1, 2],
+                        "boundary": "bounceback",
+                    },
+                ],
+            }
+        )
+
+    assert (
+        'Obstacle 1 has unsupported shape "cuboidz". Supported shapes are cuboid and sphere.'
+        == str(excinfo.value)
     )
 
 

@@ -18,7 +18,7 @@ def lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
                 "velocities": {"x": 2, "y": 2},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 12], "boundary": "specular"},
+                {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
             ],
         },
     )
@@ -34,7 +34,7 @@ def lattice_2d_16x16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
                 "velocities": {"x": 2, "y": 2},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 12], "boundary": "specular"},
+                {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
             ],
         },
     )
@@ -76,6 +76,129 @@ def test_lattice_num_velocities(dummy_lattice: SpaceTimeLattice):
             dummy_lattice.properties.get_num_velocity_qubits(num_timesteps)
             == 8 * (num_timesteps * num_timesteps + num_timesteps) + 4
         )
+
+
+def test_lattice_sphere_no_center():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "radius": 5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert "Obstacle 1: sphere obstacle does not specify a center." == str(
+        excinfo.value
+    )
+
+
+def test_lattice_sphere_no_radius():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5, 5],
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert "Obstacle 1: sphere obstacle does not specify a radius." == str(
+        excinfo.value
+    )
+
+
+def test_lattice_sphere_bad_radius():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5, 5],
+                        "radius": -5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert "Obstacle 1: radius -5 is not a natural number." == str(excinfo.value)
+
+
+def test_lattice_sphere_bad_center_1():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5, 5, 5],
+                        "radius": 5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert (
+        "Obstacle 1: center is 3-dimensional whereas the lattice is 2-dimensional."
+        == str(excinfo.value)
+    )
+
+
+def test_lattice_sphere_bad_center_2():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5],
+                        "radius": 5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert (
+        "Obstacle 1: center is 1-dimensional whereas the lattice is 2-dimensional."
+        == str(excinfo.value)
+    )
 
 
 def test_adaptable_qubit_register_indexing_measure_off_volume_off():
