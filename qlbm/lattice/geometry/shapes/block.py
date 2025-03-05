@@ -25,8 +25,9 @@ from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to
 
 class Block(SpaceTimeShape):
     r"""
-    Contains information required for the generation of bounce-back and specular reflection boundary conditions for the :class:`.CQLBM` algorithm.
-
+    Contains information required for the generation of boundary conditions for an axis-parallel cuboid obstacle.
+    
+    Available for the specular reflection and bounce-back for the :class:`.CQLBM` algorithm and bounce-back for the :class:`.STQBM` algorithm.
     A block can be constructed from minimal information, see the Table below.
 
     .. list-table:: Constructor parameters
