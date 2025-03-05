@@ -1,4 +1,3 @@
-import pytest
 from qiskit.circuit.library import MCMT, XGate
 
 from qlbm.components.common.primitives import MCSwap

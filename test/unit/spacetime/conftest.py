@@ -3,7 +3,6 @@ import pytest
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.geometry.shapes.circle import Circle
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
-from qlbm.tools.utils import flatten, get_qubits_to_invert
 
 
 # 1D Lattices
@@ -157,7 +156,7 @@ def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
 
 
 @pytest.fixture
-def lattice_1d_16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
+def lattice_1d_16_1_obstacle_5_timesteps_1_obstacle() -> SpaceTimeLattice:
     return SpaceTimeLattice(
         5,
         {

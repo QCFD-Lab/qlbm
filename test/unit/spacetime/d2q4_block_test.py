@@ -1,6 +1,4 @@
-import pytest
 
-from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.utils import flatten, get_qubits_to_invert
 
 

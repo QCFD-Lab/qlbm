@@ -1,7 +1,4 @@
-import pytest
 
-from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.utils import flatten
 
 

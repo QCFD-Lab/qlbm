@@ -4,8 +4,6 @@ from typing import List, Set, Tuple
 import pytest
 
 from qlbm.lattice.geometry.shapes.circle import Circle
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
-from qlbm.tools.utils import flatten, get_qubits_to_invert
 
 
 def non_intersecting_lists(lists: List[List[Tuple[int, int]]]) -> bool:
