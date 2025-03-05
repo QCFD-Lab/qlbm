@@ -1,7 +1,7 @@
 """Implementation of circle data structure."""
 
 from json import dumps
-from typing import Dict, List, Tuple, override
+from typing import Dict, List, Tuple, cast, override
 
 import numpy as np
 from stl import mesh
@@ -205,7 +205,7 @@ class Circle(SpaceTimeShape):
     def split_perimeter_points(
         self, points: List[Tuple[int, int]]
     ) -> Tuple[
-        List[List[Tuple[int, int]]], List[Tuple[int, int]], List[Tuple[int, int]]
+        List[List[Tuple[int, int]]], List[List[Tuple[int, int]]], List[Tuple[int, int]]
     ]:
         """
         Splits point on the perimeter of the circle into three categories.
@@ -226,11 +226,11 @@ class Circle(SpaceTimeShape):
 
         Returns
         -------
-        Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[Tuple[int, int]]]
+        Tuple[List[Tuple[int, int]], List[List[Tuple[int, int]]], List[Tuple[int, int]]]
             The points classified by which category they belong to.
         """
         axis_segments = []
-        diagonal_segments = []
+        diagonal_segments: List[List[Tuple[int, int]]] = []
         row_groups: Dict[int, List[int]] = {}
         col_groups: Dict[int, List[int]] = {}
         primary_diag_groups: Dict[int, List[Tuple[int, int]]] = {}  # x - y constant
@@ -286,28 +286,28 @@ class Circle(SpaceTimeShape):
         # Primary diagonal segments (x - y constant)
         for _, diag_points in primary_diag_groups.items():
             diag_points.sort()
-            segment_start = diag_points[0]
+            segment_start = diag_points[0]  # type: ignore
             for i in range(1, len(diag_points)):
                 if (
                     diag_points[i][0] != diag_points[i - 1][0] + 1
                     or diag_points[i][1] != diag_points[i - 1][1] + 1
                 ):
-                    diagonal_segments.append([segment_start, diag_points[i - 1]])
-                    segment_start = diag_points[i]
-            diagonal_segments.append([segment_start, diag_points[-1]])
+                    diagonal_segments.append([segment_start, diag_points[i - 1]]) # type: ignore
+                    segment_start = diag_points[i]  # type: ignore
+            diagonal_segments.append([segment_start, diag_points[-1]]) # type: ignore
 
         # Secondary diagonal segments (x + y constant)
         for _, diag_points in secondary_diag_groups.items():
             diag_points.sort()
-            segment_start = diag_points[0]
+            segment_start = diag_points[0]  # type: ignore
             for i in range(1, len(diag_points)):
                 if (
                     diag_points[i][0] != diag_points[i - 1][0] + 1
                     or diag_points[i][1] != diag_points[i - 1][1] - 1
                 ):
-                    diagonal_segments.append([segment_start, diag_points[i - 1]])
-                    segment_start = diag_points[i]
-            diagonal_segments.append([segment_start, diag_points[-1]])
+                    diagonal_segments.append([segment_start, diag_points[i - 1]]) # type: ignore
+                    segment_start = diag_points[i]  # type: ignore
+            diagonal_segments.append([segment_start, diag_points[-1]]) # type: ignore
 
         # Remove zero-length segments
         axis_segments = [seg for seg in axis_segments if seg[0] != seg[1]]
@@ -402,13 +402,15 @@ class Circle(SpaceTimeShape):
                 )
             )
 
-        for segment in diag_segments:
-            expanded_gridpoints = Circle.expand_diagonal_segments([segment])
+        for diag_segment in diag_segments:
+            expanded_diag_gridpoints: List[Tuple[int, ...]] = (
+                Circle.expand_diagonal_segments([diag_segment])
+            )
             for reflection_dim in [0, 1]:
                 other_dim = 1 - reflection_dim
                 streaming_line_velocities = [0, 2] if reflection_dim == 0 else [1, 3]
                 # If larger than the center, then it is an upper bound
-                bound = segment[0][other_dim] > self.center[other_dim]
+                bound = diag_segment[0][other_dim] > self.center[other_dim]
 
                 if not bound:
                     streaming_line_velocities = list(
@@ -418,7 +420,7 @@ class Circle(SpaceTimeShape):
                 reflection_list.extend(
                     self.get_spacetime_reflection_data_d2q4_from_points(
                         properties,
-                        expanded_gridpoints,
+                        expanded_diag_gridpoints,
                         streaming_line_velocities,
                         self.__symmetric_increment(
                             num_steps, reflection_dim, properties
@@ -459,7 +461,7 @@ class Circle(SpaceTimeShape):
     @staticmethod
     def expand_axis_segments(
         axis_segments: List[List[Tuple[int, int]]],
-    ) -> List[Tuple[int, int]]:
+    ) -> List[Tuple[int, ...]]:
         """
         Expands axis-aligned segments encoded as the two extremes of the segment into lists of all points contained within each segment.
 
@@ -483,7 +485,10 @@ class Circle(SpaceTimeShape):
                 x_values = list(range(min(x1, x2), max(x1, x2) + 1))
                 y_values = [y1] * len(x_values)
             points_in_segments.extend(
-                [(x_values[i], y_values[i]) for i in range(len(x_values))]
+                [
+                    cast(Tuple[int, ...], (x_values[i], y_values[i]))
+                    for i in range(len(x_values))
+                ]
             )
 
         return points_in_segments
@@ -491,7 +496,7 @@ class Circle(SpaceTimeShape):
     @staticmethod
     def expand_diagonal_segments(
         diagonal_segments: List[List[Tuple[int, int]]],
-    ) -> List[Tuple[int, int]]:
+    ) -> List[Tuple[int, ...]]:
         """
         Expands diagonal segments encoded as the two extremes of the segment into lists of all points contained within each segment.
 
@@ -502,7 +507,7 @@ class Circle(SpaceTimeShape):
 
         Returns
         -------
-        List[Tuple[int, int]]
+        List[Tuple[int, ...]]
             All points within each segment.
         """
         points_in_segments = []
@@ -517,6 +522,9 @@ class Circle(SpaceTimeShape):
                 y_values.append(offset_multiplier * step[1] + y1)
 
             points_in_segments.extend(
-                [(x_values[i], y_values[i]) for i in range(len(x_values))]
+                [
+                    cast(Tuple[int, ...], (x_values[i], y_values[i]))
+                    for i in range(len(x_values))
+                ]
             )
         return points_in_segments
