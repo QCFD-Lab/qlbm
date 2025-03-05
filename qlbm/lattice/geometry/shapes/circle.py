@@ -1,30 +1,56 @@
-"""Implementation of cuboid data structure."""
+"""Implementation of circle data structure."""
 
-from functools import cmp_to_key
-from itertools import product
 from json import dumps
-from typing import Dict, List, Tuple, cast, override
+from typing import Dict, List, Tuple, override
 
 import numpy as np
 from stl import mesh
 
-from qlbm.lattice.geometry.encodings.collisionless import (
-    DimensionalReflectionData,
-    ReflectionPoint,
-    ReflectionResetEdge,
-    ReflectionWall,
-)
 from qlbm.lattice.geometry.encodings.spacetime import (
     SpaceTimePWReflectionData,
-    SpaceTimeVolumetricReflectionData,
 )
 from qlbm.lattice.geometry.shapes.base import SpaceTimeShape
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to_invert
+from qlbm.tools.utils import flatten
 
 
 class Circle(SpaceTimeShape):
+    """
+    Contains information required for the generation of bounce-back boundary conditions for the :class:`.STQBM` algorithm.
+
+    A circle can be constructed from minimal information, see the Table below.
+
+    .. list-table:: Constructor parameters
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Parameter
+          - Description
+        * - :attr:`center`
+          - A ``Tuple[int, ...]`` specifying the center of the circle. For example, ``(2, 5)``.
+        * - :attr:`radius`
+          - An ``int`` specifying the radius of the circle. For example, ``3``.
+        * - :attr:`num_grid_qubits`
+          - The number of grid qubits of the underlying lattice.
+        * - :attr:`boundary_condition`
+          - A ``string`` indicating the type of boundary condition of the block. At the moment, only ``"bounceback"`` is supported.
+        * - :attr:`num_mesh_segments`
+          - An ``int`` that describes how fine the ``stl`` of the object is.
+
+    The :class:`.Circle` constructor will parse this information and automatically infer all of the information
+    required to perform all of the reflection edge cases. Class attributes are described in the table below.
+
+        .. list-table:: Class attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`perimeter_points`
+          - The ``List[Tuple[int, int]]`` of all gridpoints that lie on the perimeter of the circle, and are therefore relevant for boundary conditions.
+    """
+
     def __init__(
         self,
         center: Tuple[int, ...],
@@ -40,10 +66,17 @@ class Circle(SpaceTimeShape):
         self.perimeter_points = self.get_circle_perimeter()
 
     def get_circle_perimeter(self) -> List[Tuple[int, int]]:
+        """
+        Uses Bresenham's circle drawing algorithm to specify all points along the perimeter of the circle.
+
+        Returns
+        -------
+        List[Tuple[int, int]]
+            All gridpoints that lie on the perimeter of the circle
+        """
         points = set()
         x, y = self.radius, 0
 
-        # Using Bresenham's circle algorithm
         d = 1 - self.radius
         while x >= y:
             points.update(
@@ -126,6 +159,21 @@ class Circle(SpaceTimeShape):
     def is_point_on_segment(
         self, gridpoint: Tuple[int, int], segment: List[Tuple[int, int]]
     ) -> bool:
+        """
+        Whether the point belongs to a given axis-aligned segment.
+
+        Parameters
+        ----------
+        gridpoint : Tuple[int, int]
+            The gridpoint to test for.
+        segment : List[Tuple[int, int]]
+            The segment to test for.
+
+        Returns
+        -------
+        bool
+            Whether the point belongs to a given axis-aligned segment.
+        """
         return min(segment[0][0], segment[1][0]) <= gridpoint[0] <= max(
             segment[0][0], segment[1][0]
         ) and min(segment[0][1], segment[1][1]) <= gridpoint[1] <= max(
@@ -137,9 +185,50 @@ class Circle(SpaceTimeShape):
         gridpoint: Tuple[int, int],
         segments: List[List[Tuple[int, int]]],
     ) -> bool:
+        """
+        Whether the point belongs to any axis-aligned segment in a given list.
+
+        Parameters
+        ----------
+        gridpoint : Tuple[int, int]
+            The gridpoint to test for.
+        segments : List[List[Tuple[int, int]]]
+            The segments to test for.
+
+        Returns
+        -------
+        bool
+            Whether the point lays on any of the given segments.
+        """
         return any(self.is_point_on_segment(gridpoint, s) for s in segments)
 
-    def split_perimeter_points(self, points: List[Tuple[int, int]]):
+    def split_perimeter_points(
+        self, points: List[Tuple[int, int]]
+    ) -> Tuple[
+        List[List[Tuple[int, int]]], List[Tuple[int, int]], List[Tuple[int, int]]
+    ]:
+        """
+        Splits point on the perimeter of the circle into three categories.
+
+        Points belong to either
+        (1) axis-aligned segments
+        (2) diagonal segments, or
+        (3) individual points.
+
+        Axis-aligned and diagonal segments are encoded as the two ends of the segment.
+        Individual points are simply listed by their coordinates.
+        The results are returned in the order listed previously.
+
+        Parameters
+        ----------
+        points : List[Tuple[int, int]]
+            The gridpoints on the perimeter of the circle.
+
+        Returns
+        -------
+        Tuple[List[Tuple[int, int]], List[Tuple[int, int]], List[Tuple[int, int]]]
+            The points classified by which category they belong to.
+        """
         axis_segments = []
         diagonal_segments = []
         row_groups: Dict[int, List[int]] = {}
@@ -368,7 +457,22 @@ class Circle(SpaceTimeShape):
         raise NotImplementedError
 
     @staticmethod
-    def expand_axis_segments(axis_segments):
+    def expand_axis_segments(
+        axis_segments: List[List[Tuple[int, int]]],
+    ) -> List[Tuple[int, int]]:
+        """
+        Expands axis-aligned segments encoded as the two extremes of the segment into lists of all points contained within each segment.
+
+        Parameters
+        ----------
+        axis_segments : List[List[Tuple[int, int]]]
+            The segments to expand.
+
+        Returns
+        -------
+        List[Tuple[int, int]]
+            All points within each segment.
+        """
         points_in_segments = []
         for segment in axis_segments:
             (x1, y1), (x2, y2) = segment
@@ -385,7 +489,22 @@ class Circle(SpaceTimeShape):
         return points_in_segments
 
     @staticmethod
-    def expand_diagonal_segments(diagonal_segments):
+    def expand_diagonal_segments(
+        diagonal_segments: List[List[Tuple[int, int]]],
+    ) -> List[Tuple[int, int]]:
+        """
+        Expands diagonal segments encoded as the two extremes of the segment into lists of all points contained within each segment.
+
+        Parameters
+        ----------
+        diagonal_segments : List[List[Tuple[int, int]]]
+            The diagonal segments to expand
+
+        Returns
+        -------
+        List[Tuple[int, int]]
+            All points within each segment.
+        """
         points_in_segments = []
         for segment in diagonal_segments:
             (x1, y1), (x2, y2) = segment
@@ -401,6 +520,3 @@ class Circle(SpaceTimeShape):
                 [(x_values[i], y_values[i]) for i in range(len(x_values))]
             )
         return points_in_segments
-
-    # @staticmethod
-    # def expand

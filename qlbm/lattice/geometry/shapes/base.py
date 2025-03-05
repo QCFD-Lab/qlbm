@@ -11,7 +11,6 @@ from qlbm.lattice.geometry.encodings.spacetime import (
 )
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.utils import flatten, get_qubits_to_invert
-from collections.abc import Callable
 
 
 class Shape(ABC):
@@ -80,6 +79,27 @@ class SpaceTimeShape(Shape):
         symmetric_non_reflection_dimension_increment: List[Tuple[int, Tuple[int, ...]]],
         num_steps: int,
     ) -> List[SpaceTimePWReflectionData]:
+        """
+        Traverses the stencil of a collection of grid points and computes the corresponding :class:`.SpaceTimePWReflectionData`.
+
+        Parameters
+        ----------
+        properties : SpaceTimeLatticeBuilder
+            The lattice discretizationproperties.
+        gridpoints : List[Tuple[int, ...]]
+            The gridpoints to compute the reflection data for.
+        streaming_line_velocities : List[int]
+            The streaming lines to traverse.
+        symmetric_non_reflection_dimension_increment : List[Tuple[int, Tuple[int, ...]]]
+            A list of increments in the non-traversing direction(s) that when applied iteratively cover the stencil.
+        num_steps : int
+            The number of steps to compute the reflection data for.
+
+        Returns
+        -------
+        List[SpaceTimePWReflectionData]
+            The reflection data for each position in the stencil and each lattice gridpoint.
+        """
         reflection_list: List[SpaceTimePWReflectionData] = []
         # Each surface is made up of several gridpoints
         for gridpoint in gridpoints:
