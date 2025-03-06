@@ -5,6 +5,7 @@ from .encodings import (
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
+    SpaceTimeDiagonalReflectionData,
     SpaceTimePWReflectionData,
     SpaceTimeVolumetricReflectionData,
 )
@@ -15,6 +16,7 @@ __all__ = [
     "ReflectionPoint",
     "ReflectionWall",
     "ReflectionResetEdge",
+    "SpaceTimeDiagonalReflectionData",
     "SpaceTimePWReflectionData",
     "SpaceTimeVolumetricReflectionData",
     "Block",
