@@ -26,7 +26,7 @@ from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to
 class Block(SpaceTimeShape):
     r"""
     Contains information required for the generation of boundary conditions for an axis-parallel cuboid obstacle.
-    
+
     Available for the specular reflection and bounce-back for the :class:`.CQLBM` algorithm and bounce-back for the :class:`.STQBM` algorithm.
     A block can be constructed from minimal information, see the Table below.
 
@@ -734,5 +734,6 @@ class Block(SpaceTimeShape):
             for numeric_dim_index in range(self.num_dims)
         }
         block_dict["boundary"] = self.boundary_condition
+        block_dict["shape"] = "cuboid"
 
         return block_dict

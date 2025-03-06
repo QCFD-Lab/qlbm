@@ -31,12 +31,12 @@ class Shape(ABC):
     @abstractmethod
     def stl_mesh(self) -> mesh.Mesh:
         """
-        Provides the ``stl`` representation of the block.
+        Provides the ``stl`` representation of the shape.
 
         Returns
         -------
         ``stl.mesh.Mesh``
-            The mesh representing the block.
+            The mesh representing the shape.
         """
         pass
 
@@ -48,19 +48,19 @@ class Shape(ABC):
         Returns
         -------
         str
-            The JSON representation of the block.
+            The JSON representation of the shape.
         """
         pass
 
     @abstractmethod
     def to_dict(self):
         """
-        Produces a dictionary representation of the block.
+        Produces a dictionary representation of the shape.
 
         Returns
         -------
         Dict[str, List[int] | str]
-            A dictionary representation of the bounds and boundary conditions of the block.
+            A dictionary representation of the bounds and boundary conditions of the shape.
         """
         pass
 

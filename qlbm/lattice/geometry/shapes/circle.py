@@ -41,7 +41,7 @@ class Circle(SpaceTimeShape):
     The :class:`.Circle` constructor will parse this information and automatically infer all of the information
     required to perform all of the reflection edge cases. Class attributes are described in the table below.
 
-        .. list-table:: Class attributes
+    .. list-table:: Class attributes
         :widths: 25 50
         :header-rows: 1
 
@@ -49,6 +49,7 @@ class Circle(SpaceTimeShape):
           - Description
         * - :attr:`perimeter_points`
           - The ``List[Tuple[int, int]]`` of all gridpoints that lie on the perimeter of the circle, and are therefore relevant for boundary conditions.
+
     """
 
     def __init__(
@@ -292,9 +293,9 @@ class Circle(SpaceTimeShape):
                     diag_points[i][0] != diag_points[i - 1][0] + 1
                     or diag_points[i][1] != diag_points[i - 1][1] + 1
                 ):
-                    diagonal_segments.append([segment_start, diag_points[i - 1]]) # type: ignore
+                    diagonal_segments.append([segment_start, diag_points[i - 1]])  # type: ignore
                     segment_start = diag_points[i]  # type: ignore
-            diagonal_segments.append([segment_start, diag_points[-1]]) # type: ignore
+            diagonal_segments.append([segment_start, diag_points[-1]])  # type: ignore
 
         # Secondary diagonal segments (x + y constant)
         for _, diag_points in secondary_diag_groups.items():
@@ -305,9 +306,9 @@ class Circle(SpaceTimeShape):
                     diag_points[i][0] != diag_points[i - 1][0] + 1
                     or diag_points[i][1] != diag_points[i - 1][1] - 1
                 ):
-                    diagonal_segments.append([segment_start, diag_points[i - 1]]) # type: ignore
+                    diagonal_segments.append([segment_start, diag_points[i - 1]])  # type: ignore
                     segment_start = diag_points[i]  # type: ignore
-            diagonal_segments.append([segment_start, diag_points[-1]]) # type: ignore
+            diagonal_segments.append([segment_start, diag_points[-1]])  # type: ignore
 
         # Remove zero-length segments
         axis_segments = [seg for seg in axis_segments if seg[0] != seg[1]]
@@ -329,6 +330,7 @@ class Circle(SpaceTimeShape):
     @override
     def to_dict(self):
         return {
+            "shape": "circle",
             "center": list(self.center),
             "radius": self.radius,
             "boundary": self.boundary_condition,

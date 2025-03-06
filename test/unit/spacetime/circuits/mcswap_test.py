@@ -12,6 +12,7 @@ def test_mcswap_13ctrl():
                 "dim": {"x": 16, "y": 16},
                 "velocities": {"x": 2, "y": 2},
             },
+            "geometry": [],
         },
     )
 
@@ -37,6 +38,7 @@ def test_mcswap_grid_ctrl():
                 "dim": {"x": 16, "y": 16},
                 "velocities": {"x": 2, "y": 2},
             },
+            "geometry": [],
         },
     )
 

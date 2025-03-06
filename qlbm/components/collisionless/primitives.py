@@ -40,19 +40,20 @@ class GridMeasurement(LBMPrimitive):
         lattice = CollisionlessLattice({
             "lattice": {
                 "dim": {
-                "x": 8,
-                "y": 8
-                },
-                "velocities": {
-                "x": 4,
-                "y": 4
+                        "x": 8,
+                        "y": 8
+                    },
+                    "velocities": {
+                        "x": 4,
+                        "y": 4
                 }
             },
             "geometry": [
-                {
-                "x": [5, 6],
-                "y": [1, 2],
-                "boundary": "specular"
+                {   
+                    "shape": "cuboid",
+                    "x": [5, 6],
+                    "y": [1, 2],
+                    "boundary": "specular"
                 }
             ]
         })
@@ -122,19 +123,20 @@ class CollisionlessInitialConditions(LBMPrimitive):
         lattice = CollisionlessLattice({
             "lattice": {
                 "dim": {
-                "x": 8,
-                "y": 8
-                },
-                "velocities": {
-                "x": 4,
-                "y": 4
+                        "x": 8,
+                        "y": 8
+                    },
+                    "velocities": {
+                        "x": 4,
+                        "y": 4
                 }
             },
             "geometry": [
                 {
-                "x": [5, 6],
-                "y": [1, 2],
-                "boundary": "specular"
+                    "shape": "cuboid",
+                    "x": [5, 6],
+                    "y": [1, 2],
+                    "boundary": "specular"
                 }
             ]
         })
@@ -481,7 +483,7 @@ class EdgeComparator(LBMPrimitive):
                     "dim": {"x": 8, "y": 8, "z": 8},
                     "velocities": {"x": 4, "y": 4, "z": 4},
                 },
-                "geometry": [{"x": [2, 5], "y": [2, 5], "z": [2, 5], "boundary": "specular"}],
+                "geometry": [{"shape":"cuboid", "x": [2, 5], "y": [2, 5], "z": [2, 5], "boundary": "specular"}],
             }
         )
 
