@@ -66,7 +66,7 @@ class Shape(ABC):
 
 
 class SpaceTimeShape(Shape):
-    """Base class for all shapes compatible with the :class:`.STQLBM` algorithm."""
+    """Base class for all shapes compatible with the :class:`.SpaceTimeQLBM` algorithm."""
 
     def __init__(self, num_grid_qubits: List[int], boundary_condition: str):
         super().__init__(num_grid_qubits, boundary_condition)
@@ -195,7 +195,7 @@ class SpaceTimeShape(Shape):
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
     ) -> List[SpaceTimePWReflectionData]:
-        """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.STQLBM` lattice.
+        """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.SpaceTimeQLBM` lattice.
 
         Parameters
         ----------
@@ -218,7 +218,7 @@ class SpaceTimeShape(Shape):
         num_steps: int | None = None,
     ) -> List[SpaceTimePWReflectionData]:
         """
-        Calculate space-time reflection data for :math:`D_2Q_4` :class:`.STQLBM` lattice.
+        Calculate space-time reflection data for :math:`D_2Q_4` :class:`.SpaceTimeQLBM` lattice.
 
         Parameters
         ----------
@@ -240,7 +240,7 @@ class SpaceTimeShape(Shape):
         properties: SpaceTimeLatticeBuilder,
         num_steps: int | None = None,
     ) -> List[SpaceTimeVolumetricReflectionData]:
-        """Calculate volumetric reflection data for :math:`D_2Q_4` :class:`.STQLBM` lattice.
+        """Calculate volumetric reflection data for :math:`D_2Q_4` :class:`.SpaceTimeQLBM` lattice.
 
         Parameters
         ----------

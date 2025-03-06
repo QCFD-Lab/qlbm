@@ -55,17 +55,17 @@ The :class:`.CQLBM` algorithm uses the following data structures:
 #. :class:`.ReflectionWall` models the 2D or 3D information of the wall of the obstacle.
 #. :class:`.ReflectionResetEdge` models the 3D information of an edge along the walls of an obstacle.
 
-The :class:`.STQLBM` algorithm on makes use of the following:
+The :class:`.SpaceTimeQLBM` algorithm on makes use of the following:
 
 #. :class:`.SpaceTimePWReflectionData` models the reflection data of a single grid point of the lattice.
 #. :class:`.SpaceTimeVolumetricReflectionData` models the reflection data of a contiguous volume in space.
 #. :class:`.SpaceTimeDiagonalReflectionData` of diagonals in 2D.
 
 .. note::
-    :class:`.CQLBM` and :class:`.STQLBM` support different kinds of geometry.
+    :class:`.CQLBM` and :class:`.SpaceTimeQLBM` support different kinds of geometry.
     For :class:`.CQLBM`, geometry objects can only be 2D or 3D cuboids, and they must be placed
     at least two grid points apart for consistent behavior.
-    :class:`.STQLBM` supports 2D rectangles of arbitrary lengths, as well as circles.
+    :class:`.SpaceTimeQLBM` supports 2D rectangles of arbitrary lengths, as well as circles.
 
 .. autoclass:: qlbm.lattice.geometry.Block
     :members:
