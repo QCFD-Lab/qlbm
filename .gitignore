@@ -169,3 +169,5 @@ config.json
 
 test/artifacts
 qlbm-output
+
+*.gif
