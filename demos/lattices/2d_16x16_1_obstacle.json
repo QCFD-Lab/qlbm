@@ -11,6 +11,7 @@
   },
   "geometry": [
     {
+      "shape": "cuboid",
       "x": [10, 12],
       "y": [2, 13],
       "boundary": "specular"

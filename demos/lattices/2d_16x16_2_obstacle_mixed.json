@@ -11,11 +11,13 @@
   },
   "geometry": [
     {
+      "shape": "cuboid",
       "x": [9, 12],
       "y": [3, 6],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [9, 12],
       "y": [9, 12],
       "boundary": "bounceback"
