@@ -55,6 +55,8 @@ dev = [
     "ipykernel",
     "sphinx==8.0.2",
     "pydata-sphinx-theme",
+    "pyvista[jupyter]",
+    "imageio",
 ]
 cpu = ["qulacs>=0.6.3", "qiskit-aer>=0.16"]
 gpu = ["qulacs-gpu>=0.3", "qiskit-aer-gpu>=0.13"]
