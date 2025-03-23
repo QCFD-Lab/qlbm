@@ -257,7 +257,7 @@ class SpaceTimeShape(Shape):
         pass
 
     @abstractmethod
-    def name() -> str:
+    def name(self) -> str:
         """
         The name of the shape.
 
