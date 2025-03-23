@@ -64,8 +64,8 @@ class QBMResult(ABC):
         Output files are formatted as ``output_dir/paraview_dir/cube_<x>.stl``.
         The output is created through the :class:`.Block`'s :meth:`.Block.stl_mesh` method.
         """
-        for c, block in enumerate(flatten(self.lattice.blocks.values())):
-            block.stl_mesh().save(f"{self.paraview_dir}/cube_{c}.stl")
+        for c, shape in enumerate(flatten(self.lattice.blocks.values())):
+            shape.stl_mesh().save(f"{self.paraview_dir}/{shape.name()}_{c}.stl")
 
     def save_timestep_array(
         self,

@@ -255,3 +255,15 @@ class SpaceTimeShape(Shape):
             The information encoding the reflections to be performed.
         """
         pass
+
+    @abstractmethod
+    def name() -> str:
+        """
+        The name of the shape.
+
+        Returns
+        -------
+        str
+            The name of the shape.
+        """
+        pass

@@ -728,12 +728,16 @@ class Block(SpaceTimeShape):
         return dumps(self.to_dict())
 
     @override
+    def name(self) -> str:
+        return "cuboid"
+
+    @override
     def to_dict(self) -> Dict[str, List[int] | str]:
         block_dict: Dict[str, List[int] | str] = {
             dimension_letter(numeric_dim_index): list(self.bounds[numeric_dim_index])
             for numeric_dim_index in range(self.num_dims)
         }
         block_dict["boundary"] = self.boundary_condition
-        block_dict["shape"] = "cuboid"
+        block_dict["shape"] = self.name()
 
         return block_dict
