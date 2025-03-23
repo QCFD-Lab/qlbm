@@ -126,8 +126,9 @@ class QBMResult(ABC):
             self.lattice.num_gridpoints[2] + 1 if self.lattice.num_dims > 2 else 1,
         )
 
+        formatted_timestep = "{:03d}".format(timestep)
         writer = vtk.vtkXMLImageDataWriter()
-        writer.SetFileName(f"{self.paraview_dir}/step_{timestep}.vti")
+        writer.SetFileName(f"{self.paraview_dir}/step_{formatted_timestep}.vti")
         writer.SetInputData(img)
         writer.Write()
 
