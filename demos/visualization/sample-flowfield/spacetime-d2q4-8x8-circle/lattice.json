@@ -2,7 +2,7 @@
   "lattice": { "dim": { "x": 8, "y": 8 }, "velocities": { "x": 2, "y": 2 } },
   "geometry": [
     {
-      "shape": "circle",
+      "shape": "sphere",
       "center": [3, 3],
       "radius": 2,
       "boundary": "bounceback"
