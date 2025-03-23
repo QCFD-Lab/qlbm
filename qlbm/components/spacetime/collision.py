@@ -134,6 +134,12 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
         """
         circuit = QuantumCircuit(self.lattice.properties.get_num_velocities_per_point())
 
+        # circuit.cx(1, 2)
+        # circuit.cx(0, 1)
+        # circuit.cx(0, 3)
+
+        # return circuit if not reset_state else circuit.inverse()
+
         if not reset_state:
             circuit.cx(control_qubit=0, target_qubit=2)
             circuit.x(0)

@@ -81,17 +81,20 @@ The `demos` directory contains several use cases for simulating and analyzing th
     }
   },
   "geometry": [
-    {
+    { 
+      "shape": "cuboid",
       "x": [18, 20],
       "y": [6, 25],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [23, 25],
       "y": [3, 17],
       "boundary": "bounceback"
     },
     {
+      "shape": "cuboid",
       "x": [28, 29],
       "y": [16, 29],
       "boundary": "specular"

@@ -103,7 +103,30 @@ class Circle(SpaceTimeShape):
 
     @override
     def stl_mesh(self):
-        # Create vertices for top and bottom faces
+        vertices = np.array([(x, y, 0) for x, y in self.perimeter_points])
+        faces = []
+
+        num_points = len(self.perimeter_points)
+        for i in range(num_points):
+            for j in range(i + 1, num_points):
+                for k in range(j + 1, num_points):
+                    faces.append([i, j, k])
+
+        faces = np.array(faces)  # type: ignore
+
+        surface = mesh.Mesh(
+            np.zeros(
+                faces.shape[0],  # type: ignore
+                dtype=mesh.Mesh.dtype,
+            )
+        )
+        for i, f in enumerate(faces):
+            for j in range(3):
+                surface.vectors[i][j] = vertices[f[j]]
+
+        return surface
+
+    def __stl_mesh_smooth(self):
         angles = np.linspace(0, 2 * np.pi, self.num_mesh_segments, endpoint=False)
         top_vertices = np.array(
             [
@@ -126,11 +149,9 @@ class Circle(SpaceTimeShape):
             ]
         )
 
-        # Center points for top and bottom
         top_center = np.array([self.center[0], self.center[1], 0.5])
         bottom_center = np.array([self.center[0], self.center[1], -0.5])
 
-        # Create triangle faces
         faces = []
         for i in range(self.num_mesh_segments):
             next_i = (i + 1) % self.num_mesh_segments
@@ -328,9 +349,13 @@ class Circle(SpaceTimeShape):
         return dumps(self.to_dict())
 
     @override
+    def name(self):
+        return "sphere"
+
+    @override
     def to_dict(self):
         return {
-            "shape": "circle",
+            "shape": self.name(),
             "center": list(self.center),
             "radius": self.radius,
             "boundary": self.boundary_condition,
@@ -408,11 +433,14 @@ class Circle(SpaceTimeShape):
             expanded_diag_gridpoints: List[Tuple[int, ...]] = (
                 Circle.expand_diagonal_segments([diag_segment])
             )
+
+            if (4, 1) in expanded_diag_gridpoints:
+                print("ok!")
             for reflection_dim in [0, 1]:
                 other_dim = 1 - reflection_dim
                 streaming_line_velocities = [0, 2] if reflection_dim == 0 else [1, 3]
                 # If larger than the center, then it is an upper bound
-                bound = diag_segment[0][other_dim] > self.center[other_dim]
+                bound = diag_segment[0][reflection_dim] > self.center[reflection_dim]
 
                 if not bound:
                     streaming_line_velocities = list(
