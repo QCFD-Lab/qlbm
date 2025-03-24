@@ -64,8 +64,8 @@ class QBMResult(ABC):
         Output files are formatted as ``output_dir/paraview_dir/cube_<x>.stl``.
         The output is created through the :class:`.Block`'s :meth:`.Block.stl_mesh` method.
         """
-        for c, block in enumerate(flatten(self.lattice.blocks.values())):
-            block.stl_mesh().save(f"{self.paraview_dir}/cube_{c}.stl")
+        for c, shape in enumerate(flatten(self.lattice.blocks.values())):
+            shape.stl_mesh().save(f"{self.paraview_dir}/{shape.name()}_{c}.stl")
 
     def save_timestep_array(
         self,
@@ -126,8 +126,9 @@ class QBMResult(ABC):
             self.lattice.num_gridpoints[2] + 1 if self.lattice.num_dims > 2 else 1,
         )
 
+        formatted_timestep = "{:03d}".format(timestep)
         writer = vtk.vtkXMLImageDataWriter()
-        writer.SetFileName(f"{self.paraview_dir}/step_{timestep}.vti")
+        writer.SetFileName(f"{self.paraview_dir}/step_{formatted_timestep}.vti")
         writer.SetInputData(img)
         writer.Write()
 

@@ -14,12 +14,14 @@ from qlbm.components.collisionless.primitives import (
     ComparatorMode,
 )
 from qlbm.lattice import (
-    Block,
     CollisionlessLattice,
+)
+from qlbm.lattice.geometry.encodings.collisionless import (
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
 )
+from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
@@ -54,7 +56,7 @@ class SpecularWallComparator(LBMPrimitive):
         lattice = CollisionlessLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
-                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "specular"}],
+                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "specular"}],
             }
         )
 
@@ -160,7 +162,7 @@ class SpecularReflectionOperator(CQLBMOperator):
         lattice = CollisionlessLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
-                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "specular"}],
+                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "specular"}],
             }
         )
 

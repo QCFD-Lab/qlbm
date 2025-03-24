@@ -1,22 +1,22 @@
-"""Reflection operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
+"""Reflection operator for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime` that swaps particles one gridpoint at a time."""
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List
+from typing import List, Tuple, cast
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMT, XGate
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.lattice.blocks import Block
+from qlbm.components.common.primitives import MCSwap
+from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import CircuitException
 
 
-class SpaceTimeReflectionOperator(SpaceTimeOperator):
-    """Operator implementing reflection in the :class:`.SpaceTimeQLBM` algorithm.
+class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
+    """Operator implementing reflection in the :class:`.SpaceTimeQLBM` algorithm, one gridpoint at a time.
 
     Work in progress.
 
@@ -86,23 +86,28 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
                     # Which in turn allows us to control on this row, in combination with the comparator
                     circuit.x(grid_qubit_indices_to_invert)
 
-                control_qubits = self.lattice.grid_index()
-                target_qubits = [
-                    self.lattice.velocity_index(
-                        neighbor_velocity_pair[0],
-                        neighbor_velocity_pair[1],
-                    )[0]
-                    for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs
-                ]
-
-                # Controlled swap decompositions
-                circuit.cx(target_qubits[1], target_qubits[0])
-                circuit.compose(
-                    MCMT(XGate(), len(control_qubits) + 1, len(target_qubits) - 1),
-                    qubits=control_qubits + target_qubits,
-                    inplace=True,
-                )
-                circuit.cx(target_qubits[1], target_qubits[0])
+                # Controlled on the gird qubits, swap the velocities affected by reflection
+                for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs:
+                    circuit.compose(
+                        MCSwap(
+                            self.lattice,
+                            self.lattice.grid_index(),
+                            cast(
+                                Tuple[int, int],
+                                tuple(
+                                    [
+                                        self.lattice.velocity_index(
+                                            nvp[0],
+                                            nvp[1],
+                                        )[0]
+                                        for nvp in neighbor_velocity_pair
+                                    ]
+                                ),
+                            ),
+                            self.logger,
+                        ).circuit,
+                        inplace=True,
+                    )
 
                 if grid_qubit_indices_to_invert:
                     circuit.x(grid_qubit_indices_to_invert)
@@ -135,23 +140,28 @@ class SpaceTimeReflectionOperator(SpaceTimeOperator):
                     # Which in turn allows us to control on this row, in combination with the comparator
                     circuit.x(grid_qubit_indices_to_invert)
 
-                control_qubits = self.lattice.grid_index()
-                target_qubits = [
-                    self.lattice.velocity_index(
-                        neighbor_velocity_pair[0],
-                        neighbor_velocity_pair[1],
-                    )[0]
-                    for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs
-                ]
-
-                # Controlled swap decompositions
-                circuit.cx(target_qubits[1], target_qubits[0])
-                circuit.compose(
-                    MCMT(XGate(), len(control_qubits) + 1, len(target_qubits) - 1),
-                    qubits=control_qubits + target_qubits,
-                    inplace=True,
-                )
-                circuit.cx(target_qubits[1], target_qubits[0])
+                # Controlled on the gird qubits, swap the velocities affected by reflection
+                for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs:
+                    circuit.compose(
+                        MCSwap(
+                            self.lattice,
+                            self.lattice.grid_index(),
+                            cast(
+                                Tuple[int, int],
+                                tuple(
+                                    [
+                                        self.lattice.velocity_index(
+                                            nvp[0],
+                                            nvp[1],
+                                        )[0]
+                                        for nvp in neighbor_velocity_pair
+                                    ]
+                                ),
+                            ),
+                            self.logger,
+                        ).circuit,
+                        inplace=True,
+                    )
 
                 if grid_qubit_indices_to_invert:
                     circuit.x(grid_qubit_indices_to_invert)

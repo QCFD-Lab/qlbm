@@ -11,36 +11,43 @@
   },
   "geometry": [
     {
+      "shape": "cuboid",
       "x": [18, 19],
       "y": [7, 14],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [18, 19],
       "y": [19, 26],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [26, 27],
       "y": [19, 26],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [26, 27],
       "y": [7, 14],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [20, 25],
       "y": [4, 5],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [20, 25],
       "y": [16, 17],
       "boundary": "specular"
     },
     {
+      "shape": "cuboid",
       "x": [20, 25],
       "y": [28, 29],
       "boundary": "specular"

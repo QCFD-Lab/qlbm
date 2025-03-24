@@ -29,7 +29,7 @@ dependencies = [
     "pytket>=1.29.2",
     "pytket-qiskit",
     "pytket-qulacs>=0.33",
-    "qiskit>=1.3",
+    "qiskit>=1.2, <1.3",
     "qiskit_qasm3_import>=0.4.2",
     "qiskit-qulacs>=0.1.0",
     "tqdm>=4.66",
@@ -55,6 +55,8 @@ dev = [
     "ipykernel",
     "sphinx==8.0.2",
     "pydata-sphinx-theme",
+    "pyvista[jupyter]",
+    "imageio",
 ]
 cpu = ["qulacs>=0.6.3", "qiskit-aer>=0.16"]
 gpu = ["qulacs-gpu>=0.3", "qiskit-aer-gpu>=0.13"]

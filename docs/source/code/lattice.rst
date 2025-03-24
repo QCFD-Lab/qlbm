@@ -36,35 +36,53 @@ Geometry
 ----------------------------------
 
 Processing obstacle geometry into quantum circuits is a tedious and error-prone task when performed manually.
-To alleviate this challenge, ``qlbm`` provides a :class:`.Block` class that
-parses the geometry information supplied as part of the :class:`.Lattice` specification
+To alleviate this challenge, ``qlbm`` provides :class:`.Block` and :class:`.Circle` classes that
+parse the geometry information supplied as part of the :class:`.Lattice` specification
 into information that parameterized the construction of quantum circuits.
 This includes the position of the obstacle within the grid and its boundary conditions.
-In addition, :class:`Block`\ s contain triangulation methods that
+In addition, these shapes contain triangulation methods that
 allow them to be exported as ``stl`` files and visualized in Paraview.
 
-Each block contains snippets of information that determine how
+Each shape contains snippets of information that determine how
 individual components of reflection behave.
 To make the generation of this circuits more manageable, we
-segment the block information into different categories of edge cases:
+segment the block information into different categories of edge cases, which are also broken down by algorithm.
+
+The :class:`.CQLBM` algorithm uses the following data structures:
 
 #. :class:`.DimensionalReflectionData` models the isolated, one-dimensional features of a fixed point on the grid.
 #. :class:`.ReflectionPoint` models the 2D or 3D information of a fixed point in space.
 #. :class:`.ReflectionWall` models the 2D or 3D information of the wall of the obstacle.
 #. :class:`.ReflectionResetEdge` models the 3D information of an edge along the walls of an obstacle.
 
-.. note::
-    At the moment, only the :class:`.CQLBM` algorithm supports geometry.
-    Geometry objects can only be 2D or 3D cuboids, and they must be placed
-    at least two grid points apart for consistent behavior.
+The :class:`.SpaceTimeQLBM` algorithm on makes use of the following:
 
-.. autoclass:: qlbm.lattice.blocks.Block
+#. :class:`.SpaceTimePWReflectionData` models the reflection data of a single grid point of the lattice.
+#. :class:`.SpaceTimeVolumetricReflectionData` models the reflection data of a contiguous volume in space.
+#. :class:`.SpaceTimeDiagonalReflectionData` of diagonals in 2D.
+
+.. note::
+    :class:`.CQLBM` and :class:`.SpaceTimeQLBM` support different kinds of geometry.
+    For :class:`.CQLBM`, geometry objects can only be 2D or 3D cuboids, and they must be placed
+    at least two grid points apart for consistent behavior.
+    :class:`.SpaceTimeQLBM` supports 2D rectangles of arbitrary lengths, as well as circles.
+
+.. autoclass:: qlbm.lattice.geometry.Block
     :members:
 
-.. autoclass:: qlbm.lattice.blocks.DimensionalReflectionData
+.. autoclass:: qlbm.lattice.geometry.Circle
+    :members:
 
-.. autoclass:: qlbm.lattice.blocks.ReflectionPoint
+.. autoclass:: qlbm.lattice.geometry.DimensionalReflectionData
 
-.. autoclass:: qlbm.lattice.blocks.ReflectionWall
+.. autoclass:: qlbm.lattice.geometry.ReflectionPoint
 
-.. autoclass:: qlbm.lattice.blocks.ReflectionResetEdge
+.. autoclass:: qlbm.lattice.geometry.ReflectionWall
+
+.. autoclass:: qlbm.lattice.geometry.ReflectionResetEdge
+
+.. autoclass:: qlbm.lattice.geometry.SpaceTimePWReflectionData
+
+.. autoclass:: qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData
+
+.. autoclass:: qlbm.lattice.geometry.SpaceTimeDiagonalReflectionData

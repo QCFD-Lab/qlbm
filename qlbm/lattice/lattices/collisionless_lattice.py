@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 from qiskit import QuantumCircuit, QuantumRegister
 from typing_extensions import override
 
-from qlbm.lattice.blocks import Block
+from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten
 
@@ -66,11 +66,11 @@ class CollisionlessLattice(Lattice):
           - :meth:`ancillae_comparator_index`
           - The qubits used to for :class:`.Comparator`\ s. Used for reflection.
         * - :attr:`grid_registers`
-          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \\right \\rceil`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \right \rceil`
           - :meth:`grid_index`
           - The qubits encoding the physical grid.
         * - :attr:`velocity_registers`
-          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \\right \\rceil - 1`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \right \rceil - 1`
           - :meth:`velocity_index`
           - The qubits encoding speeds.
         * - :attr:`velocity_dir_registers`
@@ -137,7 +137,7 @@ class CollisionlessLattice(Lattice):
         CollisionlessLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
-                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
+                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
             }
         ).circuit.draw("mpl")
     """

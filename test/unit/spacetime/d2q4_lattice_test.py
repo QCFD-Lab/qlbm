@@ -9,19 +9,6 @@ from qlbm.tools.exceptions import LatticeException
 
 
 @pytest.fixture
-def dummy_lattice() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        0,
-        {
-            "lattice": {
-                "dim": {"x": 256, "y": 256},
-                "velocities": {"x": 2, "y": 2},
-            },
-        },
-    )
-
-
-@pytest.fixture
 def lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
     return SpaceTimeLattice(
         1,
@@ -31,7 +18,7 @@ def lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
                 "velocities": {"x": 2, "y": 2},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 12], "boundary": "specular"},
+                {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
             ],
         },
     )
@@ -47,21 +34,8 @@ def lattice_2d_16x16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
                 "velocities": {"x": 2, "y": 2},
             },
             "geometry": [
-                {"x": [4, 6], "y": [3, 12], "boundary": "specular"},
+                {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
             ],
-        },
-    )
-
-
-@pytest.fixture
-def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
-    return SpaceTimeLattice(
-        5,
-        {
-            "lattice": {
-                "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
-            },
         },
     )
 
@@ -102,6 +76,129 @@ def test_lattice_num_velocities(dummy_lattice: SpaceTimeLattice):
             dummy_lattice.properties.get_num_velocity_qubits(num_timesteps)
             == 8 * (num_timesteps * num_timesteps + num_timesteps) + 4
         )
+
+
+def test_lattice_sphere_no_center():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "radius": 5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert "Obstacle 1: sphere obstacle does not specify a center." == str(
+        excinfo.value
+    )
+
+
+def test_lattice_sphere_no_radius():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5, 5],
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert "Obstacle 1: sphere obstacle does not specify a radius." == str(
+        excinfo.value
+    )
+
+
+def test_lattice_sphere_bad_radius():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5, 5],
+                        "radius": -5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert "Obstacle 1: radius -5 is not a natural number." == str(excinfo.value)
+
+
+def test_lattice_sphere_bad_center_1():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5, 5, 5],
+                        "radius": 5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert (
+        "Obstacle 1: center is 3-dimensional whereas the lattice is 2-dimensional."
+        == str(excinfo.value)
+    )
+
+
+def test_lattice_sphere_bad_center_2():
+    with pytest.raises(LatticeException) as excinfo:
+        SpaceTimeLattice(
+            1,
+            {
+                "lattice": {
+                    "dim": {"x": 16, "y": 16},
+                    "velocities": {"x": 2, "y": 2},
+                },
+                "geometry": [
+                    {
+                        "shape": "sphere",
+                        "center": [5],
+                        "radius": 5,
+                        "boundary": "bounceback",
+                    },
+                ],
+            },
+        )
+
+    assert (
+        "Obstacle 1: center is 1-dimensional whereas the lattice is 2-dimensional."
+        == str(excinfo.value)
+    )
 
 
 def test_adaptable_qubit_register_indexing_measure_off_volume_off():
@@ -1048,7 +1145,16 @@ def test_bad_lattice_specification_velocities_3d():
     )
 
 
-def test_2d_lattice_grid_register(dummy_lattice):
+def test_2d_lattice_grid_register():
+    dummy_lattice = SpaceTimeLattice(
+        0,
+        {
+            "lattice": {
+                "dim": {"x": 256, "y": 256},
+                "velocities": {"x": 2, "y": 2},
+            },
+        },
+    )
     assert dummy_lattice.grid_index(0) == list(range(8))
     assert dummy_lattice.grid_index(1) == list(range(8, 16))
     assert dummy_lattice.grid_index() == list(range(16))
@@ -1176,6 +1282,7 @@ def test_volumetric_ancilla_qubit_combinations_overflow_xy(
         )
         == [[28, 30], [29, 30], [28, 31], [29, 31]]
     )
+
 
 def test_volumetric_ancilla_qubit_combinations_exception_overflow(
     lattice_2d_16x16_1_obstacle_1_timestep,

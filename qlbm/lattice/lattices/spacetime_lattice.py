@@ -63,11 +63,11 @@ class SpaceTimeLattice(Lattice):
           - Access Method
           - Description
         * - :attr:`grid_registers`
-          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \\right \\rceil`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \right \rceil`
           - :meth:`grid_index`
           - The qubits encoding the physical grid.
         * - :attr:`velocity_registers`
-          - :math:`\min(N_g \cdot N_v, \\frac{N_v^2\cdot N_t \cdot (N_t + 1)}{2} + N_v)`
+          - :math:`\min(N_g \cdot N_v, \frac{N_v^2\cdot N_t \cdot (N_t + 1)}{2} + N_v)`
           - :meth:`velocity_index`
           - The qubits encoding local and neighboring velocities.
 

@@ -2,7 +2,8 @@ from typing import List
 
 import pytest
 
-from qlbm.lattice.blocks import Block, ReflectionWall
+from qlbm.lattice.geometry.encodings.collisionless import ReflectionWall
+from qlbm.lattice.geometry.shapes.block import Block
 
 
 @pytest.fixture

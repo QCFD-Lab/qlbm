@@ -36,7 +36,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
     :attr:`timestep`          The time step for which to perform streaming.
-    :attr:`gate_to_apply`     The gate to apply to the velocities matching equivalence classes. Defaults to :math:`R_y(\\frac{\pi}{2})`.
+    :attr:`gate_to_apply`     The gate to apply to the velocities matching equivalence classes. Defaults to :math:`R_y(\frac{\pi}{2})`.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
 
@@ -133,6 +133,12 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
             The collision (re-)set circuit for a single gridpoint.
         """
         circuit = QuantumCircuit(self.lattice.properties.get_num_velocities_per_point())
+
+        # circuit.cx(1, 2)
+        # circuit.cx(0, 1)
+        # circuit.cx(0, 3)
+
+        # return circuit if not reset_state else circuit.inverse()
 
         if not reset_state:
             circuit.cx(control_qubit=0, target_qubit=2)

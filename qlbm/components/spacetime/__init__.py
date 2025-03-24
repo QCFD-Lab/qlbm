@@ -4,7 +4,7 @@ from .collision import SpaceTimeCollisionOperator
 from .initial.pointwise import PointWiseSpaceTimeInitialConditions
 from .initial.volumetric import VolumetricSpaceTimeInitialConditions
 from .measurement import SpaceTimeGridVelocityMeasurement
-from .reflection import SpaceTimeReflectionOperator
+from .reflection import PointWiseSpaceTimeReflectionOperator
 from .spacetime import SpaceTimeQLBM
 from .streaming import SpaceTimeStreamingOperator
 
@@ -15,5 +15,5 @@ __all__ = [
     "SpaceTimeStreamingOperator",
     "SpaceTimeQLBM",
     "SpaceTimeGridVelocityMeasurement",
-    "SpaceTimeReflectionOperator",
+    "PointWiseSpaceTimeReflectionOperator",
 ]

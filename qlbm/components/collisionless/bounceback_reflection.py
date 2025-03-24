@@ -14,8 +14,13 @@ from qlbm.components.collisionless.primitives import (
     ComparatorMode,
 )
 from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
-from qlbm.lattice import Block, CollisionlessLattice, ReflectionPoint, ReflectionWall
-from qlbm.lattice.blocks import ReflectionResetEdge
+from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice.geometry.encodings.collisionless import (
+    ReflectionPoint,
+    ReflectionResetEdge,
+    ReflectionWall,
+)
+from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
@@ -50,7 +55,7 @@ class BounceBackWallComparator(LBMPrimitive):
         lattice = CollisionlessLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
-                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
+                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
             }
         )
 
@@ -162,7 +167,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
         lattice = CollisionlessLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
-                "geometry": [{"x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
+                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
             }
         )
 
