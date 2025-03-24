@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Visualizing Collisionless circuits &#8212; qlbm 0.0.4 documentation</title>
+    <title>Visualizing Collisionless circuits &#8212; qlbm 0.0.5 documentation</title>
   
   
   
@@ -121,7 +121,7 @@
   
   
   
-    <p class="title logo__title">qlbm 0.0.4 documentation</p>
+    <p class="title logo__title">qlbm 0.0.5 documentation</p>
   
 </a></div>
     
@@ -321,6 +321,8 @@
 <ul class="current nav bd-sidenav">
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Visualizing Collisionless circuits</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spacetime_vis.html">Visualizing Space-Time circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="geometry_vis.html">Visualizing Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="flowfield_vis.html">Flowfield Visualization</a></li>
 </ul>
 </div>
 </nav></div>
@@ -476,7 +478,9 @@ q_3: ─┤ P(0) ├─
 <span class="n">example_lattice</span> <span class="o">=</span> <span class="n">CollisionlessLattice</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
-        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;specular&quot;</span><span class="p">}],</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="s2">&quot;cuboid&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;specular&quot;</span><span class="p">}</span>
+        <span class="p">],</span>
     <span class="p">}</span>
 <span class="p">)</span>
 </pre></div>

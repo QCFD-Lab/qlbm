@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Space-Time Circuits &#8212; qlbm 0.0.4 documentation</title>
+    <title>Space-Time Circuits &#8212; qlbm 0.0.5 documentation</title>
   
   
   
@@ -120,7 +120,7 @@
   
   
   
-    <p class="title logo__title">qlbm 0.0.4 documentation</p>
+    <p class="title logo__title">qlbm 0.0.5 documentation</p>
   
 </a></div>
     
@@ -539,7 +539,7 @@ For an in-depth mathematical explanation of the procedure, consult pages 15-18 o
 <span id="stqlbm-collision"></span><h2>Collision<a class="headerlink" href="#collision" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="qlbm.components.spacetime.collision.SpaceTimeCollisionOperator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.spacetime.collision.</span></span><span class="sig-name descname"><span class="pre">SpaceTimeCollisionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate_to_apply=Instruction(name='ry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qubits=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_clbits=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=[1.5707963267948966])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/spacetime/collision.py#L16-L156"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.spacetime.collision.SpaceTimeCollisionOperator" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.spacetime.collision.</span></span><span class="sig-name descname"><span class="pre">SpaceTimeCollisionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gate_to_apply=Instruction(name='ry'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qubits=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_clbits=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">params=[1.5707963267948966])</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components/spacetime/collision.py#L16-L162"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.spacetime.collision.SpaceTimeCollisionOperator" title="Link to this definition">#</a></dt>
 <dd><p>An operator that performs collision part of the <a class="reference internal" href="#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> algorithm.</p>
 <p>Collision is a local operation that is performed simultaneously on all velocity qubits corresponding to a grid location.
 In practice, this means the same circuit is repeated across all “local” qubit register chunks.
@@ -568,7 +568,7 @@ For an in-depth mathematical explanation of the procedure, consult pages 11-15 o
 <td><p>The time step for which to perform streaming.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">gate_to_apply</span></code></p></td>
-<td><p>The gate to apply to the velocities matching equivalence classes. Defaults to <span class="math notranslate nohighlight">\(R_y(\\frac{\pi}{2})\)</span>.</p></td>
+<td><p>The gate to apply to the velocities matching equivalence classes. Defaults to <span class="math notranslate nohighlight">\(R_y(\frac{\pi}{2})\)</span>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
 <td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>

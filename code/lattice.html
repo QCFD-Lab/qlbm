@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Lattices and Geometry &#8212; qlbm 0.0.4 documentation</title>
+    <title>Lattices and Geometry &#8212; qlbm 0.0.5 documentation</title>
   
   
   
@@ -120,7 +120,7 @@
   
   
   
-    <p class="title logo__title">qlbm 0.0.4 documentation</p>
+    <p class="title logo__title">qlbm 0.0.5 documentation</p>
   
 </a></div>
     
@@ -444,7 +444,7 @@ Each quantum component that is parameterized by a <code class="docutils literal 
 to which it appends its designated logic.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">blocks</span></code></p></td>
-<td><p>A <code class="docutils literal notranslate"><span class="pre">Dict[str,</span> <span class="pre">List[Block]]</span></code> that contains all of the <a class="reference internal" href="#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s encoding the solid geometry of the lattice.
+<td><p>A <code class="docutils literal notranslate"><span class="pre">Dict[str,</span> <span class="pre">List[Block]]</span></code> that contains all of the <a class="reference internal" href="#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s encoding the solid geometry of the lattice.
 The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., <code class="docutils literal notranslate"><span class="pre">&quot;bounceback&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;specular&quot;</span></code>).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
@@ -490,12 +490,12 @@ and <span class="math notranslate nohighlight">\(d\)</span> is the total number 
 <td><p>The qubits used to for <a class="reference internal" href="cqlbm_comps.html#qlbm.components.collisionless.primitives.Comparator" title="qlbm.components.collisionless.primitives.Comparator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Comparator</span></code></a>s. Used for reflection.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">grid_registers</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \\right \\rceil\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \right \rceil\)</span></p></td>
 <td><p><a class="reference internal" href="#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice.grid_index" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice.grid_index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">grid_index()</span></code></a></p></td>
 <td><p>The qubits encoding the physical grid.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">velocity_registers</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \\right \\rceil - 1\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\Sigma_{1\leq j \leq d} \left \lceil{\log N_{v_j}} \right \rceil - 1\)</span></p></td>
 <td><p><a class="reference internal" href="#qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice.velocity_index" title="qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice.velocity_index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">velocity_index()</span></code></a></p></td>
 <td><p>The qubits encoding speeds.</p></td>
 </tr>
@@ -554,7 +554,7 @@ A sample configuration might look as follows:</p>
 <span class="n">CollisionlessLattice</span><span class="p">(</span>
     <span class="p">{</span>
         <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}},</span>
-        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;bounceback&quot;</span><span class="p">}],</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;shape&quot;</span><span class="p">:</span><span class="s2">&quot;cuboid&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;bounceback&quot;</span><span class="p">}],</span>
     <span class="p">}</span>
 <span class="p">)</span><span class="o">.</span><span class="n">circuit</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
 </pre></div>
@@ -790,7 +790,7 @@ Each quantum component that is parameterized by a <code class="docutils literal 
 to which it appends its designated logic.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">blocks</span></code></p></td>
-<td><p>A <code class="docutils literal notranslate"><span class="pre">Dict[str,</span> <span class="pre">List[Block]]</span></code> that contains all of the <a class="reference internal" href="#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s encoding the solid geometry of the lattice.
+<td><p>A <code class="docutils literal notranslate"><span class="pre">Dict[str,</span> <span class="pre">List[Block]]</span></code> that contains all of the <a class="reference internal" href="#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s encoding the solid geometry of the lattice.
 The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., <code class="docutils literal notranslate"><span class="pre">&quot;bounceback&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;specular&quot;</span></code>).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
@@ -821,12 +821,12 @@ and <span class="math notranslate nohighlight">\(d\)</span> is the total number 
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">grid_registers</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \\right \\rceil\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \right \rceil\)</span></p></td>
 <td><p><a class="reference internal" href="#qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice.grid_index" title="qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice.grid_index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">grid_index()</span></code></a></p></td>
 <td><p>The qubits encoding the physical grid.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">velocity_registers</span></code></p></td>
-<td><p><span class="math notranslate nohighlight">\(\min(N_g \cdot N_v, \\frac{N_v^2\cdot N_t \cdot (N_t + 1)}{2} + N_v)\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\min(N_g \cdot N_v, \frac{N_v^2\cdot N_t \cdot (N_t + 1)}{2} + N_v)\)</span></p></td>
 <td><p><a class="reference internal" href="#qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice.velocity_index" title="qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice.velocity_index"><code class="xref py py-meth docutils literal notranslate"><span class="pre">velocity_index()</span></code></a></p></td>
 <td><p>The qubits encoding local and neighboring velocities.</p></td>
 </tr>
@@ -1067,33 +1067,42 @@ and a different operation, based on two <span class="math notranslate nohighligh
 <section id="geometry">
 <span id="id4"></span><h2>Geometry<a class="headerlink" href="#geometry" title="Link to this heading">#</a></h2>
 <p>Processing obstacle geometry into quantum circuits is a tedious and error-prone task when performed manually.
-To alleviate this challenge, <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> provides a <a class="reference internal" href="#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> class that
-parses the geometry information supplied as part of the <a class="reference internal" href="base_comps.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> specification
+To alleviate this challenge, <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> provides <a class="reference internal" href="#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> and <a class="reference internal" href="#qlbm.lattice.geometry.Circle" title="qlbm.lattice.geometry.Circle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Circle</span></code></a> classes that
+parse the geometry information supplied as part of the <a class="reference internal" href="base_comps.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> specification
 into information that parameterized the construction of quantum circuits.
 This includes the position of the obstacle within the grid and its boundary conditions.
-In addition, <code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code>s contain triangulation methods that
+In addition, these shapes contain triangulation methods that
 allow them to be exported as <code class="docutils literal notranslate"><span class="pre">stl</span></code> files and visualized in Paraview.</p>
-<p>Each block contains snippets of information that determine how
+<p>Each shape contains snippets of information that determine how
 individual components of reflection behave.
 To make the generation of this circuits more manageable, we
-segment the block information into different categories of edge cases:</p>
+segment the block information into different categories of edge cases, which are also broken down by algorithm.</p>
+<p>The <a class="reference internal" href="cqlbm_comps.html#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> algorithm uses the following data structures:</p>
 <ol class="arabic simple">
-<li><p><a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> models the isolated, one-dimensional features of a fixed point on the grid.</p></li>
-<li><p><a class="reference internal" href="#qlbm.lattice.blocks.ReflectionPoint" title="qlbm.lattice.blocks.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a> models the 2D or 3D information of a fixed point in space.</p></li>
-<li><p><a class="reference internal" href="#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a> models the 2D or 3D information of the wall of the obstacle.</p></li>
-<li><p><a class="reference internal" href="#qlbm.lattice.blocks.ReflectionResetEdge" title="qlbm.lattice.blocks.ReflectionResetEdge"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a> models the 3D information of an edge along the walls of an obstacle.</p></li>
+<li><p><a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> models the isolated, one-dimensional features of a fixed point on the grid.</p></li>
+<li><p><a class="reference internal" href="#qlbm.lattice.geometry.ReflectionPoint" title="qlbm.lattice.geometry.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a> models the 2D or 3D information of a fixed point in space.</p></li>
+<li><p><a class="reference internal" href="#qlbm.lattice.geometry.ReflectionWall" title="qlbm.lattice.geometry.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a> models the 2D or 3D information of the wall of the obstacle.</p></li>
+<li><p><a class="reference internal" href="#qlbm.lattice.geometry.ReflectionResetEdge" title="qlbm.lattice.geometry.ReflectionResetEdge"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a> models the 3D information of an edge along the walls of an obstacle.</p></li>
+</ol>
+<p>The <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> algorithm on makes use of the following:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#qlbm.lattice.geometry.SpaceTimePWReflectionData" title="qlbm.lattice.geometry.SpaceTimePWReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimePWReflectionData</span></code></a> models the reflection data of a single grid point of the lattice.</p></li>
+<li><p><a class="reference internal" href="#qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData" title="qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeVolumetricReflectionData</span></code></a> models the reflection data of a contiguous volume in space.</p></li>
+<li><p><a class="reference internal" href="#qlbm.lattice.geometry.SpaceTimeDiagonalReflectionData" title="qlbm.lattice.geometry.SpaceTimeDiagonalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeDiagonalReflectionData</span></code></a> of diagonals in 2D.</p></li>
 </ol>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>At the moment, only the <a class="reference internal" href="cqlbm_comps.html#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> algorithm supports geometry.
-Geometry objects can only be 2D or 3D cuboids, and they must be placed
-at least two grid points apart for consistent behavior.</p>
+<p><a class="reference internal" href="cqlbm_comps.html#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> and <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> support different kinds of geometry.
+For <a class="reference internal" href="cqlbm_comps.html#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a>, geometry objects can only be 2D or 3D cuboids, and they must be placed
+at least two grid points apart for consistent behavior.
+<a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> supports 2D rectangles of arbitrary lengths, as well as circles.</p>
 </div>
 <dl class="py class">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.blocks.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary_condition</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L84-L804"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block" title="Link to this definition">#</a></dt>
-<dd><p>Contains information required for the generation of bounce-back and specular reflection boundary conditions for the <a class="reference internal" href="cqlbm_comps.html#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> algorithm.</p>
-<p>A block can be constructed from minimal information, see the Table below.</p>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_grid_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary_condition</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L26-L743"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block" title="Link to this definition">#</a></dt>
+<dd><p>Contains information required for the generation of boundary conditions for an axis-parallel cuboid obstacle.</p>
+<p>Available for the specular reflection and bounce-back for the <a class="reference internal" href="cqlbm_comps.html#qlbm.components.collisionless.cqlbm.CQLBM" title="qlbm.components.collisionless.cqlbm.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> algorithm and bounce-back for the <code class="xref py py-class docutils literal notranslate"><span class="pre">STQBM</span></code> algorithm.
+A block can be constructed from minimal information, see the Table below.</p>
 <div class="pst-scrollable-table-container"><table class="table" id="id7">
 <caption><span class="caption-text">Constructor parameters</span><a class="headerlink" href="#id7" title="Link to this table">#</a></caption>
 <colgroup>
@@ -1118,7 +1127,7 @@ at least two grid points apart for consistent behavior.</p>
 </tbody>
 </table>
 </div>
-<p>The <a class="reference internal" href="#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> constructor will parse this information and automatically infer all of the information
+<p>The <a class="reference internal" href="#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> constructor will parse this information and automatically infer all of the information
 required to perform all of the reflection edge cases.
 This data is split over several attributes, see the table below.</p>
 <div class="pst-scrollable-table-container"><table class="table" id="id8">
@@ -1137,34 +1146,34 @@ This data is split over several attributes, see the table below.</p>
 <td><p>The <code class="docutils literal notranslate"><span class="pre">List[Tuple[int,</span> <span class="pre">int]]</span></code> of lower and upper bounds in each dimension. For example, <code class="docutils literal notranslate"><span class="pre">[(2,</span> <span class="pre">5),</span> <span class="pre">(10,</span> <span class="pre">12)]</span></code>; <code class="docutils literal notranslate"><span class="pre">[(2,</span> <span class="pre">5),</span> <span class="pre">(9,</span> <span class="pre">12),</span> <span class="pre">(33,</span> <span class="pre">70)]</span></code>.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">inside_points_data</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[Tuple[DimensionalReflectionData,</span> <span class="pre">...]]</span></code> data encoding the corner points on the <cite>inside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each entry is a tuple of <a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> of the lower and upper bounds of that dimension, respectively.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[Tuple[DimensionalReflectionData,</span> <span class="pre">...]]</span></code> data encoding the corner points on the <cite>inside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each entry is a tuple of <a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> of the lower and upper bounds of that dimension, respectively.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">outside_points_data</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[Tuple[DimensionalReflectionData,</span> <span class="pre">...]]</span></code> data encoding the corner points on the <cite>outside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each entry is a tuple of <a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> of the lower and upper bounds of that dimension, respectively.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[Tuple[DimensionalReflectionData,</span> <span class="pre">...]]</span></code> data encoding the corner points on the <cite>outside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each entry is a tuple of <a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> of the lower and upper bounds of that dimension, respectively.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">walls_inside</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[List[ReflectionWall,</span> <span class="pre">...]]</span></code> data encoding the walls of the <cite>inside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each inner list is a list of two <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a>s of the lower and upper bounds of that dimension, respectively.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[List[ReflectionWall,</span> <span class="pre">...]]</span></code> data encoding the walls of the <cite>inside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each inner list is a list of two <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionWall" title="qlbm.lattice.geometry.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a>s of the lower and upper bounds of that dimension, respectively.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">walls_outside</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[List[ReflectionWall,</span> <span class="pre">...]]</span></code> data encoding the walls of the <cite>outside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each inner list is a list of two <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionWall" title="qlbm.lattice.blocks.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a>s of the lower and upper bounds of that dimension, respectively.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[List[ReflectionWall,</span> <span class="pre">...]]</span></code> data encoding the walls of the <cite>outside</cite> of the obstacle. The outer list contains <span class="math notranslate nohighlight">\(d\)</span> entries, one per dimension. Each inner list is a list of two <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionWall" title="qlbm.lattice.geometry.ReflectionWall"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a>s of the lower and upper bounds of that dimension, respectively.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">corners_inside</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding the corner points on the <cite>inside</cite> of the obstacle. There are 4 inner corner <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionPoint" title="qlbm.lattice.blocks.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a>s per obstacle in 2D, and 8 in 3D.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding the corner points on the <cite>inside</cite> of the obstacle. There are 4 inner corner <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionPoint" title="qlbm.lattice.geometry.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a>s per obstacle in 2D, and 8 in 3D.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">corners_outside</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding the corner points on the <cite>outside</cite> of the obstacle. There are 4 outer corner <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionPoint" title="qlbm.lattice.blocks.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a>s per obstacle in 2D, and 8 in 3D.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding the corner points on the <cite>outside</cite> of the obstacle. There are 4 outer corner <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionPoint" title="qlbm.lattice.geometry.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a>s per obstacle in 2D, and 8 in 3D.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">near_corner_points_2d</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding points on the outside of the object that are adjacent to inner corner points. These points require additional logic in the quantum circuit for particles that have streamed without reflecting off the obstacle. Only applicable to 2D example, since 3D example use edges instead. There are 8 near-corner <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionPoint" title="qlbm.lattice.blocks.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a> s per obstacle.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding points on the outside of the object that are adjacent to inner corner points. These points require additional logic in the quantum circuit for particles that have streamed without reflecting off the obstacle. Only applicable to 2D example, since 3D example use edges instead. There are 8 near-corner <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionPoint" title="qlbm.lattice.geometry.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a> s per obstacle.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">corner_edges_3d</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionResetEdge]</span></code> data encoding edges on the outside of the object that are adjacent to corners of the obstacle. Used to reset ancilla qubit states after reflection. There are 12 corner <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionResetEdge" title="qlbm.lattice.blocks.ReflectionResetEdge"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a> s per obstacle.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionResetEdge]</span></code> data encoding edges on the outside of the object that are adjacent to corners of the obstacle. Used to reset ancilla qubit states after reflection. There are 12 corner <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionResetEdge" title="qlbm.lattice.geometry.ReflectionResetEdge"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a> s per obstacle.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">near_corner_edges_3d</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionResetEdge]</span></code> data encoding edges on the outside of the object that are adjacent either side of <code class="xref py py-attr docutils literal notranslate"><span class="pre">corner_edges_3d</span></code>. These edges require additional logic in the quantum circuit for particles that have streamed without reflecting off the obstacle. There are 24 near-corner <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionResetEdge" title="qlbm.lattice.blocks.ReflectionResetEdge"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a> s per obstacle.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionResetEdge]</span></code> data encoding edges on the outside of the object that are adjacent either side of <code class="xref py py-attr docutils literal notranslate"><span class="pre">corner_edges_3d</span></code>. These edges require additional logic in the quantum circuit for particles that have streamed without reflecting off the obstacle. There are 24 near-corner <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionResetEdge" title="qlbm.lattice.geometry.ReflectionResetEdge"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a> s per obstacle.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">overlapping_near_corner_edge_points_3d</span></code></p></td>
-<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding the set of points at the intersections of <code class="xref py py-attr docutils literal notranslate"><span class="pre">near_corner_edges_3d</span></code>. These points require additional logic in to account for the fact that the state of obstacle ancilla qubits was doubly reset (once by each edge). There are 24 such <a class="reference internal" href="#qlbm.lattice.blocks.ReflectionPoint" title="qlbm.lattice.blocks.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a> s per obstacle.</p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[ReflectionPoint]</span></code> data encoding the set of points at the intersections of <code class="xref py py-attr docutils literal notranslate"><span class="pre">near_corner_edges_3d</span></code>. These points require additional logic in to account for the fact that the state of obstacle ancilla qubits was doubly reset (once by each edge). There are 24 such <a class="reference internal" href="#qlbm.lattice.geometry.ReflectionPoint" title="qlbm.lattice.geometry.ReflectionPoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a> s per obstacle.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1173,21 +1182,21 @@ This data is split over several attributes, see the table below.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>bounds</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>)</p></li>
-<li><p><strong>num_qubits</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>num_grid_qubits</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
 <li><p><strong>boundary_condition</strong> (<em>str</em>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block.get_spacetime_reflection_data_d1q2">
-<span class="sig-name descname"><span class="pre">get_spacetime_reflection_data_d1q2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L520-L575"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block.get_spacetime_reflection_data_d1q2" title="Link to this definition">#</a></dt>
-<dd><p>Calculate space-time reflection data for <span class="math notranslate nohighlight">\(D_1Q_2\)</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">STQLBM</span></code> lattice.</p>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.get_spacetime_reflection_data_d1q2">
+<span class="sig-name descname"><span class="pre">get_spacetime_reflection_data_d1q2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L455-L497"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.get_spacetime_reflection_data_d1q2" title="Link to this definition">#</a></dt>
+<dd><p>Calculate space-time reflection data for <span class="math notranslate nohighlight">\(D_1Q_2\)</span> <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> lattice.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>properties</strong> (<em>SpaceTimeLatticeBuilder</em>) – The lattice discretization properties.</p></li>
-<li><p><strong>None</strong> (<em>num_steps int</em><em> |</em>) – Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.</p></li>
-<li><p><strong>optional</strong> – Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.</p></li>
+<li><p><strong>None</strong> (<em>num_steps int</em><em> |</em>) – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+<li><p><strong>optional</strong> – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
 <li><p><strong>num_steps</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
 </ul>
 </dd>
@@ -1201,14 +1210,14 @@ This data is split over several attributes, see the table below.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block.get_spacetime_reflection_data_d2q4">
-<span class="sig-name descname"><span class="pre">get_spacetime_reflection_data_d2q4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L577-L708"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block.get_spacetime_reflection_data_d2q4" title="Link to this definition">#</a></dt>
-<dd><p>Calculate space-time reflection data for <span class="math notranslate nohighlight">\(D_2Q_4\)</span> <code class="xref py py-class docutils literal notranslate"><span class="pre">STQLBM</span></code> lattice.</p>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.get_spacetime_reflection_data_d2q4">
+<span class="sig-name descname"><span class="pre">get_spacetime_reflection_data_d2q4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L499-L549"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.get_spacetime_reflection_data_d2q4" title="Link to this definition">#</a></dt>
+<dd><p>Calculate space-time reflection data for <span class="math notranslate nohighlight">\(D_2Q_4\)</span> <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> lattice.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>properties</strong> (<em>SpaceTimeLatticeBuilder</em>) – The lattice discretization properties.</p></li>
-<li><p><strong>num_steps</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Number of timesteps to calculate reflections for. If None, uses properties.num_timesteps. Defaults to None.</p></li>
+<li><p><strong>num_steps</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -1221,8 +1230,30 @@ This data is split over several attributes, see the table below.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block.get_d2q4_surfaces">
-<span class="sig-name descname"><span class="pre">get_d2q4_surfaces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L710-L741"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block.get_d2q4_surfaces" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.get_d2q4_volumetric_reflection_data">
+<span class="sig-name descname"><span class="pre">get_d2q4_volumetric_reflection_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L551-L675"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.get_d2q4_volumetric_reflection_data" title="Link to this definition">#</a></dt>
+<dd><p>Calculate volumetric reflection data for <span class="math notranslate nohighlight">\(D_2Q_4\)</span> <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> lattice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>properties</strong> (<em>SpaceTimeLatticeBuilder</em>) – The lattice discretization properties.</p></li>
+<li><p><strong>None</strong> (<em>num_steps int</em><em> |</em>) – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+<li><p><strong>optional</strong> – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+<li><p><strong>num_steps</strong> (<em>int</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The information encoding the reflections to be performed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData" title="qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData">SpaceTimeVolumetricReflectionData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.get_d2q4_surfaces">
+<span class="sig-name descname"><span class="pre">get_d2q4_surfaces</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L677-L708"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.get_d2q4_surfaces" title="Link to this definition">#</a></dt>
 <dd><p>Get all surfaces of the block in 2 dimensions.</p>
 <p>The information is formatted as <code class="docutils literal notranslate"><span class="pre">List[List[List[Tuple[int,</span> <span class="pre">...]]]]</span></code>.
 The outermost list is by dimension.
@@ -1230,7 +1261,7 @@ The middle list contains two lists pertaining to the lower and upper bounds of t
 The innermost list contains the gridpoints that make up the surface encoded as tuples.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>_description_</p>
+<dd class="field-odd"><p>The block surfaces in two dimensions.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>List[List[List[Tuple[int, …]]]]</p>
@@ -1239,8 +1270,8 @@ The innermost list contains the gridpoints that make up the surface encoded as t
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block.contains_gridpoint">
-<span class="sig-name descname"><span class="pre">contains_gridpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridpoint</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L743-L760"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block.contains_gridpoint" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.contains_gridpoint">
+<span class="sig-name descname"><span class="pre">contains_gridpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridpoint</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L710-L715"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.contains_gridpoint" title="Link to this definition">#</a></dt>
 <dd><p>Whether the block contains a given gridpoint within its volume.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1256,12 +1287,12 @@ The innermost list contains the gridpoints that make up the surface encoded as t
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block.stl_mesh">
-<span class="sig-name descname"><span class="pre">stl_mesh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L762-L776"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block.stl_mesh" title="Link to this definition">#</a></dt>
-<dd><p>Provides the <code class="docutils literal notranslate"><span class="pre">stl</span></code> representation of the block.</p>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.stl_mesh">
+<span class="sig-name descname"><span class="pre">stl_mesh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L717-L724"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.stl_mesh" title="Link to this definition">#</a></dt>
+<dd><p>Provides the <code class="docutils literal notranslate"><span class="pre">stl</span></code> representation of the shape.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The mesh representing the block.</p>
+<dd class="field-odd"><p>The mesh representing the shape.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">stl.mesh.Mesh</span></code></p>
@@ -1270,12 +1301,12 @@ The innermost list contains the gridpoints that make up the surface encoded as t
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block.to_json">
-<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L778-L787"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block.to_json" title="Link to this definition">#</a></dt>
-<dd><p>Serializes the block to JSON format.</p>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L726-L728"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.to_json" title="Link to this definition">#</a></dt>
+<dd><p>Serializes the shape to JSON format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>The JSON representation of the block.</p>
+<dd class="field-odd"><p>The JSON representation of the shape.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>str</p>
@@ -1284,12 +1315,26 @@ The innermost list contains the gridpoints that make up the surface encoded as t
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.Block.to_dict">
-<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L789-L804"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.Block.to_dict" title="Link to this definition">#</a></dt>
-<dd><p>Produces a dictionary representation of the block.</p>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L730-L732"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.name" title="Link to this definition">#</a></dt>
+<dd><p>The name of the shape.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>A dictionary representation of the bounds and boundary conditions of the block.</p>
+<dd class="field-odd"><p>The name of the shape.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Block.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L734-L743"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Block.to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Produces a dictionary representation of the shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary representation of the bounds and boundary conditions of the shape.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dict[str, List[int] | str]</p>
@@ -1300,12 +1345,327 @@ The innermost list contains the gridpoints that make up the surface encoded as t
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.DimensionalReflectionData">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.blocks.</span></span><span class="sig-name descname"><span class="pre">DimensionalReflectionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubits_to_invert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_outside_obstacle_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridpoint_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L807-L865"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">Circle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_grid_qubits</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">boundary_condition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_mesh_segments</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L18-L560"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle" title="Link to this definition">#</a></dt>
+<dd><p>Contains information required for the generation of bounce-back boundary conditions for the <code class="xref py py-class docutils literal notranslate"><span class="pre">STQBM</span></code> algorithm.</p>
+<p>A circle can be constructed from minimal information, see the Table below.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id9">
+<caption><span class="caption-text">Constructor parameters</span><a class="headerlink" href="#id9" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">center</span></code></p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">Tuple[int,</span> <span class="pre">...]</span></code> specifying the center of the circle. For example, <code class="docutils literal notranslate"><span class="pre">(2,</span> <span class="pre">5)</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">radius</span></code></p></td>
+<td><p>An <code class="docutils literal notranslate"><span class="pre">int</span></code> specifying the radius of the circle. For example, <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_grid_qubits</span></code></p></td>
+<td><p>The number of grid qubits of the underlying lattice.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">boundary_condition</span></code></p></td>
+<td><p>A <code class="docutils literal notranslate"><span class="pre">string</span></code> indicating the type of boundary condition of the block. At the moment, only <code class="docutils literal notranslate"><span class="pre">&quot;bounceback&quot;</span></code> is supported.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">num_mesh_segments</span></code></p></td>
+<td><p>An <code class="docutils literal notranslate"><span class="pre">int</span></code> that describes how fine the <code class="docutils literal notranslate"><span class="pre">stl</span></code> of the object is.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The <a class="reference internal" href="#qlbm.lattice.geometry.Circle" title="qlbm.lattice.geometry.Circle"><code class="xref py py-class docutils literal notranslate"><span class="pre">Circle</span></code></a> constructor will parse this information and automatically infer all of the information
+required to perform all of the reflection edge cases. Class attributes are described in the table below.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id10">
+<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id10" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">perimeter_points</span></code></p></td>
+<td><p>The <code class="docutils literal notranslate"><span class="pre">List[Tuple[int,</span> <span class="pre">int]]</span></code> of all gridpoints that lie on the perimeter of the circle, and are therefore relevant for boundary conditions.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>center</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>radius</strong> (<em>int</em>)</p></li>
+<li><p><strong>num_grid_qubits</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>boundary_condition</strong> (<em>str</em>)</p></li>
+<li><p><strong>num_mesh_segments</strong> (<em>int</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.get_circle_perimeter">
+<span class="sig-name descname"><span class="pre">get_circle_perimeter</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L69-L102"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.get_circle_perimeter" title="Link to this definition">#</a></dt>
+<dd><p>Uses Bresenham’s circle drawing algorithm to specify all points along the perimeter of the circle.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>All gridpoints that lie on the perimeter of the circle</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[Tuple[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.stl_mesh">
+<span class="sig-name descname"><span class="pre">stl_mesh</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L104-L127"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.stl_mesh" title="Link to this definition">#</a></dt>
+<dd><p>Provides the <code class="docutils literal notranslate"><span class="pre">stl</span></code> representation of the shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The mesh representing the shape.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">stl.mesh.Mesh</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.is_point_on_segment">
+<span class="sig-name descname"><span class="pre">is_point_on_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segment</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L181-L203"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.is_point_on_segment" title="Link to this definition">#</a></dt>
+<dd><p>Whether the point belongs to a given axis-aligned segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gridpoint</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – The gridpoint to test for.</p></li>
+<li><p><strong>segment</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>) – The segment to test for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the point belongs to a given axis-aligned segment.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.is_point_on_any_segment">
+<span class="sig-name descname"><span class="pre">is_point_on_any_segment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">segments</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L205-L225"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.is_point_on_any_segment" title="Link to this definition">#</a></dt>
+<dd><p>Whether the point belongs to any axis-aligned segment in a given list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gridpoint</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – The gridpoint to test for.</p></li>
+<li><p><strong>segments</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em><em>]</em>) – The segments to test for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the point lays on any of the given segments.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.split_perimeter_points">
+<span class="sig-name descname"><span class="pre">split_perimeter_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L227-L345"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.split_perimeter_points" title="Link to this definition">#</a></dt>
+<dd><p>Splits point on the perimeter of the circle into three categories.</p>
+<p>Points belong to either
+(1) axis-aligned segments
+(2) diagonal segments, or
+(3) individual points.</p>
+<p>Axis-aligned and diagonal segments are encoded as the two ends of the segment.
+Individual points are simply listed by their coordinates.
+The results are returned in the order listed previously.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>points</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>) – The gridpoints on the perimeter of the circle.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The points classified by which category they belong to.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[List[Tuple[int, int]], List[List[Tuple[int, int]]], List[Tuple[int, int]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.to_json">
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L347-L349"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.to_json" title="Link to this definition">#</a></dt>
+<dd><p>Serializes the shape to JSON format.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The JSON representation of the shape.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.name">
+<span class="sig-name descname"><span class="pre">name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L351-L353"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.name" title="Link to this definition">#</a></dt>
+<dd><p>The name of the shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The name of the shape.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L355-L362"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.to_dict" title="Link to this definition">#</a></dt>
+<dd><p>Produces a dictionary representation of the shape.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A dictionary representation of the bounds and boundary conditions of the shape.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dict[str, List[int] | str]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.contains_gridpoint">
+<span class="sig-name descname"><span class="pre">contains_gridpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridpoint</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L364-L370"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.contains_gridpoint" title="Link to this definition">#</a></dt>
+<dd><p>Whether the block contains a given gridpoint within its volume.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gridpoint</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>) – The gridpoint to check for.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Whether the gridpoint is within the block.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.get_spacetime_reflection_data_d1q2">
+<span class="sig-name descname"><span class="pre">get_spacetime_reflection_data_d1q2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L372-L374"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.get_spacetime_reflection_data_d1q2" title="Link to this definition">#</a></dt>
+<dd><p>Calculate space-time reflection data for <span class="math notranslate nohighlight">\(D_1Q_2\)</span> <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> lattice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>properties</strong> (<em>SpaceTimeLatticeBuilder</em>) – The lattice discretization properties.</p></li>
+<li><p><strong>None</strong> (<em>num_steps int</em><em> |</em>) – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+<li><p><strong>optional</strong> – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The information encoding the reflections to be performed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[SpaceTimeReflectionData]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.get_spacetime_reflection_data_d2q4">
+<span class="sig-name descname"><span class="pre">get_spacetime_reflection_data_d2q4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L397-L485"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.get_spacetime_reflection_data_d2q4" title="Link to this definition">#</a></dt>
+<dd><p>Calculate space-time reflection data for <span class="math notranslate nohighlight">\(D_2Q_4\)</span> <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> lattice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>properties</strong> (<em>SpaceTimeLatticeBuilder</em>) – The lattice discretization properties.</p></li>
+<li><p><strong>num_steps</strong> (<em>int</em><em> | </em><em>None</em><em>, </em><em>optional</em>) – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The information encoding the reflections to be performed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[SpaceTimeReflectionData]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.get_d2q4_volumetric_reflection_data">
+<span class="sig-name descname"><span class="pre">get_d2q4_volumetric_reflection_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">properties</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L487-L489"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.get_d2q4_volumetric_reflection_data" title="Link to this definition">#</a></dt>
+<dd><p>Calculate volumetric reflection data for <span class="math notranslate nohighlight">\(D_2Q_4\)</span> <a class="reference internal" href="stqlbm_comps.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> lattice.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>properties</strong> (<em>SpaceTimeLatticeBuilder</em>) – The lattice discretization properties.</p></li>
+<li><p><strong>None</strong> (<em>num_steps int</em><em> |</em>) – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+<li><p><strong>optional</strong> – Number of timesteps to calculate reflections for. If None, uses <code class="docutils literal notranslate"><span class="pre">properties.num_timesteps</span></code>. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The information encoding the reflections to be performed.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData" title="qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData">SpaceTimeVolumetricReflectionData</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.expand_axis_segments">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">expand_axis_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axis_segments</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L491-L524"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.expand_axis_segments" title="Link to this definition">#</a></dt>
+<dd><p>Expands axis-aligned segments encoded as the two extremes of the segment into lists of all points contained within each segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>axis_segments</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em><em>]</em>) – The segments to expand.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>All points within each segment.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple[int, int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.Circle.expand_diagonal_segments">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">expand_diagonal_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">diagonal_segments</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L526-L560"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.Circle.expand_diagonal_segments" title="Link to this definition">#</a></dt>
+<dd><p>Expands diagonal segments encoded as the two extremes of the segment into lists of all points contained within each segment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>diagonal_segments</strong> (<em>List</em><em>[</em><em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em><em>]</em>) – The diagonal segments to expand</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>All points within each segment.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple[int, …]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.DimensionalReflectionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">DimensionalReflectionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qubits_to_invert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bound_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_outside_obstacle_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gridpoint_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L8-L66"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="Link to this definition">#</a></dt>
 <dd><p>Contains one-dimensional information about the position of a grid point relevant to the obstacle.</p>
 <p>Used for edge cases relating to either inside or outside corner points.</p>
-<div class="pst-scrollable-table-container"><table class="table" id="id9">
-<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id9" title="Link to this table">#</a></caption>
+<div class="pst-scrollable-table-container"><table class="table" id="id11">
+<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id11" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 33.3%" />
 <col style="width: 66.7%" />
@@ -1332,7 +1692,7 @@ The innermost list contains the gridpoints that make up the surface encoded as t
 <td><p>The <code class="docutils literal notranslate"><span class="pre">int</span></code> indicating which grid point this object encodes. Used for debugging purposes.</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">name</span></code></p></td>
-<td><p>A string assigned to each dimensional data object in the <a class="reference internal" href="#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> constructor. Used for debugging purposes.</p></td>
+<td><p>A string assigned to each dimensional data object in the <a class="reference internal" href="#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> constructor. Used for debugging purposes.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1367,15 +1727,15 @@ is encoded last in the register, and there are 3 qubits encoding the <span class
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.ReflectionPoint">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.blocks.</span></span><span class="sig-name descname"><span class="pre">ReflectionPoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims_inside</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims_outside</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inversion_function</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L927-L976"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.ReflectionPoint" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.ReflectionPoint">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">ReflectionPoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims_inside</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims_outside</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inversion_function</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L148-L197"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.ReflectionPoint" title="Link to this definition">#</a></dt>
 <dd><p>Encodes the information required to perform reflection on a single point.</p>
-<p>A point is encoded as 2 or 3 fixed <a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> objects, one per dimension.
+<p>A point is encoded as 2 or 3 fixed <a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> objects, one per dimension.
 This classes processes the information encoded in the reflection data
 objects into boolean valued attributes that determine
 whether the directional velocity qubits should be inverted to perform reflection.</p>
-<div class="pst-scrollable-table-container"><table class="table" id="id10">
-<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id10" title="Link to this table">#</a></caption>
+<div class="pst-scrollable-table-container"><table class="table" id="id12">
+<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id12" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 33.3%" />
 <col style="width: 66.7%" />
@@ -1416,25 +1776,25 @@ whether the directional velocity qubits should be inverted to perform reflection
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>data</strong> (<em>List</em><em>[</em><a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><em>DimensionalReflectionData</em></a><em>]</em>)</p></li>
+<li><p><strong>data</strong> (<em>List</em><em>[</em><a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.encodings.collisionless.DimensionalReflectionData"><em>DimensionalReflectionData</em></a><em>]</em>)</p></li>
 <li><p><strong>dims_inside</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
 <li><p><strong>dims_outside</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
-<li><p><strong>inversion_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>List</em><em>[</em><a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><em>DimensionalReflectionData</em></a><em>]</em><em>]</em><em>, </em><em>List</em><em>[</em><em>bool</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>inversion_function</strong> (<em>Callable</em><em>[</em><em>[</em><em>List</em><em>[</em><a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.encodings.collisionless.DimensionalReflectionData"><em>DimensionalReflectionData</em></a><em>]</em><em>]</em><em>, </em><em>List</em><em>[</em><em>bool</em><em>]</em><em>]</em>)</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.ReflectionWall">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.blocks.</span></span><span class="sig-name descname"><span class="pre">ReflectionWall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reflection_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L868-L924"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.ReflectionWall" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.ReflectionWall">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">ReflectionWall</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reflection_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L200-L256"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.ReflectionWall" title="Link to this definition">#</a></dt>
 <dd><p>Encodes the information required to perform reflection on a wall.</p>
 <p>Each wall is encoded as fixed over one dimensions and spanning one or two <cite>alignment</cite> dimensions.
 This in turn models which qubits are used for the comparator operations of the reflection operators.
 The information required for the alignment dimensions only consists of bounds,
-while the fixed dimension uses its <a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> representation.</p>
-<div class="pst-scrollable-table-container"><table class="table" id="id11">
-<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id11" title="Link to this table">#</a></caption>
+while the fixed dimension uses its <a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> representation.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id13">
+<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id13" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 33.3%" />
 <col style="width: 66.7%" />
@@ -1472,22 +1832,22 @@ while the fixed dimension uses its <a class="reference internal" href="#qlbm.lat
 <li><p><strong>dim</strong> (<em>int</em>)</p></li>
 <li><p><strong>lower_bounds</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
 <li><p><strong>upper_bounds</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
-<li><p><strong>reflection_data</strong> (<a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><em>DimensionalReflectionData</em></a>)</p></li>
+<li><p><strong>reflection_data</strong> (<a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.encodings.collisionless.DimensionalReflectionData"><em>DimensionalReflectionData</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="qlbm.lattice.blocks.ReflectionResetEdge">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.blocks.</span></span><span class="sig-name descname"><span class="pre">ReflectionResetEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walls_joining</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims_of_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds_disconnected_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_outside</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/blocks.py#L979-L1055"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.blocks.ReflectionResetEdge" title="Link to this definition">#</a></dt>
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.ReflectionResetEdge">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">ReflectionResetEdge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">walls_joining</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dims_of_edge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds_disconnected_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dimension_outside</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L69-L145"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.ReflectionResetEdge" title="Link to this definition">#</a></dt>
 <dd><p>Encodes the information required to perform reflection on an edge in 3D.</p>
-<p>An edge is encoded as 2 fixed points as <a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> objects, and one spanning dimension.
+<p>An edge is encoded as 2 fixed points as <a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.DimensionalReflectionData"><code class="xref py py-class docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a> objects, and one spanning dimension.
 This classes processes the information encoded in the reflection data
 object into boolean valued attributes that determine
 whether the directional velocity qubits should be inverted to perform reflection.</p>
-<div class="pst-scrollable-table-container"><table class="table" id="id12">
-<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id12" title="Link to this table">#</a></caption>
+<div class="pst-scrollable-table-container"><table class="table" id="id14">
+<caption><span class="caption-text">Class attributes</span><a class="headerlink" href="#id14" title="Link to this table">#</a></caption>
 <colgroup>
 <col style="width: 33.3%" />
 <col style="width: 66.7%" />
@@ -1525,10 +1885,156 @@ whether the directional velocity qubits should be inverted to perform reflection
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>walls_joining</strong> (<em>List</em><em>[</em><a class="reference internal" href="#qlbm.lattice.blocks.DimensionalReflectionData" title="qlbm.lattice.blocks.DimensionalReflectionData"><em>DimensionalReflectionData</em></a><em>]</em>)</p></li>
+<li><p><strong>walls_joining</strong> (<em>List</em><em>[</em><a class="reference internal" href="#qlbm.lattice.geometry.DimensionalReflectionData" title="qlbm.lattice.geometry.encodings.collisionless.DimensionalReflectionData"><em>DimensionalReflectionData</em></a><em>]</em>)</p></li>
 <li><p><strong>dims_of_edge</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>)</p></li>
 <li><p><strong>bounds_disconnected_dim</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>)</p></li>
 <li><p><strong>dimension_outside</strong> (<em>bool</em><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.SpaceTimePWReflectionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">SpaceTimePWReflectionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gridpoint_encoded</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">qubits_to_invert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocity_indices_to_reflect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_from_boundary_point</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice_properties</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L15-L87"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.SpaceTimePWReflectionData" title="Link to this definition">#</a></dt>
+<dd><p>Class encoding the necessary information for the reflection of a particle from asingle grid point in the <code class="xref py py-class docutils literal notranslate"><span class="pre">STQBLM</span></code> algorithm.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">gridpoint_encoded</span></code></p></td>
+<td><p>The gridpoint encoded in the data.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">qubits_to_invert</span></code></p></td>
+<td><p>The grid qubit indices that have the value <span class="math notranslate nohighlight">\(\ket{0}\)</span>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">velocity_index_to_reflect</span></code></p></td>
+<td><p>The index of the qubit encoding the discrete velocity that should be reflected.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">distance_from_boundary_point</span></code></p></td>
+<td><p>The distance from the gridpoints where reflection takes place.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice_properties</span></code></p></td>
+<td><p>The properties of the lattice in which reflection takes place.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gridpoint_encoded</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>qubits_to_invert</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>velocity_indices_to_reflect</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>distance_from_boundary_point</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>lattice_properties</strong> (<em>SpaceTimeLatticeBuilder</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">SpaceTimeVolumetricReflectionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fixed_dim</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ranged_dims</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">range_dimension_bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_dimension_qubits_to_invert</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fixed_gridpoint</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">velocity_index_to_reflect</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_from_boundary_wall</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice_properties</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L90-L161"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData" title="Link to this definition">#</a></dt>
+<dd><p>Class encoding the necessary information for the reflection of a volumetric split of particles in the <code class="xref py py-class docutils literal notranslate"><span class="pre">STQBLM</span></code> algorithm.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">fixed_dim</span></code></p></td>
+<td><p>The physical dimension that the volume does not span.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ranged_dims</span></code></p></td>
+<td><p>The physical dimension(s) that the volume does span.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">range_dimension_bounds</span></code></p></td>
+<td><p>The bounds of the volume in each ranged dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">fixed_dimension_qubits_to_invert</span></code></p></td>
+<td><p>The grid qubit indices that have the value <span class="math notranslate nohighlight">\(\ket{0}\)</span> for the fixed dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">fixed_gridpoint</span></code></p></td>
+<td><p>The numerical value of the fixed gridpoint. Used for debugging purposes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">velocity_index_to_reflect</span></code></p></td>
+<td><p>The index of the qubit encoding the discrete velocity that should be reflected.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">distance_from_boundary_wall</span></code></p></td>
+<td><p>The distance from the gridpoints where reflection takes place.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice_properties</span></code></p></td>
+<td><p>The properties of the lattice in which reflection takes place.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fixed_dim</strong> (<em>int</em>)</p></li>
+<li><p><strong>ranged_dims</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>range_dimension_bounds</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>fixed_dimension_qubits_to_invert</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>)</p></li>
+<li><p><strong>fixed_gridpoint</strong> (<em>int</em>)</p></li>
+<li><p><strong>velocity_index_to_reflect</strong> (<em>int</em>)</p></li>
+<li><p><strong>distance_from_boundary_wall</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>lattice_properties</strong> (<em>SpaceTimeLatticeBuilder</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.lattice.geometry.SpaceTimeDiagonalReflectionData">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.geometry.</span></span><span class="sig-name descname"><span class="pre">SpaceTimeDiagonalReflectionData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_from_boundary_wall</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice_properties</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/geometry.py#L164-L265"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.geometry.SpaceTimeDiagonalReflectionData" title="Link to this definition">#</a></dt>
+<dd><p>Class encoding the necessary information for the reflection of a volumetric split of particles in the <code class="xref py py-class docutils literal notranslate"><span class="pre">STQBLM</span></code> algorithm.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">fixed_dim</span></code></p></td>
+<td><p>The physical dimension that the volume does not span.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">ranged_dims</span></code></p></td>
+<td><p>The physical dimension(s) that the volume does span.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">range_dimension_bounds</span></code></p></td>
+<td><p>The bounds of the volume in each ranged dimension.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">fixed_dimension_qubits_to_invert</span></code></p></td>
+<td><p>The grid qubit indices that have the value <span class="math notranslate nohighlight">\(\ket{0}\)</span> for the fixed dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">fixed_gridpoint</span></code></p></td>
+<td><p>The numerical value of the fixed gridpoint. Used for debugging purposes.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">velocity_index_to_reflect</span></code></p></td>
+<td><p>The index of the qubit encoding the discrete velocity that should be reflected.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">distance_from_boundary_wall</span></code></p></td>
+<td><p>The distance from the gridpoints where reflection takes place.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice_properties</span></code></p></td>
+<td><p>The properties of the lattice in which reflection takes place.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>bounds</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>step</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>distance_from_boundary_wall</strong> (<em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>lattice_properties</strong> (<em>SpaceTimeLatticeBuilder</em>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -1611,20 +2117,42 @@ whether the directional velocity qubits should be inverted to perform reflection
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#geometry">Geometry</a><ul class="visible nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul class="nav section-nav flex-column">
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block.get_spacetime_reflection_data_d1q2"><code class="docutils literal notranslate"><span class="pre">Block.get_spacetime_reflection_data_d1q2()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block.get_spacetime_reflection_data_d2q4"><code class="docutils literal notranslate"><span class="pre">Block.get_spacetime_reflection_data_d2q4()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block.get_d2q4_surfaces"><code class="docutils literal notranslate"><span class="pre">Block.get_d2q4_surfaces()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block.contains_gridpoint"><code class="docutils literal notranslate"><span class="pre">Block.contains_gridpoint()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block.stl_mesh"><code class="docutils literal notranslate"><span class="pre">Block.stl_mesh()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block.to_json"><code class="docutils literal notranslate"><span class="pre">Block.to_json()</span></code></a></li>
-<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.Block.to_dict"><code class="docutils literal notranslate"><span class="pre">Block.to_dict()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.get_spacetime_reflection_data_d1q2"><code class="docutils literal notranslate"><span class="pre">Block.get_spacetime_reflection_data_d1q2()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.get_spacetime_reflection_data_d2q4"><code class="docutils literal notranslate"><span class="pre">Block.get_spacetime_reflection_data_d2q4()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.get_d2q4_volumetric_reflection_data"><code class="docutils literal notranslate"><span class="pre">Block.get_d2q4_volumetric_reflection_data()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.get_d2q4_surfaces"><code class="docutils literal notranslate"><span class="pre">Block.get_d2q4_surfaces()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.contains_gridpoint"><code class="docutils literal notranslate"><span class="pre">Block.contains_gridpoint()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.stl_mesh"><code class="docutils literal notranslate"><span class="pre">Block.stl_mesh()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.to_json"><code class="docutils literal notranslate"><span class="pre">Block.to_json()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.name"><code class="docutils literal notranslate"><span class="pre">Block.name()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Block.to_dict"><code class="docutils literal notranslate"><span class="pre">Block.to_dict()</span></code></a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.DimensionalReflectionData"><code class="docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.ReflectionPoint"><code class="docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.ReflectionWall"><code class="docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.blocks.ReflectionResetEdge"><code class="docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle"><code class="docutils literal notranslate"><span class="pre">Circle</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.get_circle_perimeter"><code class="docutils literal notranslate"><span class="pre">Circle.get_circle_perimeter()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.stl_mesh"><code class="docutils literal notranslate"><span class="pre">Circle.stl_mesh()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.is_point_on_segment"><code class="docutils literal notranslate"><span class="pre">Circle.is_point_on_segment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.is_point_on_any_segment"><code class="docutils literal notranslate"><span class="pre">Circle.is_point_on_any_segment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.split_perimeter_points"><code class="docutils literal notranslate"><span class="pre">Circle.split_perimeter_points()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.to_json"><code class="docutils literal notranslate"><span class="pre">Circle.to_json()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.name"><code class="docutils literal notranslate"><span class="pre">Circle.name()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.to_dict"><code class="docutils literal notranslate"><span class="pre">Circle.to_dict()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.contains_gridpoint"><code class="docutils literal notranslate"><span class="pre">Circle.contains_gridpoint()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.get_spacetime_reflection_data_d1q2"><code class="docutils literal notranslate"><span class="pre">Circle.get_spacetime_reflection_data_d1q2()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.get_spacetime_reflection_data_d2q4"><code class="docutils literal notranslate"><span class="pre">Circle.get_spacetime_reflection_data_d2q4()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.get_d2q4_volumetric_reflection_data"><code class="docutils literal notranslate"><span class="pre">Circle.get_d2q4_volumetric_reflection_data()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.expand_axis_segments"><code class="docutils literal notranslate"><span class="pre">Circle.expand_axis_segments()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.Circle.expand_diagonal_segments"><code class="docutils literal notranslate"><span class="pre">Circle.expand_diagonal_segments()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.DimensionalReflectionData"><code class="docutils literal notranslate"><span class="pre">DimensionalReflectionData</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.ReflectionPoint"><code class="docutils literal notranslate"><span class="pre">ReflectionPoint</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.ReflectionWall"><code class="docutils literal notranslate"><span class="pre">ReflectionWall</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.ReflectionResetEdge"><code class="docutils literal notranslate"><span class="pre">ReflectionResetEdge</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.SpaceTimePWReflectionData"><code class="docutils literal notranslate"><span class="pre">SpaceTimePWReflectionData</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData"><code class="docutils literal notranslate"><span class="pre">SpaceTimeVolumetricReflectionData</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.lattice.geometry.SpaceTimeDiagonalReflectionData"><code class="docutils literal notranslate"><span class="pre">SpaceTimeDiagonalReflectionData</span></code></a></li>
 </ul>
 </li>
 </ul>

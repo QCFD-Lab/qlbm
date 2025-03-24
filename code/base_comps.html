@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Base Classes &#8212; qlbm 0.0.4 documentation</title>
+    <title>Base Classes &#8212; qlbm 0.0.5 documentation</title>
   
   
   
@@ -118,7 +118,7 @@
   
   
   
-    <p class="title logo__title">qlbm 0.0.4 documentation</p>
+    <p class="title logo__title">qlbm 0.0.5 documentation</p>
   
 </a></div>
     
@@ -394,7 +394,7 @@ and horizontally based on methods (i.e., different implementations for different
 <span id="lattice-bases"></span><h2>Lattice Base<a class="headerlink" href="#lattice-base" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="qlbm.lattice.lattices.base.Lattice">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.lattices.base.</span></span><span class="sig-name descname"><span class="pre">Lattice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L15-L334"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.lattice.lattices.base.</span></span><span class="sig-name descname"><span class="pre">Lattice</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L17-L373"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice" title="Link to this definition">#</a></dt>
 <dd><p>Base class for all algorithm-specific Lattices.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">Lattice</span></code> object performs the following functions:</p>
 <ol class="arabic simple">
@@ -443,7 +443,7 @@ Each quantum component that is parameterized by a <code class="docutils literal 
 to which it appends its designated logic.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">blocks</span></code></p></td>
-<td><p>A <code class="docutils literal notranslate"><span class="pre">Dict[str,</span> <span class="pre">List[Block]]</span></code> that contains all of the <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s encoding the solid geometry of the lattice.
+<td><p>A <code class="docutils literal notranslate"><span class="pre">Dict[str,</span> <span class="pre">List[Block]]</span></code> that contains all of the <a class="reference internal" href="lattice.html#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s encoding the solid geometry of the lattice.
 The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., <code class="docutils literal notranslate"><span class="pre">&quot;bounceback&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;specular&quot;</span></code>).</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
@@ -490,7 +490,7 @@ A sample configuration might look as follows:</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="qlbm.lattice.lattices.base.Lattice.parse_input_data">
-<span class="sig-name descname"><span class="pre">parse_input_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L98-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.parse_input_data" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">parse_input_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice_data</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L100-L135"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.parse_input_data" title="Link to this definition">#</a></dt>
 <dd><p>Parses the lattice input data, provided in either a file path or a dictionary.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -501,12 +501,12 @@ or a dictionary formatted as in the main class description.</p>
 <dd class="field-even"><p>A tuple containing
 (i) a list of the number of gridpoints per dimension,
 (ii) a list of the number of velicities per dimension,
-and (iii) a dictionary containing the solid <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s.
+and (iii) a dictionary containing the solid <a class="reference internal" href="lattice.html#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>s.
 The key of the dictionary is the specific kind of
 boundary condition of the obstacle (i.e., <code class="docutils literal notranslate"><span class="pre">&quot;bounceback&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;specular&quot;</span></code>).</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Tuple[List[int], List[int], Dict[str, List[<a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block">Block</a>]]]</p>
+<dd class="field-odd"><p>Tuple[List[int], List[int], Dict[str, List[<a class="reference internal" href="lattice.html#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block">Block</a>]]]</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.LatticeException" title="qlbm.tools.exceptions.LatticeException"><strong>LatticeException</strong></a> – If the specification violates any algorithmic assumptions.</p>
@@ -516,7 +516,7 @@ boundary condition of the obstacle (i.e., <code class="docutils literal notransl
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qlbm.lattice.lattices.base.Lattice.to_json">
-<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L281-L310"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.to_json" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">to_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L320-L349"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.to_json" title="Link to this definition">#</a></dt>
 <dd><p>Serialize the lattice specification to JSON format.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -530,7 +530,7 @@ boundary condition of the obstacle (i.e., <code class="docutils literal notransl
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qlbm.lattice.lattices.base.Lattice.get_registers">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_registers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L312-L322"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.get_registers" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_registers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L351-L361"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.get_registers" title="Link to this definition">#</a></dt>
 <dd><p>Generates the registers on which the quantum circuits will be placed.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
@@ -544,7 +544,7 @@ boundary condition of the obstacle (i.e., <code class="docutils literal notransl
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qlbm.lattice.lattices.base.Lattice.logger_name">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L324-L334"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.logger_name" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">logger_name</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/lattice/lattices/base.py#L363-L373"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.lattice.lattices.base.Lattice.logger_name" title="Link to this definition">#</a></dt>
 <dd><p>An identifiable name to be used in the logger to help with benchmarking and analysis.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>

@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Infrastructure &#8212; qlbm 0.0.4 documentation</title>
+    <title>Infrastructure &#8212; qlbm 0.0.5 documentation</title>
   
   
   
@@ -120,7 +120,7 @@
   
   
   
-    <p class="title logo__title">qlbm 0.0.4 documentation</p>
+    <p class="title logo__title">qlbm 0.0.5 documentation</p>
   
 </a></div>
     
@@ -1105,7 +1105,7 @@ We begin by constructing a <a class="reference internal" href="stqlbm_comps.html
 <span id="id3"></span><h2>Results<a class="headerlink" href="#results" title="Link to this heading">#</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.result.base.</span></span><span class="sig-name descname"><span class="pre">QBMResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L15-L161"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.result.base.</span></span><span class="sig-name descname"><span class="pre">QBMResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L15-L162"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult" title="Link to this definition">#</a></dt>
 <dd><p>Base class for all algorithm-specific results.</p>
 <p>A <code class="docutils literal notranslate"><span class="pre">Result</span></code> object parses the counts extracted from the quantum state
 at the end of the simulation of some number of time steps.
@@ -1149,7 +1149,7 @@ lattice geometry and save data to disk in compressed formats.</p>
 <span class="sig-name descname"><span class="pre">visualize_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L60-L68"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.visualize_geometry" title="Link to this definition">#</a></dt>
 <dd><p>Creates <code class="docutils literal notranslate"><span class="pre">stl</span></code> files for each block in the lattice.</p>
 <p>Output files are formatted as <code class="docutils literal notranslate"><span class="pre">output_dir/paraview_dir/cube_&lt;x&gt;.stl</span></code>.
-The output is created through the <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block" title="qlbm.lattice.blocks.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>’s <a class="reference internal" href="lattice.html#qlbm.lattice.blocks.Block.stl_mesh" title="qlbm.lattice.blocks.Block.stl_mesh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Block.stl_mesh()</span></code></a> method.</p>
+The output is created through the <a class="reference internal" href="lattice.html#qlbm.lattice.geometry.Block" title="qlbm.lattice.geometry.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a>’s <a class="reference internal" href="lattice.html#qlbm.lattice.geometry.Block.stl_mesh" title="qlbm.lattice.geometry.Block.stl_mesh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Block.stl_mesh()</span></code></a> method.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -1170,7 +1170,7 @@ The output is created through the <a class="reference internal" href="lattice.ht
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.create_visualization">
-<span class="sig-name descname"><span class="pre">create_visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L100-L132"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.create_visualization" title="Link to this definition">#</a></dt>
+<span class="sig-name descname"><span class="pre">create_visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L100-L133"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.create_visualization" title="Link to this definition">#</a></dt>
 <dd><p>Creates a <code class="docutils literal notranslate"><span class="pre">vtk</span></code> visual representation of the data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1184,7 +1184,7 @@ The output is created through the <a class="reference internal" href="lattice.ht
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.save_timestep_counts">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_timestep_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_vis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L134-L156"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.save_timestep_counts" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_timestep_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_vis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L135-L157"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.save_timestep_counts" title="Link to this definition">#</a></dt>
 <dd><p>Saves the time step counts to a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1200,7 +1200,7 @@ The output is created through the <a class="reference internal" href="lattice.ht
 
 <dl class="py method">
 <dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.visualize_all_numpy_data">
-<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">visualize_all_numpy_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L158-L161"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.visualize_all_numpy_data" title="Link to this definition">#</a></dt>
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">visualize_all_numpy_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L159-L162"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.visualize_all_numpy_data" title="Link to this definition">#</a></dt>
 <dd><p>Converts all numpy data saved to disk to <code class="docutils literal notranslate"><span class="pre">vti</span></code> files.</p>
 </dd></dl>
 
