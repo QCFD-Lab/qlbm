@@ -44,6 +44,11 @@ source qlbm-cpu-venv/bin/activate
 pip install --upgrade pip
 pip install -e .[cpu,dev,docs]
 ```
+If you are using `zsh` you need to replace the last line by
+```
+pip install -e .\[cpu,dev,docs\]
+```
+
 We also provide a `make` script for this purpose, which will create the environment from scratch:
 
 ```
