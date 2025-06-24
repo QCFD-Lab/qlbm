@@ -12,7 +12,6 @@ from pytket.extensions.qulacs import QulacsBackend, tk_to_qulacs
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.compiler import transpile
 from qiskit_aer.backends.aerbackend import AerBackend
-from qiskit_qulacs import QulacsProvider
 from qulacs import QuantumCircuit as QulacsQC
 
 from qlbm.components.base import QuantumComponent
@@ -196,7 +195,10 @@ class CircuitCompiler:
                 self.logger.warn(
                     "Provided backend is ignored. The qiskit-qulacs backend is always used when compiling to Qulacs from Qiskit."
                 )
-            backend = QulacsProvider().get_backend("qulacs_simulator")
+            raise CompilerException(
+                "The qiksit-qulacs extension does not currently support qiskit>=2.0."
+            )
+            # backend = QulacsProvider().get_backend("qulacs_simulator")
 
         if self.compiler_target == "QISKIT":
             if not isinstance(backend, AerBackend):
