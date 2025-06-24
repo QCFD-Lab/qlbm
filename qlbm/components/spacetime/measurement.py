@@ -4,7 +4,7 @@ from logging import Logger, getLogger
 from typing import Tuple
 
 from qiskit import ClassicalRegister
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
@@ -132,7 +132,7 @@ class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
         target_qubits = self.lattice.ancilla_mass_index()
 
         circuit.compose(
-            MCMT(
+            MCMTGate(
                 XGate(),
                 len(control_qubits),
                 len(target_qubits),

@@ -6,7 +6,7 @@ from time import perf_counter_ns
 
 from qiskit import QuantumCircuit
 from qiskit.circuit import Gate
-from qiskit.circuit.library import MCMT, RYGate
+from qiskit.circuit.library import MCMTGate, RYGate
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
@@ -87,7 +87,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
 
         collision_circuit = self.local_collision_circuit(reset_state=False)
         collision_circuit.compose(
-            MCMT(
+            MCMTGate(
                 self.gate_to_apply,
                 self.lattice.properties.get_num_velocities_per_point() - 1,
                 1,

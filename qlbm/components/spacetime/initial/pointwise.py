@@ -4,7 +4,7 @@ from logging import Logger, getLogger
 from typing import List, Tuple
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
@@ -94,7 +94,7 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
                     continue
             circuit.compose(self.set_grid_value(grid_point_data[0]), inplace=True)
             circuit.compose(
-                MCMT(
+                MCMTGate(
                     XGate(),
                     num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
                     num_target_qubits=sum(
@@ -204,7 +204,7 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
             self.set_grid_value(absolute_neighbor_coordinates), inplace=True
         )
         circuit.compose(
-            MCMT(
+            MCMTGate(
                 XGate(),
                 num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
                 num_target_qubits=sum(

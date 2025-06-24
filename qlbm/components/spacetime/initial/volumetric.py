@@ -5,7 +5,7 @@ from time import perf_counter_ns
 from typing import List, Tuple, cast
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
@@ -109,7 +109,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
                     [any(pvb[1]) for pvb in periodic_volume_bounds]
                 ):
                     circuit.compose(
-                        MCMT(
+                        MCMTGate(
                             XGate(),
                             num_ctrl_qubits=len(control_qubit_sequence),
                             num_target_qubits=sum(

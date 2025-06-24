@@ -5,7 +5,7 @@ from time import perf_counter_ns
 from typing import List, Tuple
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
@@ -93,7 +93,9 @@ class MCSwap(LBMPrimitive):
 
         circuit.cx(self.target_qubits[1], self.target_qubits[0])
         circuit.compose(
-            MCMT(XGate(), len(self.control_qubits) + 1, len(self.target_qubits) - 1),
+            MCMTGate(
+                XGate(), len(self.control_qubits) + 1, len(self.target_qubits) - 1
+            ),
             qubits=self.control_qubits + list(self.target_qubits),
             inplace=True,
         )
