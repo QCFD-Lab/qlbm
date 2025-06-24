@@ -433,9 +433,6 @@ class Circle(SpaceTimeShape):
             expanded_diag_gridpoints: List[Tuple[int, ...]] = (
                 Circle.expand_diagonal_segments([diag_segment])
             )
-
-            if (4, 1) in expanded_diag_gridpoints:
-                print("ok!")
             for reflection_dim in [0, 1]:
                 other_dim = 1 - reflection_dim
                 streaming_line_velocities = [0, 2] if reflection_dim == 0 else [1, 3]
