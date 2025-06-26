@@ -4,7 +4,7 @@ from logging import Logger, getLogger
 from typing import List, Tuple
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMTGate, MCXGate, XGate
+from qiskit.circuit.library import MCXGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
