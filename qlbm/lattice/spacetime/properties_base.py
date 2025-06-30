@@ -39,7 +39,7 @@ class LatticeDiscretizationProperties:
         * - :attr:`num_velocities`
           - The number of velocities in the discretization. Stored as a ``Dict[LatticeDiscretization, int]``.
         * - :attr:`velocity_vectors`
-          - The velocity profile each of the :math:`q` velocity channels. Each vector is :math:`d-`dimensional and each entry represents the velocity component of the channel in a particular dimension. Stored as a ``Dict[LatticeDiscretization, numpy.ndarray]``.
+          - The velocity profile each of the :math:`q` velocity channels. Each vector is :math:`d`-dimensional and each entry represents the velocity component of the channel in a particular dimension. Stored as a ``Dict[LatticeDiscretization, numpy.ndarray]``.
     """
 
     velocity_vectors: Dict[LatticeDiscretization, np.ndarray] = {
