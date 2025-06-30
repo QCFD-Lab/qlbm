@@ -45,7 +45,7 @@ readme = "README.md"
 
 [project.optional-dependencies]
 dev = [
-    "mypy",
+    "mypy==1.16.1",
     "pytest",
     "pytest-cov",
     "coverage",
