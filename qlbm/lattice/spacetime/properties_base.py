@@ -10,6 +10,7 @@ from enum import Enum
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple, cast
 
+import numpy as np
 from qiskit import QuantumRegister
 
 
@@ -22,6 +23,79 @@ class LatticeDiscretization(Enum):
 
     D1Q2 = (1,)
     D2Q4 = (2,)
+    D3Q6 = (3,)
+
+
+class LatticeDiscretizationProperties:
+    """
+    Class containing properties of the lattice discretization in the :math:`D_dQ_q` taxonomy.
+
+    .. list-table:: Attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`num_velocities`
+          - The number of velocities in the discretization. Stored as a ``Dict[LatticeDiscretization, int]``.
+        * - :attr:`velocity_vectors`
+          - The velocity profile each of the :math:`q` velocity channels. Each vector is :math:`d-`dimensional and each entry represents the velocity component of the channel in a particular dimension. Stored as a ``Dict[LatticeDiscretization, numpy.ndarray]``.
+    """
+
+    velocity_vectors: Dict[LatticeDiscretization, np.ndarray] = {
+        LatticeDiscretization.D1Q2: np.array([[1], [-1]]),
+        LatticeDiscretization.D2Q4: np.array([[1, 0], [0, 1], [-1, 0], [0, -1]]),
+        LatticeDiscretization.D3Q6: np.array(
+            [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -1, 0], [0, 0, -1]]
+        ),
+    }
+
+    num_velocities: Dict[LatticeDiscretization, int] = {
+        LatticeDiscretization.D1Q2: 2,
+        LatticeDiscretization.D2Q4: 4,
+        LatticeDiscretization.D3Q6: 6,
+    }
+
+    @staticmethod
+    def get_velocity_vectors(
+        discretization: LatticeDiscretization,
+    ) -> np.ndarray:
+        """
+        Get the velocity vectors for a given discretization.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization for which to get the velocity vectors.
+
+        Returns
+        -------
+        np.ndarray
+            The velocity vectors corresponding to the discretization.
+        """
+        return LatticeDiscretizationProperties.velocity_vectors[discretization]
+
+    @staticmethod
+    def get_num_velocities(
+        discretization: LatticeDiscretization,
+    ) -> int:
+        """
+        Get the number of velocities for a given discretization.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization for which to get the number of velocities.
+
+        Returns
+        -------
+        int
+            The number of velocities corresponding to the discretization.
+        """
+        if discretization not in LatticeDiscretizationProperties.num_velocities:
+            raise ValueError(f"Discretization {discretization} is not supported.")
+
+        return LatticeDiscretizationProperties.num_velocities[discretization]
 
 
 class VonNeumannNeighborType(Enum):

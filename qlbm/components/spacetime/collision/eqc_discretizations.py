@@ -1,5 +1,7 @@
+"""Equivalence class utility functions. For a discussion of equivalence classes, we refer the reader to Section 4 of :cite:`spacetime2`."""
+
 from itertools import product
-from typing import Dict, List, Set, Tuple
+from typing import Dict, Set, Tuple, override
 
 import numpy as np
 
@@ -11,10 +13,39 @@ from qlbm.tools.exceptions import LatticeException
 
 
 class EquivalenceClass:
+    """
+    Class representing LGA equivalence classes.
+
+    In ``qlbm``, an equivalence class is a set of velocity configurations that share the same mass and momentum.
+    For a more in depth explanation, consult Section 4 of :cite:p:`spacetime2`.
+
+    .. list-table:: Constructor Attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`discretization`
+          - The :class:`.LatticeDiscretization` that the equivalence class belongs to.
+        * - :attr:`velocity_configurations`
+          - The :class:`Set[Tuple[bool, ...]]` that contains the velocity configurations of the equivalence class. Configurations are stored as ``q``-tuples where an entry is ``True`` if the velocity channel is occupied and ``False`` otherwise.
+
+    .. list-table:: Class Attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`mass`
+          - The total mass of the equivalence class, which is the sum of all occupied velocity channels.
+        * - :attr:`momentum`
+          - The total momentum of the equivalence class, which is the vector sum of all occupied velocity channels multiplid by their :class:`.LatticeDiscretizationProperties` velocity contribution.
+    """
+
     discretization: LatticeDiscretization
     velocity_configurations: Set[Tuple[bool, ...]]
     mass: int
-    momentum: np.array
+    momentum: np.typing.NDArray
 
     def __init__(
         self,
@@ -34,7 +65,7 @@ class EquivalenceClass:
             )
 
         self.discretization = discretization
-        self.velocity_configuration = velocity_configurations
+        self.velocity_configurations = velocity_configurations
         self.mass = sum(list(velocity_configurations)[0])
 
         velocity_vectors = LatticeDiscretizationProperties.get_velocity_vectors(
@@ -68,19 +99,74 @@ class EquivalenceClass:
             raise LatticeException("Velocity configurations have different momenta.")
 
     def size(self) -> int:
-        return len(self.velocity_configuration)
+        """
+        The number of velocity configurations in the equivalence class.
 
-    def id(self) -> Tuple[int, np.array]:
+        Returns
+        -------
+        int
+            The number of velocity configurations in the equivalence class.
+        """
+        return len(self.velocity_configurations)
+
+    def id(self) -> Tuple[int, np.typing.NDArray]:
+        """
+        The identifier of the equivalence class.
+
+        For a given discretization, an equivalence class can be uniquely identified by the common mass and momentum of its velocity configurations.
+
+        Returns
+        -------
+        Tuple[int, np.typing.NDArray]
+            The mass and momentum of the equivalence class.
+        """
         return (self.mass, self.momentum)
+
+    @override
+    def __eq__(self, value):
+        if not isinstance(value, EquivalenceClass):
+            return False
+        return (
+            self.discretization == value.discretization
+            and self.velocity_configurations == value.velocity_configurations
+            and self.mass == value.mass
+            and np.array_equal(self.momentum, value.momentum)
+        )
+
+    @override
+    def __hash__(self):
+        return hash((self.discretization, tuple(self.velocity_configurations)))
 
 
 class EquivalenceClassGenerator:
+    """
+    A class that generates equivalence classes for a given lattice discretization.
+
+    .. list-table:: Constructor Attributes
+        :widths: 25 50
+        :header-rows: 1
+
+        * - Attribute
+          - Description
+        * - :attr:`discretization`
+          - The :class:`.LatticeDiscretization` that the equivalence class belongs to.
+
+    """
+
     discretization: LatticeDiscretization
 
     def __init__(self, discretization):
         self.discretization = discretization
 
     def generate_equivalence_classes(self) -> Set[EquivalenceClass]:
+        """
+        Generates equivalence classes for the given lattice discretization.
+
+        Returns
+        -------
+        Set[EquivalenceClass]
+            All equivalence classes of the discretization.
+        """
         equivalence_classes: Dict = {}
         for state in product(
             [0, 1],
@@ -101,7 +187,7 @@ class EquivalenceClassGenerator:
             equivalence_classes[key].append(state)
 
         return {
-            EquivalenceClass(self.discretization, v)
+            EquivalenceClass(self.discretization, set(tuple(cfg.tolist()) for cfg in v))
             for _, v in equivalence_classes.items()
             if len(v) > 1
         }
