@@ -1,3 +1,5 @@
+from typing import Set, Tuple
+
 import pytest
 
 from qlbm.components.spacetime.collision import (
@@ -9,7 +11,7 @@ from qlbm.tools.exceptions import LatticeException
 
 
 def test_equivalence_class_bad_number_of_velocity_configurations():
-    velocity_profile = {(True, True, True, True)}
+    velocity_profile: Set[Tuple[bool, ...]] = {(True, True, True, True)}
     with pytest.raises(LatticeException) as excinfo:
         EquivalenceClass(LatticeDiscretization.D2Q4, velocity_profile)
     assert (
@@ -19,7 +21,7 @@ def test_equivalence_class_bad_number_of_velocity_configurations():
 
 
 def test_equivalence_class_bad_number_velocity_configurations():
-    velocity_profile = {(True, True, True), (True, True, True, False)}
+    velocity_profile: Set[Tuple[bool, ...]] = {(True, True, True), (True, True, True, False)}
     with pytest.raises(LatticeException) as excinfo:
         EquivalenceClass(LatticeDiscretization.D2Q4, velocity_profile)
     assert (
@@ -29,20 +31,21 @@ def test_equivalence_class_bad_number_velocity_configurations():
 
 
 def test_equivalence_class_bad_mass():
-    velocity_profile = {(True, False, True, False), (True, True, True, False)}
+    velocity_profile: Set[Tuple[bool, ...]] = {(True, False, True, False), (True, True, True, False)}
     with pytest.raises(LatticeException) as excinfo:
         EquivalenceClass(LatticeDiscretization.D2Q4, velocity_profile)
     assert "Velocity configurations have different masses." == str(excinfo.value)
 
 
 def test_equivalence_class_bad_momentum():
-    velocity_profile = {(True, False, True, False), (True, True, False, False)}
+    velocity_profile: Set[Tuple[bool, ...]] = {(True, False, True, False), (True, True, False, False)}
     with pytest.raises(LatticeException) as excinfo:
         EquivalenceClass(LatticeDiscretization.D2Q4, velocity_profile)
     assert "Velocity configurations have different momenta." == str(excinfo.value)
 
+
 def test_equivalence_class_ok():
-    velocity_profile = {(True, False, True, False), (False, True, False, True)}
+    velocity_profile: Set[Tuple[bool, ...]] = {(True, False, True, False), (False, True, False, True)}
     eqc = EquivalenceClass(LatticeDiscretization.D2Q4, velocity_profile)
     assert eqc.mass == 2
     assert eqc.momentum.tolist() == [0, 0]

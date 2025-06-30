@@ -1,4 +1,4 @@
-from qiskit.circuit.library import MCXGate
+from qiskit.circuit.library import MCMTGate, XGate
 
 from qlbm.components.common.primitives import MCSwap
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
@@ -21,7 +21,7 @@ def test_mcswap_13ctrl():
 
     expected_circuit.cx(6, 5)
     expected_circuit.compose(
-        MCXGate(4),
+        MCMTGate(XGate(), 4, 1),
         qubits=[0, 2, 3, 5, 6],
         inplace=True,
     )
@@ -51,7 +51,7 @@ def test_mcswap_grid_ctrl():
 
     expected_circuit.cx(11, 9)
     expected_circuit.compose(
-        MCXGate(9),
+        MCMTGate(XGate(), 9, 1),
         qubits=list(range(8)) + [9, 11],
         inplace=True,
     )
