@@ -1,7 +1,7 @@
 """Equivalence class utility functions. For a discussion of equivalence classes, we refer the reader to Section 4 of :cite:`spacetime2`."""
 
 from itertools import product
-from typing import Dict, Set, Tuple, override
+from typing import Dict, List, Set, Tuple, override
 
 import numpy as np
 
@@ -109,7 +109,7 @@ class EquivalenceClass:
         """
         return len(self.velocity_configurations)
 
-    def id(self) -> Tuple[int, np.typing.NDArray]:
+    def id(self) -> Tuple[int, List[float]]:
         """
         The identifier of the equivalence class.
 
@@ -117,10 +117,21 @@ class EquivalenceClass:
 
         Returns
         -------
-        Tuple[int, np.typing.NDArray]
+        Tuple[int, List[float]]
             The mass and momentum of the equivalence class.
         """
-        return (self.mass, self.momentum)
+        return (self.mass, self.momentum.tolist())
+    
+    def get_bitstrings(self) -> List[str]:
+        """
+        Returns the velocity configurations as bitstrings.
+
+        Returns
+        -------
+        List[str]
+            The velocity configurations of the equivalence class as bitstrings.
+        """
+        return [''.join(['1' if x else '0' for x in cfg]) for cfg in self.velocity_configurations]
 
     @override
     def __eq__(self, value):
