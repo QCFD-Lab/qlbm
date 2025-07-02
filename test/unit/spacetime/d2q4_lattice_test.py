@@ -1128,20 +1128,21 @@ def test_bad_lattice_specification_velocities():
     )
 
 
-def test_bad_lattice_specification_velocities_3d():
+def test_bad_lattice_specification_velocities_4d():
     with pytest.raises(LatticeException) as excinfo_measure:
         SpaceTimeLattice(
             2,
             {
                 "lattice": {
-                    "dim": {"x": 16, "y": 16, "z": 16},
-                    "velocities": {"x": 2, "y": 2, "z": 2},
+                    "dim": {"x": 16, "y": 16, "z": 16, "a": 32},
+                    "velocities": {"x": 2, "y": 2, "z": 2, "a": 2},
                 },
             },
         )
 
-    assert "Only 1D and 2D discretizations are currently available." == str(
-        excinfo_measure.value
+    assert (
+        "Only 1, 2, and 3-dimensional lattices are supported. Provided lattice has 4 dimensions."
+        == str(excinfo_measure.value)
     )
 
 
