@@ -9,6 +9,7 @@ from typing_extensions import override
 from qlbm.lattice.lattices.base import Lattice
 from qlbm.lattice.spacetime.d1q2 import D1Q2SpaceTimeLatticeBuilder
 from qlbm.lattice.spacetime.d2q4 import D2Q4SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.d3q6 import D3Q6SpaceTimeLatticeBuilder
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten
@@ -177,9 +178,24 @@ class SpaceTimeLattice(Lattice):
                 f"Unsupported number of velocities for 2D: {(self.num_velocities[0] + 1, self.num_velocities[1] + 1)}. Only D2Q4 is supported at the moment."
             )
 
-        raise LatticeException(
-            "Only 1D and 2D discretizations are currently available."
-        )
+        if self.num_dims == 3:
+            if (
+                self.num_velocities[0] == 1
+                and self.num_velocities[1] == 1
+                and self.num_velocities[2] == 1
+            ):
+                return D3Q6SpaceTimeLatticeBuilder(
+                    self.num_timesteps,
+                    self.num_gridpoints,
+                    include_measurement_qubit=self.include_measurement_qubit,
+                    use_volumetric_ops=self.use_volumetric_ops,
+                    logger=self.logger,
+                )
+            raise LatticeException(
+                f"Unsupported number of velocities for 3D: {(self.num_velocities[0] + 1, self.num_velocities[1] + 1)}. Only D3Q6 is supported at the moment."
+            )
+
+        raise LatticeException("Only 1-3D discretizations are currently available.")
 
     def grid_index(self, dim: int | None = None) -> List[int]:
         """Get the indices of the qubits used that encode the grid values for the specified dimension.
