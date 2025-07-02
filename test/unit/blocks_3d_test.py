@@ -38,8 +38,6 @@ def test_3d_mesh(simple_3d_block):
     assert all(a == b for a, b in zip(vertex_ull, mesh.vectors[1][1]))
     assert all(a == b for a, b in zip(vertex_ulu, mesh.vectors[1][2]))
 
-    # TODO: complete the remaining 5 faces
-
 
 def test_3d_inner_x_wall_points(simple_3d_block):
     assert len(simple_3d_block.walls_inside) == 3

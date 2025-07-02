@@ -166,7 +166,6 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
         return "Space Time Collision Operator"
 
 
@@ -257,7 +256,6 @@ class GenericSpaceTimeCollisionOperator(SpaceTimeOperator):
             The circuit performing the collision.
         """
         circuit = QuantumCircuit(self.lattice.properties.get_num_velocities_per_point())
-        # if equivalence_class.id() in [(4, [0, 0, 0]), (3, [1, 0, 0]), (2, [0, 0, 0])]:
         circuit.compose(
             SpaceTimeEQCPermutation(equivalence_class, logger=self.logger).circuit,
             inplace=True,
@@ -278,5 +276,4 @@ class GenericSpaceTimeCollisionOperator(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO
-        return "Generic Space Time Collision Operator"
+        return f"[GenericSpaceTimeCollisionOperator for discretization {self.lattice.properties.get_discretization()}]"

@@ -79,8 +79,7 @@ class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "Space Gird Measurement"
+        return f"[SpaceTimeGridVelocityMeasurement for lattice {self.lattice}]"
 
 
 class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
@@ -150,5 +149,4 @@ class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "SpaceTimePointWiseMassMeasurement"
+        return f"[SpaceTimePointWiseMassMeasurement for lattice {self.lattice}, gridpoint {self.gridpoint}, velocity {self.velocity_index_to_measure}]"

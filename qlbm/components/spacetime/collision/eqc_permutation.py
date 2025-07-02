@@ -119,5 +119,4 @@ class SpaceTimeEQCPermutation(LBMPrimitive):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "Space Time Collision Operator"
+        return f"[SpaceTimeEQCPermutation for eqc {self.equivalence_class}]"

@@ -169,5 +169,4 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "Space Time Reflection Operator"
+        return f"[PointWiseSpaceTimeReflectionOperator for lattice {self.lattice}, blocks {self.blocks}, filtered {self.filter_inside_blocks}]"

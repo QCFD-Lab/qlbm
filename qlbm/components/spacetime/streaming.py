@@ -165,5 +165,4 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "Space Time Streaming Operator"
+        return f"[SpaceTimeStreamingOperator for lattice {self.lattice}]"
