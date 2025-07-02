@@ -10,6 +10,14 @@ from qiskit.circuit.library import MCMTGate, RYGate
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
+from qlbm.components.spacetime.collision.eqc_discretizations import (
+    EquivalenceClass,
+    EquivalenceClassGenerator,
+)
+from qlbm.components.spacetime.collision.eqc_permutation import SpaceTimeEQCPermutation
+from qlbm.components.spacetime.collision.eqc_redistribution import (
+    SpaceTimeEQCRedistribution,
+)
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
@@ -160,3 +168,115 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
     def __str__(self) -> str:
         # TODO: Implement
         return "Space Time Collision Operator"
+
+
+class GenericSpaceTimeCollisionOperator(SpaceTimeOperator):
+    """
+    A generic space-time collision operator that can be used to apply any gate to the velocities of a grid location.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`lattice`           The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
+    :attr:`gate`              The gate to apply to the velocities.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    ========================= ======================================================================
+    """
+
+    def __init__(
+        self,
+        lattice: SpaceTimeLattice,
+        timestep: int,
+        logger: Logger = getLogger("qlbm"),
+    ) -> None:
+        super().__init__(lattice, logger)
+        self.lattice = lattice
+        self.timestep = timestep
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self) -> QuantumCircuit:
+        local_collision_circuit = self.create_circuit_one_register()
+        circuit = self.lattice.circuit.copy()
+
+        for velocity_qubit_indices in range(
+            self.lattice.properties.get_num_grid_qubits(),
+            self.lattice.properties.get_num_grid_qubits()
+            + self.lattice.properties.get_num_velocity_qubits(self.timestep),
+            self.lattice.properties.get_num_velocities_per_point(),
+        ):
+            circuit.compose(
+                local_collision_circuit,
+                inplace=True,
+                qubits=range(
+                    velocity_qubit_indices,
+                    velocity_qubit_indices
+                    + self.lattice.properties.get_num_velocities_per_point(),
+                ),
+            )
+        return circuit
+
+    def create_circuit_one_register(self) -> QuantumCircuit:
+        """
+        Applies the collision operator of all equivalence classes onto one velocity register.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit performing the complete collision operator.
+        """
+        circuit = QuantumCircuit(self.lattice.properties.get_num_velocities_per_point())
+
+        for eqc in EquivalenceClassGenerator(
+            self.lattice.properties.get_discretization()
+        ).generate_equivalence_classes():
+            circuit.compose(self.create_circuit_one_eqc(eqc), inplace=True)
+
+        return circuit
+
+    def create_circuit_one_eqc(
+        self, equivalence_class: EquivalenceClass
+    ) -> QuantumCircuit:
+        """
+        Creates the PRP-based collision operator for one equivalence class.
+
+        Parameters
+        ----------
+        equivalence_class : EquivalenceClass
+            The equivalence class to collide.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit performing the collision.
+        """
+        circuit = QuantumCircuit(self.lattice.properties.get_num_velocities_per_point())
+        # if equivalence_class.id() in [(4, [0, 0, 0]), (3, [1, 0, 0]), (2, [0, 0, 0])]:
+        circuit.compose(
+            SpaceTimeEQCPermutation(equivalence_class, logger=self.logger).circuit,
+            inplace=True,
+        )
+
+        circuit.compose(
+            SpaceTimeEQCRedistribution(equivalence_class, logger=self.logger).circuit,
+            inplace=True,
+        )
+        circuit.compose(
+            SpaceTimeEQCPermutation(
+                equivalence_class, inverse=True, logger=self.logger
+            ).circuit,
+            inplace=True,
+        )
+
+        return circuit
+
+    @override
+    def __str__(self) -> str:
+        # TODO
+        return "Generic Space Time Collision Operator"
