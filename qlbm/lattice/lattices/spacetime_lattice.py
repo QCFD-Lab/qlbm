@@ -123,7 +123,7 @@ class SpaceTimeLattice(Lattice):
         self.include_measurement_qubit = include_measurement_qubit
         self.use_volumetric_ops = use_volumetric_ops
 
-        self.num_gridpoints, self.num_velocities, self.blocks = self.parse_input_data(
+        self.num_gridpoints, self.num_velocities, self.shapes = self.parse_input_data(
             lattice_data
         )  # type: ignore
         self.num_dims = len(self.num_gridpoints)
@@ -416,7 +416,7 @@ class SpaceTimeLattice(Lattice):
         """
         return any(
             block.contains_gridpoint(gridpoint)
-            for block in flatten(self.blocks.values())
+            for block in flatten(self.shapes.values())
         )
 
     @override

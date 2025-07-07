@@ -23,7 +23,7 @@ class CollisionlessLattice(Lattice):
     :attr:`num_dims`            The number of dimensions of the lattice.
     :attr:`num_gridpoints`      A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
                                 **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
-                                specified in the input dicitionary is one larger than the one held in the ``Lattice``.
+                                specified in the input dictionary is one larger than the one held in the ``Lattice``.
                                 That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
     :attr:`num_grid_qubits`     The total number of qubits required to encode the lattice grid.
     :attr:`num_velocity_qubits` The total number of qubits required to encode the velocity discretization of the lattice.
@@ -160,7 +160,7 @@ class CollisionlessLattice(Lattice):
         self.num_dims = len(dimensions)
         self.num_gridpoints = dimensions
         self.num_velocities = velocities
-        self.blocks: Dict[str, List[Block]] = blocks
+        self.blocks: Dict[str, List[Block]] = blocks  # type: ignore
         self.block_list: List[Block] = flatten(list(blocks.values()))
         self.num_comparator_qubits = 2 * (self.num_dims - 1)
         self.num_obstacle_qubits = self.__num_obstacle_qubits()
@@ -514,7 +514,7 @@ class CollisionlessLattice(Lattice):
     def logger_name(self) -> str:
         gp_string = ""
         for c, gp in enumerate(self.num_gridpoints):
-            gp_string += f"{gp+1}"
+            gp_string += f"{gp + 1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
         return f"{self.num_dims}d-{gp_string}-{len(self.block_list)}-obstacle"

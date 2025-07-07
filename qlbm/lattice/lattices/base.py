@@ -31,22 +31,16 @@ class Lattice(ABC):
     Attribute                   Summary
     =========================== ======================================================================
     :attr:`num_dims`            The number of dimensions of the lattice.
-    :attr:`num_gridpoints`      A ``List[int]`` of the number of gridpoints of the lattice in each dimension.
-                                **Important**\ : for easier compatibility with binary arithmetic, the number of gridpoints
-                                specified in the input dicitionary is one larger than the one held in the ``Lattice``.
-                                That is, for a ``16x64`` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
-    :attr:`num_grid_qubits`     The total number of qubits required to encode the lattice grid.
+    :attr:`num_gridpoints`      The number of gridpoints in each dimension.
+    :attr:`num_grid_qubits`     The total number of qubits required to encode the grid.
+    :attr:`num_velocities`      The number of discrete velocities in each dimension.
     :attr:`num_velocity_qubits` The total number of qubits required to encode the velocity discretization of the lattice.
-    :attr:`num_ancilla_qubits`  The total number of ancilla (non-velocity, non-grid) qubits required for the quantum circuit to simulate this lattice.
+    :attr:`num_ancilla_qubits`  The total number of ancllary qubits required for the quantum circuit to simulate this lattice.
     :attr:`num_total_qubits`    The total number of qubits required for the quantum circuit to simulate the lattice.
-                                This is the sum of the number of grid, velocity, and ancilla qubits.
-    :attr:`registers`           A ``Tuple[qiskit.QuantumRegister, ...]`` that holds registers responsible for specific operations of the QLBM algorithm.
-    :attr:`circuit`             An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
-                                Each quantum component that is parameterized by a ``Lattice`` makes a copy of this quantum circuit
-                                to which it appends its designated logic.
-    :attr:`blocks`              A ``Dict[str, List[Block]]`` that contains all of the :class:`.Block`\ s encoding the solid geometry of the lattice.
-                                The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
-    :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`registers`           The qubit registers of the quantum algorithm.
+    :attr:`circuit`             The blueprint quantum circuit for all components of the algorithm.
+    :attr:`shapes`              A list of the solid geometry objects.
+    :attr:`logger`              The performance logger.
     =========================== ======================================================================
 
     A lattice can be constructed from from either an input file or a Python dictionary.
@@ -81,13 +75,71 @@ class Lattice(ABC):
     """
 
     num_dims: int
+    """
+    The number of dimensions of the system.
+    """
     num_gridpoints: List[int]
+    """
+    The number of gridpoints of the lattice in each dimension.
+    
+    .. warning::
+
+        For easier compatibility with binary arithmetic, the number of gridpoints 
+        specified in the input dictionary is one larger than the one held in the :class:`.Lattice` s.
+        That is, for a :math:`16 \\times 64` lattice, the ``num_gridpoints`` attribute will have the value ``[15, 63]``.
+    """
+
     num_velocities: List[int]
+    """
+    The number of velocities in each dimension. This will be refactored in the future to support :math:`D_dQ_q` discretizations.
+
+    .. warning::
+
+        For easier compatibility with binary arithmetic, the number of velocities 
+        specified in the input dictionary is one larger than the one held in the :class:`.Lattice` s.
+        If the numbers of discrete velocities are :math:`4` and :math:`2`, the ``num_velocities`` attribute will have the value ``[3, 1]``.
+    """
+
+    num_grid_qubits: int
+    """
+    The number of qubits required to encode the grid.
+    """
+
+    num_velocity_qubits: int
+    """
+    The number of qubits required to encode the velocity discretization of the lattice.
+    """
+
+    num_ancilla_qubits: int
+    """
+    The number of ancilla (non-velocity, non-grid) qubits required for the quantum circuit to simulate this lattice.
+    """
+
     num_total_qubits: int
+    """
+    The total number of qubits required for the quantum circuit to simulate the lattice. This is the sum of the number of grid, velocity, and ancilla qubits.
+    """
+
     registers: Tuple[QuantumRegister, ...]
-    logger: Logger
+    """
+    A tuple that holds registers responsible for specific operations of the QLBM algorithm.
+    """
     circuit: QuantumCircuit
-    blocks: Dict[str, List[Block]]
+    """
+    An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
+    Each quantum component that is parameterized by a :class:`.Lattice` makes a copy of this quantum circuit
+    to which it appends its designated logic.
+    """
+
+    shapes: Dict[str, List[Shape]]
+    """
+    Contains all of the :class:`.Shape`s encoding the solid geometry of the lattice. The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+    """
+
+    logger: Logger
+    """
+    The performance logger, by default ``getLogger("qlbm")``.
+    """
 
     def __init__(
         self,
@@ -100,7 +152,7 @@ class Lattice(ABC):
     def parse_input_data(
         self,
         lattice_data: str | Dict,  # type: ignore
-    ) -> Tuple[List[int], List[int], Dict[str, List[Block]]]:
+    ) -> Tuple[List[int], List[int], Dict[str, List[Shape]]]:
         r"""
         Parses the lattice input data, provided in either a file path or a dictionary.
 
@@ -112,11 +164,11 @@ class Lattice(ABC):
 
         Returns
         -------
-        Tuple[List[int], List[int], Dict[str, List[Block]]]
+        Tuple[List[int], List[int], Dict[str, List[Shape]]]
             A tuple containing
             (i) a list of the number of gridpoints per dimension,
             (ii) a list of the number of velicities per dimension,
-            and (iii) a dictionary containing the solid :class:`.Block`\ s.
+            and (iii) a dictionary containing the solid :class:`.Shape`\ s.
             The key of the dictionary is the specific kind of
             boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
 
@@ -341,8 +393,8 @@ class Lattice(ABC):
 
         lattice_dict["geometry"] = flatten(
             [
-                [block.to_dict() for block in self.blocks[boundary_type]]
-                for boundary_type in self.blocks
+                [block.to_dict() for block in self.shapes[boundary_type]]
+                for boundary_type in self.shapes
             ]
         )
 
