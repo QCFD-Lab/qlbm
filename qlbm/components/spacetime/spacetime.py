@@ -81,7 +81,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
                 PointWiseSpaceTimeReflectionOperator(
                     self.lattice,
                     timestep,
-                    self.lattice.blocks["bounceback"],
+                    self.lattice.shapes["bounceback"],
                     self.filter_inside_blocks,
                     self.logger,
                 ).circuit,
