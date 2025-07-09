@@ -8,6 +8,7 @@ from typing_extensions import override
 from qlbm.components.base import LBMAlgorithm
 from qlbm.components.spacetime.reflection import PointWiseSpaceTimeReflectionOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.tools.exceptions import LatticeException
 
 from .collision.d2q4_old import SpaceTimeD2Q4CollisionOperator
 from .streaming import SpaceTimeStreamingOperator
@@ -72,6 +73,12 @@ class SpaceTimeQLBM(LBMAlgorithm):
         circuit = self.lattice.circuit.copy()
 
         for timestep in range(self.lattice.num_timesteps, 0, -1):
+            # Warn the user if there are any shapes that are NOT bounceback boundary conditions.
+            if self.lattice.shapes["specular"]:
+                raise LatticeException(
+                    "Currently, the Space-Time QLBM algorithm only supports bounceback boundary conditions."
+                )
+
             circuit.compose(
                 SpaceTimeStreamingOperator(self.lattice, timestep, self.logger).circuit,
                 inplace=True,
@@ -101,4 +108,4 @@ class SpaceTimeQLBM(LBMAlgorithm):
 
     @override
     def __str__(self) -> str:
-        return f"[Space Time QLBM on lattice={self.lattice}]"
+        return f"[SpaceTimes QLBM on lattice={self.lattice}]"
