@@ -6,7 +6,7 @@ from typing import Dict, List, Tuple
 from qiskit import QuantumCircuit, QuantumRegister
 from typing_extensions import override
 
-from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten
 
@@ -34,7 +34,7 @@ class CollisionlessLattice(Lattice):
     :attr:`circuit`             An empty ``qiskit.QuantumCircuit`` with labeled registers that quantum components use as a base.
                                 Each quantum component that is parameterized by a ``Lattice`` makes a copy of this quantum circuit
                                 to which it appends its designated logic.
-    :attr:`blocks`              A ``Dict[str, List[Block]]`` that contains all of the :class:`.Block`\ s encoding the solid geometry of the lattice.
+    :attr:`shapes`              A ``Dict[str, List[Shape]]`` that contains all of the :class:`.Shape`\ s encoding the solid geometry of the lattice.
                                 The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
     :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``.
     =========================== ======================================================================
@@ -155,13 +155,13 @@ class CollisionlessLattice(Lattice):
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice_data, logger)
-        dimensions, velocities, blocks = self.parse_input_data(lattice_data)  # type: ignore
+        dimensions, velocities, shapes = self.parse_input_data(lattice_data)  # type: ignore
 
         self.num_dims = len(dimensions)
         self.num_gridpoints = dimensions
         self.num_velocities = velocities
-        self.blocks: Dict[str, List[Block]] = blocks  # type: ignore
-        self.block_list: List[Block] = flatten(list(blocks.values()))
+        self.shapes: Dict[str, List[Shape]] = shapes  # type: ignore
+        self.shape_list: List[Shape] = flatten(list(shapes.values()))
         self.num_comparator_qubits = 2 * (self.num_dims - 1)
         self.num_obstacle_qubits = self.__num_obstacle_qubits()
         self.num_ancilla_qubits = (
@@ -495,8 +495,8 @@ class CollisionlessLattice(Lattice):
 
     def __num_obstacle_qubits(self) -> int:
         all_obstacle_bounceback: bool = len(
-            [b for b in self.block_list if b.boundary_condition == "bounceback"]
-        ) == len(self.block_list)
+            [b for b in self.shape_list if b.boundary_condition == "bounceback"]
+        ) == len(self.shape_list)
         if all_obstacle_bounceback:
             # A single qubit suffices to determine
             # Whether particles have streamed inside the object
@@ -508,7 +508,7 @@ class CollisionlessLattice(Lattice):
 
     @override
     def __str__(self) -> str:
-        return f"[Lattice with {self.num_gridpoints} gps, {self.num_velocities} vels, and {str(self.blocks)} blocks with {self.num_total_qubits} qubits]"
+        return f"[Lattice with {self.num_gridpoints} gps, {self.num_velocities} vels, and {str(self.shapes)} shapes with {self.num_total_qubits} qubits]"
 
     @override
     def logger_name(self) -> str:
@@ -517,4 +517,4 @@ class CollisionlessLattice(Lattice):
             gp_string += f"{gp + 1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
-        return f"{self.num_dims}d-{gp_string}-{len(self.block_list)}-obstacle"
+        return f"{self.num_dims}d-{gp_string}-{len(self.shape_list)}-obstacle"

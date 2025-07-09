@@ -519,5 +519,5 @@ class SpecularReflectionOperator(CQLBMOperator):
     @override
     def __str__(self) -> str:
         return (
-            f"[Operator SpecularReflectionOperator against block {self.lattice.blocks}]"
+            f"[Operator SpecularReflectionOperator against shapes {self.lattice.shapes}]"
         )

@@ -8,6 +8,8 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import get_time_series
 
 from .bounceback_reflection import BounceBackReflectionOperator
@@ -68,21 +70,36 @@ class CQLBM(LBMAlgorithm):
                 ).circuit,
                 inplace=True,
             )
-            if self.lattice.blocks["specular"]:
+            if self.lattice.shapes["specular"]:
+                if not all(
+                    isinstance(shape, Block)
+                    for shape in self.lattice.shapes["specular"]
+                ):
+                    raise LatticeException(
+                        "All shapes with the 'specular' boundary condition must be of type Block for the CQLBM algorithm. "
+                    )
                 circuit.compose(
                     SpecularReflectionOperator(
                         self.lattice,
-                        self.lattice.blocks["specular"],
+                        self.lattice.shapes["specular"],  # type: ignore
                         logger=self.logger,
                     ).circuit,
                     inplace=True,
                 )
 
-            if self.lattice.blocks["bounceback"]:
+            if self.lattice.shapes["bounceback"]:
+                if self.lattice.shapes["specular"]:
+                    if not all(
+                        isinstance(shape, Block)
+                        for shape in self.lattice.shapes["specular"]
+                    ):
+                        raise LatticeException(
+                            "All shapes with the 'bounceback' boundary condition must be of type Block for the CQLBM algorithm. "
+                        )
                 circuit.compose(
                     BounceBackReflectionOperator(
                         self.lattice,
-                        self.lattice.blocks["bounceback"],
+                        self.lattice.shapes["bounceback"],  # type: ignore
                         logger=self.logger,
                     ).circuit,
                     inplace=True,

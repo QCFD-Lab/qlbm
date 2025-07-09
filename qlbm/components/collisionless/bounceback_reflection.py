@@ -529,4 +529,4 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
     @override
     def __str__(self) -> str:
-        return f"[Operator BounceBackReflectionOperator against block {self.lattice.blocks}]"
+        return f"[Operator BounceBackReflectionOperator against shapes {self.lattice.shapes}]"
