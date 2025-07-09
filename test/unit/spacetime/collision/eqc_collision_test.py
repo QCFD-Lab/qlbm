@@ -5,9 +5,9 @@ from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 
 from qlbm.components.spacetime.collision.eqc_collision import (
-    GenericSpaceTimeCollisionOperator,
+    EQCCollisionOperator,
 )
-from qlbm.components.spacetime.collision.eqc_discretizations import (
+from qlbm.lattice.eqc.eqc_generator import (
     EquivalenceClassGenerator,
 )
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
@@ -102,8 +102,7 @@ def test_d2q4_collision_positive_cases(
         },
     )
 
-    collision_operator = GenericSpaceTimeCollisionOperator(lattice, 0)
-    local_circuit = collision_operator.create_circuit_one_register()
+    local_circuit = EQCCollisionOperator(lattice.properties.get_discretization()).circuit
     assert local_circuit.num_qubits == 4
     eqc = d2q4_equivalence_class_bitstrings[equivalence_class_index]
     for velocity_cfg in eqc:
@@ -121,8 +120,7 @@ def test_d2q4_collision_negative_cases(d2q4_equivalence_class_bitstrings):
         },
     )
 
-    collision_operator = GenericSpaceTimeCollisionOperator(lattice, 0)
-    local_circuit = collision_operator.create_circuit_one_register()
+    local_circuit = EQCCollisionOperator(lattice.properties.get_discretization()).circuit
     assert local_circuit.num_qubits == 4
 
     for b in [
@@ -165,8 +163,7 @@ def test_d3q6_collision_positive_cases(
         },
     )
 
-    collision_operator = GenericSpaceTimeCollisionOperator(lattice, 0)
-    local_circuit = collision_operator.create_circuit_one_register()
+    local_circuit = EQCCollisionOperator(lattice.properties.get_discretization()).circuit
     assert local_circuit.num_qubits == 6
     eqc = d3q6_equivalence_class_bitstrings[equivalence_class_index]
     for velocity_cfg in eqc:

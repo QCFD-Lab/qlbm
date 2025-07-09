@@ -2,10 +2,10 @@ from typing import Set, Tuple
 
 import pytest
 
-from qlbm.components.spacetime.collision import (
-    EquivalenceClass,
+from qlbm.lattice.eqc.eqc_generator import (
     EquivalenceClassGenerator,
 )
+from qlbm.lattice.eqc.eqc import EquivalenceClass
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 

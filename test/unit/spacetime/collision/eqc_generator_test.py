@@ -1,9 +1,9 @@
 import numpy as np
 
-from qlbm.components.spacetime.collision.eqc_discretizations import (
-    EquivalenceClass,
+from qlbm.lattice.eqc.eqc_generator import (
     EquivalenceClassGenerator,
 )
+from qlbm.lattice.eqc.eqc import EquivalenceClass
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 
 
