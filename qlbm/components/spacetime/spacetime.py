@@ -9,7 +9,7 @@ from qlbm.components.base import LBMAlgorithm
 from qlbm.components.spacetime.reflection import PointWiseSpaceTimeReflectionOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
-from .collision import SpaceTimeCollisionOperator
+from .collision.d2q4_old import SpaceTimeD2Q4CollisionOperator
 from .streaming import SpaceTimeStreamingOperator
 
 
@@ -91,7 +91,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
             # There is no collision in 1D
             if self.lattice.num_dims > 1:
                 circuit.compose(
-                    SpaceTimeCollisionOperator(
+                    SpaceTimeD2Q4CollisionOperator(
                         self.lattice, timestep, logger=self.logger
                     ).circuit,
                     inplace=True,

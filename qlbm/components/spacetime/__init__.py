@@ -1,6 +1,6 @@
 """Modular qlbm quantum circuit components for the CQLBM algorithm :cite:p:`spacetime`."""
 
-from .collision import SpaceTimeCollisionOperator
+from .collision.d2q4_old import SpaceTimeD2Q4CollisionOperator
 from .initial.pointwise import PointWiseSpaceTimeInitialConditions
 from .initial.volumetric import VolumetricSpaceTimeInitialConditions
 from .measurement import SpaceTimeGridVelocityMeasurement
@@ -9,7 +9,7 @@ from .spacetime import SpaceTimeQLBM
 from .streaming import SpaceTimeStreamingOperator
 
 __all__ = [
-    "SpaceTimeCollisionOperator",
+    "SpaceTimeD2Q4CollisionOperator",
     "PointWiseSpaceTimeInitialConditions",
     "VolumetricSpaceTimeInitialConditions",
     "SpaceTimeStreamingOperator",
