@@ -230,6 +230,11 @@ class SimulationConfig:
         # Circuits
         self.initial_conditions = initial_conditions
         self.algorithm = algorithm
+        self.algorithm_copy = (
+            algorithm.circuit.copy()
+            if isinstance(algorithm, QuantumComponent)
+            else algorithm.copy()
+        )
         self.postprocessing = postprocessing
         self.measurement = measurement
 
