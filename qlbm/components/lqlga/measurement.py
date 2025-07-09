@@ -1,15 +1,12 @@
 """Measurement operator for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
 
 from logging import Logger, getLogger
-from typing import Tuple
 
 from qiskit import ClassicalRegister
-from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
-from qlbm.components.base import LQLGAOperator, SpaceTimeOperator
+from qlbm.components.base import LQLGAOperator
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
-from qlbm.tools.utils import flatten, get_qubits_to_invert
 
 
 class LQLGAGridVelocityMeasurement(LQLGAOperator):

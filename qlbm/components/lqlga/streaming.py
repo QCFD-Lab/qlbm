@@ -1,18 +1,13 @@
 """Streaming operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
 
-import math
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List, Tuple
 
-from qiskit import QuantumCircuit
 from typing_extensions import override
 
-from qlbm.components.base import LQLGAOperator, SpaceTimeOperator
+from qlbm.components.base import LQLGAOperator
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
-from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
-from qlbm.tools.exceptions import CircuitException
 
 
 class LQLGAStreamingOperator(LQLGAOperator):

@@ -2,15 +2,10 @@ from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List, Tuple
 
-from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCXGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
-from qlbm.lattice.spacetime.properties_base import VonNeumannNeighbor
-from qlbm.tools.utils import bit_value, flatten
 
 
 class LQGLAInitialConditions(LBMPrimitive):

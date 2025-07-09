@@ -6,7 +6,7 @@ from time import perf_counter_ns
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
-from qlbm.components.base import LQLGAOperator, SpaceTimeOperator
+from qlbm.components.base import LQLGAOperator
 from qlbm.components.common.cbse_collision.cbse_collision import EQCCollisionOperator
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 

@@ -8,16 +8,6 @@ from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.components.common.cbse_collision.cbse_collision import EQCCollisionOperator
-from qlbm.components.common.cbse_collision.cbse_permutation import (
-    EQCPermutation,
-)
-from qlbm.components.common.cbse_collision.cbse_redistribution import (
-    EQCRedistribution,
-)
-from qlbm.lattice.eqc.eqc import EquivalenceClass
-from qlbm.lattice.eqc.eqc_generator import (
-    EquivalenceClassGenerator,
-)
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 

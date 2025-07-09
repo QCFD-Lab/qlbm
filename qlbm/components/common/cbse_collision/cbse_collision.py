@@ -1,15 +1,11 @@
 """Collision operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
 
-from logging import Logger, getLogger
-from math import pi
 from time import perf_counter_ns
 
 from qiskit import QuantumCircuit
-from qiskit.circuit import Gate
-from qiskit.circuit.library import MCMTGate, RYGate
 from typing_extensions import override
 
-from qlbm.components.base import LBMPrimitive, SpaceTimeOperator
+from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.cbse_collision.cbse_permutation import (
     EQCPermutation,
 )

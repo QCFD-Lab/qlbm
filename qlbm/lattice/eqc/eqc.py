@@ -1,11 +1,12 @@
-from qlbm.lattice.spacetime.properties_base import LatticeDiscretization, LatticeDiscretizationProperties
-from qlbm.tools.exceptions import LatticeException
-
+from typing import List, Set, Tuple, override
 
 import numpy as np
 
-
-from typing import List, Set, Tuple, override
+from qlbm.lattice.spacetime.properties_base import (
+    LatticeDiscretization,
+    LatticeDiscretizationProperties,
+)
+from qlbm.tools.exceptions import LatticeException
 
 
 class EquivalenceClass:
