@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 from stl import mesh
 
+from qlbm.lattice.geometry.encodings.lqlga import LQLGAPointwiseReflectionData
 from qlbm.lattice.geometry.encodings.spacetime import (
     SpaceTimePWReflectionData,
     SpaceTimeVolumetricReflectionData,
@@ -62,6 +63,68 @@ class Shape(ABC):
         Dict[str, List[int] | str]
             A dictionary representation of the bounds and boundary conditions of the shape.
         """
+        pass
+
+
+class LQLGAShape(Shape):
+    """Base class for all shapes compatible with the :class:`.LQLGA` algorithm."""
+
+    def __init__(self, num_grid_qubits: List[int], boundary_condition: str):
+        super().__init__(num_grid_qubits, boundary_condition)
+
+    def get_lqlga_reflection_data_d1q2_from_points(
+        self,
+        gridpoints: List[Tuple[int, ...]],
+        before_reflection_velocity_index: int,
+        after_reflection_velocity_index: int,
+        reflection_increment_from_boundary: Tuple[int, ...],
+        max_grid_size: int,
+    ) -> List[LQLGAPointwiseReflectionData]:
+        """Calculate LQLGA reflection data for D1Q2 lattice from a list of points.
+
+        Parameters
+        ----------
+        gridpoints : List[Tuple[int, ...]]
+            List of grid points where reflections occur, inside the solid domain.
+        before_reflection_velocity_index : int
+            Velocity index before reflection.
+        after_reflection_velocity_index : int
+            Velocity index after reflection.
+        reflection_increment_from_boundary : Tuple[int, ...]
+            Increment vector from boundary point to reflection destination.
+        max_grid_size: int
+            The size of the grid on which reflection is performed, to account for periodicity.
+
+        Returns
+        -------
+        List[LQLGAPointwiseReflectionData]
+            List of reflection data for each point.
+        """
+        return [
+            LQLGAPointwiseReflectionData(
+                tuple(
+                    [
+                        gridpoint,
+                        tuple(
+                            (a + b) % max_grid_size
+                            for a, b in zip(
+                                gridpoint, reflection_increment_from_boundary
+                            )
+                        ),
+                    ],
+                ),
+                tuple(
+                    [before_reflection_velocity_index, after_reflection_velocity_index],
+                ),
+            )
+            for gridpoint in gridpoints
+        ]
+
+    @abstractmethod
+    def get_lqlga_reflection_data_d1q2(
+        self,
+    ) -> List[LQLGAPointwiseReflectionData]:
+        """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.LQLGA`."""
         pass
 
 

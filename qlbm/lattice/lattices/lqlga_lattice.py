@@ -130,7 +130,38 @@ class LQLGALattice(Lattice):
             raise LatticeException(
                 f"Velocity {velocity} is out of bounds for the lattice with {self.num_velocities_per_point} velocities per point."
             )
-        return self.gridpoint_index_tuple(gridpoint) + velocity
+        return (
+            self.gridpoint_index_tuple(gridpoint) * self.num_velocities_per_point
+            + velocity
+        )
+
+    def get_velocity_qubits_of_line(self, line_index: int) -> Tuple[int, int]:
+        r"""
+        Returns the velocity qubits of the positive and negative directions of a streaming line.
+
+        Assumes that the lattice follows a :math:`D_{d}Q_{q}` discretization, where if :math:`q` is even, there are
+        :math:`\lceil \frac{q}{2} \rceil` streaming lines. This is to be generalized in the future.
+
+        Parameters
+        ----------
+        line_index : int
+            The index of the line to get the velocity qubits for.
+
+        Returns
+        -------
+        List[int]
+            The list of velocity qubits for the specified line.
+        """
+        if line_index < 0 or line_index > self.num_velocities_per_point // 2:
+            raise LatticeException(
+                f"Streaming Line index {line_index} is out of bounds for the lattice with {self.num_velocities_per_point // 2} lines."
+            )
+        return (
+            (self.num_velocities_per_point % 2) + line_index,
+            (self.num_velocities_per_point % 2)
+            + line_index
+            + self.num_velocities_per_point // 2,
+        )
 
     @override
     def logger_name(self) -> str:
@@ -139,4 +170,4 @@ class LQLGALattice(Lattice):
             gp_string += f"{gp + 1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
-        return f"lqlga-d{self.num_dims}-q{LatticeDiscretizationProperties.get_num_velocities(self.discretization)}-{gp_string}"
+        return f"lqlga-d{self.num_dims}-q{self.num_velocities_per_point}-{gp_string}"

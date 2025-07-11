@@ -18,12 +18,12 @@ from qlbm.lattice.geometry.encodings.spacetime import (
     SpaceTimePWReflectionData,
     SpaceTimeVolumetricReflectionData,
 )
-from qlbm.lattice.geometry.shapes.base import SpaceTimeShape
+from qlbm.lattice.geometry.shapes.base import LQLGAShape, SpaceTimeShape
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to_invert
 
 
-class Block(SpaceTimeShape):
+class Block(SpaceTimeShape, LQLGAShape):
     r"""
     Contains information required for the generation of boundary conditions for an axis-parallel cuboid obstacle.
 
@@ -706,6 +706,18 @@ class Block(SpaceTimeShape):
             surfaces.append(surfaces_of_dim)
 
         return surfaces
+
+    @override
+    def get_lqlga_reflection_data_d1q2(self):
+        return self.get_lqlga_reflection_data_d1q2_from_points(
+            [tuple([self.bounds[0][0]])],
+            0,
+            1,
+            tuple([-1]),
+            2 ** self.num_grid_qubits[0],
+        ) + self.get_lqlga_reflection_data_d1q2_from_points(
+            [tuple([self.bounds[0][1]])], 1, 0, tuple([1]), 2 ** self.num_grid_qubits[0]
+        )
 
     @override
     def contains_gridpoint(self, gridpoint: Tuple[int, ...]) -> bool:

@@ -243,6 +243,7 @@ class Lattice(ABC):
         for dim in range(num_dimensions):
             dim_index = dimension_letter(dim)
 
+            # ! TODO move to after parsing
             if not is_two_pow(lattice_dict["dim"][dim_index]):  # type: ignore
                 raise LatticeException(
                     f"Lattice {dim_index}-dimension has a number of grid points that is not divisible by 2."
