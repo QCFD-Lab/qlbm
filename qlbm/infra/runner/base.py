@@ -10,12 +10,18 @@ from qiskit.quantum_info import Statevector
 from qiskit_aer import AerSimulator
 
 from qlbm.infra.reinitialize import (
-    CollisionlessReinitializer,
+    IdentityReinitializer,
     Reinitializer,
     SpaceTimeReinitializer,
 )
-from qlbm.infra.result import CollisionlessResult, QBMResult, SpaceTimeResult
+from qlbm.infra.result import (
+    CollisionlessResult,
+    LQLGAResult,
+    QBMResult,
+    SpaceTimeResult,
+)
 from qlbm.lattice import CollisionlessLattice, Lattice
+from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException, ResultsException
 
@@ -127,6 +133,10 @@ class CircuitRunner(ABC):
             return SpaceTimeResult(
                 cast(SpaceTimeLattice, self.lattice), output_directory, output_file_name
             )
+        elif isinstance(self.lattice, LQLGALattice):
+            return LQLGAResult(
+                cast(LQLGALattice, self.lattice), output_directory, output_file_name
+            )
         else:
             raise ResultsException(f"Unsupported lattice: {self.lattice}.")
 
@@ -144,9 +154,11 @@ class CircuitRunner(ABC):
         ResultsException
             If the underlying algorithm does not support reinitialization.
         """
-        if isinstance(self.lattice, CollisionlessLattice):
-            return CollisionlessReinitializer(
-                cast(CollisionlessLattice, self.lattice),
+        if isinstance(self.lattice, CollisionlessLattice) or isinstance(
+            self.lattice, LQLGALattice
+        ):
+            return IdentityReinitializer(
+                self.lattice,
                 self.config.get_execution_compiler(),
                 self.logger,
             )
