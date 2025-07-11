@@ -10,7 +10,6 @@ from typing_extensions import override
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 from .base import QBMResult
 

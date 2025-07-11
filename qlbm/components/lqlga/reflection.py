@@ -2,13 +2,12 @@
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List, Tuple, cast
+from typing import List, cast
 
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import LQLGAOperator
-from qlbm.components.common.primitives import MCSwap
 from qlbm.lattice.geometry.shapes.base import LQLGAShape, Shape
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization

@@ -12,7 +12,8 @@ class LQLGAPointwiseReflectionData(LQLGAReflectionData):
     """
     Data structure representing pointwise space-time reflection information for LQLGA geometries.
 
-    Attributes:
+    Attributes
+    ----------
         gridpoints (Tuple[Tuple[int, ...], Tuple[int, ...]]):
             A tuple containing two grid points (as tuples of integers) that are
             related by a reflection operation.
