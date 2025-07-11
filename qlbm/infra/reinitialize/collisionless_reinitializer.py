@@ -11,15 +11,16 @@ from qulacs import QuantumCircuit as QulacsQC
 from typing_extensions import override
 
 from qlbm.infra.compiler import CircuitCompiler
-from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice.lattices.base import Lattice
 
 from .base import Reinitializer
 
 
-class CollisionlessReinitializer(Reinitializer):
+class IdentityReinitializer(Reinitializer):
     r"""
-    :class:`.CQLBM`-specific implementation of the :class:`.Reinitializer`.
+    Implementation of the :class:`.Reinitializer` that passes along the statevector to the following time step.
 
+    Useful for the :class:`.CQLBM` and :class:`.LQLGA` algorithms.
     Compatible with both :class:`.QiskitRunner`\ s and :class:`.QulacsRunner`\ s.
     To generate a new set of initial conditions for the CQLBM algorithm,
     the reinitializer simply returns the quantum state computed
@@ -31,19 +32,19 @@ class CollisionlessReinitializer(Reinitializer):
     =========================== ======================================================================
     Attribute                   Summary
     =========================== ======================================================================
-    :attr:`lattice`             The :class:`.CollisionlessLattice` of the simulated system.
+    :attr:`lattice`             The :class:`.Lattice` of the simulated system.
     :attr:`compiler`            The compiler that converts the novel initial conditions circuits.
     :attr:`logger`              The performance logger, by default ``getLogger("qlbm")``
     =========================== ======================================================================
     """
 
-    lattice: CollisionlessLattice
+    lattice: Lattice
     statevector: Statevector
     counts: Counts
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: Lattice,
         compiler: CircuitCompiler,
         logger: Logger = getLogger("qlbm"),
     ):
