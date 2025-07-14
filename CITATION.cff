@@ -30,7 +30,6 @@ preferred-citation:
   doi: "10.1016/j.cpc.2025.109699"
   journal: "Computer Physics Communications"
   title: "qlbm – A Qantum Lattice Boltzmann Software Framework"
-  issue: 1
   volume: 315
   year: 2025
-  pages: 109699
+  start: 109699
