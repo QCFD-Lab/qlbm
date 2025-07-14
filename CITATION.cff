@@ -12,6 +12,25 @@ authors:
   orcid: "https://orcid.org/0000-0003-0802-945X"
 title: "qlbm – A Qantum Lattice Boltzmann Software Framework"
 version: 0.0.5
-doi: 10.1016/j.cpc.2025.109699
-date-released: 2017-12-18
-url: "doi: 10.1016/j.cpc.2025.109699
+doi: "10.1016/j.cpc.2025.109699"
+date-released: 2025-03-24
+url: "https://doi.org/10.1016/j.cpc.2025.109699"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Georgescu"
+    given-names: "Calin A."
+    orcid: "https://orcid.org/0000-0002-8102-6389"
+  - family-names: "Schalkers"
+    given-names: "Merel A."
+    orcid: "https://orcid.org/0000-0001-7751-9060"
+  - family-names: "Möller"
+    given-names: "Matthias"
+    orcid: "https://orcid.org/0000-0003-0802-945X"
+  doi: "10.1016/j.cpc.2025.109699"
+  journal: "Computer Physics Communications"
+  title: "qlbm – A Qantum Lattice Boltzmann Software Framework"
+  issue: 1
+  volume: 315
+  year: 2025
+  pages: 109699
