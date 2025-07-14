@@ -110,4 +110,18 @@ The `demos` directory contains several use cases for simulating and analyzing th
 
 ## Citation
 
-A preprint describing `qlbm` in detail is currently available on [arXiv](https://arxiv.org/abs/2411.19439). If you use `qlbm`, you can cite it as per the [CITATION.bib file](CITATION.bib).
+An open access peer-reviewed article describing `qlbm` is available [here](https://doi.org/10.1016/j.cpc.2025.109699). If you use `qlbm`, you can cite it as per the [CITATION.bib](CITATION.bib) file:
+
+```
+@article{georgescu2025qlbm,
+title = {qlbm – A quantum lattice Boltzmann software framework},
+journal = {Computer Physics Communications},
+volume = {315},
+pages = {109699},
+year = {2025},
+issn = {0010-4655},
+doi = {https://doi.org/10.1016/j.cpc.2025.109699},
+url = {https://www.sciencedirect.com/science/article/pii/S0010465525002012},
+author = {C\u{{a}}lin A. Georgescu and Merel A. Schalkers and Matthias M\"{o}ller},
+}
+```
