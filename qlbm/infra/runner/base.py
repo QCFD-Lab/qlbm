@@ -10,10 +10,10 @@ from qiskit.quantum_info import Statevector
 from qiskit_aer import AerSimulator
 
 from qlbm.infra.reinitialize import (
-    IdentityReinitializer,
     Reinitializer,
     SpaceTimeReinitializer,
 )
+from qlbm.infra.reinitialize.identity_reinitializer import IdentityReinitializer
 from qlbm.infra.result import (
     CollisionlessResult,
     LQLGAResult,
