@@ -61,7 +61,7 @@ class BounceBackWallComparator(LBMPrimitive):
 
         # Comparing on the indices of the inside x-wall on the lower-bound of the obstacle
         BounceBackWallComparator(
-            lattice=lattice, wall=lattice.block_list[0].walls_inside[0][0]
+            lattice=lattice, wall=lattice.shape_list[0].walls_inside[0][0]
         ).draw("mpl")
     """
 
@@ -171,7 +171,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
             }
         )
 
-        BounceBackReflectionOperator(lattice=lattice, blocks=lattice.block_list)
+        BounceBackReflectionOperator(lattice=lattice, blocks=lattice.shape_list)
     """
 
     def __init__(

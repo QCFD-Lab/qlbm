@@ -488,7 +488,7 @@ class EdgeComparator(LBMPrimitive):
         )
 
         # Draw the edge comparator circuit for one specific corner edge
-        EdgeComparator(lattice, lattice.block_list[0].corner_edges_3d[0]).draw("mpl")
+        EdgeComparator(lattice, lattice.shape_list[0].corner_edges_3d[0]).draw("mpl")
     """
 
     def __init__(
