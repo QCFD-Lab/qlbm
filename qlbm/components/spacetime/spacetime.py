@@ -24,7 +24,7 @@ class SpaceTimeQLBM(LBMAlgorithm):
     The algorithm is composed of two main steps, the implementation of which (in general) varies per individual time step:
 
     #. Streaming performed by the :class:`.SpaceTimeStreamingOperator` moves the particles on the grid by means of swap gates over velocity qubits.
-    #. Collision performed by the :class:`.SpaceTimeCollisionOperator` does not move particles on the grid, but locally alters the velocity qubits at each grid point, if applicable.
+    #. Collision performed by the :class:`.GenericSpaceTimeCollisionOperator` does not move particles on the grid, but locally alters the velocity qubits at each grid point, if applicable.
 
     ========================= ======================================================================
     Attribute                  Summary

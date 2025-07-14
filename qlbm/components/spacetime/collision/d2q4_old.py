@@ -1,3 +1,5 @@
+"""Collision operator for the :math:`D_2Q_4` discretization :class:`.SpaceTimeQLBM` algorithm as described in :cite:`spacetime`."""
+
 from logging import Logger, getLogger
 from math import pi
 from time import perf_counter_ns
@@ -44,7 +46,7 @@ class SpaceTimeD2Q4CollisionOperator(SpaceTimeOperator):
     .. plot::
         :include-source:
 
-        from qlbm.components.spacetime import SpaceTimeCollisionOperator
+        from qlbm.components.spacetime.collision.d2q4_old import SpaceTimeD2Q4CollisionOperator
         from qlbm.lattice import SpaceTimeLattice
 
         # Build an example lattice
@@ -57,7 +59,7 @@ class SpaceTimeD2Q4CollisionOperator(SpaceTimeOperator):
         )
 
         # Draw the collision operator for 1 time step
-        SpaceTimeCollisionOperator(lattice=lattice, timestep=1).draw("mpl")
+        SpaceTimeD2Q4CollisionOperator(lattice=lattice, timestep=1).draw("mpl")
     """
 
     def __init__(
