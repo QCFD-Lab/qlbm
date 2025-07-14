@@ -141,6 +141,11 @@ class Lattice(ABC):
     The performance logger, by default ``getLogger("qlbm")``.
     """
 
+    register: Tuple[List[QuantumRegister], ...]
+    """
+    A tuple of lists of :class:`qiskit.QuantumRegister` s that are used to store the quantum information of the lattice.
+    """
+
     def __init__(
         self,
         lattice_data: str | Dict,  # type: ignore
