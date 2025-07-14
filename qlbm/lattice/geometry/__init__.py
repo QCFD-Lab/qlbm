@@ -2,6 +2,8 @@
 
 from .encodings import (
     DimensionalReflectionData,
+    LQLGAPointwiseReflectionData,
+    LQLGAReflectionData,
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
@@ -21,4 +23,6 @@ __all__ = [
     "SpaceTimeVolumetricReflectionData",
     "Block",
     "Circle",
+    "LQLGAPointwiseReflectionData",
+    "LQLGAReflectionData",
 ]
