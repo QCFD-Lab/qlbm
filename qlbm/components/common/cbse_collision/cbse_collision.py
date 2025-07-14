@@ -23,6 +23,30 @@ from qlbm.lattice.spacetime.properties_base import (
 
 
 class EQCCollisionOperator(LBMPrimitive):
+    """
+    Collision operator based on the equivalence class abstraction described in section 5 of :cite:`spacetime2`.
+
+    Consists of a permutation, redistribution, and inverse permutation of the velocity qubits.
+    This operator is designed to be applied to a single velocity register, which can be repeated depending on the encoding.
+    Used in the :class:`.GenericSpaceTimeCollisionOperator` and :class:`.GenericLQLGACollisionOperator`.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`discretization`    The discretization for which this collision operator is defined.
+    :attr:`num_velocities`    The number of velocities in the discretization.
+    ========================= ======================================================================
+    """
+
+    discretization: LatticeDiscretization
+    """
+    The discretization of the lattice for which this collision operator is defined.
+    """
+
+    num_velocities: int
+    """
+    The number of velocities in the discretization."""
+
     def __init__(
         self,
         discretization: LatticeDiscretization,

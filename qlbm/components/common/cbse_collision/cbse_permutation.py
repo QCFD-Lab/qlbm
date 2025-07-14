@@ -1,3 +1,5 @@
+"""Permutations of states belonging to equivalence classes, based on the computational basis state encoding."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import override
@@ -11,11 +13,45 @@ from qlbm.tools.exceptions import CircuitException
 
 
 class EQCPermutation(LBMPrimitive):
-    """Permutes states belonging to equivalence classes onto pre-determined basis states.
+    """Applies a permutation to the velocity qubits of an equivalence Sclass in the CBSE encoding.
 
-    Precedes redistribution.
+    This is used as part of the PRP collision operator described in section 5 of :cite:`spacetime2`.
+    Utilized in the :class:`.EQCCollisionOperator`.
 
-    WIP.
+    ============================== =================================================================
+    Attribute              Summary
+    ============================== =================================================================
+    :attr:`equivalence_class`      The equivalence class of the operator.
+    :attr:`inverse`                Whether to apply the inverse permutation.
+    ============================== =================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import EQCPermutation
+        from qlbm.lattice import LatticeDiscretization
+        from qlbm.lattice.eqc import EquivalenceClassGenerator
+
+        # Generate some equivalence classes
+        eqcs = EquivalenceClassGenerator(
+            LatticeDiscretization.D3Q6
+        ).generate_equivalence_classes()
+
+        # Select one at random and draw its circuit
+        EQCPermutation(eqcs.pop(), inverse=False).circuit.draw("mpl")
+
+    """
+
+    equivalence_class: EquivalenceClass
+    """
+    The equivalence class for which the permutation is defined.
+    """
+
+    inverse: bool
+    """
+    Whether to apply the inverse permutation.
     """
 
     def __init__(
