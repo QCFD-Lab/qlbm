@@ -110,7 +110,7 @@ The `demos` directory contains several use cases for simulating and analyzing th
 
 ## Citation
 
-An open access peer-reviewed article describing `qlbm` is available [here](https://doi.org/10.1016/j.cpc.2025.109699). If you use `qlbm`, you can cite it as per the [CITATION.bib](CITATION.bib) file:
+An open access peer-reviewed article describing `qlbm` is available [here](https://doi.org/10.1016/j.cpc.2025.109699). If you use `qlbm`, you can cite it as:
 
 ```
 @article{georgescu2025qlbm,
