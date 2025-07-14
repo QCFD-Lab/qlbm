@@ -1,4 +1,4 @@
-"""Collision operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
+"""Collision operators for the :class:`.LQLGA` algorithm."""
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
@@ -12,6 +12,12 @@ from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 
 
 class GenericLQLGACollisionOperator(LQLGAOperator):
+    """
+    Equivalence class-based LGA collision operator for the :class:`.LQLGA` algorithm.
+
+    This operator applies the :class:`.EQCCollisionOperator` operator to all velocity qubits at each grid point.
+    """
+
     def __init__(
         self,
         lattice: LQLGALattice,

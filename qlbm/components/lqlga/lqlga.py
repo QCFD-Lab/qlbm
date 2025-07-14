@@ -13,6 +13,18 @@ from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 
 
 class LQLGA(LBMAlgorithm):
+    r"""
+    Implementation of the Linear Quantum Lattice Gas Algorithm (LQLGA).
+
+    For a lattice with :math:`N_g` gridpoints and :math:`q` discrete velocities,
+    LQLGA requires exactly :math:`N_g \cdot q` qubits.
+
+    That is exactly equal to the number of classical bits required for one
+    deterministic run of the classical LGA algorithm.
+
+    More information about this algorithm can be found in :cite:t:`lqlga1`, :cite:t:`lqlga2`, and :cite:t:`spacetime2`.
+    """
+
     lattice: LQLGALattice
 
     def __init__(

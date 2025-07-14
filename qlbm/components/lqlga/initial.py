@@ -1,3 +1,5 @@
+"""Initial conditions for the :class:`.LQLGA` algorithm."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List, Tuple
@@ -9,6 +11,21 @@ from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 
 
 class LQGLAInitialConditions(LBMPrimitive):
+    """
+    Primitive for setting initial conditions in the :class:`.LQLGA` algorithm.
+
+    This operator allows the construction of arbitrary deterministic initial conditions for the LQLGA algorithm.
+    The number of gates required by this operator is equal to the number of enabled velocity qubits across all grid points.
+    The depth of the circuit is 1, as all gates are applied in parallel at each grid point.
+    """
+
+    grid_data: List[Tuple[Tuple[int, ...], Tuple[bool, ...]]]
+    """
+    Grid data for the initial conditions, where each tuple contains:
+    #. A tuple of grid point indices (e.g., `(x, y, z)`).
+    #. A tuple of booleans indicating which velocity qubits are enabled at that grid point.
+    """
+
     def __init__(
         self,
         lattice: LQLGALattice,
@@ -27,6 +44,7 @@ class LQGLAInitialConditions(LBMPrimitive):
             f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
         )
 
+    @override
     def create_circuit(self):
         circuit = self.lattice.circuit.copy()
 

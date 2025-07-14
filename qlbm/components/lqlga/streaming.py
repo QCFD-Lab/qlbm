@@ -11,6 +11,14 @@ from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 
 
 class LQLGAStreamingOperator(LQLGAOperator):
+    """
+    Streaming operator for the :class:`.LQLGA` algorithm.
+
+    Streaming is implemented by a series of swap gates as described in :cite:`spacetime`.
+    The number of gates scales linearly with size of the grid,
+    while the depth scales logarithmically.
+    """
+
     def __init__(
         self,
         lattice: LQLGALattice,
@@ -50,6 +58,22 @@ class LQLGAStreamingOperator(LQLGAOperator):
     def logarithmic_depth_streaming_line_swaps(
         self, num_gridpoints: int, negative_direction: bool
     ) -> List[List[Tuple[int, int]]]:
+        """
+
+        Implements the logarithmic depth streaming line permuation as described in Section 4 of :cite:`spacetime`.
+
+        Parameters
+        ----------
+        num_gridpoints : int
+            The number of gridpoints in the streaming line.
+        negative_direction : bool
+            Whether streaming occurs in the negative direction (i.e., from high to low indices).
+
+        Returns
+        -------
+        List[List[Tuple[int, int]]]
+            A list of layers, where each layer is a list of tuples representing pairs of gridpoints to swap.
+        """
         if num_gridpoints < 2:
             return []
 

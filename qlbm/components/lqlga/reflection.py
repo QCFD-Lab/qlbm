@@ -15,6 +15,27 @@ from qlbm.tools.exceptions import CircuitException
 
 
 class LQLGAReflectionOperator(LQLGAOperator):
+    """
+    Operator implementing reflection in the :class:`.LQLGA` algorithm.
+
+    Reflections in this algorithm can be entirely implemented by swap gates.
+    The number of gates scales with the number of grridpoints of the solid geometry.
+    The depth of the operator is 1.
+
+    ============================ ======================================================================
+    Attribute                     Summary
+    ============================ ======================================================================
+    :attr:`lattice`              The lattice the operator acts on.
+    :attr:`shapes`               A list of boundary-conditioned shapes.
+    :attr:`logger`               The performance logger, by default ``getLogger("qlbm")``.
+    ============================ ======================================================================
+    """
+
+    shapes: List[LQLGAShape]
+    """
+    A list of shapes that require reflection at the boundaries.
+    """
+
     def __init__(
         self,
         lattice: LQLGALattice,
