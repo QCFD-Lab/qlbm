@@ -1,3 +1,5 @@
+"""Generator class for equivalence classes in LGA-based algorithms."""
+
 from itertools import product
 from typing import Dict, Set
 
@@ -23,6 +25,20 @@ class EquivalenceClassGenerator:
         * - :attr:`discretization`
           - The :class:`.LatticeDiscretization` that the equivalence class belongs to.
 
+    Example usage:
+
+    .. code-block:: python
+        :linenos:
+        
+        from qlbm.lattice import LatticeDiscretization
+        from qlbm.lattice.eqc import EquivalenceClassGenerator
+
+        # Generate some equivalence classes
+        eqcs = EquivalenceClassGenerator(
+            LatticeDiscretization.D3Q6
+        ).generate_equivalence_classes()
+
+        print(eqcs.pop().get_bitstrings())
     """
 
     discretization: LatticeDiscretization

@@ -1,3 +1,5 @@
+"""Geometrical data encodings specific to the :class:`.LQLGA` algorithm."""
+
 from abc import ABC
 from typing import Tuple
 

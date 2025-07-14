@@ -1,3 +1,5 @@
+"""Implementation of the equivalence class abstraction described in Section 4 of :cite:p:`spacetime2`."""
+
 from typing import List, Set, Tuple, override
 
 import numpy as np
@@ -40,9 +42,16 @@ class EquivalenceClass:
     """
 
     discretization: LatticeDiscretization
+    """The discretization of the equivalence class."""
+
     velocity_configurations: Set[Tuple[bool, ...]]
+    """The velocity configurations of the equivalence class, represented as a set of tuples of boolean corresponding to velocity channel occupancies that all have the same mass and momentum."""
+
     mass: int
+    """The total mass of the equivalence class, which is the sum of all occupied velocity channels."""
+
     momentum: np.typing.NDArray
+    """The total momentum of the equivalence class, which is the vector sum of all occupied velocity channels multiplied by their :class:`.LatticeDiscretizationProperties` velocity contribution."""
 
     def __init__(
         self,
@@ -128,7 +137,10 @@ class EquivalenceClass:
         List[str]
             The velocity configurations of the equivalence class as bitstrings.
         """
-        return [''.join(['1' if x else '0' for x in cfg]) for cfg in self.velocity_configurations]
+        return [
+            "".join(["1" if x else "0" for x in cfg])
+            for cfg in self.velocity_configurations
+        ]
 
     @override
     def __eq__(self, value):

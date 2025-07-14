@@ -102,18 +102,19 @@ class LQLGAShape(Shape):
         """
         return [
             LQLGAPointwiseReflectionData(
-                tuple(
+                tuple(  # type: ignore
                     [
                         gridpoint,
                         tuple(
                             (a + b) % max_grid_size
                             for a, b in zip(
-                                gridpoint, reflection_increment_from_boundary
+                                gridpoint,
+                                reflection_increment_from_boundary,
                             )
                         ),
                     ],
                 ),
-                tuple(
+                tuple(  # type: ignore
                     [before_reflection_velocity_index, after_reflection_velocity_index],
                 ),
             )

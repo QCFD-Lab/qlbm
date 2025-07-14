@@ -120,7 +120,7 @@ class Lattice(ABC):
     The total number of qubits required for the quantum circuit to simulate the lattice. This is the sum of the number of grid, velocity, and ancilla qubits.
     """
 
-    registers: Tuple[QuantumRegister, ...]
+    velocity_register: Tuple[QuantumRegister, ...]
     """
     A tuple that holds registers responsible for specific operations of the QLBM algorithm.
     """
