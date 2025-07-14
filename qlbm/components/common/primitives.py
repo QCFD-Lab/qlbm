@@ -44,7 +44,7 @@ class EmptyPrimitive(LBMPrimitive):
 
     @override
     def create_circuit(self) -> QuantumCircuit:
-        return QuantumCircuit(*self.lattice.registers)
+        return self.lattice.circuit.copy()
 
     @override
     def __str__(self) -> str:
