@@ -69,21 +69,9 @@ The collision module contains collision operators and adjacent logic classes.
 The former implements the circuits that perform collision in computational basis state encodings,
 while the latter contains useful abstractions that circuits build on top of.
 
-Collision Operators
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. autoclass:: qlbm.components.spacetime.collision.GenericSpaceTimeCollisionOperator
 
-.. autoclass:: qlbm.components.spacetime.collision.SpaceTimeCollisionOperator
-
-Collision Logic Classes
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. autoclass:: qlbm.lattice.spacetime.properties_base.LatticeDiscretization
-
-.. autoclass:: qlbm.lattice.spacetime.properties_base.LatticeDiscretizationProperties
-
-.. autoclass:: qlbm.components.spacetime.collision.EquivalenceClass
-
-.. autoclass:: qlbm.components.spacetime.collision.EquivalenceClassGenerator
+.. autoclass:: qlbm.components.spacetime.collision.SpaceTimeD2Q4CollisionOperator
 
 .. _stqlbm_others:
 
