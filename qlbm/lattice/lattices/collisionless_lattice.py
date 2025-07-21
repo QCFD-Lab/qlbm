@@ -8,7 +8,7 @@ from typing_extensions import override
 
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import dimension_letter, flatten
+from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 
 from .base import Lattice
 
@@ -155,10 +155,23 @@ class CollisionlessLattice(Lattice):
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice_data, logger)
-        dimensions, velocities, shapes = self.parse_input_data(lattice_data)  # type: ignore
+        dimensions, velocities, shapes, self.discretization = self.parse_input_data(
+            lattice_data
+        )  # type: ignore
 
         self.num_dims = len(dimensions)
         self.num_gridpoints = dimensions
+
+        for dim in range(self.num_dims):
+            if not is_two_pow(self.num_gridpoints[dim] + 1):  # type: ignore
+                raise LatticeException(
+                    f"Lattice has a number of grid points that is not divisible by 2 in dimension {dimension_letter(dim)}."
+                )
+            if not is_two_pow(velocities[dim] + 1):  # type: ignore
+                raise LatticeException(
+                    f"Lattice has a number of velocities that is not divisible by 2 in dimension {dimension_letter(dim)}."
+                )
+
         self.num_velocities = velocities
         self.shapes: Dict[str, List[Shape]] = shapes  # type: ignore
         self.shape_list: List[Shape] = flatten(list(shapes.values()))

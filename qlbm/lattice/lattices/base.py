@@ -10,6 +10,10 @@ from qiskit import QuantumCircuit, QuantumRegister
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.geometry.shapes.circle import Circle
+from qlbm.lattice.spacetime.properties_base import (
+    LatticeDiscretization,
+    LatticeDiscretizationProperties,
+)
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 
@@ -157,7 +161,7 @@ class Lattice(ABC):
     def parse_input_data(
         self,
         lattice_data: str | Dict,  # type: ignore
-    ) -> Tuple[List[int], List[int], Dict[str, List[Shape]]]:
+    ) -> Tuple[List[int], List[int], Dict[str, List[Shape]], LatticeDiscretization]:
         r"""
         Parses the lattice input data, provided in either a file path or a dictionary.
 
@@ -169,11 +173,12 @@ class Lattice(ABC):
 
         Returns
         -------
-        Tuple[List[int], List[int], Dict[str, List[Shape]]]
+        Tuple[List[int], List[int], Dict[str, List[Shape]], LatticeDiscretization]
             A tuple containing
             (i) a list of the number of gridpoints per dimension,
             (ii) a list of the number of velicities per dimension,
-            and (iii) a dictionary containing the solid :class:`.Shape`\ s.
+            (iii) a dictionary containing the solid :class:`.Shape`\ s,
+            and (iv) the discretization enum of the lattice.
             The key of the dictionary is the specific kind of
             boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
 
@@ -232,11 +237,6 @@ class Lattice(ABC):
                 'Lattice configuration missing "velocities" properties.'
             )
 
-        if len(lattice_dict["dim"]) != len(lattice_dict["velocities"]):  # type: ignore
-            raise LatticeException(
-                "Lattice configuration dimensionality is inconsistent."
-            )
-
         num_dimensions = len(lattice_dict["dim"])  # type: ignore
 
         if num_dimensions not in [1, 2, 3]:
@@ -244,37 +244,60 @@ class Lattice(ABC):
                 f"Only 1, 2, and 3-dimensional lattices are supported. Provided lattice has {len(lattice_dict['dim'])} dimensions."  # type: ignore
             )
 
-        # Check whether the number of grid points and velocities is compatible
-        for dim in range(num_dimensions):
-            dim_index = dimension_letter(dim)
-
-            # ! TODO move to after parsing
-            if not is_two_pow(lattice_dict["dim"][dim_index]):  # type: ignore
-                raise LatticeException(
-                    f"Lattice {dim_index}-dimension has a number of grid points that is not divisible by 2."
-                )
-
-            if not is_two_pow(lattice_dict["velocities"][dim_index]):  # type: ignore
-                raise LatticeException(
-                    f"Lattice {dim_index}-dimension has a number of velocities that is not divisible by 2."
-                )
-
-        # The lattice properties are ok
         grid_list: List[int] = [
             # -1 because the bit_length() would "overshoot" for powers of 2
             lattice_dict["dim"][dimension_letter(dim)] - 1
             for dim in range(num_dimensions)
         ]
-        velocity_list: List[int] = [
-            # -1 because the bit_length() would "overshoot" for powers of 2
-            lattice_dict["velocities"][dimension_letter(dim)] - 1
-            for dim in range(num_dimensions)
-        ]
+
+        discretization: LatticeDiscretization = LatticeDiscretization.CFLDISCRETIZATION
+        velocity_list: List[int] = []
+
+        # Check if velocities is a string (DdQq format) or dict
+        if isinstance(lattice_dict["velocities"], str):  # type: ignore
+            # Parse DdQq format (e.g., "D2Q4" means 2 dimensions, 4 velocities total)
+            velocity_spec = lattice_dict["velocities"]  # type: ignore
+            if not velocity_spec.startswith("D") or "Q" not in velocity_spec:
+                raise LatticeException(
+                    f"Invalid velocity specification format: {lattice_dict['velocities']}. Expected format like 'd2q4'."
+                )
+
+            try:
+                parts = velocity_spec[1:].split("Q")
+                spec_dims = int(parts[0])
+                total_velocities = int(parts[1])
+                velocity_list = []
+
+                if spec_dims != num_dimensions:
+                    raise LatticeException(
+                        f"Velocity specification dimensions ({spec_dims}) do not match lattice dimensions ({num_dimensions})."
+                    )
+
+                discretization = LatticeDiscretizationProperties.get_discretization(
+                    num_dimensions, total_velocities
+                )
+
+            except (ValueError, IndexError):
+                raise LatticeException(
+                    f"Invalid velocity specification format: {lattice_dict['velocities']}. Expected format like 'D<x>Q<y>'."
+                )
+
+        else:
+            if len(lattice_dict["dim"]) != len(lattice_dict["velocities"]):  # type: ignore
+                raise LatticeException(
+                    "Lattice configuration dimensionality is inconsistent."
+                )
+
+            velocity_list = [
+                # -1 because the bit_length() would "overshoot" for powers of 2
+                lattice_dict["velocities"][dimension_letter(dim)] - 1
+                for dim in range(num_dimensions)
+            ]
 
         parsed_obstacles: Dict[str, List[Shape]] = {"specular": [], "bounceback": []}
 
         if "geometry" not in input_dict:
-            return grid_list, velocity_list, parsed_obstacles
+            return grid_list, velocity_list, parsed_obstacles, discretization
 
         geometry_list: List[Dict[str, List[int]]] = input_dict["geometry"]  # type: ignore
 
@@ -373,7 +396,7 @@ class Lattice(ABC):
                     )
                 )
 
-        return grid_list, velocity_list, parsed_obstacles
+        return grid_list, velocity_list, parsed_obstacles, discretization
 
     def to_json(self) -> str:
         """
@@ -393,7 +416,11 @@ class Lattice(ABC):
                 "velocities": {
                     dimension_letter(dim): self.num_velocities[dim] + 1
                     for dim in range(self.num_dims)
-                },
+                }
+                if self.discretization == LatticeDiscretization.CFLDISCRETIZATION
+                else LatticeDiscretizationProperties.string_representation[
+                    self.discretization
+                ],  # type: ignore
             },
         }
 

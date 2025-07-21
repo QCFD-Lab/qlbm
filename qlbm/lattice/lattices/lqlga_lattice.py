@@ -73,11 +73,10 @@ class LQLGALattice(Lattice):
     def __init__(self, lattice_data, logger=...):
         super().__init__(lattice_data, logger)
 
-        self.num_gridpoints, self.num_velocities, self.shapes = self.parse_input_data(
-            lattice_data
+        self.num_gridpoints, self.num_velocities, self.shapes, self.discretization = (
+            self.parse_input_data(lattice_data)
         )  # type: ignore
         self.num_dims = len(self.num_gridpoints)
-        self.discretization = self.__get_discretization()
         self.num_velocities_per_point = (
             LatticeDiscretizationProperties.get_num_velocities(self.discretization)
         )
@@ -94,34 +93,6 @@ class LQLGALattice(Lattice):
         self.velocity_register = self.registers
 
         self.circuit = QuantumCircuit(*self.registers)
-
-    def __get_discretization(self) -> LatticeDiscretization:
-        if self.num_dims == 1:
-            if self.num_velocities[0] == 1:
-                return LatticeDiscretization.D1Q2
-            raise LatticeException(
-                f"Unsupported number of velocities for 1D: {self.num_velocities[0] + 1}. Only D1Q2 is supported at the moment."
-            )
-
-        if self.num_dims == 2:
-            if self.num_velocities[0] == 1 and self.num_velocities[1] == 1:
-                return LatticeDiscretization.D2Q4
-            raise LatticeException(
-                f"Unsupported number of velocities for 2D: {(self.num_velocities[0] + 1, self.num_velocities[1] + 1)}. Only D2Q4 is supported at the moment."
-            )
-
-        if self.num_dims == 3:
-            if (
-                self.num_velocities[0] == 1
-                and self.num_velocities[1] == 1
-                and self.num_velocities[2] == 1
-            ):
-                return LatticeDiscretization.D3Q6
-            raise LatticeException(
-                f"Unsupported number of velocities for 3D: {(self.num_velocities[0] + 1, self.num_velocities[1] + 1)}. Only D3Q6 is supported at the moment."
-            )
-
-        raise LatticeException("Only 1-3D discretizations are currently available.")
 
     @override
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
@@ -284,7 +255,7 @@ class LQLGALattice(Lattice):
         Parameters
         ----------
         line_index : int
-            The index of the line to get the velocity qubits for.
+            The index of the line to get the velocity qubits for. Counted from 0 according to the regular discretization taxonomy.
 
         Returns
         -------
@@ -295,6 +266,7 @@ class LQLGALattice(Lattice):
             raise LatticeException(
                 f"Streaming Line index {line_index} is out of bounds for the lattice with {self.num_velocities_per_point // 2} lines."
             )
+
         return (
             (self.num_velocities_per_point % 2) + line_index,
             (self.num_velocities_per_point % 2)
