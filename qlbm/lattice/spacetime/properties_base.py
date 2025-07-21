@@ -21,9 +21,11 @@ class LatticeDiscretization(Enum):
     The only supported discretizations currently are D1Q2 and D2Q4.
     """
 
+    CFLDISCRETIZATION = (0,)
     D1Q2 = (1,)
     D2Q4 = (2,)
     D3Q6 = (3,)
+    D1Q3 = (4,)
 
 
 class LatticeDiscretizationProperties:
@@ -48,12 +50,35 @@ class LatticeDiscretizationProperties:
         LatticeDiscretization.D3Q6: np.array(
             [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -1, 0], [0, 0, -1]]
         ),
+        LatticeDiscretization.D1Q3: np.array([[0], [1], [-1]]),
+    }
+
+    channel_masses: Dict[LatticeDiscretization, np.ndarray] = {
+        LatticeDiscretization.D1Q2: np.ones(2),
+        LatticeDiscretization.D2Q4: np.ones(4),
+        LatticeDiscretization.D3Q6: np.ones(6),
+        LatticeDiscretization.D1Q3: np.concatenate((np.array([2]), np.ones(2))),
     }
 
     num_velocities: Dict[LatticeDiscretization, int] = {
         LatticeDiscretization.D1Q2: 2,
         LatticeDiscretization.D2Q4: 4,
         LatticeDiscretization.D3Q6: 6,
+        LatticeDiscretization.D1Q3: 3,
+    }
+
+    num_dimensions: Dict[LatticeDiscretization, int] = {
+        LatticeDiscretization.D1Q2: 1,
+        LatticeDiscretization.D2Q4: 2,
+        LatticeDiscretization.D3Q6: 3,
+        LatticeDiscretization.D1Q3: 1,
+    }
+
+    string_representation: Dict[LatticeDiscretization, str] = {
+        LatticeDiscretization.D1Q2: "D1Q2",
+        LatticeDiscretization.D2Q4: "D2Q4",
+        LatticeDiscretization.D3Q6: "D3Q6",
+        LatticeDiscretization.D1Q3: "D1Q3",
     }
 
     @staticmethod
@@ -96,6 +121,88 @@ class LatticeDiscretizationProperties:
             raise ValueError(f"Discretization {discretization} is not supported.")
 
         return LatticeDiscretizationProperties.num_velocities[discretization]
+
+    @staticmethod
+    def get_channel_masses(
+        discretization: LatticeDiscretization,
+    ) -> np.ndarray:
+        """
+        Get the channel masses for a given discretization.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization for which to get the channel masses.
+
+        Returns
+        -------
+        np.ndarray
+            The channel masses corresponding to the discretization.
+        """
+        return LatticeDiscretizationProperties.channel_masses[discretization]
+
+    @staticmethod
+    def get_discretizations_of_dimensionality(
+        num_dimensions: int,
+    ) -> List[LatticeDiscretization]:
+        """
+        Get all discretizations with a given number of dimensions.
+
+        Parameters
+        ----------
+        num_dimensions : int
+            The number of dimensions to filter by.
+
+        Returns
+        -------
+        List[LatticeDiscretization]
+            A list of discretizations with the specified number of dimensions.
+        """
+        return [
+            d
+            for d in LatticeDiscretization
+            if d != LatticeDiscretization.CFLDISCRETIZATION
+            and LatticeDiscretizationProperties.num_dimensions[d] == num_dimensions
+        ]
+
+    @staticmethod
+    def get_discretization(
+        num_dimensions: int, num_velocities: int
+    ) -> LatticeDiscretization:
+        """
+        Get the discretization for a given number of dimensions and velocities.
+
+        Parameters
+        ----------
+        num_dimensions : int
+            The number of dimensions.
+        num_velocities : int
+            The number of velocities.
+
+        Returns
+        -------
+        LatticeDiscretization
+            The discretization corresponding to the given parameters.
+        """
+        compatible_discretizations = (
+            LatticeDiscretizationProperties.get_discretizations_of_dimensionality(
+                num_dimensions
+            )
+        )
+
+        compatible_discretizations = [
+            discretization
+            for discretization in compatible_discretizations
+            if LatticeDiscretizationProperties.get_num_velocities(discretization)
+            == num_velocities
+        ]
+
+        if not compatible_discretizations:
+            raise ValueError(
+                f"No discretization found for {num_dimensions} dimensions and {num_velocities} velocities."
+            )
+
+        return compatible_discretizations[0]
 
 
 class VonNeumannNeighborType(Enum):

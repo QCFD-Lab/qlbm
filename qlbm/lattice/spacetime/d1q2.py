@@ -1,4 +1,4 @@
-""":math:`D_2Q_4` STQBM builder."""
+""":math:`D_1Q_2` STQBM builder."""
 
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple, cast
@@ -16,7 +16,7 @@ from qlbm.tools.exceptions import LatticeException
 
 
 class D1Q2SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
-    """:math:`D_2Q_4` STQBM builder."""
+    """:math:`D_1Q_2` STQBM builder."""
 
     # Points to the right of the origin are marked as 0
     # And points to the left are marked as 1

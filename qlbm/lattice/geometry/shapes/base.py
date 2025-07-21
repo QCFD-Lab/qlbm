@@ -72,7 +72,7 @@ class LQLGAShape(Shape):
     def __init__(self, num_grid_qubits: List[int], boundary_condition: str):
         super().__init__(num_grid_qubits, boundary_condition)
 
-    def get_lqlga_reflection_data_d1q2_from_points(
+    def get_lqlga_reflection_data_1d_from_points(
         self,
         gridpoints: List[Tuple[int, ...]],
         before_reflection_velocity_index: int,
@@ -123,6 +123,13 @@ class LQLGAShape(Shape):
 
     @abstractmethod
     def get_lqlga_reflection_data_d1q2(
+        self,
+    ) -> List[LQLGAPointwiseReflectionData]:
+        """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.LQLGA`."""
+        pass
+
+    @abstractmethod
+    def get_lqlga_reflection_data_d1q3(
         self,
     ) -> List[LQLGAPointwiseReflectionData]:
         """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.LQLGA`."""
