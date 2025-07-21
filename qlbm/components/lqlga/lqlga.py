@@ -43,6 +43,11 @@ class LQLGA(LBMAlgorithm):
         circuit = self.lattice.circuit.copy()
 
         circuit.compose(
+            GenericLQLGACollisionOperator(self.lattice, self.logger).circuit,
+            inplace=True,
+        )
+
+        circuit.compose(
             LQLGAStreamingOperator(self.lattice, self.logger).circuit, inplace=True
         )
 
@@ -50,11 +55,6 @@ class LQLGA(LBMAlgorithm):
             LQLGAReflectionOperator(
                 self.lattice, self.lattice.shapes["bounceback"], self.logger
             ).circuit,
-            inplace=True,
-        )
-
-        circuit.compose(
-            GenericLQLGACollisionOperator(self.lattice, self.logger).circuit,
             inplace=True,
         )
 
