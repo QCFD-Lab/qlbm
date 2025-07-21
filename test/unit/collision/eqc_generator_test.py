@@ -1,9 +1,9 @@
 import numpy as np
 
+from qlbm.lattice.eqc.eqc import EquivalenceClass
 from qlbm.lattice.eqc.eqc_generator import (
     EquivalenceClassGenerator,
 )
-from qlbm.lattice.eqc.eqc import EquivalenceClass
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 
 
@@ -12,6 +12,10 @@ def test_eqc_generator_d1q2():
     eqcs = generator.generate_equivalence_classes()
     assert len(eqcs) == 0
 
+def test_eqc_generator_d1q3():
+    generator = EquivalenceClassGenerator(LatticeDiscretization.D1Q3)
+    eqcs = generator.generate_equivalence_classes()
+    assert len(eqcs) == 1
 
 def test_eqc_generator_d2q4():
     generator = EquivalenceClassGenerator(LatticeDiscretization.D2Q4)

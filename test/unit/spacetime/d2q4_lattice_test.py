@@ -15,7 +15,7 @@ def lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
             "geometry": [
                 {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
@@ -31,7 +31,7 @@ def lattice_2d_16x16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
             "geometry": [
                 {"shape": "cuboid", "x": [4, 6], "y": [3, 12], "boundary": "specular"},
@@ -47,7 +47,7 @@ def volumetric_lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
         },
         use_volumetric_ops=True,
@@ -207,7 +207,7 @@ def test_adaptable_qubit_register_indexing_measure_off_volume_off():
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
         },
     )
@@ -237,7 +237,7 @@ def test_adaptable_qubit_register_indexing_measure_on_volume_off():
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
         },
         include_measurement_qubit=True,
@@ -262,7 +262,7 @@ def test_adaptable_qubit_register_indexing_measure_on_volume_on():
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
         },
         include_measurement_qubit=True,
@@ -1123,7 +1123,7 @@ def test_bad_lattice_specification_velocities():
         )
 
     assert (
-        "Unsupported number of velocities for 2D: (4, 2). Only D2Q4 is supported at the moment."
+        "LatticeDiscretization.CFLDISCRETIZATION not currently implemented for the Space-Time method. Only D1Q2 and D2Q4 are fully at the moment. D3Q6 only supports collision."
         == str(excinfo_measure.value)
     )
 
@@ -1152,7 +1152,7 @@ def test_2d_lattice_grid_register():
         {
             "lattice": {
                 "dim": {"x": 256, "y": 256},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
         },
     )

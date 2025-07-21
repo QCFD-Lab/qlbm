@@ -10,7 +10,7 @@ def test_mcswap_13ctrl():
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
             "geometry": [],
         },
@@ -36,7 +36,7 @@ def test_mcswap_grid_ctrl():
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
             "geometry": [],
         },

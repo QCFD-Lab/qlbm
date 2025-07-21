@@ -21,7 +21,7 @@ def test_lqlga_grid_index_mapping_edge():
         {
             "lattice": {
                 "dim": {"x": 64, "y": 8},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
         },
     )

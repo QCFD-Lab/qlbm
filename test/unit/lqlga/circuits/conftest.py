@@ -9,7 +9,7 @@ def lattice_d2q4_256_8() -> LQLGALattice:
         {
             "lattice": {
                 "dim": {"x": 256, "y": 8},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
         },
     )
@@ -21,7 +21,7 @@ def lattice_d1q2_256() -> LQLGALattice:
         {
             "lattice": {
                 "dim": {"x": 256},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2",
             },
         },
     )
@@ -32,7 +32,7 @@ def lattice_d1q2_8() -> LQLGALattice:
         {
             "lattice": {
                 "dim": {"x": 8},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2",
             },
         },
     )

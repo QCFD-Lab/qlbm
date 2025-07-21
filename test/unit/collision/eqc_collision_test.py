@@ -97,12 +97,14 @@ def test_d2q4_collision_positive_cases(
     lattice = SpaceTimeLattice(
         1,
         {
-            "lattice": {"dim": {"x": 4, "y": 4}, "velocities": {"x": 2, "y": 2}},
+            "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "D2Q4"},
             "geometry": [],
         },
     )
 
-    local_circuit = EQCCollisionOperator(lattice.properties.get_discretization()).circuit
+    local_circuit = EQCCollisionOperator(
+        lattice.properties.get_discretization()
+    ).circuit
     assert local_circuit.num_qubits == 4
     eqc = d2q4_equivalence_class_bitstrings[equivalence_class_index]
     for velocity_cfg in eqc:
@@ -115,12 +117,14 @@ def test_d2q4_collision_negative_cases(d2q4_equivalence_class_bitstrings):
     lattice = SpaceTimeLattice(
         1,
         {
-            "lattice": {"dim": {"x": 4, "y": 4}, "velocities": {"x": 2, "y": 2}},
+            "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "D2Q4"},
             "geometry": [],
         },
     )
 
-    local_circuit = EQCCollisionOperator(lattice.properties.get_discretization()).circuit
+    local_circuit = EQCCollisionOperator(
+        lattice.properties.get_discretization()
+    ).circuit
     assert local_circuit.num_qubits == 4
 
     for b in [
@@ -157,13 +161,15 @@ def test_d3q6_collision_positive_cases(
         {
             "lattice": {
                 "dim": {"x": 2, "y": 2, "z": 2},
-                "velocities": {"x": 2, "y": 2, "z": 2},
+                "velocities": "D3Q6",
             },
             "geometry": [],
         },
     )
 
-    local_circuit = EQCCollisionOperator(lattice.properties.get_discretization()).circuit
+    local_circuit = EQCCollisionOperator(
+        lattice.properties.get_discretization()
+    ).circuit
     assert local_circuit.num_qubits == 6
     eqc = d3q6_equivalence_class_bitstrings[equivalence_class_index]
     for velocity_cfg in eqc:
