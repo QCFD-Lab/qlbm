@@ -72,13 +72,18 @@ class EquivalenceClass:
 
         self.discretization = discretization
         self.velocity_configurations = velocity_configurations
-        self.mass = sum(list(velocity_configurations)[0])
+        channel_masses = LatticeDiscretizationProperties.get_channel_masses(
+            discretization
+        )
+        self.mass = np.dot(channel_masses, list(velocity_configurations)[0])
 
         velocity_vectors = LatticeDiscretizationProperties.get_velocity_vectors(
             discretization
         )
+
         if not all(
-            (sum(velocity_cfg) == self.mass) for velocity_cfg in velocity_configurations
+            (np.dot(velocity_cfg, channel_masses) == self.mass)
+            for velocity_cfg in velocity_configurations
         ):
             raise LatticeException("Velocity configurations have different masses.")
         self.momentum = sum(

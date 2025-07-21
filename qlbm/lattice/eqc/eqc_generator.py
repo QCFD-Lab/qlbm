@@ -29,7 +29,7 @@ class EquivalenceClassGenerator:
 
     .. code-block:: python
         :linenos:
-        
+
         from qlbm.lattice import LatticeDiscretization
         from qlbm.lattice.eqc import EquivalenceClassGenerator
 
@@ -66,7 +66,9 @@ class EquivalenceClassGenerator:
                 self.discretization
             )
             state = np.array(state)  # type: ignore
-            mass = np.sum(state)
+            mass = state @ LatticeDiscretizationProperties.get_channel_masses(
+                self.discretization
+            )
             momentum = np.sum(state[:, None] * velocity_vectors, axis=0)  # type: ignore
 
             key = (mass, tuple(momentum))
