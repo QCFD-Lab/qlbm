@@ -11,6 +11,7 @@ from qiskit.quantum_info import Operator
 from qlbm.components.base import LBMPrimitive
 from qlbm.lattice.eqc.eqc import EquivalenceClass
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretizationProperties
+from qlbm.tools.utils import is_two_pow
 
 
 class EQCRedistribution(LBMPrimitive):
@@ -100,32 +101,40 @@ class EQCRedistribution(LBMPrimitive):
             self.equivalence_class.discretization
         )
         circuit = QuantumCircuit(nv)
-
         n = self.equivalence_class.size()
         nq = np.ceil(np.log2(n)).astype(int)
 
-        QFT = np.array(
-            [
-                [np.exp(2j * np.pi * i * j / n) / np.sqrt(n) for j in range(n)]
-                for i in range(n)
-            ]
-        )
+        redistribution_circuit = QuantumCircuit(nq)
+        if is_two_pow(n):
+            redistribution_circuit.ry(np.pi / 2, list(range(nq)), label="RY(π/2)")
+        else:
+            QFT = np.array(
+                [
+                    [np.exp(2j * np.pi * i * j / n) / np.sqrt(n) for j in range(n)]
+                    for i in range(n)
+                ]
+            )
 
-        U = np.eye(2**nq, dtype=complex)
-        U[:n, :n] = QFT
-        op = Operator(U)
-        assert op.is_unitary()
+            U = np.eye(2**nq, dtype=complex)
+            U[:n, :n] = QFT
+            op = Operator(U)
+            assert op.is_unitary()
 
-        qft_block_circ = QuantumCircuit(nq)
-        qft_block_circ.append(op, list(range(nq)))
+            redistribution_circuit.append(op, list(range(nq)))
 
         circuit.compose(
-            qft_block_circ.control(nv - int(nq), label=rf"Coll({n}, {nq})"),
+            redistribution_circuit.control(
+                nv - int(nq),
+                label=rf"MCRY(π/2, nq)" if is_two_pow(n) else rf"Coll({n}, {nq})",
+            ),
             qubits=list(range(nv - 1, -1, -1)),
             inplace=True,
         )
 
-        return circuit.decompose() if self.decompose_block else circuit
+        if not is_two_pow(n):
+            return circuit.decompose() if self.decompose_block else circuit
+        else:
+            return circuit
 
     @override
     def __str__(self):
