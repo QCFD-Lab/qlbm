@@ -58,6 +58,9 @@ class LQLGAReflectionOperator(LQLGAOperator):
         if discretization == LatticeDiscretization.D1Q2:
             return self.__create_circuit_d1q2()
 
+        elif discretization == LatticeDiscretization.D1Q3:
+            return self.__create_circuit_d1q3()
+
         raise CircuitException(f"Reflection Operator unsupported for {discretization}.")
 
     def __create_circuit_d1q2(self) -> QuantumCircuit:
@@ -65,6 +68,23 @@ class LQLGAReflectionOperator(LQLGAOperator):
 
         for shape in self.shapes:
             for reflection_data in shape.get_lqlga_reflection_data_d1q2():
+                circuit.swap(
+                    self.lattice.velocity_index_tuple(
+                        reflection_data.gridpoints[0],
+                        reflection_data.velocity_indices_to_swap[0],
+                    ),
+                    self.lattice.velocity_index_tuple(
+                        reflection_data.gridpoints[1],
+                        reflection_data.velocity_indices_to_swap[1],
+                    ),
+                )
+        return circuit
+
+    def __create_circuit_d1q3(self) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+
+        for shape in self.shapes:
+            for reflection_data in shape.get_lqlga_reflection_data_d1q3():
                 circuit.swap(
                     self.lattice.velocity_index_tuple(
                         reflection_data.gridpoints[0],
