@@ -125,7 +125,7 @@ class EQCRedistribution(LBMPrimitive):
         circuit.compose(
             redistribution_circuit.control(
                 nv - int(nq),
-                label=rf"MCRY(π/2, nq)" if is_two_pow(n) else rf"Coll({n}, {nq})",
+                label=rf"MCRY(π/2, {nq})" if is_two_pow(n) else rf"Coll({n}, {nq})",
             ),
             qubits=list(range(nv - 1, -1, -1)),
             inplace=True,

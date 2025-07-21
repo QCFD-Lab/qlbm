@@ -15,7 +15,7 @@ from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretizationProperties,
 )
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
+from qlbm.tools.utils import dimension_letter, flatten
 
 
 class Lattice(ABC):
