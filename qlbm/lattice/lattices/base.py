@@ -43,6 +43,7 @@ class Lattice(ABC):
     :attr:`num_total_qubits`    The total number of qubits required for the quantum circuit to simulate the lattice.
     :attr:`registers`           The qubit registers of the quantum algorithm.
     :attr:`circuit`             The blueprint quantum circuit for all components of the algorithm.
+    :attr:`discretization`      The discretization of the lattice, as an enum value of :class:`.LatticeDiscretization`.
     :attr:`shapes`              A list of the solid geometry objects.
     :attr:`logger`              The performance logger.
     =========================== ======================================================================
@@ -150,6 +151,11 @@ class Lattice(ABC):
     A tuple of lists of :class:`qiskit.QuantumRegister` s that are used to store the quantum information of the lattice.
     """
 
+    discretization: LatticeDiscretization
+    """
+    The discretization of the lattice, as an enum value of :class:`.LatticeDiscretization`.
+    """
+
     def __init__(
         self,
         lattice_data: str | Dict,  # type: ignore
@@ -199,7 +205,7 @@ class Lattice(ABC):
     def __parse_input_dict(
         self,
         input_dict: Dict,  # type: ignore
-    ) -> Tuple[List[int], List[int], Dict[str, List[Shape]]]:
+    ) -> Tuple[List[int], List[int], Dict[str, List[Shape]], LatticeDiscretization]:
         r"""
         Parses the lattice input data, provided as a dictionary.
 
@@ -210,7 +216,7 @@ class Lattice(ABC):
 
         Returns
         -------
-        Tuple[List[int], List[int], Dict[str, List[Shape]]]
+        Tuple[List[int], List[int], Dict[str, List[Shape]], LatticeDiscretization]
             A tuple containing
             (i) a list of the number of gridpoints per dimension,
             (ii) a list of the number of velicities per dimension,
