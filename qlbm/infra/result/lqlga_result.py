@@ -10,6 +10,7 @@ from typing_extensions import override
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
+from qlbm.lattice.spacetime.properties_base import LatticeDiscretizationProperties
 
 from .base import QBMResult
 
@@ -57,9 +58,13 @@ class LQLGAResult(QBMResult):
         create_vis: bool = True,
         save_array: bool = False,
     ):
+        total_counts = sum(counts.values())
         if self.lattice.num_dims == 1:
             # The second dimension is a dirty rendering trick for VTK and Paraview
             count_history = np.zeros((self.lattice.num_gridpoints[0] + 1, 2))
+            channel_masses = LatticeDiscretizationProperties.get_channel_masses(
+                self.lattice.discretization
+            )
             for count in counts:
                 count_inverse = count[::-1]
                 num_vel = self.lattice.num_velocities_per_point
@@ -67,15 +72,20 @@ class LQLGAResult(QBMResult):
                     self.lattice.num_base_qubits
                     // self.lattice.num_velocities_per_point
                 ):
-                    num_populations = int(
-                        count_inverse[gp * num_vel : (gp + 1) * num_vel][::-1].count(
-                            "1"  # The number of 1s is the number of populations
-                        )
+                    mass = np.dot(
+                        np.array(
+                            list(
+                                map(
+                                    lambda x: float(x),
+                                    count_inverse[gp * num_vel : (gp + 1) * num_vel],
+                                )
+                            )
+                        ),
+                        channel_masses,
                     )
-                    # Another dirty rendering trick for VTK and Paraview
-                    count_history[gp][0] = count_history[gp][1] = (
-                        counts[count] * num_populations
-                    )
+                    pops = counts[count] * mass / total_counts
+                    count_history[gp][0] += pops
+                    count_history[gp][1] += pops
         self.save_timestep_array(
             np.transpose(count_history),
             timestep,
