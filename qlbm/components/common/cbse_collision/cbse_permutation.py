@@ -73,7 +73,9 @@ class EQCPermutation(LBMPrimitive):
 
     @override
     def create_circuit(self):
-        if self.equivalence_class.discretization == LatticeDiscretization.D2Q4:
+        if self.equivalence_class.discretization == LatticeDiscretization.D1Q3:
+            return self.__create_circuit_d1q3()
+        elif self.equivalence_class.discretization == LatticeDiscretization.D2Q4:
             return self.__create_circuit_d2q4()
         elif self.equivalence_class.discretization == LatticeDiscretization.D3Q6:
             return self.__create_circuit_d3q6()
@@ -81,6 +83,18 @@ class EQCPermutation(LBMPrimitive):
             raise CircuitException(
                 f"Collision not yet supported for discretization {self.equivalence_class.discretization}."
             )
+
+    def __create_circuit_d1q3(self):
+        circuit = QuantumCircuit(3)
+
+        if not self.inverse:
+            circuit.cx(0, 1)
+            circuit.cx(0, 2)
+        else:
+            circuit.cx(0, 2)
+            circuit.cx(0, 1)
+
+        return circuit
 
     def __create_circuit_d2q4(self):
         circuit = QuantumCircuit(4)
