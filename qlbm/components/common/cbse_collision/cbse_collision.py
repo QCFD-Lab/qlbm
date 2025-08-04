@@ -36,6 +36,32 @@ class EQCCollisionOperator(LBMPrimitive):
     :attr:`discretization`    The discretization for which this collision operator is defined.
     :attr:`num_velocities`    The number of velocities in the discretization.
     ========================= ======================================================================
+
+    Simple D2Q4 example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import EQCCollisionOperator
+        from qlbm.lattice import LatticeDiscretization
+
+        # Select a discretization and draw its circuit
+        EQCCollisionOperator(
+            LatticeDiscretization.D2Q4
+        ).draw("mpl")
+
+    More complex D3Q6 example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import EQCCollisionOperator
+        from qlbm.lattice import LatticeDiscretization
+
+        # Select a discretization and draw its circuit
+        EQCCollisionOperator(
+            LatticeDiscretization.D3Q6
+        ).draw("mpl")
     """
 
     discretization: LatticeDiscretization
