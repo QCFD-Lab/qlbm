@@ -61,3 +61,5 @@ Collision Components
 
 .. autoclass:: qlbm.components.common.EQCRedistribution
 
+.. autoclass:: qlbm.components.common.EQCCollisionOperator
+
