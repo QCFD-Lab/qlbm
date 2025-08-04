@@ -23,6 +23,27 @@ class LQLGA(LBMAlgorithm):
     deterministic run of the classical LGA algorithm.
 
     More information about this algorithm can be found in :cite:t:`lqlga1`, :cite:t:`lqlga2`, and :cite:t:`spacetime2`.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.lqlga import LQLGA
+        from qlbm.lattice import LQLGALattice
+
+        lattice = LQLGALattice(
+            {
+                "lattice": {
+                    "dim": {"x": 7},
+                    "velocities": "D1Q3",
+                },
+                "geometry": [{"shape": "cuboid", "x": [3, 5], "boundary": "bounceback"}],
+            },
+        )
+
+        LQLGA(lattice=lattice).draw("mpl")
+
     """
 
     lattice: LQLGALattice

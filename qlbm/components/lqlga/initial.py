@@ -17,6 +17,26 @@ class LQGLAInitialConditions(LBMPrimitive):
     This operator allows the construction of arbitrary deterministic initial conditions for the LQLGA algorithm.
     The number of gates required by this operator is equal to the number of enabled velocity qubits across all grid points.
     The depth of the circuit is 1, as all gates are applied in parallel at each grid point.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import LQLGALattice
+        from qlbm.components.lqlga import LQGLAInitialConditions
+
+        lattice = LQLGALattice(
+            {
+                "lattice": {
+                    "dim": {"x": 4},
+                    "velocities": "D1Q3",
+                },
+                "geometry": [],
+            },
+        )
+        initial_conditions = LQGLAInitialConditions(lattice, [(tuple([2]), (True, True, True))])
+        initial_conditions.draw("mpl")
     """
 
     grid_data: List[Tuple[Tuple[int, ...], Tuple[bool, ...]]]

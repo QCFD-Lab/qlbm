@@ -10,10 +10,31 @@ from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 
 
 class LQLGAGridVelocityMeasurement(LQLGAOperator):
+    # TODO: Improve documentation
     """
     Measurement operator for the :class:`.LQLGA` algorithm.
 
     This operator measures the velocity qubits at each grid point in the LQLGA lattice.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.lqlga import LQLGAGridVelocityMeasurement
+        from qlbm.lattice import LQLGALattice
+
+        lattice = LQLGALattice(
+            {
+                "lattice": {
+                    "dim": {"x": 5},
+                    "velocities": "D1Q3",
+                },
+                "geometry": [],
+            },
+        )
+
+        LQLGAGridVelocityMeasurement(lattice=lattice).draw("mpl")
     """
 
     def __init__(

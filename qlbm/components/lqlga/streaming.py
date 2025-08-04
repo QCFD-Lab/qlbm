@@ -11,12 +11,33 @@ from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 
 
 class LQLGAStreamingOperator(LQLGAOperator):
+    # TODO: Improve documentation
     """
     Streaming operator for the :class:`.LQLGA` algorithm.
 
     Streaming is implemented by a series of swap gates as described in :cite:`spacetime`.
     The number of gates scales linearly with size of the grid,
     while the depth scales logarithmically.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.lqlga import LQLGAStreamingOperator
+        from qlbm.lattice import LQLGALattice
+
+        lattice = LQLGALattice(
+            {
+                "lattice": {
+                    "dim": {"x": 4},
+                    "velocities": "D1Q3",
+                },
+                "geometry": [],
+            },
+        )
+        streaming_operator = LQLGAStreamingOperator(lattice)
+        streaming_operator.draw("mpl")
     """
 
     def __init__(
