@@ -88,10 +88,7 @@ class SpaceTimeLattice(Lattice):
                     "x": 16,
                     "y": 16
                 },
-                "velocities": {
-                    "x": 2,
-                    "y": 2
-                }
+                "velocities": "D2Q4"
             },
             "geometry": []
         }
@@ -106,7 +103,7 @@ class SpaceTimeLattice(Lattice):
         SpaceTimeLattice(
             num_timesteps=1,
             lattice_data={
-                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": "D2Q4"},
                 "geometry": [],
             }
         ).circuit.draw("mpl")
