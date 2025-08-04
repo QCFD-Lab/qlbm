@@ -13,8 +13,8 @@ check-python-version:
 	@PYTHON_VERSION=$$($(PYTHON) --version 2>&1 | awk '{print $$2}'); \
 	MAJOR_VERSION=$$(echo $$PYTHON_VERSION | cut -d. -f1); \
 	MINOR_VERSION=$$(echo $$PYTHON_VERSION | cut -d. -f2); \
-	if [ "$$MAJOR_VERSION" -ne 3 ] || [ "$$MINOR_VERSION" -lt 8 ] || [ "$$MINOR_VERSION" -gt 13 ]; then \
-	    echo "Python version must be between 3.8 and 3.13"; \
+	if [ "$$MAJOR_VERSION" -ne 3 ] || [ "$$MINOR_VERSION" -lt 12 ] || [ "$$MINOR_VERSION" -gt 13 ]; then \
+	    echo "Python version must be between 3.12 and 3.13"; \
 	    exit 1; \
 	fi
 

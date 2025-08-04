@@ -183,7 +183,7 @@ def test_lattice_exception_mismatched_bad_dimensions():
         )
 
     assert (
-        "Lattice y-dimension has a number of grid points that is not divisible by 2."
+        "Lattice has a number of grid points that is not divisible by 2 in dimension y."
         == str(excinfo.value)
     )
 
@@ -200,7 +200,7 @@ def test_lattice_exception_mismatched_bad_velocities():
         )
 
     assert (
-        "Lattice y-dimension has a number of velocities that is not divisible by 2."
+        "Lattice has a number of velocities that is not divisible by 2 in dimension y."
         == str(excinfo.value)
     )
 

@@ -5,7 +5,7 @@ from time import perf_counter_ns
 from typing import List
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import CQLBMOperator, LBMPrimitive
@@ -62,7 +62,7 @@ class SpecularWallComparator(LBMPrimitive):
 
         # Comparing on the indices of the inside x-wall on the lower-bound of the obstacle
         SpecularWallComparator(
-            lattice=lattice, wall=lattice.block_list[0].walls_inside[0][0]
+            lattice=lattice, wall=lattice.shape_list[0].walls_inside[0][0]
         ).draw("mpl")
     """
 
@@ -166,7 +166,7 @@ class SpecularReflectionOperator(CQLBMOperator):
             }
         )
 
-        SpecularReflectionOperator(lattice=lattice, blocks=lattice.block_list)
+        SpecularReflectionOperator(lattice=lattice, blocks=lattice.shape_list)
     """
 
     def __init__(
@@ -307,7 +307,7 @@ class SpecularReflectionOperator(CQLBMOperator):
         target_qubits = self.lattice.ancillae_obstacle_index(wall.dim)
 
         circuit.compose(
-            MCMT(
+            MCMTGate(
                 XGate(),
                 len(control_qubits),
                 len(target_qubits),
@@ -388,7 +388,7 @@ class SpecularReflectionOperator(CQLBMOperator):
                 circuit.x(self.lattice.velocity_dir_index(dim))
 
         circuit.compose(
-            MCMT(
+            MCMTGate(
                 XGate(),
                 len(control_qubits),
                 len(target_qubits),
@@ -463,7 +463,7 @@ class SpecularReflectionOperator(CQLBMOperator):
         )
 
         circuit.compose(
-            MCMT(
+            MCMTGate(
                 XGate(),
                 len(control_qubits),
                 len(target_qubits),
@@ -519,5 +519,5 @@ class SpecularReflectionOperator(CQLBMOperator):
     @override
     def __str__(self) -> str:
         return (
-            f"[Operator SpecularReflectionOperator against block {self.lattice.blocks}]"
+            f"[Operator SpecularReflectionOperator against shapes {self.lattice.shapes}]"
         )

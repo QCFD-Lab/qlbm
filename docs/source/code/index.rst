@@ -14,9 +14,11 @@ The :ref:`tools` module contains miscellaneous utilities.
 
 .. toctree::
 
-   base_comps
-   cqlbm_comps
-   stqlbm_comps
+   comps_base
+   comps_cqlbm
+   comps_collision
+   comps_stqbm
+   comps_lqlga
    lattice
    infra
    tools

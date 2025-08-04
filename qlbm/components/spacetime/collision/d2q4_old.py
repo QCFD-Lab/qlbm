@@ -1,4 +1,4 @@
-"""Collision operators for the :class:`.SpaceTimeQLBM` algorithm :cite:`spacetime`."""
+"""Collision operator for the :math:`D_2Q_4` discretization :class:`.SpaceTimeQLBM` algorithm as described in :cite:`spacetime`."""
 
 from logging import Logger, getLogger
 from math import pi
@@ -6,14 +6,14 @@ from time import perf_counter_ns
 
 from qiskit import QuantumCircuit
 from qiskit.circuit import Gate
-from qiskit.circuit.library import MCMT, RYGate
+from qiskit.circuit.library import MCMTGate, RYGate
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
-class SpaceTimeCollisionOperator(SpaceTimeOperator):
+class SpaceTimeD2Q4CollisionOperator(SpaceTimeOperator):
     r"""An operator that performs collision part of the :class:`.SpaceTimeQLBM` algorithm.
 
     Collision is a local operation that is performed simultaneously on all velocity qubits corresponding to a grid location.
@@ -46,20 +46,20 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
     .. plot::
         :include-source:
 
-        from qlbm.components.spacetime import SpaceTimeCollisionOperator
+        from qlbm.components.spacetime.collision.d2q4_old import SpaceTimeD2Q4CollisionOperator
         from qlbm.lattice import SpaceTimeLattice
 
         # Build an example lattice
         lattice = SpaceTimeLattice(
             num_timesteps=1,
             lattice_data={
-                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": "D2Q4"},
                 "geometry": [],
             },
         )
 
         # Draw the collision operator for 1 time step
-        SpaceTimeCollisionOperator(lattice=lattice, timestep=1).draw("mpl")
+        SpaceTimeD2Q4CollisionOperator(lattice=lattice, timestep=1).draw("mpl")
     """
 
     def __init__(
@@ -87,7 +87,7 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
 
         collision_circuit = self.local_collision_circuit(reset_state=False)
         collision_circuit.compose(
-            MCMT(
+            MCMTGate(
                 self.gate_to_apply,
                 self.lattice.properties.get_num_velocities_per_point() - 1,
                 1,
@@ -158,5 +158,4 @@ class SpaceTimeCollisionOperator(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
         return "Space Time Collision Operator"

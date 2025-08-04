@@ -7,7 +7,7 @@ and paraview integration for visualization.
 
 from .compiler import CircuitCompiler
 from .result import CollisionlessResult, SpaceTimeResult
-from .runner import CircuitRunner, QiskitRunner, QulacsRunner, SimulationConfig
+from .runner import CircuitRunner, QiskitRunner, SimulationConfig
 
 __all__ = [
     "CircuitCompiler",
@@ -16,6 +16,5 @@ __all__ = [
     "CollisionlessResult",
     "SpaceTimeResult",
     "QiskitRunner",
-    "QulacsRunner",
     "SimulationConfig",
 ]

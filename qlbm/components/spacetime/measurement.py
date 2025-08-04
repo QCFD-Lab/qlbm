@@ -4,7 +4,7 @@ from logging import Logger, getLogger
 from typing import Tuple
 
 from qiskit import ClassicalRegister
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
@@ -39,7 +39,7 @@ class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
         lattice = SpaceTimeLattice(
             num_timesteps=1,
             lattice_data={
-                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": "D2Q4"},
                 "geometry": [],
             },
         )
@@ -79,8 +79,7 @@ class SpaceTimeGridVelocityMeasurement(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "Space Gird Measurement"
+        return f"[SpaceTimeGridVelocityMeasurement for lattice {self.lattice}]"
 
 
 class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
@@ -132,7 +131,7 @@ class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
         target_qubits = self.lattice.ancilla_mass_index()
 
         circuit.compose(
-            MCMT(
+            MCMTGate(
                 XGate(),
                 len(control_qubits),
                 len(target_qubits),
@@ -150,5 +149,4 @@ class SpaceTimePointWiseMassMeasurement(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "SpaceTimePointWiseMassMeasurement"
+        return f"[SpaceTimePointWiseMassMeasurement for lattice {self.lattice}, gridpoint {self.gridpoint}, velocity {self.velocity_index_to_measure}]"

@@ -13,7 +13,7 @@ def dummy_1d_lattice() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 256},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2",
             },
         },
     )
@@ -26,7 +26,7 @@ def lattice_1d_16_1_obstacle_1_timestep() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2"
             },
             "geometry": [
                 {"shape": "cuboid", "x": [4, 6], "boundary": "bounceback"},
@@ -42,7 +42,7 @@ def lattice_1d_16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2"
             },
             "geometry": [
                 {"shape": "cuboid", "x": [4, 6], "boundary": "bounceback"},
@@ -58,7 +58,7 @@ def lattice_1d_16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2"
             },
         },
     )
@@ -71,7 +71,7 @@ def volumetric_lattice_1d_16_1_obstacle_1_timestep() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2"
             },
         },
         use_volumetric_ops=True,
@@ -86,7 +86,7 @@ def dummy_lattice() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 32, "y": 32},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4"
             },
         },
     )
@@ -99,7 +99,7 @@ def lattice_2d_16x16_1_obstacle_1_timestep() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4"
             },
             "geometry": [
                 {
@@ -120,7 +120,7 @@ def lattice_2d_16x16_1_obstacle_2_timesteps() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4"
             },
             "geometry": [
                 {
@@ -141,7 +141,7 @@ def lattice_2d_16x16_1_obstacle_5_timesteps() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4"
             },
             "geometry": [
                 {
@@ -162,7 +162,7 @@ def lattice_1d_16_1_obstacle_5_timesteps_1_obstacle() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2"
             },
             "geometry": [
                 {"shape": "cuboid", "x": [5, 11], "boundary": "bounceback"},
@@ -178,7 +178,7 @@ def lattice_1d_16_1_obstacle_5_timesteps_large_obstacle() -> SpaceTimeLattice:
         {
             "lattice": {
                 "dim": {"x": 16},
-                "velocities": {"x": 2},
+                "velocities": "D1Q2"
             },
             "geometry": [
                 {"shape": "cuboid", "x": [2, 14], "boundary": "bounceback"},

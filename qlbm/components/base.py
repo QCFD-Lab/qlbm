@@ -10,6 +10,7 @@ from qiskit.qasm3 import dump as dump_qasm3
 from typing_extensions import override
 
 from qlbm.lattice import CollisionlessLattice, Lattice
+from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
 
@@ -231,6 +232,33 @@ class SpaceTimeOperator(LBMOperator):
     def __init__(
         self,
         lattice: SpaceTimeLattice,
+        logger: Logger = getLogger("qlbm"),
+    ) -> None:
+        super().__init__(lattice, logger)
+        self.lattice = lattice
+
+
+class LQLGAOperator(LBMOperator):
+    """
+    Specialization of the :class:`.LBMOperator` operator class for the LQLGA algorithm.
+
+    Specializaitons of this class infer their properties
+    based on a :class:`.LQLGALattice`.
+
+    ========================= ======================================================================
+    Attribute                  Summary
+    ========================= ======================================================================
+    :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the operator.
+    :attr:`lattice`           The :class:`.LQLGALattice` based on which the properties of the operator are inferred.
+    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
+    ========================= ======================================================================
+    """
+
+    lattice: LQLGALattice
+
+    def __init__(
+        self,
+        lattice: LQLGALattice,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)

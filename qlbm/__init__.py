@@ -9,7 +9,7 @@ from .components import (
     CollisionlessStreamingOperator,
     SpecularReflectionOperator,
 )
-from .infra import CircuitCompiler, CollisionlessResult, QiskitRunner, QulacsRunner
+from .infra import CircuitCompiler, CollisionlessResult, QiskitRunner
 from .lattice import CollisionlessLattice, Lattice
 from .lattice.lattices.spacetime_lattice import SpaceTimeLattice
 

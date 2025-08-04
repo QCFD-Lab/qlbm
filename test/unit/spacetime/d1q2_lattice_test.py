@@ -239,7 +239,7 @@ def test_bad_lattice_specification_velocities():
         )
 
     assert (
-        "Unsupported number of velocities for 1D: 4. Only D1Q2 is supported at the moment."
+        "LatticeDiscretization.CFLDISCRETIZATION not currently implemented for the Space-Time method. Only D1Q2 and D2Q4 are fully at the moment. D3Q6 only supports collision."
         == str(excinfo_measure.value)
     )
 

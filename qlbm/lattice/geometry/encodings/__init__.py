@@ -6,6 +6,7 @@ from .collisionless import (
     ReflectionResetEdge,
     ReflectionWall,
 )
+from .lqlga import LQLGAPointwiseReflectionData, LQLGAReflectionData
 from .spacetime import (
     SpaceTimeDiagonalReflectionData,
     SpaceTimePWReflectionData,
@@ -20,4 +21,6 @@ __all__ = [
     "SpaceTimePWReflectionData",
     "SpaceTimeVolumetricReflectionData",
     "SpaceTimeDiagonalReflectionData",
+    "LQLGAPointwiseReflectionData",
+    "LQLGAReflectionData",
 ]

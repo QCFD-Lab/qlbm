@@ -65,8 +65,13 @@ Streaming
 Collision
 ----------------------------------
 
-.. autoclass:: qlbm.components.spacetime.collision.SpaceTimeCollisionOperator
+The collision module contains collision operators and adjacent logic classes.
+The former implements the circuits that perform collision in computational basis state encodings,
+while the latter contains useful abstractions that circuits build on top of.
 
+.. autoclass:: qlbm.components.spacetime.collision.GenericSpaceTimeCollisionOperator
+
+.. autoclass:: qlbm.components.spacetime.collision.SpaceTimeD2Q4CollisionOperator
 
 .. _stqlbm_others:
 

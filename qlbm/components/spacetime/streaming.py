@@ -44,7 +44,7 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
         lattice = SpaceTimeLattice(
             num_timesteps=1,
             lattice_data={
-                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": "D2Q4"},
                 "geometry": [],
             },
         )
@@ -165,5 +165,4 @@ class SpaceTimeStreamingOperator(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "Space Time Streaming Operator"
+        return f"[SpaceTimeStreamingOperator for lattice {self.lattice}]"

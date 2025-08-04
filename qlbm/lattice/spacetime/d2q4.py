@@ -1,6 +1,5 @@
 """:math:`D_2Q_4` STQBM builder."""
 
-
 from itertools import product
 from logging import Logger, getLogger
 from typing import Dict, List, Tuple, cast
@@ -367,7 +366,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
     def get_reflected_index_of_velocity(self, velocity_index: int) -> int:
         if velocity_index not in list(range(4)):
             raise LatticeException(
-                f"D1Q2 discretization only supports velocities with indices {list(range(4))}. Index {velocity_index} unsupported."
+                f"D2Q4 discretization only supports velocities with indices {list(range(4))}. Index {velocity_index} unsupported."
             )
 
         return self.velocity_reflection[velocity_index]
@@ -376,7 +375,7 @@ class D2Q4SpaceTimeLatticeBuilder(SpaceTimeLatticeBuilder):
     def get_reflection_increments(self, velocity_index: int) -> Tuple[int, ...]:
         if velocity_index not in list(range(4)):
             raise LatticeException(
-                f"D1Q2 discretization only supports velocities with indices {list(range(4))}. Index {velocity_index} unsupported."
+                f"D2Q4 discretization only supports velocities with indices {list(range(4))}. Index {velocity_index} unsupported."
             )
 
         return self.extreme_point_classes[velocity_index][1]
