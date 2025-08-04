@@ -262,7 +262,7 @@ class Lattice(ABC):
         # Check if velocities is a string (DdQq format) or dict
         if isinstance(lattice_dict["velocities"], str):  # type: ignore
             # Parse DdQq format (e.g., "D2Q4" means 2 dimensions, 4 velocities total)
-            velocity_spec = lattice_dict["velocities"]  # type: ignore
+            velocity_spec = lattice_dict["velocities"].upper()  # type: ignore
             if not velocity_spec.startswith("D") or "Q" not in velocity_spec:
                 raise LatticeException(
                     f"Invalid velocity specification format: {lattice_dict['velocities']}. Expected format like 'd2q4'."
