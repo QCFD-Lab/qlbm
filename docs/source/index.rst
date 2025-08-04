@@ -31,11 +31,11 @@ The :ref:`tools` module contains miscellaneous utilities.
     
     :fas:`book;sd-text-primary` Detailed documentation of ``qlbm``.
 
-.. .. card:: Tutorials
-..     :link: tutorials
-..     :link-type: ref
+.. card:: Tutorials
+    :link: tutorials
+    :link-type: ref
     
-..     :fas:`flask;sd-text-primary` Hands-on examples.
+    :fas:`flask;sd-text-primary` Hands-on examples.
 
 
 .. toctree::
@@ -43,7 +43,7 @@ The :ref:`tools` module contains miscellaneous utilities.
    :maxdepth: 2
 
    code/index
-..    examples/index
+   examples/index
 
 References
 -----------------------------------
