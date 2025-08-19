@@ -7,8 +7,9 @@ python -m venv qlbm-cpu-venv
 source qlbm-cpu-venv/bin/activate
 mkdir qlbm-output
 pip install --upgrade pip
-pip install qlbm jupyter ipykernel matplotlib seaborn pandas
-jupyter-lab
+pip install -e ..[cpu,dev,docs]
+pip install jupyter ipykernel seaborn pandas
+jupyter lab
 ```
 
  Currently, the following directories are available:
