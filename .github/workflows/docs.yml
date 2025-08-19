@@ -26,7 +26,7 @@ jobs:
     
       - name: Install dependencies
         run: |
-          sudo apt-get install -y -qq pandoc
+          sudo apt-get install -y -qq pandoc libglfw3-dev libgles2-mesa-dev
 
       - name: Install qlbm
         run: |
