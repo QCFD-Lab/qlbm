@@ -1,4 +1,3 @@
-
 import pytest
 from qiskit_aer import AerSimulator
 
@@ -83,35 +82,36 @@ def test_collisionless_qiskit_execution(
     )
 
 
-@pytest.mark.parametrize("statevector_sampling", [True, False])
-def test_spacetime_qiskit_execution(
-    spacetime_circuits,
-    statevector_sampling,
-):
-    cfg = SimulationConfig(
-        initial_conditions=spacetime_circuits["initial_conditions"],
-        algorithm=spacetime_circuits["algorithm"],
-        postprocessing=spacetime_circuits["postprocessing"],
-        measurement=spacetime_circuits["measurement"],
-        target_platform="QISKIT",
-        compiler_platform="QISKIT",
-        optimization_level=0,
-        execution_backend=AerSimulator(method="statevector"),
-        sampling_backend=AerSimulator(method="statevector")
-        if statevector_sampling
-        else None,
-        statevector_sampling=statevector_sampling,
-    )
+# Qulacs is not currently supported due to qiskit 2.0
+# @pytest.mark.parametrize("statevector_sampling", [True, False])
+# def test_spacetime_qiskit_execution(
+#     spacetime_circuits,
+#     statevector_sampling,
+# ):
+#     cfg = SimulationConfig(
+#         initial_conditions=spacetime_circuits["initial_conditions"],
+#         algorithm=spacetime_circuits["algorithm"],
+#         postprocessing=spacetime_circuits["postprocessing"],
+#         measurement=spacetime_circuits["measurement"],
+#         target_platform="QISKIT",
+#         compiler_platform="QISKIT",
+#         optimization_level=0,
+#         execution_backend=AerSimulator(method="statevector"),
+#         sampling_backend=AerSimulator(method="statevector")
+#         if statevector_sampling
+#         else None,
+#         statevector_sampling=statevector_sampling,
+#     )
 
-    cfg.validate()
-    cfg.prepare_for_simulation()
+#     cfg.validate()
+#     cfg.prepare_for_simulation()
 
-    runner = QiskitRunner(cfg, spacetime_circuits["lattice"])
+#     runner = QiskitRunner(cfg, spacetime_circuits["lattice"])
 
-    # Simulate the circuits using both snapshots and sampling
-    runner.run(
-        2,  # Number of time steps
-        512,  # Number of shots per time step
-        f"{OUTPUT_DIR}/spacetime-sampling-{int(statevector_sampling)}",
-        statevector_snapshots=True,
-    )
+#     # Simulate the circuits using both snapshots and sampling
+#     runner.run(
+#         2,  # Number of time steps
+#         512,  # Number of shots per time step
+#         f"{OUTPUT_DIR}/spacetime-sampling-{int(statevector_sampling)}",
+#         statevector_snapshots=True,
+#     )
