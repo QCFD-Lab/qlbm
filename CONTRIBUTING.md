@@ -1,6 +1,6 @@
 # Contributing
 
-Pull requests are welcome. To make a PR, first fork the repo, make your proposed changes on the main branch, and open a PR from your fork. If it passes tests and is accepted after review, it will be merged. For discussions about feature requests and contributions, please contact `c.a.georgescu@tudelft.nl`.
+Pull requests are welcome. To make a PR, first fork the repo, make your proposed changes on the main branch, and open a PR from your fork. If it passes tests and is accepted after review, it will be merged. For discussions about feature requests and contributions, please contact `qcfd-EWI@tudelft.nl`.
 
 ## Code style
 
