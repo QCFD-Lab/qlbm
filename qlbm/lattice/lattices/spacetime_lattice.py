@@ -9,9 +9,13 @@ from typing_extensions import override
 from qlbm.lattice.lattices.base import Lattice
 from qlbm.lattice.spacetime.d1q2 import D1Q2SpaceTimeLatticeBuilder
 from qlbm.lattice.spacetime.d2q4 import D2Q4SpaceTimeLatticeBuilder
-from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.d3q6 import D3Q6SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.properties_base import (
+    LatticeDiscretization,
+    SpaceTimeLatticeBuilder,
+)
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import flatten
+from qlbm.tools.utils import flatten, is_two_pow
 
 
 class SpaceTimeLattice(Lattice):
@@ -84,10 +88,7 @@ class SpaceTimeLattice(Lattice):
                     "x": 16,
                     "y": 16
                 },
-                "velocities": {
-                    "x": 2,
-                    "y": 2
-                }
+                "velocities": "D2Q4"
             },
             "geometry": []
         }
@@ -102,7 +103,7 @@ class SpaceTimeLattice(Lattice):
         SpaceTimeLattice(
             num_timesteps=1,
             lattice_data={
-                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": "D2Q4"},
                 "geometry": [],
             }
         ).circuit.draw("mpl")
@@ -122,10 +123,17 @@ class SpaceTimeLattice(Lattice):
         self.include_measurement_qubit = include_measurement_qubit
         self.use_volumetric_ops = use_volumetric_ops
 
-        self.num_gridpoints, self.num_velocities, self.blocks = self.parse_input_data(
-            lattice_data
+        self.num_gridpoints, self.num_velocities, self.shapes, self.discretization = (
+            self.parse_input_data(lattice_data)
         )  # type: ignore
         self.num_dims = len(self.num_gridpoints)
+
+        for dim in range(self.num_dims):
+            if not is_two_pow(self.num_gridpoints[dim] + 1):  # type: ignore
+                raise LatticeException(
+                    f"Lattice has a number of grid points that is not divisible by 2 in dimension {dim}."
+                )
+
         self.num_timesteps = num_timesteps
 
         self.properties: SpaceTimeLatticeBuilder = self.__get_builder()
@@ -151,34 +159,35 @@ class SpaceTimeLattice(Lattice):
         logger.info(self.__str__())
 
     def __get_builder(self) -> SpaceTimeLatticeBuilder:
-        if self.num_dims == 1:
-            if self.num_velocities[0] == 1:
-                return D1Q2SpaceTimeLatticeBuilder(
-                    self.num_timesteps,
-                    self.num_gridpoints,
-                    include_measurement_qubit=self.include_measurement_qubit,
-                    use_volumetric_ops=self.use_volumetric_ops,
-                    logger=self.logger,
-                )
-            raise LatticeException(
-                f"Unsupported number of velocities for 1D: {self.num_velocities[0] + 1}. Only D1Q2 is supported at the moment."
+        if self.discretization == LatticeDiscretization.D1Q2:
+            return D1Q2SpaceTimeLatticeBuilder(
+                self.num_timesteps,
+                self.num_gridpoints,
+                include_measurement_qubit=self.include_measurement_qubit,
+                use_volumetric_ops=self.use_volumetric_ops,
+                logger=self.logger,
             )
 
-        if self.num_dims == 2:
-            if self.num_velocities[0] == 1 and self.num_velocities[1] == 1:
-                return D2Q4SpaceTimeLatticeBuilder(
-                    self.num_timesteps,
-                    self.num_gridpoints,
-                    include_measurement_qubit=self.include_measurement_qubit,
-                    use_volumetric_ops=self.use_volumetric_ops,
-                    logger=self.logger,
-                )
-            raise LatticeException(
-                f"Unsupported number of velocities for 2D: {(self.num_velocities[0] + 1, self.num_velocities[1] + 1)}. Only D2Q4 is supported at the moment."
+        if self.discretization == LatticeDiscretization.D2Q4:
+            return D2Q4SpaceTimeLatticeBuilder(
+                self.num_timesteps,
+                self.num_gridpoints,
+                include_measurement_qubit=self.include_measurement_qubit,
+                use_volumetric_ops=self.use_volumetric_ops,
+                logger=self.logger,
+            )
+
+        if self.discretization == LatticeDiscretization.D3Q6:
+            return D3Q6SpaceTimeLatticeBuilder(
+                self.num_timesteps,
+                self.num_gridpoints,
+                include_measurement_qubit=self.include_measurement_qubit,
+                use_volumetric_ops=self.use_volumetric_ops,
+                logger=self.logger,
             )
 
         raise LatticeException(
-            "Only 1D and 2D discretizations are currently available."
+            f"{self.discretization} not currently implemented for the Space-Time method. Only D1Q2 and D2Q4 are fully at the moment. D3Q6 only supports collision."
         )
 
     def grid_index(self, dim: int | None = None) -> List[int]:
@@ -400,7 +409,7 @@ class SpaceTimeLattice(Lattice):
         """
         return any(
             block.contains_gridpoint(gridpoint)
-            for block in flatten(self.blocks.values())
+            for block in flatten(self.shapes.values())
         )
 
     @override

@@ -7,7 +7,7 @@ from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 
 
 class SpaceTimeReflectionData(ABC):
-    """Base class for all space-time reflectiopn data structures."""
+    """Base class for all space-time reflection data structures."""
 
     pass
 

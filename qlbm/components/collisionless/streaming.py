@@ -7,7 +7,8 @@ from typing import List
 
 import numpy as np
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMT, QFT, XGate
+from qiskit.circuit.library import MCXGate
+from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import CQLBMOperator, LBMPrimitive
@@ -93,7 +94,7 @@ class StreamingAncillaPreparation(LBMPrimitive):
                 circuit.x(velocity_qubit_indices_to_invert)
 
             circuit.compose(
-                MCMT(XGate(), num_velocity_qubits, 1),
+                MCXGate(num_velocity_qubits),
                 qubits=self.lattice.velocity_index(self.dim)
                 + self.lattice.ancillae_velocity_index(self.dim),
                 inplace=True,

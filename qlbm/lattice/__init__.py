@@ -9,16 +9,28 @@ from .geometry.encodings.collisionless import (
 from .geometry.shapes.block import (
     Block,
 )
+from .geometry.shapes.circle import (
+    Circle,
+)
 from .lattices import CollisionlessLattice, Lattice
+from .lattices.lqlga_lattice import LQLGALattice
 from .lattices.spacetime_lattice import SpaceTimeLattice
+from .spacetime.properties_base import (
+    LatticeDiscretization,
+    LatticeDiscretizationProperties,
+)
 
 __all__ = [
     "Lattice",
     "CollisionlessLattice",
     "SpaceTimeLattice",
+    "LQLGALattice",
     "DimensionalReflectionData",
     "ReflectionWall",
     "ReflectionPoint",
     "ReflectionResetEdge",
     "Block",
+    "Circle",
+    "LatticeDiscretization",
+    "LatticeDiscretizationProperties",
 ]

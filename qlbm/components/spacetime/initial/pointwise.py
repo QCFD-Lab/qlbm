@@ -4,7 +4,7 @@ from logging import Logger, getLogger
 from typing import List, Tuple
 
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCXGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
@@ -55,7 +55,7 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
         lattice = SpaceTimeLattice(
             num_timesteps=1,
             lattice_data={
-                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": {"x": 2, "y": 2}},
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": "D2Q4"},
                 "geometry": [],
             },
         )
@@ -93,26 +93,20 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
                 if self.lattice.is_inside_an_obstacle(grid_point_data[0]):
                     continue
             circuit.compose(self.set_grid_value(grid_point_data[0]), inplace=True)
-            circuit.compose(
-                MCMT(
-                    XGate(),
-                    num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
-                    num_target_qubits=sum(
-                        grid_point_data[1]
-                    ),  # The sum is equal to the number of velocities set to true
-                ),
-                qubits=list(
-                    self.lattice.grid_index()
-                    + flatten(
-                        [
-                            self.lattice.velocity_index(0, c)
-                            for c, is_velocity_enabled in enumerate(grid_point_data[1])
-                            if is_velocity_enabled
-                        ]
-                    )
-                ),
-                inplace=True,
-            )
+            for target_qubit in flatten(
+                [
+                    self.lattice.velocity_index(0, c)
+                    for c, is_velocity_enabled in enumerate(grid_point_data[1])
+                    if is_velocity_enabled
+                ]
+            ):
+                circuit.compose(
+                    MCXGate(
+                        num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
+                    ),
+                    qubits=list(self.lattice.grid_index() + [target_qubit]),
+                    inplace=True,
+                )
             circuit.compose(self.set_grid_value(grid_point_data[0]), inplace=True)
 
             # Set the velocity state for neighbors in increasing velocity
@@ -203,26 +197,20 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
         circuit.compose(
             self.set_grid_value(absolute_neighbor_coordinates), inplace=True
         )
-        circuit.compose(
-            MCMT(
-                XGate(),
-                num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
-                num_target_qubits=sum(
-                    velocity_values
-                ),  # The sum is equal to the number of velocities set to true
-            ),
-            inplace=True,
-            qubits=list(
-                self.lattice.grid_index()
-                + flatten(
-                    [
-                        self.lattice.velocity_index(neighbor.neighbor_index, c)
-                        for c, is_velocity_enabled in enumerate(velocity_values)
-                        if is_velocity_enabled
-                    ]
-                )
-            ),
-        )
+        for target_qubit in flatten(
+            [
+                self.lattice.velocity_index(neighbor.neighbor_index, c)
+                for c, is_velocity_enabled in enumerate(velocity_values)
+                if is_velocity_enabled
+            ]
+        ):
+            circuit.compose(
+                MCXGate(
+                    num_ctrl_qubits=self.lattice.properties.get_num_grid_qubits(),
+                ),
+                qubits=list(self.lattice.grid_index() + [target_qubit]),
+                inplace=True,
+            )
         circuit.compose(
             self.set_grid_value(absolute_neighbor_coordinates), inplace=True
         )

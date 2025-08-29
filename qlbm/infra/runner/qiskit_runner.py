@@ -4,6 +4,7 @@ from logging import Logger, getLogger
 from time import perf_counter_ns
 
 from qiskit import QuantumCircuit as QiskitQC
+from qiskit import transpile
 from qiskit.circuit.library import Initialize
 from qiskit.quantum_info import Statevector
 from typing_extensions import override
@@ -62,6 +63,7 @@ class QiskitRunner(CircuitRunner):
         output_directory: str,
         output_file_name: str = "step",
         statevector_snapshots: bool = False,
+        recompile_each_step: bool = False,  # ! Document
     ) -> QBMResult:
         if (self.sampling_backend is None) and self.config.statevector_sampling:
             raise ExecutionException(
@@ -89,6 +91,7 @@ class QiskitRunner(CircuitRunner):
                 num_shots,
                 initial_conditions,
                 simulation_result,
+                recompile_each_step,
             )
             if statevector_snapshots
             else self._run_time_loop(
@@ -111,6 +114,7 @@ class QiskitRunner(CircuitRunner):
         num_shots: int,
         initial_conditions: QiskitQC,
         simulation_result: QBMResult,
+        recompile_each_step: bool = False,  # ! Document
     ) -> QBMResult:
         for step in range(num_steps + 1):
             step_start_time = perf_counter_ns()
@@ -124,7 +128,15 @@ class QiskitRunner(CircuitRunner):
             )
             # The first step consists of just initial conditions
             if step > 0:
-                circuit.compose(self.config.algorithm, inplace=True)
+                if recompile_each_step:
+                    circuit.compose(self.config.algorithm_copy, inplace=True)
+                    circuit = transpile(
+                        circuit,
+                        backend=self.execution_backend,
+                        optimization_level=0,
+                    )
+                else:
+                    circuit.compose(self.config.algorithm, inplace=True)
 
             if (
                 self.reinitializer.requires_statevector()

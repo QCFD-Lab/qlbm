@@ -9,7 +9,7 @@ from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
 from qlbm.components.common.primitives import MCSwap
-from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.lattice.geometry.shapes.base import Shape, SpaceTimeShape
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import CircuitException
@@ -25,7 +25,7 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
     ============================ ======================================================================
     :attr:`lattice`              The :class:`.SpaceTimeLattice` based on which the properties of the operator are inferred.
     :attr:`timestep`             The timestep for to which to perform reflection.
-    :attr:`blocks`               A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
+    :attr:`shapes`               A list of  :class:`.Shape` objects for which to generate the BB boundary condition circuits.
     :attr:`filter_inside_blocks` A ``bool`` that, when enabled, disregards operations that would have happened inside blocks.
     :attr:`logger`               The performance logger, by default ``getLogger("qlbm")``.
     ============================ ======================================================================
@@ -36,7 +36,7 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
         self,
         lattice: SpaceTimeLattice,
         timestep: int,
-        blocks: List[Block],
+        shapes: List[Shape],
         filter_inside_blocks: bool = True,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -48,7 +48,7 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
                 f"Invalid time step {timestep}, select a value between 1 and {lattice.num_timesteps}"
             )
 
-        self.blocks = blocks
+        self.shapes = cast(List[SpaceTimeShape], shapes)
         self.filter_inside_blocks = filter_inside_blocks
 
         self.logger.info(f"Creating circuit {str(self)}...")
@@ -71,7 +71,7 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
     def __create_circuit_d1q2(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
-        for block in self.blocks:
+        for block in self.shapes:
             for reflection_data in block.get_spacetime_reflection_data_d1q2(
                 self.lattice.properties, self.timestep
             ):
@@ -116,7 +116,7 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
     def __create_circuit_d2q4(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
-        for block in self.blocks:
+        for block in self.shapes:
             reflection_data_points = block.get_spacetime_reflection_data_d2q4(
                 self.lattice.properties, self.timestep
             )
@@ -169,5 +169,4 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
 
     @override
     def __str__(self) -> str:
-        # TODO: Implement
-        return "Space Time Reflection Operator"
+        return f"[PointWiseSpaceTimeReflectionOperator for lattice {self.lattice}, blocks {self.shapes}, filtered {self.filter_inside_blocks}]"

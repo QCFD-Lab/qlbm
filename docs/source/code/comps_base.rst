@@ -20,6 +20,9 @@ Lattice Base
 .. autoclass:: qlbm.lattice.lattices.base.Lattice
     :members:
 
+.. autoclass:: qlbm.lattice.geometry.shapes.base.Shape
+    :members:
+
 .. _components_bases:
 
 Components Base

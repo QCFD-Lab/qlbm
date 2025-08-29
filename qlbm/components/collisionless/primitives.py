@@ -6,7 +6,7 @@ from time import perf_counter_ns
 from typing import List
 
 from qiskit import ClassicalRegister, QuantumCircuit
-from qiskit.circuit.library import QFT
+from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
@@ -49,7 +49,7 @@ class GridMeasurement(LBMPrimitive):
                 }
             },
             "geometry": [
-                {   
+                {
                     "shape": "cuboid",
                     "x": [5, 6],
                     "y": [1, 2],
@@ -488,7 +488,7 @@ class EdgeComparator(LBMPrimitive):
         )
 
         # Draw the edge comparator circuit for one specific corner edge
-        EdgeComparator(lattice, lattice.block_list[0].corner_edges_3d[0]).draw("mpl")
+        EdgeComparator(lattice, lattice.shape_list[0].corner_edges_3d[0]).draw("mpl")
     """
 
     def __init__(

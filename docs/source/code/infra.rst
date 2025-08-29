@@ -40,7 +40,7 @@ Performance
 .. autoclass:: qlbm.infra.reinitialize.base.Reinitializer
     :members:
 
-.. autoclass:: qlbm.infra.reinitialize.collisionless_reinitializer.CollisionlessReinitializer
+.. autoclass:: qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer
     :members:
 
 .. autoclass:: qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer

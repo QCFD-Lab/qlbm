@@ -62,8 +62,9 @@ source qlbm-cpu-venv/bin/activate
 
 
 Currently, `qlbm` supports two algorithms:
- - The Collisionless QLBM described in [Efficient and fail-safe quantum algorithm for the transport equation](https://doi.org/10.1016/j.jcp.2024.112816) ([arXiv:2211.14269](https://arxiv.org/abs/2211.14269)) by M.A. Schalkers and M. Möller.
- - The Space-Time QLBM described in [On the importance of data encoding in quantum Boltzmann methods](https://link.springer.com/article/10.1007/s11128-023-04216-6) by M.A. Schalkers and M. Möller.
+ - The Quantum Transport Method (Collisionless QLBM) described in [Efficient and fail-safe quantum algorithm for the transport equation](https://doi.org/10.1016/j.jcp.2024.112816) ([arXiv:2211.14269](https://arxiv.org/abs/2211.14269)) by M.A. Schalkers and M. Möller.
+ - The Space-Time QLBM/QLGA described in [On the importance of data encoding in quantum Boltzmann methods](https://link.springer.com/article/10.1007/s11128-023-04216-6) by M.A. Schalkers and M. Möller and expanded in [Fully Quantum Lattice Gas Automata Building Blocks for Computational Basis State Encodings](https://arxiv.org/abs/2506.12662).
+ - The Linear-encoding Quantum Lattice Gas Automata (LQLGA) described in [On quantum extensions of hydrodynamic lattice gas automata](https://www.mdpi.com/2410-3896/4/2/48) by P. Love and [Fully Quantum Lattice Gas Automata Building Blocks for Computational Basis State Encodings](https://arxiv.org/abs/2506.12662).
 
 The `demos` directory contains several use cases for simulating and analyzing these algorithms. Each demo requires minimal setup once the virtual environment has been configured. Consult the `README.md` file in the `demos` directory for further details.
 
@@ -110,4 +111,18 @@ The `demos` directory contains several use cases for simulating and analyzing th
 
 ## Citation
 
-A preprint describing `qlbm` in detail is currently available on [arXiv](https://arxiv.org/abs/2411.19439). If you use `qlbm`, you can cite it as per the [CITATION.bib file](CITATION.bib).
+An open access peer-reviewed article describing `qlbm` is available [here](https://doi.org/10.1016/j.cpc.2025.109699). If you use `qlbm`, you can cite it as:
+
+```
+@article{georgescu2025qlbm,
+title = {qlbm – A quantum lattice Boltzmann software framework},
+journal = {Computer Physics Communications},
+volume = {315},
+pages = {109699},
+year = {2025},
+issn = {0010-4655},
+doi = {https://doi.org/10.1016/j.cpc.2025.109699},
+url = {https://www.sciencedirect.com/science/article/pii/S0010465525002012},
+author = {C\u{{a}}lin A. Georgescu and Merel A. Schalkers and Matthias M\"{o}ller},
+}
+```

@@ -25,11 +25,23 @@ from .collisionless.streaming import (
 )
 from .common import (
     EmptyPrimitive,
+    EQCCollisionOperator,
+    EQCPermutation,
+    EQCRedistribution,
+)
+from .lqlga import (
+    LQLGA,
+    GenericLQLGACollisionOperator,
+    LQGLAInitialConditions,
+    LQLGAGridVelocityMeasurement,
+    LQLGAReflectionOperator,
+    LQLGAStreamingOperator,
 )
 
 __all__ = [
     "QuantumComponent",
     "LBMPrimitive",
+    "GenericLQLGACollisionOperator",
     "LBMOperator",
     "CQLBMOperator",
     "SpaceTimeOperator",
@@ -48,4 +60,13 @@ __all__ = [
     "SpecularReflectionOperator",
     "BounceBackReflectionOperator",
     "CQLBM",
+    "GenericLQLGACollisionOperator",
+    "LQGLAInitialConditions",
+    "LQLGA",
+    "LQLGAGridVelocityMeasurement",
+    "LQLGAReflectionOperator",
+    "LQLGAStreamingOperator",
+    "EQCCollisionOperator",
+    "EQCPermutation",
+    "EQCRedistribution",
 ]

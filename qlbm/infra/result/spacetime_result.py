@@ -25,15 +25,21 @@ class SpaceTimeResult(QBMResult):
     =========================== ======================================================================
     :attr:`lattice`             The :class:`.SpaceTimeLattice` of the simulated system.
     :attr:`directory`           The directory to which the results outputs data to.
-    :attr:`paraview_dir`        The subdirectory under ``directory`` which stores the Paraview files.
     :attr:`output_file_name`    The root name for files containing time step artifacts, by default "step".
     =========================== ======================================================================
     """
 
     num_steps: int
+    """The time step to which this result corresponds."""
+
     directory: str
+    """The output directory for the results."""
+
     output_file_name: str
+    """The name of the file to output the artifacts to."""
+
     lattice: SpaceTimeLattice
+    """The lattice the result corresponds to."""
 
     def __init__(
         self,

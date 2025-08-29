@@ -17,10 +17,10 @@ def lattice_symmetric_small_2d():
 def test_3d_incrementer_size(lattice_asymmetric_medium_3d):
     inc: ControlledIncrementer = ControlledIncrementer(lattice_asymmetric_medium_3d)
 
-    assert inc.circuit.size() == 32
+    assert inc.circuit.size() == 78
 
 
 def test_2d_incrementer_size(lattice_symmetric_small_2d):
     inc: ControlledIncrementer = ControlledIncrementer(lattice_symmetric_small_2d)
 
-    assert inc.circuit.size() == 24
+    assert inc.circuit.size() == 68

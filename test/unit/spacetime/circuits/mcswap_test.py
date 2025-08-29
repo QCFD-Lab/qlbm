@@ -1,4 +1,4 @@
-from qiskit.circuit.library import MCMT, XGate
+from qiskit.circuit.library import MCMTGate, XGate
 
 from qlbm.components.common.primitives import MCSwap
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
@@ -10,7 +10,7 @@ def test_mcswap_13ctrl():
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
             "geometry": [],
         },
@@ -21,13 +21,13 @@ def test_mcswap_13ctrl():
 
     expected_circuit.cx(6, 5)
     expected_circuit.compose(
-        MCMT(XGate(), 4, 1),
+        MCMTGate(XGate(), 4, 1),
         qubits=[0, 2, 3, 5, 6],
         inplace=True,
     )
     expected_circuit.cx(6, 5)
 
-    assert mcswap.circuit == expected_circuit
+    assert mcswap.circuit.decompose() == expected_circuit.decompose()
 
 
 def test_mcswap_grid_ctrl():
@@ -36,7 +36,7 @@ def test_mcswap_grid_ctrl():
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
-                "velocities": {"x": 2, "y": 2},
+                "velocities": "D2Q4",
             },
             "geometry": [],
         },
@@ -51,10 +51,10 @@ def test_mcswap_grid_ctrl():
 
     expected_circuit.cx(11, 9)
     expected_circuit.compose(
-        MCMT(XGate(), 9, 1),
+        MCMTGate(XGate(), 9, 1),
         qubits=list(range(8)) + [9, 11],
         inplace=True,
     )
     expected_circuit.cx(11, 9)
 
-    assert mcswap.circuit == expected_circuit
+    assert mcswap.circuit.decompose() == expected_circuit.decompose()

@@ -29,7 +29,7 @@ dependencies = [
     "pytket>=1.29.2",
     "pytket-qiskit",
     "pytket-qulacs>=0.33",
-    "qiskit>=1.2, <1.3",
+    "qiskit>=2.0",
     "qiskit_qasm3_import>=0.4.2",
     "qiskit-qulacs>=0.1.0",
     "tqdm>=4.66",
@@ -45,7 +45,7 @@ readme = "README.md"
 
 [project.optional-dependencies]
 dev = [
-    "mypy",
+    "mypy==1.16.1",
     "pytest",
     "pytest-cov",
     "coverage",
@@ -104,6 +104,7 @@ module = [
     "qiskit.qasm3",
     "qiskit.quantum_info",
     "qiskit.result",
+    "qiskit.synthesis",
     "qiskit.transpiler.preset_passmanagers",
     "qiskit_aer",
     "qiskit_aer.backends.aerbackend",
