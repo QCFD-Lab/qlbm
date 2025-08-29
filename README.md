@@ -126,3 +126,7 @@ url = {https://www.sciencedirect.com/science/article/pii/S0010465525002012},
 author = {C\u{{a}}lin A. Georgescu and Merel A. Schalkers and Matthias M\"{o}ller},
 }
 ```
+
+## Contact
+
+In addition to opening issues, you can contact the developers of `qlbm` at `qcfd-EWI@tudelft.nl`.
