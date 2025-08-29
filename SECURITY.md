@@ -11,4 +11,4 @@ The following versions of ``qlbm`` are currently supported
 
 ## Reporting a Vulnerability
 
-To report a security vulnerability, you can contact `c.a.georgescu@tudelft.nl`. Please describe your vulnerability in detail, and include the exact version of Python, `qlbm`, and `qiskit` that are affected. 
+To report a security vulnerability, you can contact `qcfd-EWI@tudelft.nl`. Please describe your vulnerability in detail, and include the exact version of Python, `qlbm`, and `qiskit` that are affected. 
