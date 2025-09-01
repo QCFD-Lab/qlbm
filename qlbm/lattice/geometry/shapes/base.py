@@ -132,7 +132,7 @@ class LQLGAShape(Shape):
     def get_lqlga_reflection_data_d1q3(
         self,
     ) -> List[LQLGAPointwiseReflectionData]:
-        """Calculate space-time reflection data for :math:`D_1Q_2` :class:`.LQLGA`."""
+        """Calculate space-time reflection data for :math:`D_1Q_3` :class:`.LQLGA`."""
         pass
 
 

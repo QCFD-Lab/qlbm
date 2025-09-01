@@ -50,29 +50,29 @@ def test_qiskit_target_compilation(
 
     assert isinstance(compiled_circuit, QiskitQC)
 
+# Qulacs is not currently supported due to qiskit 2.0
+# @pytest.mark.parametrize(
+#     "lattice_fixture,velocity,compiler_platform",
+#     list(
+#         product(
+#             ["lattice_symmetric_small_2d", "lattice_asymmetric_medium_3d"],
+#             list(range(3)),
+#             ["QISKIT", "TKET"],
+#         )
+#     ),
+# )
+# def test_qulacs_target_compilation(
+#     lattice_fixture, velocity, compiler_platform, request
+# ):
+#     lattice = request.getfixturevalue(lattice_fixture)
+#     num_velocities = (
+#         lattice.num_velocities[0] + 1
+#     )  # +1 because velocities are between 0 and n_vi
+#     velocities = get_time_series(num_velocities)[velocity]
+#     op = CollisionlessStreamingOperator(lattice, velocities)
+#     compiler = CircuitCompiler(compiler_platform, "QULACS")
 
-@pytest.mark.parametrize(
-    "lattice_fixture,velocity,compiler_platform",
-    list(
-        product(
-            ["lattice_symmetric_small_2d", "lattice_asymmetric_medium_3d"],
-            list(range(3)),
-            ["QISKIT", "TKET"],
-        )
-    ),
-)
-def test_qulacs_target_compilation(
-    lattice_fixture, velocity, compiler_platform, request
-):
-    lattice = request.getfixturevalue(lattice_fixture)
-    num_velocities = (
-        lattice.num_velocities[0] + 1
-    )  # +1 because velocities are between 0 and n_vi
-    velocities = get_time_series(num_velocities)[velocity]
-    op = CollisionlessStreamingOperator(lattice, velocities)
-    compiler = CircuitCompiler(compiler_platform, "QULACS")
+#     # Qulacs backend is determined automatically
+#     compiled_circuit = compiler.compile(op, None, 0)
 
-    # Qulacs backend is determined automatically
-    compiled_circuit = compiler.compile(op, None, 0)
-
-    assert isinstance(compiled_circuit, QulacsQC)
+#     assert isinstance(compiled_circuit, QulacsQC)
