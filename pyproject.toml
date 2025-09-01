@@ -38,7 +38,7 @@ dependencies = [
 authors = [
     { name = "qlbm authors" },
 ]
-maintainers = [{ name = "Calin Georgescu", email = "C.A.Georgescu@tudelft.nl" }]
+maintainers = [{ name = "Calin Georgescu", email = "qcfd-EWI@tudelft.nl" }]
 description = "Quantum Algorithms for Lattice Boltzmann Methods."
 readme = "README.md"
 
