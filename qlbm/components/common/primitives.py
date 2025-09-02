@@ -60,7 +60,7 @@ class MCSwap(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` or :class:`.SpaceTimeLattice` based on which the number of qubits is inferred.
+    :attr:`lattice`           The :class:`.Lattice` based on which the number of qubits is inferred.
     :attr:`control_qubits`    The qubits that control the swap gate.
     :attr:`target_qubits`     The two qubits to be swapped.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
