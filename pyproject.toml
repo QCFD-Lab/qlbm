@@ -35,12 +35,15 @@ dependencies = [
     "tqdm>=4.66",
     "vtk",
 ]
-authors = [
-    { name = "qlbm authors" },
-]
-maintainers = [{ name = "Calin Georgescu", email = "qcfd-EWI@tudelft.nl" }]
+authors = [{ name = "qlbm authors" }, { email = "qcfd-EWI@tudelft.nl" }]
+maintainers = [{ name = "Calin Georgescu", email = "c.a.georgescu@tudelft.nl" }]
 description = "Quantum Algorithms for Lattice Boltzmann Methods."
 readme = "README.md"
+license = { text = "MPL-2.0" }
+
+
+[project.urls]
+Homepage = "https://qcfd-lab.github.io/qlbm/"
 
 
 [project.optional-dependencies]
@@ -80,7 +83,7 @@ include = ["qlbm", "qlbm.*"]
 
 [tool.mypy]
 python_version = "3.12"
-warn_return_any = false                              # False positives due to Qiskit implementation
+warn_return_any = false    # False positives due to Qiskit implementation
 warn_unused_configs = true
 warn_unreachable = true
 check_untyped_defs = true
@@ -121,7 +124,7 @@ exclude_also = [
     "raise AssertionError",
     "raise NotImplementedError",
     "@(abc\\.)?abstractmethod",
-    ]
+]
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
