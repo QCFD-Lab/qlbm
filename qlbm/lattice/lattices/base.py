@@ -250,11 +250,16 @@ class Lattice(ABC):
                 f"Only 1, 2, and 3-dimensional lattices are supported. Provided lattice has {len(lattice_dict['dim'])} dimensions."  # type: ignore
             )
 
+        # Set for access to the geometry parsing utiliti
+        self.num_dims = num_dimensions
+
         grid_list: List[int] = [
             # -1 because the bit_length() would "overshoot" for powers of 2
             lattice_dict["dim"][dimension_letter(dim)] - 1
             for dim in range(num_dimensions)
         ]
+
+        self.num_gridpoints = grid_list
 
         discretization: LatticeDiscretization = LatticeDiscretization.CFLDISCRETIZATION
         velocity_list: List[int] = []
@@ -300,12 +305,35 @@ class Lattice(ABC):
                 for dim in range(num_dimensions)
             ]
 
-        parsed_obstacles: Dict[str, List[Shape]] = {"specular": [], "bounceback": []}
-
         if "geometry" not in input_dict:
-            return grid_list, velocity_list, parsed_obstacles, discretization
+            return (
+                grid_list,
+                velocity_list,
+                {"specular": [], "bounceback": []},
+                discretization,
+            )
 
         geometry_list: List[Dict[str, List[int]]] = input_dict["geometry"]  # type: ignore
+
+        parsed_obstacles = self.parse_geometry_dict(geometry_list)
+
+        return grid_list, velocity_list, parsed_obstacles, discretization
+
+    def parse_geometry_dict(self, geometry_list) -> Dict[str, List[Shape]]:
+        """
+        Parses the 'geometry' section of the lattice specification.
+
+        Parameters
+        ----------
+        geometry_list : List[Dict]
+            A list of the geometry components. See demos for concrete examples.
+
+        Returns
+        -------
+        Dict[str, List[Shape]]
+            A dictionary where keys consist of boundary conditions (specular or bounceback) and entries consists of all shapes of that boundary condition.
+        """
+        parsed_obstacles: Dict[str, List[Shape]] = {"specular": [], "bounceback": []}
 
         # Check whether obstacles are well-defined
         for c, obstacle_dict in enumerate(geometry_list):  # type: ignore
@@ -331,12 +359,12 @@ class Lattice(ABC):
             # Parsing blocks
             if obstacle_dict["shape"] == "cuboid":
                 if (
-                    len(obstacle_dict) - 2 != num_dimensions
+                    len(obstacle_dict) - 2 != self.num_dims
                 ):  # -1 to account for the boundary specification
                     raise LatticeException(
-                        f"Obstacle {c + 1} has {len(obstacle_dict) - 2} dimensions whereas the lattice has {num_dimensions}."
+                        f"Obstacle {c + 1} has {len(obstacle_dict) - 2} dimensions whereas the lattice has {self.num_dims}."
                     )
-                for dim in range(num_dimensions):
+                for dim in range(self.num_dims):
                     dim_index = dimension_letter(dim)
 
                     if len(obstacle_dict[dim_index]) != 2:
@@ -351,7 +379,7 @@ class Lattice(ABC):
 
                     if (
                         obstacle_dict[dim_index][0] < 0
-                        or obstacle_dict[dim_index][-1] > lattice_dict["dim"][dim_index]
+                        or obstacle_dict[dim_index][-1] > self.num_gridpoints[dim]
                     ):
                         raise LatticeException(
                             f"Obstacle {c + 1} is out of bounds in the {dim_index}-dimension."
@@ -364,11 +392,11 @@ class Lattice(ABC):
                                 obstacle_dict[dimension_letter(numeric_dim_index)][0],
                                 obstacle_dict[dimension_letter(numeric_dim_index)][1],
                             )
-                            for numeric_dim_index in range(num_dimensions)
+                            for numeric_dim_index in range(self.num_dims)
                         ],
                         [
-                            (grid_list[numeric_dim_index]).bit_length()
-                            for numeric_dim_index in range(num_dimensions)
+                            (self.num_gridpoints[numeric_dim_index]).bit_length()
+                            for numeric_dim_index in range(self.num_dims)
                         ],
                         obstacle_dict["boundary"],  # type: ignore
                     )
@@ -382,9 +410,9 @@ class Lattice(ABC):
                     raise LatticeException(
                         f"Obstacle {c + 1}: sphere obstacle does not specify a radius."
                     )
-                if len(obstacle_dict["center"]) != num_dimensions:
+                if len(obstacle_dict["center"]) != self.num_dims:
                     raise LatticeException(
-                        f"Obstacle {c + 1}: center is {len(obstacle_dict['center'])}-dimensional whereas the lattice is {num_dimensions}-dimensional."
+                        f"Obstacle {c + 1}: center is {len(obstacle_dict['center'])}-dimensional whereas the lattice is {self.num_dims}-dimensional."
                     )
                 if int(obstacle_dict["radius"]) <= 0:  # type: ignore
                     raise LatticeException(
@@ -395,14 +423,14 @@ class Lattice(ABC):
                         tuple(int(coord) for coord in obstacle_dict["center"]),
                         int(obstacle_dict["radius"]),  # type: ignore
                         [
-                            (grid_list[numeric_dim_index]).bit_length()
-                            for numeric_dim_index in range(num_dimensions)
+                            (self.num_gridpoints[numeric_dim_index]).bit_length()
+                            for numeric_dim_index in range(self.num_dims)
                         ],
                         obstacle_dict["boundary"],  # type: ignore
                     )
                 )
 
-        return grid_list, velocity_list, parsed_obstacles, discretization
+        return parsed_obstacles
 
     def to_json(self) -> str:
         """
