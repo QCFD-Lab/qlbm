@@ -167,6 +167,7 @@ class Lattice(ABC):
     def parse_input_data(
         self,
         lattice_data: str | Dict,  # type: ignore
+        compressed_grid: bool = True,
     ) -> Tuple[List[int], List[int], Dict[str, List[Shape]], LatticeDiscretization]:
         r"""
         Parses the lattice input data, provided in either a file path or a dictionary.
@@ -176,6 +177,8 @@ class Lattice(ABC):
         lattice_data : str | Dict
             Either a file path to read a JSON-formatted specification from,
             or a dictionary formatted as in the main class description.
+        compressed_grid : bool
+            Whether the grid data is compressed into logarithmically many qubits.
 
         Returns
         -------
@@ -250,7 +253,7 @@ class Lattice(ABC):
                 f"Only 1, 2, and 3-dimensional lattices are supported. Provided lattice has {len(lattice_dict['dim'])} dimensions."  # type: ignore
             )
 
-        # Set for access to the geometry parsing utiliti
+        # Set for access to the geometry parsing utilities
         self.num_dims = num_dimensions
 
         grid_list: List[int] = [
@@ -399,6 +402,7 @@ class Lattice(ABC):
                             for numeric_dim_index in range(self.num_dims)
                         ],
                         obstacle_dict["boundary"],  # type: ignore
+                        num_gridpoints=self.num_gridpoints,
                     )
                 )
             elif obstacle_dict["shape"] == "sphere":
@@ -490,3 +494,16 @@ class Lattice(ABC):
             A string that can be used to sufficiently identify the lattice specification.
         """
         pass
+
+    @abstractmethod
+    def has_multiple_geometries(self) -> bool:
+        """
+        Whether multiple lattice geometries are simulated simultaneously.
+
+        Returns
+        -------
+        bool
+            Whether multiple lattice geometries are simulated simultaneously.
+        """
+        pass
+
