@@ -468,3 +468,8 @@ class SpaceTimeLattice(Lattice):
             adjusted_bounds.append((new_bounds, overflow_occurred))
 
         return adjusted_bounds
+
+
+    @override
+    def has_multiple_geometries(self):
+        return False # multiple geometries unsupported for STQBM

@@ -531,3 +531,7 @@ class CollisionlessLattice(Lattice):
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
         return f"{self.num_dims}d-{gp_string}-{len(self.shape_list)}-obstacle"
+    
+    @override
+    def has_multiple_geometries(self):
+        return False # multiple geometries unsupported for CQBM
