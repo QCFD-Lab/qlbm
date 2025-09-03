@@ -13,6 +13,6 @@ __all__ = [
     "LQLGA",
     "LQLGAGridVelocityMeasurement",
     "LQLGAReflectionOperator",
-    "LQLGAMGReflectionOperator"
+    "LQLGAMGReflectionOperator",
     "LQLGAStreamingOperator",
 ]
