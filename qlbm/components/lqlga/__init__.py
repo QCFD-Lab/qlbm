@@ -4,7 +4,7 @@ from .collision import GenericLQLGACollisionOperator
 from .initial import LQGLAInitialConditions
 from .lqlga import LQLGA
 from .measurement import LQLGAGridVelocityMeasurement
-from .reflection import LQLGAReflectionOperator
+from .reflection import LQLGAMGReflectionOperator, LQLGAReflectionOperator
 from .streaming import LQLGAStreamingOperator
 
 __all__ = [
@@ -13,5 +13,6 @@ __all__ = [
     "LQLGA",
     "LQLGAGridVelocityMeasurement",
     "LQLGAReflectionOperator",
+    "LQLGAMGReflectionOperator"
     "LQLGAStreamingOperator",
 ]

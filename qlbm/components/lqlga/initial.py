@@ -82,6 +82,9 @@ class LQGLAInitialConditions(LBMPrimitive):
                 if is_enabled
             )
 
+        if self.lattice.has_multiple_geometries():
+            circuit.h(self.lattice.marker_index())
+
         return circuit
 
     @override
