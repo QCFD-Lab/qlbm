@@ -1,0 +1,798 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LQLGA Circuits &#8212; qlbm 0.0.6 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=b4fc2567" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1fd71caa"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/comps_lqlga';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Lattices and Geometry" href="lattice.html" />
+    <link rel="prev" title="Space-Time Circuits" href="comps_stqbm.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">qlbm 0.0.6 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Internal Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/qcfd-lab/qlbm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/qlbm/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Internal Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/qcfd-lab/qlbm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/qlbm/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="comps_base.html">Base Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comps_cqlbm.html">Collisionless Circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comps_collision.html">Collision Logic Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comps_stqbm.html">Space-Time Circuits</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">LQLGA Circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices and Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="infra.html">Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Other Tools</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Internal Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">LQLGA Circuits</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="lqlga-circuits">
+<span id="lqlga-components"></span><h1>LQLGA Circuits<a class="headerlink" href="#lqlga-circuits" title="Link to this heading">#</a></h1>
+<p>This page contains documentation about the quantum circuits that make up the
+<strong>L</strong>inear <strong>Q</strong>uantum <strong>L</strong>attice <strong>G</strong>as <strong>A</strong>utomata (LQLGA).
+For a more in-depth depth description of the LQLGA algorithm,
+we suggest <span id="id1">[<a class="reference internal" href="../index.html#id17" title="Peter Love. On quantum extensions of hydrodynamic lattice gas automata. Condensed Matter, 4(2):48, 2019.">4</a>]</span>, <span id="id2">[<a class="reference internal" href="../index.html#id16" title="Sriharsha Kocherla, Zhixin Song, Fatima Ezahra Chrit, Bryan Gard, Eugene F Dumitrescu, Alexander Alexeev, and Spencer H Bryngelson. Fully quantum algorithm for mesoscale fluid simulations with application to partial differential equations. AVS Quantum Science, 2024.">3</a>]</span>, and <span id="id3">[<a class="reference internal" href="../index.html#id14" title="Călin A Georgescu, Merel A Schalkers, and Matthias Möller. Fully quantum lattice gas automata building blocks for computational basis state encodings. arXiv preprint arXiv:2506.12662, 2025.">1</a>]</span>.
+The LQGLA encodes a lattice of <span class="math notranslate nohighlight">\(N_g\)</span> gridpoints with <span class="math notranslate nohighlight">\(q\)</span> discrete velocities
+each into <span class="math notranslate nohighlight">\(N_g \cdot q\)</span> qubits.
+The time-evolution of the system consists of the following steps:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#lqlga-initial"><span class="std std-ref">Initial Conditions</span></a> prepare the starting state of the flow field.</p></li>
+<li><p><a class="reference internal" href="#lqlga-streaming"><span class="std std-ref">Streaming</span></a> move particles across gridpoints according to the velocity discretization.</p></li>
+<li><p><a class="reference internal" href="#lqlga-reflection"><span class="std std-ref">Reflection</span></a> circuits apply boundary conditions that affect particles that come in contact with solid obstacles. Reflection places those particles back in the appropriate position of the fluid domain.</p></li>
+<li><p><a class="reference internal" href="#lqlga-collision"><span class="std std-ref">Collision</span></a> operators create superposed local configurations of velocity profiles.</p></li>
+<li><p><a class="reference internal" href="#lqlga-measurement"><span class="std std-ref">Measurement</span></a> operations extract information out of the quantum state, which can later be post-processed classically.</p></li>
+</ol>
+<p>This page documents the individual components that make up the CQLBM algorithm.
+Subsections follow a top-down approach, where end-to-end operators are introduced first,
+before being broken down into their constituent parts.</p>
+<section id="end-to-end-algorithms">
+<span id="lqlga-e2e"></span><h2>End-to-end algorithms<a class="headerlink" href="#end-to-end-algorithms" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.LQLGA">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.</span></span><span class="sig-name descname"><span class="pre">LQLGA</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components.py#L18-L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.LQLGA" title="Link to this definition">#</a></dt>
+<dd><p>Implementation of the Linear Quantum Lattice Gas Algorithm (LQLGA).</p>
+<p>For a lattice with <span class="math notranslate nohighlight">\(N_g\)</span> gridpoints and <span class="math notranslate nohighlight">\(q\)</span> discrete velocities,
+LQLGA requires exactly <span class="math notranslate nohighlight">\(N_g \cdot q\)</span> qubits.</p>
+<p>That is exactly equal to the number of classical bits required for one
+deterministic run of the classical LGA algorithm.</p>
+<p>More information about this algorithm can be found in <span id="id4">Love [<a class="reference internal" href="../index.html#id17" title="Peter Love. On quantum extensions of hydrodynamic lattice gas automata. Condensed Matter, 4(2):48, 2019.">4</a>]</span>, <span id="id5">Kocherla <em>et al.</em> [<a class="reference internal" href="../index.html#id16" title="Sriharsha Kocherla, Zhixin Song, Fatima Ezahra Chrit, Bryan Gard, Eugene F Dumitrescu, Alexander Alexeev, and Spencer H Bryngelson. Fully quantum algorithm for mesoscale fluid simulations with application to partial differential equations. AVS Quantum Science, 2024.">3</a>]</span>, and <span id="id6">Georgescu <em>et al.</em> [<a class="reference internal" href="../index.html#id14" title="Călin A Georgescu, Merel A Schalkers, and Matthias Möller. Fully quantum lattice gas automata building blocks for computational basis state encodings. arXiv preprint arXiv:2506.12662, 2025.">1</a>]</span>.</p>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.components.lqlga</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.lattice</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGALattice</span>
+
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">LQLGALattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">},</span>
+            <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="s2">&quot;D1Q3&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="s2">&quot;cuboid&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;bounceback&quot;</span><span class="p">}],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">LQLGA</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/f367831e1951031dfb321739c66f793f/comps_lqlga-1.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/1bf2035ce60eb87811ea793190c27f51/comps_lqlga-1.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/6939b7008c2d335b23bb8865913918c7/comps_lqlga-1.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/c2d27b7ee12e57be9d6c2b0ba55e01fe/comps_lqlga-1.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/comps_lqlga-1.png" class="plot-directive" src="../_images/comps_lqlga-1.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<em>LQLGALattice</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="initial-conditions">
+<span id="lqlga-initial"></span><h2>Initial Conditions<a class="headerlink" href="#initial-conditions" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.LQGLAInitialConditions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.</span></span><span class="sig-name descname"><span class="pre">LQGLAInitialConditions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components.py#L13-L92"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.LQGLAInitialConditions" title="Link to this definition">#</a></dt>
+<dd><p>Primitive for setting initial conditions in the <a class="reference internal" href="#qlbm.components.LQLGA" title="qlbm.components.LQLGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LQLGA</span></code></a> algorithm.</p>
+<p>This operator allows the construction of arbitrary deterministic initial conditions for the LQLGA algorithm.
+The number of gates required by this operator is equal to the number of enabled velocity qubits across all grid points.
+The depth of the circuit is 1, as all gates are applied in parallel at each grid point.</p>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.lattice</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGALattice</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.components.lqlga</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQGLAInitialConditions</span>
+
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">LQLGALattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+            <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="s2">&quot;D1Q3&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">initial_conditions</span> <span class="o">=</span> <span class="n">LQGLAInitialConditions</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="p">[(</span><span class="nb">tuple</span><span class="p">([</span><span class="mi">2</span><span class="p">]),</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">))])</span>
+<span class="n">initial_conditions</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/804dd595bd078154ee9d5d6e867142e9/comps_lqlga-2.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/da09855e875e656b7779689d95c378ad/comps_lqlga-2.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/8fdd02eb4c9f46c04949e41c8e0b8dc4/comps_lqlga-2.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/6755a99ef25594bbf747e205cd70fe7b/comps_lqlga-2.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/comps_lqlga-2.png" class="plot-directive" src="../_images/comps_lqlga-2.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<em>LQLGALattice</em>)</p></li>
+<li><p><strong>grid_data</strong> (<em>List</em><em>[</em><em>Tuple</em><em>[</em><em>Tuple</em><em>[</em><em>int</em><em>, </em><em>...</em><em>]</em><em>, </em><em>Tuple</em><em>[</em><em>bool</em><em>, </em><em>...</em><em>]</em><em>]</em><em>]</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="streaming">
+<span id="lqlga-streaming"></span><h2>Streaming<a class="headerlink" href="#streaming" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.LQLGAStreamingOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.</span></span><span class="sig-name descname"><span class="pre">LQLGAStreamingOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components.py#L13-L120"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.LQLGAStreamingOperator" title="Link to this definition">#</a></dt>
+<dd><p>Streaming operator for the <a class="reference internal" href="#qlbm.components.LQLGA" title="qlbm.components.LQLGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LQLGA</span></code></a> algorithm.</p>
+<p>Streaming is implemented by a series of swap gates as described in <span id="id7">[<a class="reference internal" href="../index.html#id11" title="Merel A. Schalkers and Matthias Möller. On the importance of data encoding in quantum boltzmann methods. Quantum Information Processing, 23(1):20, 2024.">7</a>]</span>.
+The number of gates scales linearly with size of the grid,
+while the depth scales logarithmically.</p>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.components.lqlga</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGAStreamingOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.lattice</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGALattice</span>
+
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">LQLGALattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">},</span>
+            <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="s2">&quot;D1Q3&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">streaming_operator</span> <span class="o">=</span> <span class="n">LQLGAStreamingOperator</span><span class="p">(</span><span class="n">lattice</span><span class="p">)</span>
+<span class="n">streaming_operator</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/172fe4977288b21976cc023869ed0dc9/comps_lqlga-3.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/a562af1ad18300d7e2b949e1ecc937d6/comps_lqlga-3.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/d13e8b56232fae82000cfd7ab3274694/comps_lqlga-3.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/f230c0a08b2ad1c7d21a11a222168713/comps_lqlga-3.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/comps_lqlga-3.png" class="plot-directive" src="../_images/comps_lqlga-3.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<em>LQLGALattice</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="reflection">
+<span id="lqlga-reflection"></span><h2>Reflection<a class="headerlink" href="#reflection" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.LQLGAReflectionOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.</span></span><span class="sig-name descname"><span class="pre">LQLGAReflectionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components.py#L19-L127"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.LQLGAReflectionOperator" title="Link to this definition">#</a></dt>
+<dd><p>Operator implementing reflection in the <a class="reference internal" href="#qlbm.components.LQLGA" title="qlbm.components.LQLGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LQLGA</span></code></a> algorithm.</p>
+<p>Reflections in this algorithm can be entirely implemented by swap gates.
+The number of gates scales with the number of gridpoints of the solid geometry.
+The depth of the operator is 1.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The lattice the operator acts on.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">shapes</span></code></p></td>
+<td><p>A list of boundary-conditioned shapes.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.components.lqlga</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGAReflectionOperator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.lattice</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGALattice</span>
+
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">LQLGALattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">},</span>
+            <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="s2">&quot;D1Q3&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;shape&quot;</span><span class="p">:</span> <span class="s2">&quot;cuboid&quot;</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="s2">&quot;boundary&quot;</span><span class="p">:</span> <span class="s2">&quot;bounceback&quot;</span><span class="p">}],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">reflection_operator</span> <span class="o">=</span> <span class="n">LQLGAReflectionOperator</span><span class="p">(</span>
+    <span class="n">lattice</span><span class="p">,</span> <span class="n">shapes</span><span class="o">=</span><span class="n">lattice</span><span class="o">.</span><span class="n">shapes</span><span class="p">[</span><span class="s2">&quot;bounceback&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">reflection_operator</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/5e7cfffe134f1bae0f553cdcb3f0baa4/comps_lqlga-4.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/8bc113f082fd91d2bb1da5ca7993b8a2/comps_lqlga-4.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/e904613ab63538a34e33daefa1b29579/comps_lqlga-4.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/874e061561b2df16e3e067f08d708fa1/comps_lqlga-4.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/comps_lqlga-4.png" class="plot-directive" src="../_images/comps_lqlga-4.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<em>LQLGALattice</em>)</p></li>
+<li><p><strong>shapes</strong> (<em>List</em><em>[</em><em>LQLGAShape</em><em>]</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="collision">
+<span id="lqlga-collision"></span><h2>Collision<a class="headerlink" href="#collision" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.GenericLQLGACollisionOperator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.</span></span><span class="sig-name descname"><span class="pre">GenericLQLGACollisionOperator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components.py#L14-L61"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.GenericLQLGACollisionOperator" title="Link to this definition">#</a></dt>
+<dd><p>Equivalence class-based LGA collision operator for the <a class="reference internal" href="#qlbm.components.LQLGA" title="qlbm.components.LQLGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LQLGA</span></code></a> algorithm.</p>
+<p>This operator applies the <a class="reference internal" href="comps_collision.html#qlbm.components.common.EQCCollisionOperator" title="qlbm.components.common.EQCCollisionOperator"><code class="xref py py-class docutils literal notranslate"><span class="pre">EQCCollisionOperator</span></code></a> operator to all velocity qubits at each grid point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<em>LQLGALattice</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="measurement">
+<span id="lqlga-measurement"></span><h2>Measurement<a class="headerlink" href="#measurement" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.components.LQLGAGridVelocityMeasurement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.components.</span></span><span class="sig-name descname"><span class="pre">LQLGAGridVelocityMeasurement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/components.py#L12-L66"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.components.LQLGAGridVelocityMeasurement" title="Link to this definition">#</a></dt>
+<dd><p>Measurement operator for the <a class="reference internal" href="#qlbm.components.LQLGA" title="qlbm.components.LQLGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LQLGA</span></code></a> algorithm.</p>
+<p>This operator measures the velocity qubits at each grid point in the LQLGA lattice.</p>
+<p>Example usage:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.components.lqlga</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGAGridVelocityMeasurement</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.lattice</span><span class="w"> </span><span class="kn">import</span> <span class="n">LQLGALattice</span>
+
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">LQLGALattice</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">},</span>
+            <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="s2">&quot;D1Q3&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+
+<span class="n">LQLGAGridVelocityMeasurement</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">)</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/f58c636964bd420b7c199bd8927cd72d/comps_lqlga-5.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/d427433603af442d2c17759870818724/comps_lqlga-5.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/75d50667f835a27d26a27cf6acc2e638/comps_lqlga-5.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/e7d0d03da90a79c36f74ab31b0acee78/comps_lqlga-5.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/comps_lqlga-5.png" class="plot-directive" src="../_images/comps_lqlga-5.png" />
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<em>LQLGALattice</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="comps_stqbm.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Space-Time Circuits</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="lattice.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Lattices and Geometry</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#end-to-end-algorithms">End-to-end algorithms</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.LQLGA"><code class="docutils literal notranslate"><span class="pre">LQLGA</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#initial-conditions">Initial Conditions</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.LQGLAInitialConditions"><code class="docutils literal notranslate"><span class="pre">LQGLAInitialConditions</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#streaming">Streaming</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.LQLGAStreamingOperator"><code class="docutils literal notranslate"><span class="pre">LQLGAStreamingOperator</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.LQLGAReflectionOperator"><code class="docutils literal notranslate"><span class="pre">LQLGAReflectionOperator</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#collision">Collision</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.GenericLQLGACollisionOperator"><code class="docutils literal notranslate"><span class="pre">GenericLQLGACollisionOperator</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#measurement">Measurement</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.components.LQLGAGridVelocityMeasurement"><code class="docutils literal notranslate"><span class="pre">LQLGAGridVelocityMeasurement</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+<div id="searchbox"></div></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/code/comps_lqlga.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, qlbm authors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
