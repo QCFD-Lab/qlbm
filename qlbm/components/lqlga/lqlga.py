@@ -7,7 +7,10 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMAlgorithm
 from qlbm.components.lqlga.collision import GenericLQLGACollisionOperator
-from qlbm.components.lqlga.reflection import LQLGAReflectionOperator
+from qlbm.components.lqlga.reflection import (
+    LQLGAMGReflectionOperator,
+    LQLGAReflectionOperator,
+)
 from qlbm.components.lqlga.streaming import LQLGAStreamingOperator
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 
@@ -72,12 +75,27 @@ class LQLGA(LBMAlgorithm):
             LQLGAStreamingOperator(self.lattice, self.logger).circuit, inplace=True
         )
 
-        circuit.compose(
-            LQLGAReflectionOperator(
-                self.lattice, self.lattice.shapes["bounceback"], self.logger
-            ).circuit,
-            inplace=True,
-        )
+        if self.lattice.has_multiple_geometries():
+            circuit.compose(
+                LQLGAMGReflectionOperator(
+                    self.lattice,
+                    [
+                        gdict["bounceback"] + gdict["specular"]
+                        for gdict in self.lattice.geometries
+                    ],
+                    self.logger,
+                ).circuit,
+                inplace=True,
+            )
+        else:
+            circuit.compose(
+                LQLGAReflectionOperator(
+                    self.lattice,
+                    self.lattice.shapes["bounceback"] + self.lattice.shapes["specular"],
+                    self.logger,
+                ).circuit,
+                inplace=True,
+            )
 
         return circuit
 

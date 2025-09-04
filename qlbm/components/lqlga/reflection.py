@@ -2,16 +2,18 @@
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List, cast
+from typing import List, Tuple, cast
 
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import LQLGAOperator
+from qlbm.components.common.primitives import MCSwap
 from qlbm.lattice.geometry.shapes.base import LQLGAShape, Shape
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import CircuitException
+from qlbm.tools.utils import get_qubits_to_invert
 
 
 class LQLGAReflectionOperator(LQLGAOperator):
@@ -19,7 +21,7 @@ class LQLGAReflectionOperator(LQLGAOperator):
     Operator implementing reflection in the :class:`.LQLGA` algorithm.
 
     Reflections in this algorithm can be entirely implemented by swap gates.
-    The number of gates scales with the number of grridpoints of the solid geometry.
+    The number of gates scales with the number of gridpoints of the solid geometry.
     The depth of the operator is 1.
 
     ============================ ======================================================================
@@ -123,3 +125,165 @@ class LQLGAReflectionOperator(LQLGAOperator):
     @override
     def __str__(self) -> str:
         return f"[PointWiseLQLGAReflectionOperator for lattice {self.lattice}, shapes {self.shapes}]"
+
+
+class LQLGAMGReflectionOperator(LQLGAOperator):
+    """
+    Operator implementing reflection in the :class:`.LQLGA` algorithm with multiple geometries.
+
+    Reflections in this algorithm can be entirely implemented a series of controlled swap gates.
+    This is equivalent to multiple controlled realizations of the :class:`.LQLGAReflectionOperator`
+    applied in series.
+
+    ============================ ======================================================================
+    Attribute                     Summary
+    ============================ ======================================================================
+    :attr:`lattice`              The lattice the operator acts on.
+    :attr:`shapes`               A list of boundary-conditioned shapes.
+    :attr:`logger`               The performance logger, by default ``getLogger("qlbm")``.
+    ============================ ======================================================================
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.lqlga import LQLGAReflectionOperator
+        from qlbm.lattice import LQLGALattice
+
+        lattice = LQLGALattice(
+            {
+                "lattice": {
+                    "dim": {"x": 7},
+                    "velocities": "D1Q3",
+                },
+                "geometry": [{"shape": "cuboid", "x": [3, 5], "boundary": "bounceback"}],
+            },
+        )
+        reflection_operator = LQLGAReflectionOperator(
+            lattice, shapes=lattice.shapes["bounceback"]
+        )
+        reflection_operator.draw("mpl")
+
+    """
+
+    shapes: List[List[LQLGAShape]]
+    """
+    A list of shapes that require reflection at the boundaries.
+    """
+
+    def __init__(
+        self,
+        lattice: LQLGALattice,
+        shapes: List[List[Shape]],
+        logger: Logger = getLogger("qlbm"),
+    ) -> None:
+        super().__init__(lattice, logger)
+        self.shapes = cast(List[List[LQLGAShape]], shapes)
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self) -> QuantumCircuit:
+        discretization = self.lattice.discretization
+        if discretization == LatticeDiscretization.D1Q2:
+            return self.__create_circuit_d1q2()
+
+        elif discretization == LatticeDiscretization.D1Q3:
+            return self.__create_circuit_d1q3()
+
+        raise CircuitException(f"Reflection Operator unsupported for {discretization}.")
+
+    def __create_circuit_d1q2(self) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+
+        for c, geometry in enumerate(self.shapes):
+            # Prepare the /ket{1} state in the marker register
+            qubits_to_invert = [
+                q + self.lattice.marker_index()[0]
+                for q in get_qubits_to_invert(c, self.lattice.num_marker_qubits)
+            ]
+
+            if qubits_to_invert:
+                circuit.x(qubits_to_invert)
+
+            for shape in geometry:
+                for reflection_data in shape.get_lqlga_reflection_data_d1q2():
+                    circuit.compose(
+                        MCSwap(
+                            self.lattice,
+                            self.lattice.marker_index(),
+                            cast(
+                                Tuple[int, int],
+                                tuple(
+                                    [
+                                        self.lattice.velocity_index_tuple(
+                                            reflection_data.gridpoints[0],
+                                            reflection_data.velocity_indices_to_swap[0],
+                                        ),
+                                        self.lattice.velocity_index_tuple(
+                                            reflection_data.gridpoints[1],
+                                            reflection_data.velocity_indices_to_swap[1],
+                                        ),
+                                    ],
+                                ),
+                            ),
+                            self.logger,
+                        ).circuit,
+                        inplace=True,
+                    )
+
+            if qubits_to_invert:
+                circuit.x(qubits_to_invert)
+        return circuit
+
+    def __create_circuit_d1q3(self) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+        for c, geometry in enumerate(self.shapes):
+            # Prepare the /ket{1} state in the marker register
+            qubits_to_invert = [
+                q + self.lattice.marker_index()[0]
+                for q in get_qubits_to_invert(c, self.lattice.num_marker_qubits)
+            ]
+
+            if qubits_to_invert:
+                circuit.x(qubits_to_invert)
+
+            for shape in geometry:
+                for reflection_data in shape.get_lqlga_reflection_data_d1q3():
+                    circuit.compose(
+                        MCSwap(
+                            self.lattice,
+                            self.lattice.marker_index(),
+                            cast(
+                                Tuple[int, int],
+                                tuple(
+                                    [
+                                        self.lattice.velocity_index_tuple(
+                                            reflection_data.gridpoints[0],
+                                            reflection_data.velocity_indices_to_swap[0],
+                                        ),
+                                        self.lattice.velocity_index_tuple(
+                                            reflection_data.gridpoints[1],
+                                            reflection_data.velocity_indices_to_swap[1],
+                                        ),
+                                    ],
+                                ),
+                            ),
+                        ).circuit,
+                        inplace=True,
+                    )
+
+            if qubits_to_invert:
+                circuit.x(qubits_to_invert)
+
+        return circuit
+
+    @override
+    def __str__(self) -> str:
+        return f"[LQLGAMGReflectionOperator for lattice {self.lattice}, shapes {self.shapes}]"

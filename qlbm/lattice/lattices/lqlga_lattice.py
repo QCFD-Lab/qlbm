@@ -4,6 +4,7 @@ from itertools import product
 from math import prod
 from typing import Dict, List, Tuple, cast, override
 
+from numpy import ceil, log2
 from qiskit import QuantumCircuit, QuantumRegister
 
 from qlbm.lattice.geometry.shapes.base import Shape
@@ -13,6 +14,7 @@ from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretizationProperties,
 )
 from qlbm.tools.exceptions import LatticeException
+from qlbm.tools.utils import flatten
 
 
 class LQLGALattice(Lattice):
@@ -67,6 +69,9 @@ class LQLGALattice(Lattice):
     num_base_qubits: int
     """The number of qubits required to represent the lattice."""
 
+    num_marker_qubits: int
+    """The number of qubits used to identify geometries, if parallel lattices are being simulated."""
+
     velocity_register: QuantumRegister
     """The quantum register representing the velocities of the lattice."""
 
@@ -76,6 +81,7 @@ class LQLGALattice(Lattice):
         self.num_gridpoints, self.num_velocities, self.shapes, self.discretization = (
             self.parse_input_data(lattice_data)
         )  # type: ignore
+        self.geometries: List[Dict[str, List[Shape]]] = [self.shapes]
         self.num_dims = len(self.num_gridpoints)
         self.num_velocities_per_point = (
             LatticeDiscretizationProperties.get_num_velocities(self.discretization)
@@ -85,12 +91,18 @@ class LQLGALattice(Lattice):
             prod(map(lambda x: x + 1, self.num_gridpoints))
             * self.num_velocities_per_point
         )
+        self.num_marker_qubits = (
+            int(ceil(log2(len(self.geometries))))
+            if self.has_multiple_geometries()
+            else 0
+        )
 
-        self.num_total_qubits = self.num_base_qubits
+        self.num_total_qubits = self.num_base_qubits + self.num_marker_qubits
 
-        self.registers = self.get_registers()
+        temp_registers = self.get_registers()
 
-        self.velocity_register = self.registers
+        self.velocity_register, self.marker_register = temp_registers
+        self.registers = tuple(flatten(temp_registers))
 
         self.circuit = QuantumCircuit(*self.registers)
 
@@ -106,7 +118,18 @@ class LQLGALattice(Lattice):
             )
         ]
 
-        return velocity_registers  # type: ignore
+        marker_register = (
+            [
+                QuantumRegister(
+                    int(ceil(log2(len(self.geometries)))),
+                    name="m",
+                )
+            ]
+            if self.has_multiple_geometries()
+            else []
+        )
+
+        return (velocity_registers, marker_register)
 
     def gridpoint_index_tuple(self, gridpoint: Tuple[int, ...]) -> int:
         """
@@ -245,6 +268,21 @@ class LQLGALattice(Lattice):
             + velocity
         )
 
+    def marker_index(self) -> List[int]:
+        """
+        Get the indices of the qubits addressing the marker.
+
+        This is only useful if multiple lattice geometries are addressed simultaneously.
+
+        Returns
+        -------
+        List[int]
+            The absolute indices of the marker qubits.
+        """
+        return list(
+            range(self.num_base_qubits, self.num_base_qubits + self.num_marker_qubits)
+        )
+
     def get_velocity_qubits_of_line(self, line_index: int) -> Tuple[int, int]:
         r"""
         Returns the velocity qubits of the positive and negative directions of a streaming line.
@@ -282,3 +320,57 @@ class LQLGALattice(Lattice):
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
         return f"lqlga-d{self.num_dims}-q{self.num_velocities_per_point}-{gp_string}"
+
+    def set_geometries(self, geometries):
+        """
+        Updates the geometry setup of the lattice.
+
+        For a given lattice (set number of gridpoints and velocity discretization),
+        set multiple geometry configurations to simulate simultaneously.
+
+        .. code-block:: python
+            from qlbm.lattice import LQLGALattice
+
+            lattice = LQLGALattice(
+                {
+                    "lattice": {
+                        "dim": {"x": 5},
+                        "velocities": "D1Q2",
+                    },
+                },
+            )
+
+            lattice.set_geometries(
+                [
+                    [{"shape": "cuboid", "x": [3, 4], "boundary": "bounceback"}],
+                    [{"shape": "cuboid", "x": [1, 2], "boundary": "specular"}],
+                    [{"shape": "cuboid", "x": [1, 4], "boundary": "specular"}],
+                ]
+            )
+
+            lattice.circuit.draw("mpl")
+
+        Parameters
+        ----------
+        geometries : Dict
+            A list of geometries to simulate on the same lattice.
+        """
+        self.geometries = [self.parse_geometry_dict(g) for g in geometries]
+
+        # Update the class attribute that depend on the register setup
+        temp_registers = self.get_registers()
+
+        self.velocity_register, self.marker_register = temp_registers
+        self.registers = tuple(flatten(temp_registers))
+        self.num_marker_qubits = (
+            int(ceil(log2(len(self.geometries))))
+            if self.has_multiple_geometries()
+            else 0
+        )
+
+        self.num_total_qubits = self.num_base_qubits + self.num_marker_qubits
+        self.circuit = QuantumCircuit(*self.registers)
+
+    @override
+    def has_multiple_geometries(self) -> bool:
+        return len(self.geometries) > 1

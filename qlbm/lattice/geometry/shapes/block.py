@@ -102,8 +102,13 @@ class Block(SpaceTimeShape, LQLGAShape):
         bounds: List[Tuple[int, int]],
         num_grid_qubits: List[int],
         boundary_condition: str,
+        num_gridpoints: List[int] | None = None,
     ) -> None:
         super().__init__(num_grid_qubits, boundary_condition)
+        if num_gridpoints is None:
+            self.num_gridpoints = [2**nq for nq in num_grid_qubits]
+        else:
+            self.num_gridpoints = num_gridpoints
         # TODO: check whether the number of dimensions is consistent
         self.bounds: List[Tuple[int, int]] = bounds
         if self.num_dims == 3:
@@ -709,14 +714,15 @@ class Block(SpaceTimeShape, LQLGAShape):
 
     @override
     def get_lqlga_reflection_data_d1q2(self):
+        print(self.num_grid_qubits[0])
         return self.get_lqlga_reflection_data_1d_from_points(
             [tuple([self.bounds[0][0]])],
             0,
             1,
             tuple([-1]),
-            2 ** self.num_grid_qubits[0],
+            self.num_gridpoints[0] + 1,
         ) + self.get_lqlga_reflection_data_1d_from_points(
-            [tuple([self.bounds[0][1]])], 1, 0, tuple([1]), 2 ** self.num_grid_qubits[0]
+            [tuple([self.bounds[0][1]])], 1, 0, tuple([1]), self.num_gridpoints[0] + 1
         )
 
     @override
@@ -726,9 +732,13 @@ class Block(SpaceTimeShape, LQLGAShape):
             1,
             2,
             tuple([-1]),
-            2 ** self.num_grid_qubits[0],
+            self.num_grid_qubits[0] + 1,
         ) + self.get_lqlga_reflection_data_1d_from_points(
-            [tuple([self.bounds[0][1]])], 2, 1, tuple([1]), 2 ** self.num_grid_qubits[0]
+            [tuple([self.bounds[0][1]])],
+            2,
+            1,
+            tuple([1]),
+            self.num_grid_qubits[0] + 1,
         )
 
     @override

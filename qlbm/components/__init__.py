@@ -34,6 +34,7 @@ from .lqlga import (
     GenericLQLGACollisionOperator,
     LQGLAInitialConditions,
     LQLGAGridVelocityMeasurement,
+    LQLGAMGReflectionOperator,
     LQLGAReflectionOperator,
     LQLGAStreamingOperator,
 )
@@ -64,6 +65,7 @@ __all__ = [
     "LQGLAInitialConditions",
     "LQLGA",
     "LQLGAGridVelocityMeasurement",
+    "LQLGAMGReflectionOperator",
     "LQLGAReflectionOperator",
     "LQLGAStreamingOperator",
     "EQCCollisionOperator",

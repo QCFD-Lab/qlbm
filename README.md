@@ -21,18 +21,7 @@
 </a>
 </p>
 
-
-## PyPI installation
-
-`qlbm` can be installed through `pip`. We recommend the use of a Python 3.12 or 3.13 virtual environment:
-
-```bash
-python -m venv qlbm-cpu-venv
-pip install --upgrade pip
-pip install qlbm
-```
-
-## Local installation
+## Install from source
 
 Alternatively, you can also install the latest version of `qlbm` by cloning the repository and installing from source as follows (again using Python 3.12 or 3.13):
 
@@ -56,7 +45,21 @@ make install-cpu
 source qlbm-cpu-venv/bin/activate
 ```
 
-`qlbm` additionally supports several other options, including GPU and MPI simulation. There are also Docker container images in the `Docker` directory. Due to how quickly the code base is evolving, we recommend using the CPU option for stability purposes.
+## PyPI installation
+
+`qlbm` can also be installed through `pip`. We recommend the use of a Python 3.12 or 3.13 virtual environment:
+
+```bash
+python -m venv qlbm-cpu-venv
+pip install --upgrade pip
+pip install qlbm
+```
+
+Note that `qlbm` evolves quickly and it is likely that the GitHub repository contains new features that the PyPI installation does not. To get the latest developments, we recommend the source installation.
+
+## Container installation
+
+There are also Docker container images in the `Docker` directory that can be used to install `qlbm` in a container environment. Due to how quickly the code base is evolving, we recommend using the CPU option for stability purposes.
 
 ## Algorithms and Usage
 

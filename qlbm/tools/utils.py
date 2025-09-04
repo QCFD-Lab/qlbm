@@ -255,14 +255,14 @@ def get_time_series(
     return speed_controls  # type: ignore
 
 
-def get_qubits_to_invert(gridpoint_encoded: int, num_qubits: int) -> List[int]:
+def get_qubits_to_invert(number_encoded: int, num_qubits: int) -> List[int]:
     r"""
-    Returns the indices at which a given gridpoint encoded value has a 0. Inverting these indices results in a :math:`\ket{1}^{\otimes n}` state.
+    Returns the indices at which a given number encoded value has a 0. Inverting these indices results in a :math:`\ket{1}^{\otimes n}` state.
 
     Parameters
     ----------
-    gridpoint_encoded : int
-        The integer representation of the gridpoint.
+    number_encoded : int
+        The integer representation of the number.
     num_qubits : int
         The total nuimber of grid qubits.
 
@@ -271,4 +271,4 @@ def get_qubits_to_invert(gridpoint_encoded: int, num_qubits: int) -> List[int]:
     List[int]
         The indices of the (qu)bits that have value 0.
     """
-    return [i for i in range(num_qubits) if not bit_value(gridpoint_encoded, i)]
+    return [i for i in range(num_qubits) if not bit_value(number_encoded, i)]

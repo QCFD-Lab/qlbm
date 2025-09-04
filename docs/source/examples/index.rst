@@ -16,5 +16,6 @@ Currently, the following visualization tutorials are available online:
 
    notebooks/collisionless_vis
    notebooks/spacetime_vis
+   notebooks/lqlga_vis
    notebooks/geometry_vis
    notebooks/flowfield_vis

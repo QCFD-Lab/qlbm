@@ -1,16 +1,12 @@
-FROM python:3.11-bookworm
+FROM python:3.13-bookworm
 
-RUN apt-get update -qq && apt-get install -y -qq libboost-all-dev cmake
+RUN apt-get update -qq && apt-get install -y -qq libboost-all-dev cmake pandoc libglfw3-dev libgles2-mesa-dev
 
 WORKDIR /qlbm
 
-COPY Makefile Makefile
 COPY pyproject.toml pyproject.toml
-COPY README.md README.md
-
-RUN make install-cpu
-
-COPY qlbm qlbm
-COPY test test
+RUN python -m pip install --upgrade pip \
+    && pip install --no-cache-dir -e ".[cpu,dev,docs]" \
+    && rm -rf /root/.cache/pip
 
 ENTRYPOINT /bin/bash
