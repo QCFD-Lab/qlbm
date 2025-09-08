@@ -5,7 +5,7 @@ from qlbm.lattice.spacetime.properties_base import LatticeDiscretizationProperti
 
 
 def test_lqlga_lattice_num_registers_d1q2(lattice_d1q2_256):
-    assert len(lattice_d1q2_256.registers) == 256  # One empty register
+    assert len(lattice_d1q2_256.registers) == 256  #
     assert all(reg.size == 2 for reg in lattice_d1q2_256.velocity_register)
     assert lattice_d1q2_256.circuit.num_qubits == 512
 
