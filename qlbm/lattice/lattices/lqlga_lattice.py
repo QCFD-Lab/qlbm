@@ -97,11 +97,19 @@ class LQLGALattice(Lattice):
             else 0
         )
 
+        self.num_accumulation_qubits = 0
+        self.indices_to_accumulate = []
+
+        self.__update_registers()
+
+    def __update_registers(self):
         self.num_total_qubits = self.num_base_qubits + self.num_marker_qubits
 
         temp_registers = self.get_registers()
 
-        self.velocity_register, self.marker_register = temp_registers
+        self.velocity_register, self.marker_register, self.accumulation_register = (
+            temp_registers
+        )
         self.registers = tuple(flatten(temp_registers))
 
         self.circuit = QuantumCircuit(*self.registers)
@@ -129,7 +137,13 @@ class LQLGALattice(Lattice):
             else []
         )
 
-        return (velocity_registers, marker_register)
+        accumulation_register = (
+            [QuantumRegister(self.num_accumulation_qubits, name="acc")]
+            if self.has_accumulation_register()
+            else []
+        )
+
+        return (velocity_registers, marker_register, accumulation_register)
 
     def gridpoint_index_tuple(self, gridpoint: Tuple[int, ...]) -> int:
         """
@@ -357,20 +371,50 @@ class LQLGALattice(Lattice):
         """
         self.geometries = [self.parse_geometry_dict(g) for g in geometries]
 
-        # Update the class attribute that depend on the register setup
-        temp_registers = self.get_registers()
-
-        self.velocity_register, self.marker_register = temp_registers
-        self.registers = tuple(flatten(temp_registers))
-        self.num_marker_qubits = (
-            int(ceil(log2(len(self.geometries))))
-            if self.has_multiple_geometries()
-            else 0
-        )
-
-        self.num_total_qubits = self.num_base_qubits + self.num_marker_qubits
-        self.circuit = QuantumCircuit(*self.registers)
+        self.__update_registers()
 
     @override
     def has_multiple_geometries(self) -> bool:
         return len(self.geometries) > 1
+
+    def has_accumulation_register(self) -> bool:
+        """
+        Whether the lattice has a register that accumulates quantities at each step.
+
+        Returns
+        -------
+        bool
+            Whether the lattice has a register that accumulates quantities at each step.
+        """
+        return self.num_accumulation_qubits > 0
+
+    def use_accumulation_register(self, size: int, indices_to_accumulate: List[int]):
+        """
+        Sets up the accumulation register of the lattice.
+
+        This register has a weighted value added to it at the end of each time step.
+        The value is a linear combination of the occupancy of several velocity channels.
+        This in turn allows for time-averaged calculations for values related to pressure,
+        mass, or drag/lift coefficients.
+
+        Parameters
+        ----------
+        size : int
+            The size of the register that accumulates the value.
+        indices_to_accumulate : List[int]
+            The qubit indices that contribute to the accumulated value.
+        """
+        if size <= 0:
+            raise LatticeException(
+                f"Accumulation register size has to be positive. Provided value: {size}"
+            )
+
+        if any(i < 0 or i >= self.num_base_qubits for i in indices_to_accumulate):
+            raise LatticeException(
+                f"Accumulation indices have to be between 0 and {self.num_base_qubits} for this lattice."
+            )
+
+        self.num_accumulation_qubits = size
+        self.indices_to_accumulate = indices_to_accumulate
+
+        self.__update_registers()
