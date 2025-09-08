@@ -28,6 +28,7 @@ from .common import (
     EQCCollisionOperator,
     EQCPermutation,
     EQCRedistribution,
+    HammingWeightAdder,
 )
 from .lqlga import (
     LQLGA,
@@ -71,4 +72,5 @@ __all__ = [
     "EQCCollisionOperator",
     "EQCPermutation",
     "EQCRedistribution",
+    "HammingWeightAdder",
 ]

@@ -4,8 +4,11 @@ from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List, Tuple
 
+import numpy as np
+from numpy import pi
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
+from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
@@ -106,3 +109,73 @@ class MCSwap(LBMPrimitive):
     @override
     def __str__(self) -> str:
         return f"[Primitive MCSwap with lattice {self.lattice}]"
+
+
+class HammingWeightAdder(LBMPrimitive):
+    """
+    QFT-based Hamming Weight adder.
+
+    This primitive adds the hamming weight (number of 1s) in a given register :math:`x`
+    to the binary-encoded value of a second register :math:`y`.
+    """
+
+    x_register_size: int
+    """
+    The size of the register encoding the hamming weight value to add.
+    """
+
+    y_register_size: int
+    """
+    The size of the register to which the hamming weight is added.
+    """
+
+    def __init__(
+        self,
+        x_register_size: int,
+        y_register_size: int,
+        logger: Logger = getLogger("qlbm"),
+    ):
+        super().__init__(logger)
+        self.x_register_size = x_register_size
+        self.y_register_size = y_register_size
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self) -> QuantumCircuit:
+        circuit = QuantumCircuit(self.x_register_size + self.y_register_size)
+
+        circuit.compose(
+            QFT(self.y_register_size),
+            inplace=True,
+            qubits=list(
+                range(self.x_register_size, self.x_register_size + self.y_register_size)
+            ),
+        )
+
+        angles = np.zeros(self.y_register_size)
+        for i in range(self.y_register_size):
+            angles[i] = 2 * pi / (2 ** (self.y_register_size - i))
+
+        for xi in range(self.x_register_size):
+            for k, yi in enumerate(range(self.y_register_size)):
+                circuit.cp(angles[k], xi, self.x_register_size + yi)
+
+        circuit.compose(
+            QFT(self.y_register_size, inverse=True),
+            inplace=True,
+            qubits=list(
+                range(self.x_register_size, self.x_register_size + self.y_register_size)
+            ),
+        )
+
+        return circuit
+
+    @override
+    def __str__(self):
+        return f"[Primitive HWAdder with with register size {self.x_register_size} and {self.y_register_size}]"
