@@ -1,0 +1,7 @@
+{
+  "lattice": {
+    "dim": {"x": 8}, 
+    "velocities": "D1Q3"
+  }, 
+  "geometry": []
+}
