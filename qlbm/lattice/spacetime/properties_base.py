@@ -13,6 +13,8 @@ from typing import Dict, List, Tuple, cast
 import numpy as np
 from qiskit import QuantumRegister
 
+from qlbm.tools.exceptions import LatticeException
+
 
 class LatticeDiscretization(Enum):
     """
@@ -118,7 +120,7 @@ class LatticeDiscretizationProperties:
             The number of velocities corresponding to the discretization.
         """
         if discretization not in LatticeDiscretizationProperties.num_velocities:
-            raise ValueError(f"Discretization {discretization} is not supported.")
+            raise LatticeException(f"Discretization {discretization} is not supported.")
 
         return LatticeDiscretizationProperties.num_velocities[discretization]
 
