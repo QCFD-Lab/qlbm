@@ -1,6 +1,7 @@
 """Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.LQLGA` algorithm."""
 
 from itertools import product
+from logging import getLogger
 from math import prod
 from typing import Dict, List, Tuple, cast, override
 
@@ -75,7 +76,11 @@ class LQLGALattice(Lattice):
     velocity_register: QuantumRegister
     """The quantum register representing the velocities of the lattice."""
 
-    def __init__(self, lattice_data, logger=...):
+    def __init__(
+        self,
+        lattice_data,
+        logger=getLogger("qlbm"),
+    ):
         super().__init__(lattice_data, logger)
 
         self.num_gridpoints, self.num_velocities, self.shapes, self.discretization = (
@@ -370,7 +375,11 @@ class LQLGALattice(Lattice):
             A list of geometries to simulate on the same lattice.
         """
         self.geometries = [self.parse_geometry_dict(g) for g in geometries]
-
+        self.num_marker_qubits = (
+            int(ceil(log2(len(self.geometries))))
+            if self.has_multiple_geometries()
+            else 0
+        )
         self.__update_registers()
 
     @override
@@ -418,3 +427,21 @@ class LQLGALattice(Lattice):
         self.indices_to_accumulate = indices_to_accumulate
 
         self.__update_registers()
+
+    def accumulation_index(self) -> List[int]:
+        """
+        Get the indices of the qubits used for the accumulation register.
+
+        Returns
+        -------
+        List[int]
+            The absolute indices of the accumulation qubits.
+        """
+        return list(
+            range(
+                self.num_base_qubits + self.num_marker_qubits,
+                self.num_base_qubits
+                + self.num_marker_qubits
+                + self.num_accumulation_qubits,
+            )
+        )
