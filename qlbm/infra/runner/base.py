@@ -21,6 +21,7 @@ from qlbm.infra.result import (
     SpaceTimeResult,
 )
 from qlbm.lattice import CollisionlessLattice, Lattice
+from qlbm.lattice.lattices.abe_lattice import ABELattice
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException, ResultsException
@@ -123,9 +124,11 @@ class CircuitRunner(ABC):
         ResultsException
             If there is no matching result object for the runner's lattice.
         """
-        if isinstance(self.lattice, CollisionlessLattice):
+        if isinstance(self.lattice, CollisionlessLattice) or isinstance(
+            self.lattice, ABELattice
+        ):
             return CollisionlessResult(
-                cast(CollisionlessLattice, self.lattice),
+                self.lattice,  # type: ignore
                 output_directory,
                 output_file_name,
             )
@@ -154,8 +157,10 @@ class CircuitRunner(ABC):
         ResultsException
             If the underlying algorithm does not support reinitialization.
         """
-        if isinstance(self.lattice, CollisionlessLattice) or isinstance(
-            self.lattice, LQLGALattice
+        if (
+            isinstance(self.lattice, CollisionlessLattice)
+            or isinstance(self.lattice, LQLGALattice)
+            or isinstance(self.lattice, ABELattice)
         ):
             return IdentityReinitializer(
                 self.lattice,
