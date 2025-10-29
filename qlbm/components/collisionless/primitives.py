@@ -94,7 +94,7 @@ class GridMeasurement(LBMPrimitive):
 
     @override
     def __str__(self) -> str:
-        return f"[Primitive InitialConditions with lattice {self.lattice}]"
+        return f"[Primitive DVGridMeasurement with lattice {self.lattice}]"
 
 
 class CollisionlessInitialConditions(LBMPrimitive):
