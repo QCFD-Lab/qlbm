@@ -8,6 +8,7 @@ import numpy as np
 from numpy import pi
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
+from qiskit.quantum_info import Operator
 from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
@@ -179,3 +180,51 @@ class HammingWeightAdder(LBMPrimitive):
     @override
     def __str__(self):
         return f"[Primitive HWAdder with with register size {self.x_register_size} and {self.y_register_size}]"
+
+
+class TruncatedQFT(LBMPrimitive):
+    """TODO."""
+
+    def __init__(
+        self,
+        num_qubits: int,
+        dft_size: int,
+        logger: Logger = getLogger("qlbm"),
+    ):
+        super().__init__(logger)
+        self.num_qubits = num_qubits
+        self.dft_size = dft_size
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self):
+        circuit = QuantumCircuit(self.num_qubits)
+
+        QFT = np.array(
+            [
+                [
+                    np.exp(2j * np.pi * i * j / self.dft_size) / np.sqrt(self.dft_size)
+                    for j in range(self.dft_size)
+                ]
+                for i in range(self.dft_size)
+            ]
+        )
+
+        U = np.eye(2**self.num_qubits, dtype=complex)
+        U[: self.dft_size, : self.dft_size] = QFT
+        op = Operator(U)
+        assert op.is_unitary()
+
+        circuit.append(op, list(range(self.num_qubits)))
+
+        return circuit
+    
+    @override
+    def __str__(self):
+        return f"[Primitive TuncatedQFT({self.num_qubits}, {self.dft_size})]"
