@@ -9,6 +9,7 @@ from qiskit import QuantumCircuit
 from qiskit.quantum_info import Operator
 
 from qlbm.components.base import LBMPrimitive
+from qlbm.components.common.primitives import TruncatedQFT
 from qlbm.lattice.eqc.eqc import EquivalenceClass
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretizationProperties
 from qlbm.tools.utils import is_two_pow
@@ -108,19 +109,7 @@ class EQCRedistribution(LBMPrimitive):
         if is_two_pow(n):
             redistribution_circuit.ry(np.pi / 2, list(range(nq)), label="RY(π/2)")
         else:
-            QFT = np.array(
-                [
-                    [np.exp(2j * np.pi * i * j / n) / np.sqrt(n) for j in range(n)]
-                    for i in range(n)
-                ]
-            )
-
-            U = np.eye(2**nq, dtype=complex)
-            U[:n, :n] = QFT
-            op = Operator(U)
-            assert op.is_unitary()
-
-            redistribution_circuit.append(op, list(range(nq)))
+            redistribution_circuit = TruncatedQFT(nq, n).circuit
 
         circuit.compose(
             redistribution_circuit.control(
