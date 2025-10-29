@@ -10,6 +10,7 @@ from typing_extensions import override
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice.lattices.abe_lattice import ABELattice
 
 from .base import QBMResult
 
@@ -38,12 +39,12 @@ class CollisionlessResult(QBMResult):
     output_file_name: str
     """The name of the file to output the artifacts to."""
 
-    lattice: CollisionlessLattice
+    lattice: CollisionlessLattice | ABELattice
     """The lattice the result corresponds to."""
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: CollisionlessLattice | ABELattice,
         directory: str,
         output_file_name: str = "step",
     ) -> None:
@@ -70,7 +71,23 @@ class CollisionlessResult(QBMResult):
             else 0,
         )
 
-        if self.lattice.num_dims == 2:
+        if self.lattice.num_dims == 1:
+            # The second dimension is a dirty rendering trick for VTK and Paraview
+            count_history = np.zeros((self.lattice.num_gridpoints[0] + 1, 2))
+            for count in counts:
+                x = int(
+                    count[self.lattice.num_velocity_qubits :],
+                    2,
+                )
+                # Another dirty rendering trick for VTK and Paraview
+                count_history[x][0] += counts[count] * (
+                    1 + (int(count[: self.lattice.num_velocity_qubits] == "00"))
+                )
+                count_history[x][1] += counts[count] * (
+                    1 + (int(count[: self.lattice.num_velocity_qubits] == "00"))
+                )
+
+        elif self.lattice.num_dims == 2:
             count_history = np.zeros(
                 (self.lattice.num_gridpoints[0] + 1, self.lattice.num_gridpoints[1] + 1)
             )
@@ -105,7 +122,10 @@ class CollisionlessResult(QBMResult):
                 count_history[x][y][z] = counts[count]
 
         self.save_timestep_array(
-            count_history, timestep, create_vis=create_vis, save_counts_array=save_array
+            count_history if self.lattice.num_dims > 1 else np.transpose(count_history),
+            timestep,
+            create_vis=create_vis,
+            save_counts_array=save_array,
         )
 
     @override
