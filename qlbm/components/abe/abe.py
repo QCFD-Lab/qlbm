@@ -6,13 +6,13 @@ from time import perf_counter_ns
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
-from qlbm.components.abe.averaged_collision import ABEAveragedCollisionOperator
+from qlbm.components.abe.reflection import ABEReflectionOperator
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice import CollisionlessLattice
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.abe_lattice import ABELattice
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import get_time_series
+from qlbm.tools.utils import flatten, get_time_series
 
 from .streaming import ABEStreamingOperator
 
@@ -49,13 +49,24 @@ class ABECQLBM(LBMAlgorithm):
             inplace=True,
         )
 
-        # circuit.compose(
-        #     ABEAveragedCollisionOperator(
-        #         self.lattice,
-        #         logger=self.logger,
-        #     ).circuit,
-        #     inplace=True,
-        # )
+        for bc in ["bounceback", "specular"]:
+            if self.lattice.shapes[bc]:
+                if not all(
+                    isinstance(shape, Block)
+                    for shape in self.lattice.shapes["specular"]
+                ):
+                    raise LatticeException(
+                        f"All shapes with the {bc} boundary condition must be cuboids for the CQLBM algorithm. "
+                    )
+
+        circuit.compose(
+            ABEReflectionOperator(
+                self.lattice,
+                flatten(list(self.lattice.shapes.values())),  # type: ignore
+                logger=self.logger,
+            ).circuit,
+            inplace=True,
+        )
 
         return circuit
 
