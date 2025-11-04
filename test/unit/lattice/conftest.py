@@ -1,13 +1,13 @@
 import pytest
 
 from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.lattices.abe_lattice import ABELattice
+from qlbm.lattice.lattices.abe_lattice import ABLattice
 
 
 # 1D Lattices
 @pytest.fixture
-def dummy_1d_lattice() -> ABELattice:
-    return ABELattice(
+def dummy_1d_lattice() -> ABLattice:
+    return ABLattice(
         0,
         {
             "lattice": {
@@ -19,8 +19,8 @@ def dummy_1d_lattice() -> ABELattice:
 
 
 @pytest.fixture
-def lattice_1d_16_1_obstacle() -> ABELattice:
-    return ABELattice(
+def lattice_1d_16_1_obstacle() -> ABLattice:
+    return ABLattice(
         {
             "lattice": {
                 "dim": {"x": 16},
@@ -36,8 +36,8 @@ def lattice_1d_16_1_obstacle() -> ABELattice:
 
 # 2D Lattices
 @pytest.fixture
-def dummy_2d_lattice() -> ABELattice:
-    return ABELattice(
+def dummy_2d_lattice() -> ABLattice:
+    return ABLattice(
         0,
         {
             "lattice": {
@@ -49,8 +49,8 @@ def dummy_2d_lattice() -> ABELattice:
 
 
 @pytest.fixture
-def lattice_2d_16x16_1_obstacle() -> ABELattice:
-    return ABELattice(
+def lattice_2d_16x16_1_obstacle() -> ABLattice:
+    return ABLattice(
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},

@@ -12,7 +12,7 @@ from qlbm.components.base import LBMOperator, LBMPrimitive
 from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
 from qlbm.lattice.geometry.encodings.collisionless import ReflectionPoint
 from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.lattices.abe_lattice import ABELattice
+from qlbm.lattice.lattices.abe_lattice import ABLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten, get_qubits_to_invert
@@ -21,11 +21,11 @@ from qlbm.tools.utils import flatten, get_qubits_to_invert
 class ABEReflectionOperator(LBMOperator):
     """TODO."""
 
-    lattice: ABELattice
+    lattice: ABLattice
 
     def __init__(
         self,
-        lattice: ABELattice,
+        lattice: ABLattice,
         blocks: List[Block],
         logger: Logger = getLogger("qlbm"),
     ) -> None:

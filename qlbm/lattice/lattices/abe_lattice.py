@@ -18,7 +18,7 @@ from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 from .base import AmplitudeLattice
 
 
-class ABELattice(AmplitudeLattice):
+class ABLattice(AmplitudeLattice):
     """TODO."""
 
     discretization: LatticeDiscretization
@@ -108,7 +108,7 @@ class ABELattice(AmplitudeLattice):
     @override
     def velocity_index(self, dim: int | None = None) -> List[int]:
         if dim is not None:
-            raise LatticeException("ABELattice does not support a dimensional breakdown of velocities.")
+            raise LatticeException("ABLattice does not support a dimensional breakdown of velocities.")
         return list(
             range(
                 self.num_grid_qubits,

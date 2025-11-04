@@ -1,10 +1,10 @@
 import pytest
 
-from qlbm.lattice import ABELattice
+from qlbm.lattice import ABLattice
 from qlbm.tools.exceptions import LatticeException
 
 
-def test_2d_abe_lattice_basic_properties(lattice_2d_16x16_1_obstacle: ABELattice):
+def test_2d_abe_lattice_basic_properties(lattice_2d_16x16_1_obstacle: ABLattice):
     assert lattice_2d_16x16_1_obstacle.num_dims == 2
     assert lattice_2d_16x16_1_obstacle.num_gridpoints == [15, 15]
     assert lattice_2d_16x16_1_obstacle.num_ancilla_qubits == 3
@@ -13,7 +13,7 @@ def test_2d_abe_lattice_basic_properties(lattice_2d_16x16_1_obstacle: ABELattice
     assert lattice_2d_16x16_1_obstacle.num_total_qubits == 13
 
 
-def test_2d_lattice_grid_register(lattice_2d_16x16_1_obstacle: ABELattice):
+def test_2d_lattice_grid_register(lattice_2d_16x16_1_obstacle: ABLattice):
     assert lattice_2d_16x16_1_obstacle.grid_index(0) == list(range(4))
     assert lattice_2d_16x16_1_obstacle.grid_index(1) == list(range(4, 8))
     assert lattice_2d_16x16_1_obstacle.grid_index() == list(range(8))
@@ -27,12 +27,12 @@ def test_2d_lattice_grid_register(lattice_2d_16x16_1_obstacle: ABELattice):
 
 
 def test_2d_lattice_velocity_register(
-    lattice_2d_16x16_1_obstacle: ABELattice,
+    lattice_2d_16x16_1_obstacle: ABLattice,
 ):
     assert lattice_2d_16x16_1_obstacle.velocity_index() == [8, 9]
 
 def test_2d_lattice_ancilla_comparator_register(
-    lattice_2d_16x16_1_obstacle: ABELattice,
+    lattice_2d_16x16_1_obstacle: ABLattice,
 ):
     assert lattice_2d_16x16_1_obstacle.ancillae_comparator_index(0) == [10, 11]
     assert lattice_2d_16x16_1_obstacle.ancillae_comparator_index() == [10, 11]
@@ -46,7 +46,7 @@ def test_2d_lattice_ancilla_comparator_register(
 
 
 def test_2d_lattice_ancilla_obstacle_register(
-    lattice_2d_16x16_1_obstacle: ABELattice,
+    lattice_2d_16x16_1_obstacle: ABLattice,
 ):
     assert lattice_2d_16x16_1_obstacle.ancillae_obstacle_index() == [8 + 2 + 2]
 

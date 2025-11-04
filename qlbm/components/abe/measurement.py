@@ -5,7 +5,7 @@ from qiskit import ClassicalRegister, QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.lattice.lattices.abe_lattice import ABELattice
+from qlbm.lattice.lattices.abe_lattice import ABLattice
 
 
 class ABEGridMeasurement(LBMPrimitive):
@@ -13,7 +13,7 @@ class ABEGridMeasurement(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: ABELattice,
+        lattice: ABLattice,
         measure_velocity_qubits: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:

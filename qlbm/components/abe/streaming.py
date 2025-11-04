@@ -8,7 +8,7 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMOperator
 from qlbm.components.collisionless.streaming import PhaseShift
-from qlbm.lattice.lattices.abe_lattice import ABELattice
+from qlbm.lattice.lattices.abe_lattice import ABLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import get_qubits_to_invert
@@ -17,11 +17,11 @@ from qlbm.tools.utils import get_qubits_to_invert
 class ABEStreamingOperator(LBMOperator):
     """TODO."""
 
-    lattice: ABELattice
+    lattice: ABLattice
 
     def __init__(
         self,
-        lattice: ABELattice,
+        lattice: ABLattice,
         additional_control_qubit_indices: List[int] = [],
         logger: Logger = getLogger("qlbm"),
     ) -> None:

@@ -13,7 +13,7 @@ from .geometry.shapes.circle import (
     Circle,
 )
 from .lattices import CollisionlessLattice, Lattice
-from .lattices.abe_lattice import ABELattice
+from .lattices.abe_lattice import ABLattice
 from .lattices.lqlga_lattice import LQLGALattice
 from .lattices.spacetime_lattice import SpaceTimeLattice
 from .spacetime.properties_base import (
@@ -23,7 +23,7 @@ from .spacetime.properties_base import (
 
 __all__ = [
     "Lattice",
-    "ABELattice",
+    "ABLattice",
     "CollisionlessLattice",
     "SpaceTimeLattice",
     "LQLGALattice",

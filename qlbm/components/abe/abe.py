@@ -9,7 +9,7 @@ from typing_extensions import override
 from qlbm.components.abe.reflection import ABEReflectionOperator
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.lattices.abe_lattice import ABELattice
+from qlbm.lattice.lattices.abe_lattice import ABLattice
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten
 
@@ -21,11 +21,11 @@ class ABECQLBM(LBMAlgorithm):
 
     def __init__(
         self,
-        lattice: ABELattice,
+        lattice: ABLattice,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
-        self.lattice: ABELattice = lattice
+        self.lattice: ABLattice = lattice
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()

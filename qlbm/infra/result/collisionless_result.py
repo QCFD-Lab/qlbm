@@ -10,7 +10,7 @@ from typing_extensions import override
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.lattices.abe_lattice import ABELattice
+from qlbm.lattice.lattices.abe_lattice import ABLattice
 
 from .base import QBMResult
 
@@ -39,12 +39,12 @@ class CollisionlessResult(QBMResult):
     output_file_name: str
     """The name of the file to output the artifacts to."""
 
-    lattice: CollisionlessLattice | ABELattice
+    lattice: CollisionlessLattice | ABLattice
     """The lattice the result corresponds to."""
 
     def __init__(
         self,
-        lattice: CollisionlessLattice | ABELattice,
+        lattice: CollisionlessLattice | ABLattice,
         directory: str,
         output_file_name: str = "step",
     ) -> None:
