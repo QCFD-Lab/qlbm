@@ -87,14 +87,14 @@ class CQLBM(LBMAlgorithm):
                     inplace=True,
                 )
 
-            if self.lattice.shapes["bounceback"]:
-                if self.lattice.shapes["specular"]:
+            for bc in ["bounceback", "specular"]:
+                if self.lattice.shapes[bc]:
                     if not all(
                         isinstance(shape, Block)
                         for shape in self.lattice.shapes["specular"]
                     ):
                         raise LatticeException(
-                            "All shapes with the 'bounceback' boundary condition must be of type Block for the CQLBM algorithm. "
+                            f"All shapes with the {bc} boundary condition must be cuboids for the CQLBM algorithm. "
                         )
                 circuit.compose(
                     BounceBackReflectionOperator(
