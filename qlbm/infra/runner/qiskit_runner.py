@@ -3,7 +3,6 @@
 from logging import Logger, getLogger
 from time import perf_counter_ns
 
-import numpy as np
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit import transpile
 from qiskit.circuit.library import Initialize

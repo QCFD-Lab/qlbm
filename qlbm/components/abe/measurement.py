@@ -1,18 +1,11 @@
-from enum import Enum
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List
 
 from qiskit import ClassicalRegister, QuantumCircuit
-from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.components.collisionless.streaming import SpeedSensitivePhaseShift
-from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.geometry.encodings.collisionless import ReflectionResetEdge
 from qlbm.lattice.lattices.abe_lattice import ABELattice
-from qlbm.tools import flatten
 
 
 class ABEGridMeasurement(LBMPrimitive):

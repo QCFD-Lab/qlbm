@@ -1,20 +1,15 @@
 from logging import Logger, getLogger
-from math import pi
 from time import perf_counter_ns
 from typing import List
 
-import numpy as np
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCXGate
 from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
-from qlbm.components.base import CQLBMOperator, LBMOperator, LBMPrimitive
+from qlbm.components.base import LBMOperator
 from qlbm.components.collisionless.streaming import PhaseShift
-from qlbm.lattice import CollisionlessLattice
 from qlbm.lattice.lattices.abe_lattice import ABELattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
-from qlbm.tools import CircuitException, bit_value
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import get_qubits_to_invert
 

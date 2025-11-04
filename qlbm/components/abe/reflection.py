@@ -1,25 +1,19 @@
 from itertools import product
 from logging import Logger, getLogger
-from math import pi
 from time import perf_counter_ns
 from typing import List, Tuple
 
-import numpy as np
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMTGate, MCXGate, XGate
-from qiskit.synthesis import synth_qft_full as QFT
+from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.abe.streaming import ABEStreamingOperator
-from qlbm.components.base import CQLBMOperator, LBMOperator, LBMPrimitive
+from qlbm.components.base import LBMOperator, LBMPrimitive
 from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
-from qlbm.components.collisionless.streaming import PhaseShift
-from qlbm.lattice import CollisionlessLattice
 from qlbm.lattice.geometry.encodings.collisionless import ReflectionPoint
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.abe_lattice import ABELattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
-from qlbm.tools import CircuitException, bit_value
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten, get_qubits_to_invert
 

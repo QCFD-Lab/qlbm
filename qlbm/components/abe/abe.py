@@ -8,11 +8,10 @@ from typing_extensions import override
 
 from qlbm.components.abe.reflection import ABEReflectionOperator
 from qlbm.components.base import LBMAlgorithm
-from qlbm.lattice import CollisionlessLattice
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.abe_lattice import ABELattice
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import flatten, get_time_series
+from qlbm.tools.utils import flatten
 
 from .streaming import ABEStreamingOperator
 

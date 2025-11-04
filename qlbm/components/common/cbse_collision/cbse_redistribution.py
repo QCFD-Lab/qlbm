@@ -6,7 +6,6 @@ from typing import override
 
 import numpy as np
 from qiskit import QuantumCircuit
-from qiskit.quantum_info import Operator
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.primitives import TruncatedQFT
