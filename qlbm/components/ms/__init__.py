@@ -6,8 +6,8 @@ from .bounceback_reflection import (
 )
 from .cqlbm import CQLBM
 from .primitives import (
-    CollisionlessInitialConditions,
-    CollisionlessInitialConditions3DSlim,
+    MSInitialConditions,
+    MSInitialConditions3DSlim,
     Comparator,
     ComparatorMode,
     EdgeComparator,
@@ -16,8 +16,8 @@ from .primitives import (
 )
 from .specular_reflection import SpecularReflectionOperator, SpecularWallComparator
 from .streaming import (
-    CollisionlessStreamingOperator,
     ControlledIncrementer,
+    MSStreamingOperator,
     PhaseShift,
     SpeedSensitivePhaseShift,
     StreamingAncillaPreparation,
@@ -31,11 +31,11 @@ __all__ = [
     "ControlledIncrementer",
     "GridMeasurement",
     "EdgeComparator",
-    "CollisionlessInitialConditions",
-    "CollisionlessInitialConditions3DSlim",
+    "MSInitialConditions",
+    "MSInitialConditions3DSlim",
     "PhaseShift",
     "SpeedSensitivePhaseShift",
-    "CollisionlessStreamingOperator",
+    "MSStreamingOperator",
     "SpecularReflectionOperator",
     "SpecularWallComparator",
     "BounceBackReflectionOperator",

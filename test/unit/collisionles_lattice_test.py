@@ -1,12 +1,12 @@
 import pytest
 
-from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice import MSLattice
 from qlbm.tools.exceptions import LatticeException
 
 
 @pytest.fixture
-def lattice_2d_16x16_1_obstacle() -> CollisionlessLattice:
-    return CollisionlessLattice(
+def lattice_2d_16x16_1_obstacle() -> MSLattice:
+    return MSLattice(
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
@@ -20,8 +20,8 @@ def lattice_2d_16x16_1_obstacle() -> CollisionlessLattice:
 
 
 @pytest.fixture
-def lattice_2d_16x16_1_obstacle_asymmetric() -> CollisionlessLattice:
-    return CollisionlessLattice(
+def lattice_2d_16x16_1_obstacle_asymmetric() -> MSLattice:
+    return MSLattice(
         {
             "lattice": {
                 "dim": {"x": 16, "y": 64},
@@ -35,8 +35,8 @@ def lattice_2d_16x16_1_obstacle_asymmetric() -> CollisionlessLattice:
 
 
 @pytest.fixture
-def lattice_2d_16x16_1_obstacle_bounceback() -> CollisionlessLattice:
-    return CollisionlessLattice(
+def lattice_2d_16x16_1_obstacle_bounceback() -> MSLattice:
+    return MSLattice(
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
@@ -55,8 +55,8 @@ def lattice_2d_16x16_1_obstacle_bounceback() -> CollisionlessLattice:
 
 
 @pytest.fixture
-def lattice_2d_16x16_2_obstacle_mixed() -> CollisionlessLattice:
-    return CollisionlessLattice(
+def lattice_2d_16x16_2_obstacle_mixed() -> MSLattice:
+    return MSLattice(
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
@@ -76,8 +76,8 @@ def lattice_2d_16x16_2_obstacle_mixed() -> CollisionlessLattice:
 
 
 @pytest.fixture
-def lattice_3d_8x8x8_2_obstacle_mixed() -> CollisionlessLattice:
-    return CollisionlessLattice(
+def lattice_3d_8x8x8_2_obstacle_mixed() -> MSLattice:
+    return MSLattice(
         {
             "lattice": {
                 "dim": {"x": 8, "y": 8, "z": 8},
@@ -104,8 +104,8 @@ def lattice_3d_8x8x8_2_obstacle_mixed() -> CollisionlessLattice:
 
 
 @pytest.fixture
-def lattice_3d_8x8x8_1_obstacle_bounceback() -> CollisionlessLattice:
-    return CollisionlessLattice(
+def lattice_3d_8x8x8_1_obstacle_bounceback() -> MSLattice:
+    return MSLattice(
         {
             "lattice": {
                 "dim": {"x": 8, "y": 8, "z": 8},
@@ -126,21 +126,21 @@ def lattice_3d_8x8x8_1_obstacle_bounceback() -> CollisionlessLattice:
 
 def test_lattice_exception_empty_dict():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice({})
+        MSLattice({})
 
     assert 'Input configuration missing "lattice" properties.' == str(excinfo.value)
 
 
 def test_lattice_exception_no_dims():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice({"lattice": {}})
+        MSLattice({"lattice": {}})
 
     assert 'Lattice configuration missing "dim" properties.' == str(excinfo.value)
 
 
 def test_lattice_exception_no_velocities():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice({"lattice": {"dim": {}}})
+        MSLattice({"lattice": {"dim": {}}})
 
     assert 'Lattice configuration missing "velocities" properties.' == str(
         excinfo.value
@@ -149,14 +149,14 @@ def test_lattice_exception_no_velocities():
 
 def test_lattice_exception_mismatched_velocities_and_dims():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice({"lattice": {"dim": {"x": 64}, "velocities": [4, 4]}})
+        MSLattice({"lattice": {"dim": {"x": 64}, "velocities": [4, 4]}})
 
     assert "Lattice configuration dimensionality is inconsistent." == str(excinfo.value)
 
 
 def test_lattice_exception_mismatched_too_many_dimensions():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64, "z": 128, "w": 64},
@@ -173,7 +173,7 @@ def test_lattice_exception_mismatched_too_many_dimensions():
 
 def test_lattice_exception_mismatched_bad_dimensions():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 127},
@@ -190,7 +190,7 @@ def test_lattice_exception_mismatched_bad_dimensions():
 
 def test_lattice_exception_mismatched_bad_velocities():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -207,7 +207,7 @@ def test_lattice_exception_mismatched_bad_velocities():
 
 def test_lattice_exception_mismatched_bad_object_dimensions():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -232,7 +232,7 @@ def test_lattice_exception_mismatched_bad_object_dimensions():
 
 def test_lattice_exception_mismatched_bad_object_bound_specification():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -254,7 +254,7 @@ def test_lattice_exception_mismatched_bad_object_bound_specification():
 
 def test_lattice_exception_mismatched_bad_object_bound_decreasing():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -276,7 +276,7 @@ def test_lattice_exception_mismatched_bad_object_bound_decreasing():
 
 def test_lattice_exception_mismatched_bad_object_out_of_bounds():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -296,7 +296,7 @@ def test_lattice_exception_mismatched_bad_object_out_of_bounds():
     assert "Obstacle 1 is out of bounds in the x-dimension." == str(excinfo.value)
 
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -318,7 +318,7 @@ def test_lattice_exception_mismatched_bad_object_out_of_bounds():
 
 def test_lattice_exception_bad_object_boundary_conditions():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -342,7 +342,7 @@ def test_lattice_exception_bad_object_boundary_conditions():
 
 def test_lattice_exception_no_object_boundary_conditions():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -364,7 +364,7 @@ def test_lattice_exception_no_object_boundary_conditions():
 
 def test_lattice_exception_missing_shape():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -381,7 +381,7 @@ def test_lattice_exception_missing_shape():
 
 def test_lattice_exception_unsupported_shape():
     with pytest.raises(LatticeException) as excinfo:
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 64, "y": 64},
@@ -404,7 +404,7 @@ def test_lattice_exception_unsupported_shape():
     )
 
 
-def test_2d_lattice_basic_properties(lattice_2d_16x16_1_obstacle: CollisionlessLattice):
+def test_2d_lattice_basic_properties(lattice_2d_16x16_1_obstacle: MSLattice):
     assert lattice_2d_16x16_1_obstacle.num_dims == 2
     assert lattice_2d_16x16_1_obstacle.num_gridpoints == [15, 15]
     assert lattice_2d_16x16_1_obstacle.num_velocities == [3, 3]
@@ -415,7 +415,7 @@ def test_2d_lattice_basic_properties(lattice_2d_16x16_1_obstacle: CollisionlessL
 
 
 def test_2d_lattice_basic_qubit_register_size(
-    lattice_2d_16x16_1_obstacle: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle: MSLattice,
 ):
     # Ancilla velocity (1r2q)
     # ancilla obstacle (1r2q)
@@ -428,7 +428,7 @@ def test_2d_lattice_basic_qubit_register_size(
 
 
 def test_2d_lattice_ancilla_velocity_register(
-    lattice_2d_16x16_1_obstacle: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle: MSLattice,
 ):
     # Ancilla velocity (1r2q)
     # ancilla obstacle (1r2q)
@@ -450,7 +450,7 @@ def test_2d_lattice_ancilla_velocity_register(
 
 
 def test_2d_lattice_ancilla_obstacle_register(
-    lattice_2d_16x16_1_obstacle: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle: MSLattice,
 ):
     # Ancilla velocity (1r2q)
     # ancilla obstacle (1r2q)
@@ -472,7 +472,7 @@ def test_2d_lattice_ancilla_obstacle_register(
 
 
 def test_2d_lattice_ancilla_comparator_register(
-    lattice_2d_16x16_1_obstacle: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle: MSLattice,
 ):
     assert lattice_2d_16x16_1_obstacle.ancillae_comparator_index(0) == [4, 5]
     assert lattice_2d_16x16_1_obstacle.ancillae_comparator_index() == [4, 5]
@@ -485,7 +485,7 @@ def test_2d_lattice_ancilla_comparator_register(
     )
 
 
-def test_2d_lattice_grid_register(lattice_2d_16x16_1_obstacle: CollisionlessLattice):
+def test_2d_lattice_grid_register(lattice_2d_16x16_1_obstacle: MSLattice):
     assert lattice_2d_16x16_1_obstacle.grid_index(0) == [6, 7, 8, 9]
     assert lattice_2d_16x16_1_obstacle.grid_index(1) == [10, 11, 12, 13]
     assert lattice_2d_16x16_1_obstacle.grid_index() == list(range(6, 14))
@@ -499,7 +499,7 @@ def test_2d_lattice_grid_register(lattice_2d_16x16_1_obstacle: CollisionlessLatt
 
 
 def test_2d_lattice_velocity_register(
-    lattice_2d_16x16_1_obstacle: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle: MSLattice,
 ):
     assert lattice_2d_16x16_1_obstacle.velocity_index(0) == [14]
     assert lattice_2d_16x16_1_obstacle.velocity_index(1) == [15]
@@ -514,7 +514,7 @@ def test_2d_lattice_velocity_register(
 
 
 def test_2d_lattice_velocity_dir_register(
-    lattice_2d_16x16_1_obstacle: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle: MSLattice,
 ):
     assert lattice_2d_16x16_1_obstacle.velocity_dir_index(0) == [16]
     assert lattice_2d_16x16_1_obstacle.velocity_dir_index(1) == [17]
@@ -529,8 +529,8 @@ def test_2d_lattice_velocity_dir_register(
 
 
 def test_2d_asymmetric_lattice_ancialle_registers(
-    lattice_2d_16x16_1_obstacle: CollisionlessLattice,
-    lattice_2d_16x16_1_obstacle_asymmetric: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle: MSLattice,
+    lattice_2d_16x16_1_obstacle_asymmetric: MSLattice,
 ):
     assert lattice_2d_16x16_1_obstacle_asymmetric.num_gridpoints == [15, 63]
     assert lattice_2d_16x16_1_obstacle_asymmetric.num_velocities == [15, 3]
@@ -563,7 +563,7 @@ def test_2d_asymmetric_lattice_ancialle_registers(
 
 
 def test_2d_asymmetric_lattice_grid_registers(
-    lattice_2d_16x16_1_obstacle_asymmetric: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle_asymmetric: MSLattice,
 ):
     assert lattice_2d_16x16_1_obstacle_asymmetric.grid_index(0) == [6, 7, 8, 9]
     assert lattice_2d_16x16_1_obstacle_asymmetric.grid_index(1) == list(range(10, 16))
@@ -578,7 +578,7 @@ def test_2d_asymmetric_lattice_grid_registers(
 
 
 def test_2d_asymmetric_lattice_velocity_register(
-    lattice_2d_16x16_1_obstacle_asymmetric: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle_asymmetric: MSLattice,
 ):
     assert lattice_2d_16x16_1_obstacle_asymmetric.velocity_index(0) == [16, 17, 18]
     assert lattice_2d_16x16_1_obstacle_asymmetric.velocity_index(1) == [19]
@@ -595,7 +595,7 @@ def test_2d_asymmetric_lattice_velocity_register(
 
 
 def test_2d_asymmetric_lattice_velocity_dir_register(
-    lattice_2d_16x16_1_obstacle_asymmetric: CollisionlessLattice,
+    lattice_2d_16x16_1_obstacle_asymmetric: MSLattice,
 ):
     assert lattice_2d_16x16_1_obstacle_asymmetric.velocity_dir_index(0) == [20]
     assert lattice_2d_16x16_1_obstacle_asymmetric.velocity_dir_index(1) == [21]

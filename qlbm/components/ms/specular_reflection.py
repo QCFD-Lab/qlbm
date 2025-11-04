@@ -8,15 +8,15 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
-from qlbm.components.base import CQLBMOperator, LBMPrimitive
-from qlbm.components.collisionless.primitives import (
+from qlbm.components.base import MSOperator, LBMPrimitive
+from qlbm.components.ms.primitives import (
     Comparator,
     ComparatorMode,
 )
 from qlbm.lattice import (
-    CollisionlessLattice,
+    MSLattice,
 )
-from qlbm.lattice.geometry.encodings.collisionless import (
+from qlbm.lattice.geometry.encodings.ms import (
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
@@ -39,7 +39,7 @@ class SpecularWallComparator(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -49,11 +49,11 @@ class SpecularWallComparator(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import SpecularWallComparator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import SpecularWallComparator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "specular"}],
@@ -68,7 +68,7 @@ class SpecularWallComparator(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         wall: ReflectionWall,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -128,7 +128,7 @@ class SpecularWallComparator(LBMPrimitive):
         return f"[Primitive SpecularWallComparator on wall={self.wall}]"
 
 
-class SpecularReflectionOperator(CQLBMOperator):
+class SpecularReflectionOperator(MSOperator):
     r"""
     Operator implementing the 2D and 3D Specular Reflection (SR) boundary conditions as described :cite:t:`collisionless`.
 
@@ -145,7 +145,7 @@ class SpecularReflectionOperator(CQLBMOperator):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -155,11 +155,11 @@ class SpecularReflectionOperator(CQLBMOperator):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import SpecularReflectionOperator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import SpecularReflectionOperator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "specular"}],
@@ -171,7 +171,7 @@ class SpecularReflectionOperator(CQLBMOperator):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         blocks: List[Block],
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -490,7 +490,7 @@ class SpecularReflectionOperator(CQLBMOperator):
     ):
         """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
 
-        Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
+        Unlike in the regular :class:`.MSStreamingOperator`, the :class:`.ControlledIncrementer`
         phase shift circuit is additionally controlled on the ancilla obstacle qubit of the streaming dimension,
         which ensures that only particles whose grid position gets incremented (decremented) are those
         that have streamed inside the solid domain in this CFL time step.

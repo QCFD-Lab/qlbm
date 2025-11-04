@@ -1,27 +1,12 @@
 """Modular and extendible quantum circuits that perform parts of the QLBM algorithm."""
 
 from .base import (
-    CQLBMOperator,
+    MSOperator,
     LBMAlgorithm,
     LBMOperator,
     LBMPrimitive,
     QuantumComponent,
     SpaceTimeOperator,
-)
-from .collisionless import (
-    CQLBM,
-    BounceBackReflectionOperator,
-    CollisionlessInitialConditions,
-    CollisionlessStreamingOperator,
-    GridMeasurement,
-    SpecularReflectionOperator,
-)
-from .collisionless.primitives import Comparator, ComparatorMode, SpeedSensitiveAdder
-from .collisionless.streaming import (
-    ControlledIncrementer,
-    PhaseShift,
-    SpeedSensitivePhaseShift,
-    StreamingAncillaPreparation,
 )
 from .common import (
     EmptyPrimitive,
@@ -39,13 +24,28 @@ from .lqlga import (
     LQLGAReflectionOperator,
     LQLGAStreamingOperator,
 )
+from .ms import (
+    CQLBM,
+    BounceBackReflectionOperator,
+    MSInitialConditions,
+    GridMeasurement,
+    MSStreamingOperator,
+    SpecularReflectionOperator,
+)
+from .ms.primitives import Comparator, ComparatorMode, SpeedSensitiveAdder
+from .ms.streaming import (
+    ControlledIncrementer,
+    PhaseShift,
+    SpeedSensitivePhaseShift,
+    StreamingAncillaPreparation,
+)
 
 __all__ = [
     "QuantumComponent",
     "LBMPrimitive",
     "GenericLQLGACollisionOperator",
     "LBMOperator",
-    "CQLBMOperator",
+    "MSOperator",
     "SpaceTimeOperator",
     "LBMAlgorithm",
     "ComparatorMode",
@@ -57,8 +57,8 @@ __all__ = [
     "StreamingAncillaPreparation",
     "ControlledIncrementer",
     "GridMeasurement",
-    "CollisionlessInitialConditions",
-    "CollisionlessStreamingOperator",
+    "MSInitialConditions",
+    "MSStreamingOperator",
     "SpecularReflectionOperator",
     "BounceBackReflectionOperator",
     "CQLBM",

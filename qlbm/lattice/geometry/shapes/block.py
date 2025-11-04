@@ -8,7 +8,7 @@ from typing import Dict, List, Tuple, cast, override
 import numpy as np
 from stl import mesh
 
-from qlbm.lattice.geometry.encodings.collisionless import (
+from qlbm.lattice.geometry.encodings.ms import (
     DimensionalReflectionData,
     ReflectionPoint,
     ReflectionResetEdge,

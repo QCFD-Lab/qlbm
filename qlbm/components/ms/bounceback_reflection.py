@@ -8,14 +8,14 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
-from qlbm.components.base import CQLBMOperator, LBMPrimitive
-from qlbm.components.collisionless.primitives import (
+from qlbm.components.base import MSOperator, LBMPrimitive
+from qlbm.components.ms.primitives import (
     Comparator,
     ComparatorMode,
 )
-from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
-from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.geometry.encodings.collisionless import (
+from qlbm.components.ms.specular_reflection import SpecularWallComparator
+from qlbm.lattice import MSLattice
+from qlbm.lattice.geometry.encodings.ms import (
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
@@ -38,7 +38,7 @@ class BounceBackWallComparator(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -48,11 +48,11 @@ class BounceBackWallComparator(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import BounceBackWallComparator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import BounceBackWallComparator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
@@ -67,7 +67,7 @@ class BounceBackWallComparator(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         wall: ReflectionWall,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -133,7 +133,7 @@ class BounceBackWallComparator(LBMPrimitive):
         return f"[Primitive BounceBackWallComparator on wall={self.wall}]"
 
 
-class BounceBackReflectionOperator(CQLBMOperator):
+class BounceBackReflectionOperator(MSOperator):
     """
     Operator implementing the 2D and 3D Bounce-Back (BB) boundary conditions as described in :cite:t:`qmem`.
 
@@ -150,7 +150,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -160,11 +160,11 @@ class BounceBackReflectionOperator(CQLBMOperator):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import BounceBackReflectionOperator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import BounceBackReflectionOperator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
@@ -176,7 +176,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         blocks: List[Block],
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -494,7 +494,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
     ):
         """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
 
-        Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
+        Unlike in the regular :class:`.MSStreamingOperator`, the :class:`.ControlledIncrementer`
         phase shift circuit is additionally controlled on the ancilla obstacle qubit, which
         ensures that only particles whose grid position gets incremented (decremented) are those
         that have streamed inside the solid domain in this CFL time step.

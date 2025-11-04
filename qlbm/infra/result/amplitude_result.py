@@ -9,22 +9,21 @@ import vtk
 from typing_extensions import override
 from vtkmodules.util import numpy_support
 
-from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.base import AmplitudeLattice
 
 from .base import QBMResult
 
 
-class CollisionlessResult(QBMResult):
+class AmplitudeResult(QBMResult):
     """
-    :class:`.CQLBM`-specific implementation of the :class:`.QBMResult`.
+    Implementation of the :class:`.QBMResult` for lattices inheriting from :class:`.AmplitudeLattice`.
 
     Processes counts sampled from :class:`.GridMeasurement` primitives.
 
     =========================== ======================================================================
     Attribute                   Summary
     =========================== ======================================================================
-    :attr:`lattice`             The :class:`.CollisionlessLattice` of the simulated system.
+    :attr:`lattice`             The :class:`.AmplitudeLattice` of the simulated system.
     :attr:`directory`           The directory to which the results outputs data to.
     :attr:`output_file_name`    The root name for files containing time step artifacts, by default "step".
     =========================== ======================================================================
@@ -39,12 +38,12 @@ class CollisionlessResult(QBMResult):
     output_file_name: str
     """The name of the file to output the artifacts to."""
 
-    lattice: CollisionlessLattice | ABLattice
+    lattice: AmplitudeLattice
     """The lattice the result corresponds to."""
 
     def __init__(
         self,
-        lattice: CollisionlessLattice | ABLattice,
+        lattice: AmplitudeLattice,
         directory: str,
         output_file_name: str = "step",
     ) -> None:

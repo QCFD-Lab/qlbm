@@ -9,7 +9,7 @@ from qiskit.qasm2 import dump as dump_qasm2
 from qiskit.qasm3 import dump as dump_qasm3
 from typing_extensions import override
 
-from qlbm.lattice import CollisionlessLattice, Lattice
+from qlbm.lattice import MSLattice, Lattice
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 
@@ -184,27 +184,27 @@ class LBMOperator(QuantumComponent):
         self.lattice = lattice
 
 
-class CQLBMOperator(LBMOperator):
+class MSOperator(LBMOperator):
     """
-    Specialization of the :class:`.LBMOperator` operator class for the Collisionless Quantum Transport Method algorithm by :cite:t:`collisionless`.
+    Specialization of the :class:`.LBMOperator` operator class for the Multi-Speed Collisionless Quantum Lattice Boltzmann Method algorithm by :cite:t:`collisionless`.
 
     Specializaitons of this class infer their properties
-    based on a :class:`.CollisionlessLattice`.
+    based on a :class:`.MSLattice`.
 
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
     :attr:`circuit`           The :class:`.qiskit.QuantumCircuit` of the operator.
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``
     ========================= ======================================================================
     """
 
-    lattice: CollisionlessLattice
+    lattice: MSLattice
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)

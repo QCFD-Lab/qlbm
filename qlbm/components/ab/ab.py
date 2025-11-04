@@ -6,7 +6,7 @@ from time import perf_counter_ns
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
-from qlbm.components.abe.reflection import ABEReflectionOperator
+from qlbm.components.ab.reflection import ABEReflectionOperator
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.abe_lattice import ABLattice

@@ -10,9 +10,9 @@ from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.components.collisionless.streaming import SpeedSensitivePhaseShift
-from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.geometry.encodings.collisionless import ReflectionResetEdge
+from qlbm.components.ms.streaming import SpeedSensitivePhaseShift
+from qlbm.lattice import MSLattice
+from qlbm.lattice.geometry.encodings.ms import ReflectionResetEdge
 from qlbm.tools import flatten
 
 
@@ -24,7 +24,7 @@ class GridMeasurement(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
 
@@ -33,11 +33,11 @@ class GridMeasurement(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import GridMeasurement
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import GridMeasurement
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice({
+        lattice = MSLattice({
             "lattice": {
                 "dim": {
                         "x": 8,
@@ -64,7 +64,7 @@ class GridMeasurement(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
@@ -97,8 +97,8 @@ class GridMeasurement(LBMPrimitive):
         return f"[Primitive DVGridMeasurement with lattice {self.lattice}]"
 
 
-class CollisionlessInitialConditions(LBMPrimitive):
-    """A primitive that creates the quantum circuit to prepare the flow field in its initial conditions.
+class MSInitialConditions(LBMPrimitive):
+    """A primitive that creates the quantum circuit to prepare the flow field in its initial conditions for the :class:`.MSLattice`.
 
     The initial conditions create a quantum state spanning half the grid
     in the x-axis, and the entirety of the y (and z)-axes (if 3D).
@@ -107,7 +107,7 @@ class CollisionlessInitialConditions(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
 
@@ -116,11 +116,11 @@ class CollisionlessInitialConditions(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import CollisionlessInitialConditions
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import MSInitialConditions
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice({
+        lattice = MSLattice({
             "lattice": {
                 "dim": {
                         "x": 8,
@@ -142,12 +142,12 @@ class CollisionlessInitialConditions(LBMPrimitive):
         })
 
         # Draw the initial conditions circuit
-        CollisionlessInitialConditions(lattice).draw("mpl")
+        MSInitialConditions(lattice).draw("mpl")
     """
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
@@ -183,7 +183,7 @@ class CollisionlessInitialConditions(LBMPrimitive):
         return f"[Primitive InitialConditions with lattice {self.lattice}]"
 
 
-class CollisionlessInitialConditions3DSlim(LBMPrimitive):
+class MSInitialConditions3DSlim(LBMPrimitive):
     r"""
     A primitive that creates the quantum circuit to prepare the flow field in its initial conditions for 3 dimensions.
 
@@ -196,7 +196,7 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
 
@@ -205,11 +205,11 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import CollisionlessInitialConditions3DSlim
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import MSInitialConditions3DSlim
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice({
+        lattice = MSLattice({
             "lattice": {
                 "dim": {
                 "x": 8,
@@ -226,12 +226,12 @@ class CollisionlessInitialConditions3DSlim(LBMPrimitive):
         })
 
         # Draw the initial conditions circuit
-        CollisionlessInitialConditions3DSlim(lattice).draw("mpl")
+        MSInitialConditions3DSlim(lattice).draw("mpl")
     """
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
@@ -307,7 +307,7 @@ class SpeedSensitiveAdder(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import SpeedSensitiveAdder
+        from qlbm.components.ms import SpeedSensitiveAdder
 
         SpeedSensitiveAdder(4, 1, True).draw("mpl")
     """
@@ -372,7 +372,7 @@ class Comparator(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import Comparator, ComparatorMode
+        from qlbm.components.ms import Comparator, ComparatorMode
 
         # On a 5 qubit register, compare the number 3
         Comparator(num_qubits=5,
@@ -463,7 +463,7 @@ class EdgeComparator(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     :attr:`edge`              The coordinates of the edge within the grid.
     ========================= ======================================================================
@@ -473,11 +473,11 @@ class EdgeComparator(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import EdgeComparator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import EdgeComparator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {
                     "dim": {"x": 8, "y": 8, "z": 8},
@@ -493,7 +493,7 @@ class EdgeComparator(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         edge: ReflectionResetEdge,
         logger: Logger = getLogger("qlbm"),
     ) -> None:

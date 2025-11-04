@@ -13,7 +13,7 @@ from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 from .base import AmplitudeLattice
 
 
-class CollisionlessLattice(AmplitudeLattice):
+class MSLattice(AmplitudeLattice):
     r"""
     Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`.
 
@@ -132,9 +132,9 @@ class CollisionlessLattice(AmplitudeLattice):
     .. plot::
         :include-source:
 
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.lattice import MSLattice
 
-        CollisionlessLattice(
+        MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],

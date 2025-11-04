@@ -5,22 +5,22 @@ from qiskit import QuantumCircuit as QiskitQC
 from qiskit_aer import AerSimulator
 from qulacs import QuantumCircuit as QulacsQC
 
-from qlbm.components import CollisionlessStreamingOperator
+from qlbm.components import MSStreamingOperator
 from qlbm.infra import (
     CircuitCompiler,
 )
-from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice import MSLattice
 from qlbm.tools.utils import get_time_series
 
 
 @pytest.fixture
 def lattice_asymmetric_medium_3d():
-    return CollisionlessLattice("test/resources/asymmetric_3d_no_obstacles.json")
+    return MSLattice("test/resources/asymmetric_3d_no_obstacles.json")
 
 
 @pytest.fixture
 def lattice_symmetric_small_2d():
-    return CollisionlessLattice("test/resources/symmetric_2d_no_obstacles.json")
+    return MSLattice("test/resources/symmetric_2d_no_obstacles.json")
 
 
 @pytest.mark.parametrize(
@@ -43,7 +43,7 @@ def test_qiskit_target_compilation(
         lattice.num_velocities[0] + 1
     )  # +1 because velocities are between 0 and n_vi
     velocities = get_time_series(num_velocities)[velocity]
-    op = CollisionlessStreamingOperator(lattice, velocities)
+    op = MSStreamingOperator(lattice, velocities)
     compiler = CircuitCompiler(compiler_platform, "QISKIT")
 
     compiled_circuit = compiler.compile(op, backend, 0)
@@ -69,7 +69,7 @@ def test_qiskit_target_compilation(
 #         lattice.num_velocities[0] + 1
 #     )  # +1 because velocities are between 0 and n_vi
 #     velocities = get_time_series(num_velocities)[velocity]
-#     op = CollisionlessStreamingOperator(lattice, velocities)
+#     op = MSStreamingOperator(lattice, velocities)
 #     compiler = CircuitCompiler(compiler_platform, "QULACS")
 
 #     # Qulacs backend is determined automatically

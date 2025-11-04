@@ -2,7 +2,7 @@ from typing import List
 
 import pytest
 
-from qlbm.lattice.geometry.encodings.collisionless import ReflectionPoint
+from qlbm.lattice.geometry.encodings.ms import ReflectionPoint
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.utils import flatten
 from test.regression.blocks import Block2D as RegressionBlock2D

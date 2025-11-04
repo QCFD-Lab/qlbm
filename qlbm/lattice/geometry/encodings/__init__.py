@@ -1,6 +1,6 @@
 """Algorithm-specific geometrical data encodings."""
 
-from .collisionless import (
+from .ms import (
     DimensionalReflectionData,
     ReflectionPoint,
     ReflectionResetEdge,

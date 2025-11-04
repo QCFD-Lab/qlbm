@@ -1,12 +1,12 @@
 import pytest
 
 from qlbm.components import CQLBM
-from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice import MSLattice
 
 
 @pytest.fixture
-def lattice_2d_16x16_1_object() -> CollisionlessLattice:
-    return CollisionlessLattice(
+def lattice_2d_16x16_1_object() -> MSLattice:
+    return MSLattice(
         {
             "lattice": {
                 "dim": {"x": 16, "y": 16},
@@ -19,5 +19,5 @@ def lattice_2d_16x16_1_object() -> CollisionlessLattice:
     )
 
 
-def test_construction(lattice_2d_16x16_1_object: CollisionlessLattice):
+def test_construction(lattice_2d_16x16_1_object: MSLattice):
     CQLBM(lattice=lattice_2d_16x16_1_object)

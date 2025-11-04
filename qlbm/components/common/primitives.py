@@ -26,7 +26,7 @@ class EmptyPrimitive(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` or :class:`.SpaceTimeLattice` based on which the number of qubits is inferred.
+    :attr:`lattice`           The :class:`.MSLattice` or :class:`.SpaceTimeLattice` based on which the number of qubits is inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """

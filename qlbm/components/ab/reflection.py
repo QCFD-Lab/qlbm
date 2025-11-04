@@ -7,10 +7,10 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
-from qlbm.components.abe.streaming import ABEStreamingOperator
+from qlbm.components.ab.streaming import ABEStreamingOperator
 from qlbm.components.base import LBMOperator, LBMPrimitive
-from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
-from qlbm.lattice.geometry.encodings.collisionless import ReflectionPoint
+from qlbm.components.ms.specular_reflection import SpecularWallComparator
+from qlbm.lattice.geometry.encodings.ms import ReflectionPoint
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.abe_lattice import ABLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization

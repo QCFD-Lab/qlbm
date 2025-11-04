@@ -7,7 +7,7 @@ from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMOperator
-from qlbm.components.collisionless.streaming import PhaseShift
+from qlbm.components.ms.streaming import PhaseShift
 from qlbm.lattice.lattices.abe_lattice import ABLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException

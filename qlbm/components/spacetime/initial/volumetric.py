@@ -9,7 +9,7 @@ from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.components.collisionless.primitives import Comparator, ComparatorMode
+from qlbm.components.ms.primitives import Comparator, ComparatorMode
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.utils import flatten
 

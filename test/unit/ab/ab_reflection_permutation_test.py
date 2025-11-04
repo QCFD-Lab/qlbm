@@ -2,7 +2,7 @@ import pytest
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 
-from qlbm.components.abe.reflection import ABEReflectionPermutation
+from qlbm.components.ab.reflection import ABEReflectionPermutation
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.utils import bit_value, get_qubits_to_invert
 
