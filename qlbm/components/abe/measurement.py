@@ -21,10 +21,12 @@ class ABEGridMeasurement(LBMPrimitive):
     def __init__(
         self,
         lattice: ABELattice,
+        measure_velocity_qubits: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
         self.lattice = lattice
+        self.measure_velocity_qubits = measure_velocity_qubits
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -38,14 +40,27 @@ class ABEGridMeasurement(LBMPrimitive):
         circuit = self.lattice.circuit.copy()
         circuit.add_register(
             ClassicalRegister(
-                self.lattice.num_grid_qubits + self.lattice.num_velocity_qubits
+                self.lattice.num_grid_qubits
+                + (
+                    self.lattice.num_velocity_qubits
+                    if self.measure_velocity_qubits
+                    else 0
+                )
             )
         )
 
         circuit.measure(
-            self.lattice.grid_index() + self.lattice.velocity_index(),
+            self.lattice.grid_index()
+            + (self.lattice.velocity_index() if self.measure_velocity_qubits else []),
             list(
-                range(self.lattice.num_grid_qubits + self.lattice.num_velocity_qubits)
+                range(
+                    self.lattice.num_grid_qubits
+                    + (
+                        self.lattice.num_velocity_qubits
+                        if self.measure_velocity_qubits
+                        else 0
+                    )
+                )
             ),
         )
 
