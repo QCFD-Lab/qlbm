@@ -28,6 +28,7 @@ class LatticeDiscretization(Enum):
     D2Q4 = (2,)
     D3Q6 = (3,)
     D1Q3 = (4,)
+    D2Q9 = (5,)
 
 
 class LatticeDiscretizationProperties:
@@ -53,6 +54,19 @@ class LatticeDiscretizationProperties:
             [[1, 0, 0], [0, 1, 0], [0, 0, 1], [-1, 0, 0], [0, -1, 0], [0, 0, -1]]
         ),
         LatticeDiscretization.D1Q3: np.array([[0], [1], [-1]]),
+        LatticeDiscretization.D2Q9: np.array(
+            [
+                [0, 0],
+                [1, 0],
+                [0, 1],
+                [-1, 0],
+                [0, -1],
+                [1, 1],
+                [-1, 1],
+                [-1, -1],
+                [1, -1],
+            ]
+        ),
     }
 
     channel_masses: Dict[LatticeDiscretization, np.ndarray] = {
@@ -60,6 +74,7 @@ class LatticeDiscretizationProperties:
         LatticeDiscretization.D2Q4: np.ones(4),
         LatticeDiscretization.D3Q6: np.ones(6),
         LatticeDiscretization.D1Q3: np.concatenate((np.array([2]), np.ones(2))),
+        LatticeDiscretization.D2Q9: np.concatenate((np.array([2]), np.ones(8))),
     }
 
     num_velocities: Dict[LatticeDiscretization, int] = {
@@ -67,6 +82,7 @@ class LatticeDiscretizationProperties:
         LatticeDiscretization.D2Q4: 4,
         LatticeDiscretization.D3Q6: 6,
         LatticeDiscretization.D1Q3: 3,
+        LatticeDiscretization.D2Q9: 9,
     }
 
     num_dimensions: Dict[LatticeDiscretization, int] = {
@@ -74,6 +90,7 @@ class LatticeDiscretizationProperties:
         LatticeDiscretization.D2Q4: 2,
         LatticeDiscretization.D3Q6: 3,
         LatticeDiscretization.D1Q3: 1,
+        LatticeDiscretization.D2Q9: 2,
     }
 
     string_representation: Dict[LatticeDiscretization, str] = {
@@ -81,6 +98,7 @@ class LatticeDiscretizationProperties:
         LatticeDiscretization.D2Q4: "D2Q4",
         LatticeDiscretization.D3Q6: "D3Q6",
         LatticeDiscretization.D1Q3: "D1Q3",
+        LatticeDiscretization.D2Q9: "D2Q9",
     }
 
     @staticmethod
