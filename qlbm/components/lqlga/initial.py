@@ -124,7 +124,13 @@ class LQGLAAveragedInitialConditions(LBMPrimitive):
         circuit.h(
             flatten(
                 [
-                    list(range(gp, gp + self.lattice.num_velocities_per_point))
+                    list(
+                        range(
+                            gp * self.lattice.num_velocities_per_point,
+                            gp * self.lattice.num_velocities_per_point
+                            + self.lattice.num_velocities_per_point,
+                        )
+                    )
                     for gp in self.gridpoints
                 ]
             )
