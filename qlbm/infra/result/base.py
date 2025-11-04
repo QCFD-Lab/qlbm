@@ -2,10 +2,12 @@
 
 from abc import ABC, abstractmethod
 from os.path import isdir
+from pathlib import Path
 from typing import Dict
 
 import numpy as np
 import vtk
+from qiskit.quantum_info import Statevector
 from vtkmodules.util import numpy_support
 
 from qlbm.lattice import Lattice
@@ -167,3 +169,12 @@ class QBMResult(ABC):
     def visualize_all_numpy_data(self):
         """Converts all numpy data saved to disk to ``vti`` files."""
         pass
+
+    def save_statevector(self, statevector: Statevector, step: int):
+        statevector_dir = f"{self.directory}/statevectors"
+        if not isdir(statevector_dir):
+            create_directory_and_parents(statevector_dir)
+        state = np.asarray(statevector, dtype=np.complex128)  # shape (2**n,)
+
+        out_path = Path(f"{statevector_dir}/step_{step}.npy")
+        np.save(out_path, state)
