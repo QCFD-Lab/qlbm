@@ -15,10 +15,10 @@ from qlbm.lattice.spacetime.properties_base import (
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 
-from .base import Lattice
+from .base import AmplitudeLattice
 
 
-class ABELattice(Lattice):
+class ABELattice(AmplitudeLattice):
     """TODO."""
 
     discretization: LatticeDiscretization
@@ -83,25 +83,8 @@ class ABELattice(Lattice):
         self.registers = tuple(flatten(temporary_registers))
         self.circuit = QuantumCircuit(*self.registers)
 
+    @override
     def grid_index(self, dim: int | None = None) -> List[int]:
-        """Get the indices of the qubits used that encode the grid values for the specified dimension.
-
-        Parameters
-        ----------
-        dim : int | None, optional
-            The dimension of the grid for which to retrieve the grid qubit indices, by default ``None``.
-            When ``dim`` is ``None``, the indices of all grid qubits for all dimensions are returned.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits used to encode the grid values for the given dimension.
-
-        Raises
-        ------
-        LatticeException
-            If the dimension does not exist.
-        """
         if dim is None:
             return list(
                 range(
@@ -122,14 +105,10 @@ class ABELattice(Lattice):
             )
         )
 
-    def velocity_index(self) -> List[int]:
-        """Get the indices of the qubits used that encode the discrete velocities.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits that encode the velocity discretization.
-        """
+    @override
+    def velocity_index(self, dim: int | None = None) -> List[int]:
+        if dim is not None:
+            raise LatticeException("ABELattice does not support a dimensional breakdown of velocities.")
         return list(
             range(
                 self.num_grid_qubits,
@@ -137,28 +116,8 @@ class ABELattice(Lattice):
             )
         )
 
+    @override
     def ancillae_comparator_index(self, index: int | None = None) -> List[int]:
-        """Get the indices of the qubits used as comparator ancillae for the specified index.
-
-        Parameters
-        ----------
-        index : int | None, optional
-            The index for which to retrieve the comparator qubit indices, by default ``None``.
-            There are `num_dims-1` available indices (i.e., 1 for 2D and 2 for 3D).
-            When `index` is ``None``, the indices of ancillae qubits for all dimensions are returned.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits used as obstacle ancilla for the given dimension.
-            By convention, the 0th qubit in the returned list is used
-            for lower bound comparison and the 1st is used for upper bound comparisons.
-
-        Raises
-        ------
-        LatticeException
-            If the dimension does not exist.
-        """
         if index is None:
             return list(
                 range(
@@ -178,28 +137,8 @@ class ABELattice(Lattice):
             )
         )
 
+    @override
     def ancillae_obstacle_index(self, index: int | None = None) -> List[int]:
-        """Get the indices of the qubits used as obstacle ancilla for the specified dimension.
-
-        Parameters
-        ----------
-        index : int | None, optional
-            The index of the grid for which to retrieve the obstacle qubit index, by default ``None``.
-            When ``index`` is ``None``, the indices of ancillae qubits for all dimensions are returned.
-            For 2D lattices with only bounce-back boundary-conditions, only one obstacle
-            qubit is required.
-            For all other configurations, the algorithm uses ``2d-2`` obstacle qubits.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits used as obstacle ancilla for the given dimension.
-
-        Raises
-        ------
-        LatticeException
-            If the dimension does not exist.
-        """
         if index is None:
             return list(
                 range(

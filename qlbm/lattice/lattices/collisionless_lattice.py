@@ -10,10 +10,10 @@ from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
 
-from .base import Lattice
+from .base import AmplitudeLattice
 
 
-class CollisionlessLattice(Lattice):
+class CollisionlessLattice(AmplitudeLattice):
     r"""
     Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`.
 
@@ -230,28 +230,8 @@ class CollisionlessLattice(Lattice):
         # The velocity ancillas are on the first register, so no offset
         return [dim]
 
+    @override
     def ancillae_obstacle_index(self, index: int | None = None) -> List[int]:
-        """Get the indices of the qubits used as obstacle ancilla for the specified dimension.
-
-        Parameters
-        ----------
-        index : int | None, optional
-            The index of the grid for which to retrieve the obstacle qubit index, by default ``None``.
-            When ``index`` is ``None``, the indices of ancillae qubits for all dimensions are returned.
-            For 2D lattices with only bounce-back boundary-conditions, only one obstacle
-            qubit is required.
-            For all other configurations, the algorithm uses ``2d-2`` obstacle qubits.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits used as obstacle ancilla for the given dimension.
-
-        Raises
-        ------
-        LatticeException
-            If the dimension does not exist.
-        """
         if index is None:
             return list(range(self.num_dims, self.num_dims + self.num_obstacle_qubits))
 
@@ -263,28 +243,8 @@ class CollisionlessLattice(Lattice):
         # There are `d` ancillae velocity qubits "ahead" of this register
         return [self.num_dims + index]
 
+    @override
     def ancillae_comparator_index(self, index: int | None = None) -> List[int]:
-        """Get the indices of the qubits used as comparator ancillae for the specified index.
-
-        Parameters
-        ----------
-        index : int | None, optional
-            The index for which to retrieve the comparator qubit indices, by default ``None``.
-            There are `num_dims-1` available indices (i.e., 1 for 2D and 2 for 3D).
-            When `index` is ``None``, the indices of ancillae qubits for all dimensions are returned.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits used as obstacle ancilla for the given dimension.
-            By convention, the 0th qubit in the returned list is used
-            for lower bound comparison and the 1st is used for upper bound comparisons.
-
-        Raises
-        ------
-        LatticeException
-            If the dimension does not exist.
-        """
         # Ahead of this register
         # `d` ancillae velocity qubits
         # `num_obstacle_qubits` ancillae obstacle qubits
@@ -305,25 +265,8 @@ class CollisionlessLattice(Lattice):
         previous_qubits = self.num_dims + self.num_obstacle_qubits + 2 * index
         return list(range(previous_qubits, previous_qubits + 2))
 
+    @override
     def grid_index(self, dim: int | None = None) -> List[int]:
-        """Get the indices of the qubits used that encode the grid values for the specified dimension.
-
-        Parameters
-        ----------
-        dim : int | None, optional
-            The dimension of the grid for which to retrieve the grid qubit indices, by default ``None``.
-            When ``dim`` is ``None``, the indices of all grid qubits for all dimensions are returned.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits used to encode the grid values for the given dimension.
-
-        Raises
-        ------
-        LatticeException
-            If the dimension does not exist.
-        """
         if dim is None:
             return list(
                 range(
@@ -350,25 +293,8 @@ class CollisionlessLattice(Lattice):
             )
         )
 
+    @override
     def velocity_index(self, dim: int | None = None) -> List[int]:
-        """Get the indices of the qubits used that encode the velocity magnitude values for the specified dimension.
-
-        Parameters
-        ----------
-        dim : int | None, optional
-            The dimension of the grid for which to retrieve the velocity qubit indices, by default ``None``.
-            When ``dim`` is ``None``, the indices of all velocity magnitude qubits for all dimensions are returned.
-
-        Returns
-        -------
-        List[int]
-            A list of indices of the qubits used to encode the velocity magnitude values for the given dimension.
-
-        Raises
-        ------
-        LatticeException
-            If the dimension does not exist.
-        """
         if dim is None:
             return list(
                 range(
