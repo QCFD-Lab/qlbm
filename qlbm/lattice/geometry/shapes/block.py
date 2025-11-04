@@ -19,7 +19,11 @@ from qlbm.lattice.geometry.encodings.spacetime import (
     SpaceTimeVolumetricReflectionData,
 )
 from qlbm.lattice.geometry.shapes.base import LQLGAShape, SpaceTimeShape
-from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
+from qlbm.lattice.spacetime.properties_base import (
+    LatticeDiscretization,
+    SpaceTimeLatticeBuilder,
+)
+from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to_invert
 
 
@@ -96,6 +100,47 @@ class Block(SpaceTimeShape, LQLGAShape):
             ]
         ),
     ]
+
+    ab_wall_indices_to_reset: Dict[
+        LatticeDiscretization, Dict[Tuple[int, bool], List[int]]
+    ] = {
+        LatticeDiscretization.D2Q9: {
+            (0, False): [3, 6, 7],
+            (0, True): [1, 5, 8],
+            (1, False): [4, 7, 8],
+            (1, True): [2, 5, 6],
+        }
+    }
+
+    ab_near_corner_indices_to_reset: Dict[
+        LatticeDiscretization, Dict[int, Dict[Tuple[bool, ...], List[int]]]
+    ] = {
+        LatticeDiscretization.D2Q9: {
+            0: {
+                (False, False): [6],
+                (False, True): [7],
+                (True, False): [5],
+                (True, True): [8],
+            },
+            1: {
+                (False, False): [8],
+                (False, True): [5],
+                (True, False): [7],
+                (True, True): [6],
+            },
+        }
+    }
+
+    ab_corner_indices_to_reset: Dict[
+        LatticeDiscretization, Dict[Tuple[bool, ...], List[int]]
+    ] = {
+        LatticeDiscretization.D2Q9: {
+            (False, False): [7],
+            (False, True): [6],
+            (True, False): [8],
+            (True, True): [5],
+        }
+    }
 
     def __init__(
         self,
@@ -711,6 +756,56 @@ class Block(SpaceTimeShape, LQLGAShape):
             surfaces.append(surfaces_of_dim)
 
         return surfaces
+
+    def get_lbm_wall_velocity_indices_to_reflect(
+        self, discretization: LatticeDiscretization, dim: int, bound: bool
+    ) -> List[int]:
+        if discretization not in self.ab_wall_indices_to_reset:
+            raise LatticeException(
+                f"Discretization {discretization} not supported. Supported discretizations are: {self.ab_wall_indices_to_reset.keys()}"
+            )
+
+        if (dim, bound) not in self.ab_wall_indices_to_reset[discretization]:
+            raise LatticeException(
+                f"{(dim, bound)} is not a valid description of a wall for {discretization}."
+            )
+
+        return self.ab_wall_indices_to_reset[discretization][(dim, bound)]
+
+    def get_lbm_near_corner_velocity_indices_to_reflect(
+        self, discretization: LatticeDiscretization, dim: int, bounds: Tuple[bool, ...]
+    ) -> List[int]:
+        if discretization not in self.ab_near_corner_indices_to_reset:
+            raise LatticeException(
+                f"Discretization {discretization} not supported. Supported discretizations are: {self.ab_wall_indices_to_reset.keys()}"
+            )
+
+        if dim not in self.ab_near_corner_indices_to_reset[discretization]:
+            raise LatticeException(
+                f"{dim} is not a valid dimension for {discretization}."
+            )
+
+        if bounds not in self.ab_near_corner_indices_to_reset[discretization][dim]:
+            raise LatticeException(
+                f"{bounds} is not a valid description of a near corner gridpoint of {discretization}."
+            )
+
+        return self.ab_near_corner_indices_to_reset[discretization][dim][bounds]
+
+    def get_lbm_outside_corner_indices_to_reflect(
+        self, discretization: LatticeDiscretization, bounds: Tuple[bool, ...]
+    ):
+        if discretization not in self.ab_corner_indices_to_reset:
+            raise LatticeException(
+                f"Discretization {discretization} not supported. Supported discretizations are: {self.ab_wall_indices_to_reset.keys()}"
+            )
+
+        if bounds not in self.ab_corner_indices_to_reset[discretization]:
+            raise LatticeException(
+                f"{bounds} is not a valid description of a wall for {discretization}."
+            )
+
+        return self.ab_corner_indices_to_reset[discretization][bounds]
 
     @override
     def get_lqlga_reflection_data_d1q2(self):
