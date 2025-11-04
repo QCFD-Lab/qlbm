@@ -1,4 +1,4 @@
-""":class:`.CQLBM`-specific implementation of the :class:`.QBMResult`."""
+"""Implementation of the :class:`.QBMResult`. for :class:`AmplitudeLattice`-based algorithms."""
 
 import re
 from os import listdir

@@ -4,12 +4,12 @@ import pytest
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit_aer import AerSimulator
 
-from qlbm.components.ms import (
-    CQLBM,
-    MSInitialConditions,
-    GridMeasurement,
-)
 from qlbm.components.common import EmptyPrimitive
+from qlbm.components.ms import (
+    MSQLBM,
+    GridMeasurement,
+    MSInitialConditions,
+)
 from qlbm.infra.runner.simulation_config import SimulationConfig
 from qlbm.lattice import MSLattice
 from qlbm.tools.exceptions import ExecutionException
@@ -21,7 +21,7 @@ def symmetric_2d_no_osbtacle_circuits():
 
     return {
         "initial_conditions": MSInitialConditions(lattice),
-        "algorithm": CQLBM(lattice),
+        "algorithm": MSQLBM(lattice),
         "postprocessing": EmptyPrimitive(lattice),
         "measurement": GridMeasurement(lattice),
     }
@@ -33,7 +33,7 @@ def symmetric_2d_one_osbtacle_circuits():
 
     return {
         "initial_conditions": MSInitialConditions(lattice),
-        "algorithm": CQLBM(lattice),
+        "algorithm": MSQLBM(lattice),
         "postprocessing": EmptyPrimitive(lattice),
         "measurement": GridMeasurement(lattice),
     }

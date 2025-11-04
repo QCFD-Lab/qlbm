@@ -286,7 +286,7 @@ class ComparatorMode(Enum):
 
 
 class SpeedSensitiveAdder(LBMPrimitive):
-    r"""A QFT-based incrementer used to perform streaming in the CQLBM algorithm.
+    r"""A QFT-based incrementer used to perform streaming in the algorithms based on amplitude encodings.
 
     Incrementation and decerementation are performed as rotations on grid qubits
     that have been previously mapped to the Fourier basis.

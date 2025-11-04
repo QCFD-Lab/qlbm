@@ -1,10 +1,10 @@
 """Modular and extendible quantum circuits that perform parts of the QLBM algorithm."""
 
 from .base import (
-    MSOperator,
     LBMAlgorithm,
     LBMOperator,
     LBMPrimitive,
+    MSOperator,
     QuantumComponent,
     SpaceTimeOperator,
 )
@@ -15,6 +15,7 @@ from .common import (
     EQCRedistribution,
     HammingWeightAdder,
 )
+from .cqlbm import CQLBM
 from .lqlga import (
     LQLGA,
     GenericLQLGACollisionOperator,
@@ -25,10 +26,10 @@ from .lqlga import (
     LQLGAStreamingOperator,
 )
 from .ms import (
-    CQLBM,
+    MSQLBM,
     BounceBackReflectionOperator,
-    MSInitialConditions,
     GridMeasurement,
+    MSInitialConditions,
     MSStreamingOperator,
     SpecularReflectionOperator,
 )
@@ -61,10 +62,11 @@ __all__ = [
     "MSStreamingOperator",
     "SpecularReflectionOperator",
     "BounceBackReflectionOperator",
-    "CQLBM",
+    "MSQLBM",
     "GenericLQLGACollisionOperator",
     "LQGLAInitialConditions",
     "LQLGA",
+    "CQLBM",
     "LQLGAGridVelocityMeasurement",
     "LQLGAMGReflectionOperator",
     "LQLGAReflectionOperator",

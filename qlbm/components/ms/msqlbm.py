@@ -17,8 +17,8 @@ from .specular_reflection import SpecularReflectionOperator
 from .streaming import MSStreamingOperator, StreamingAncillaPreparation
 
 
-class CQLBM(LBMAlgorithm):
-    """The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
+class MSQLBM(LBMAlgorithm):
+    """The end-to-end algorithm of the Multi-Speed Collisionless Quantum Lattice Boltzmann Algorithm first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
 
     This implementation supports 2D and 3D simulations with with cuboid objects
     with either bounce-back or specular reflection boundary conditions.
@@ -76,7 +76,7 @@ class CQLBM(LBMAlgorithm):
                     for shape in self.lattice.shapes["specular"]
                 ):
                     raise LatticeException(
-                        "All shapes with the 'specular' boundary condition must be of type Block for the CQLBM algorithm. "
+                        "All shapes with the 'specular' boundary condition must be of type Block for the MSQLBM algorithm. "
                     )
                 circuit.compose(
                     SpecularReflectionOperator(
@@ -94,7 +94,7 @@ class CQLBM(LBMAlgorithm):
                         for shape in self.lattice.shapes["specular"]
                     ):
                         raise LatticeException(
-                            f"All shapes with the {bc} boundary condition must be cuboids for the CQLBM algorithm. "
+                            f"All shapes with the {bc} boundary condition must be cuboids for the MSQLBM algorithm. "
                         )
                 circuit.compose(
                     BounceBackReflectionOperator(
@@ -119,4 +119,4 @@ class CQLBM(LBMAlgorithm):
 
     @override
     def __str__(self) -> str:
-        return f"[Algorithm CQLBM with lattice {self.lattice}]"
+        return f"[Algorithm MSQLBM with lattice {self.lattice}]"

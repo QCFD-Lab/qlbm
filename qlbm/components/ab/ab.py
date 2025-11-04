@@ -16,7 +16,7 @@ from qlbm.tools.utils import flatten
 from .streaming import ABEStreamingOperator
 
 
-class ABECQLBM(LBMAlgorithm):
+class ABQLBM(LBMAlgorithm):
     """TODO."""
 
     def __init__(
@@ -55,7 +55,7 @@ class ABECQLBM(LBMAlgorithm):
                     for shape in self.lattice.shapes["specular"]
                 ):
                     raise LatticeException(
-                        f"All shapes with the {bc} boundary condition must be cuboids for the CQLBM algorithm. "
+                        f"All shapes with the {bc} boundary condition must be cuboids for the ABQLBM algorithm. "
                     )
 
         circuit.compose(
@@ -71,4 +71,4 @@ class ABECQLBM(LBMAlgorithm):
 
     @override
     def __str__(self) -> str:
-        return f"[Algorithm ABECQLBM with lattice {self.lattice}]"
+        return f"[Algorithm ABQLBM with lattice {self.lattice}]"

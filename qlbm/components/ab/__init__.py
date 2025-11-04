@@ -1,10 +1,10 @@
-from .ab import ABECQLBM
+from .ab import ABQLBM
 from .initial import ABEInitialConditions
 from .measurement import ABEGridMeasurement
 from .streaming import ABEStreamingOperator
 
 __all__ = [
-    "ABECQLBM",
+    "ABQLBM",
     "ABEInitialConditions",
     "ABEGridMeasurement",
     "ABEStreamingOperator",

@@ -11,14 +11,14 @@ from qiskit.circuit.library import MCXGate
 from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
-from qlbm.components.base import MSOperator, LBMPrimitive
+from qlbm.components.base import LBMPrimitive, MSOperator
 from qlbm.lattice import MSLattice
 from qlbm.tools import CircuitException, bit_value
 
 
 class StreamingAncillaPreparation(LBMPrimitive):
     r"""
-    A primitive used in :class:`.MSStreamingOperator` that implements the preparatory step of streaming necessary for the :class:`.CQLBM` method.
+    A primitive used in :class:`.MSStreamingOperator` that implements the preparatory step of streaming necessary for the :class:`.MSQLBM` method.
 
     This operator sets the ancilla qubits to :math:`\ket{1}` for the velocities that
     will be streamed in the next CFL time step.

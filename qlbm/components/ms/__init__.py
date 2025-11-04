@@ -1,17 +1,17 @@
-"""Modular qlbm quantum circuit components for the CQLBM algorithm :cite:p:`collisionless`."""
+"""Modular qlbm quantum circuit components for the MSQLBM algorithm :cite:p:`collisionless`."""
 
 from .bounceback_reflection import (
     BounceBackReflectionOperator,
     BounceBackWallComparator,
 )
-from .cqlbm import CQLBM
+from .msqlbm import MSQLBM
 from .primitives import (
-    MSInitialConditions,
-    MSInitialConditions3DSlim,
     Comparator,
     ComparatorMode,
     EdgeComparator,
     GridMeasurement,
+    MSInitialConditions,
+    MSInitialConditions3DSlim,
     SpeedSensitiveAdder,
 )
 from .specular_reflection import SpecularReflectionOperator, SpecularWallComparator
@@ -40,5 +40,5 @@ __all__ = [
     "SpecularWallComparator",
     "BounceBackReflectionOperator",
     "BounceBackWallComparator",
-    "CQLBM",
+    "MSQLBM",
 ]
