@@ -23,10 +23,40 @@ from qlbm.tools.exceptions import LatticeException
 class CQLBM(LBMAlgorithm):
     """The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
 
-    Implementations based on lattices with the DdQq discretization use the :class:`.ABQLBM`.
-    Implementations where the number of lattices is defined per dimension delegate to the :class:`.MSQLBM`.
+    Implementations based on lattices with the DdQq discretization use the :class:`.ABQLBM`:
 
-    TODO add examples
+    .. plot::
+        :include-source:
+
+        from qlbm.components import CQLBM
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
+                "geometry": [],
+            }
+        )
+
+        CQLBM(lattice).draw("mpl")
+
+    Implementations where the number of velocities is defined per dimension delegate to the :class:`.MSQLBM`.
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components import CQLBM
+        from qlbm.lattice import MSLattice
+
+        lattice = MSLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": {"x": 4, "y": 4}},
+                "geometry": [],
+            }
+        )
+
+        CQLBM(lattice).draw("mpl")
+
     """
 
     def __init__(
