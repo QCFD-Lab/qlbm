@@ -171,6 +171,18 @@ class QBMResult(ABC):
         pass
 
     def save_statevector(self, statevector: Statevector, step: int):
+        """
+        Save a given statevector to disk.
+
+        The statevector is saved as a numpy array in the ``statevector`` subdirectory of the result's root directory.
+
+        Parameters
+        ----------
+        statevector : Statevector
+            The statevector to save.
+        step : int
+            The step this statevector corresponds to, for naming purposes.
+        """
         statevector_dir = f"{self.directory}/statevectors"
         if not isdir(statevector_dir):
             create_directory_and_parents(statevector_dir)
