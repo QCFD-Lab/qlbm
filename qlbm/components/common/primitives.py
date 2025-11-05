@@ -183,7 +183,31 @@ class HammingWeightAdder(LBMPrimitive):
 
 
 class TruncatedQFT(LBMPrimitive):
-    """TODO."""
+    r"""Truncated Quantum Fourier Transform primitive used to create an equal magnitude superposition.
+
+    For a superposition of the first :math:`k` basis states encoded in :math:`n` qubits,
+    the operator consists of discrete fourier transform block of size :math:`k\times k`,
+    padded with :math:`2^n - k` :math:`1`s on the main diagonal.
+    The rationale and properties of this operator are described in :cite:`spacetime2`.
+    This primitive is used in both amplitude-based and computational basis state encodings.
+    In the :class:`ABInitialConditions`, it creates an equal magnitude superposition over the velocity space.
+    In the :class:`EQCRedistribution`, the superposition is over all basis states with an equivalent mass and momenta.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import TruncatedQFT
+
+        TruncatedQFT(4, 7).decompose(reps=2).draw("mpl")
+    """
+
+    num_qubits: int
+    """The number of qubits the operator acts on."""
+
+    dft_size: int
+    """The size of the discrete Fourier transform block."""
 
     def __init__(
         self,
@@ -224,7 +248,7 @@ class TruncatedQFT(LBMPrimitive):
         circuit.append(op, list(range(self.num_qubits)))
 
         return circuit
-    
+
     @override
     def __str__(self):
         return f"[Primitive TuncatedQFT({self.num_qubits}, {self.dft_size})]"

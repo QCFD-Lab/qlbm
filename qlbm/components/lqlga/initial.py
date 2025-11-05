@@ -94,10 +94,38 @@ class LQGLAInitialConditions(LBMPrimitive):
 
 
 class LQGLAAveragedInitialConditions(LBMPrimitive):
-    """TODO."""
+    """
+    Primitive for setting initial conditions in the :class:`.LQLGA` algorithm.
+
+    This operator creates an equal magnitude superposition over a set of gridpoints.
+    This is equivalent to starting the QLGA algorithm in all possible configurations
+    over the given set of gridpoints.
+
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import LQLGALattice
+        from qlbm.components.lqlga import LQGLAAveragedInitialConditions
+
+        lattice = LQLGALattice(
+            {
+                "lattice": {
+                    "dim": {"x": 5},
+                    "velocities": "D1Q3",
+                },
+                "geometry": [],
+            },
+        )
+        initial_conditions = LQGLAAveragedInitialConditions(lattice, [0, 2, 3])
+        initial_conditions.draw("mpl")
+
+    """
 
     gridpoints: List[int]
-    """TODO."""
+    """The gridpoints to create the uniform superposition over."""
 
     def __init__(
         self,

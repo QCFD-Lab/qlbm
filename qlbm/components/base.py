@@ -9,7 +9,7 @@ from qiskit.qasm2 import dump as dump_qasm2
 from qiskit.qasm3 import dump as dump_qasm3
 from typing_extensions import override
 
-from qlbm.lattice import MSLattice, Lattice
+from qlbm.lattice import Lattice, MSLattice
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 

@@ -2,10 +2,10 @@
 
 from .ab import (
     ABQLBM,
-    ABEReflectionPermutation,
     ABGridMeasurement,
     ABInitialConditions,
     ABReflectionOperator,
+    ABReflectionPermutation,
     ABStreamingOperator,
 )
 from .base import (
@@ -87,6 +87,6 @@ __all__ = [
     "ABInitialConditions",
     "ABGridMeasurement",
     "ABReflectionOperator",
-    "ABEReflectionPermutation",
+    "ABReflectionPermutation",
     "ABStreamingOperator",
 ]

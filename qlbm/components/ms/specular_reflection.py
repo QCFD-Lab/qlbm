@@ -8,7 +8,7 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
-from qlbm.components.base import MSOperator, LBMPrimitive
+from qlbm.components.base import LBMPrimitive, MSOperator
 from qlbm.components.ms.primitives import (
     Comparator,
     ComparatorMode,
