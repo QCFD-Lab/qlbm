@@ -19,7 +19,82 @@ from .base import AmplitudeLattice
 
 
 class ABLattice(AmplitudeLattice):
-    """TODO."""
+    r"""
+    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.ABQLBM` algorithm developed in :cite:t:`collisionless`.
+
+    This lattice is only built from :math:`D_dQ_q` specifications.
+    For multi-speed implementations, see :class:`.MSQLBM`.
+
+    The registers encoded in the lattice and their accessors are given below.
+    For the size of each register,
+    :math:`N_{g_j}` is the number of grid points of dimension :math:`j` (i.e., 64, 128),
+    :math:`q` is the number of discrete velocities, for instance, 9.
+
+    .. list-table:: Register allocation
+        :widths: 25 25 25 50
+        :header-rows: 1
+
+        * - Register
+          - Size
+          - Access Method
+          - Description
+        * - :attr:`grid_registers`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \right \rceil`
+          - :meth:`grid_index`
+          - The qubits encoding the physical grid.
+        * - :attr:`velocity_registers`
+          - :math:`\lceil\log_2 q \rceil`
+          - :meth:`velocity_index`
+          - The qubits encoding the :math:`q` discrete velocities.
+        * - :attr:`ancilla_obstacle_register`
+          - :math:`1`
+          - :meth:`ancillae_obstacle_index`
+          - The qubits used to detect whether particles have streamed into obstacles. Used for reflection.
+        * - :attr:`ancilla_comparator_register`
+          - :math:`2(d-1)`
+          - :meth:`ancillae_comparator_index`
+          - The qubits used to for :class:`.Comparator`\ s. Used for reflection.
+
+    A lattice can be constructed from from either an input file or a Python dictionary:
+
+    .. code-block:: json
+
+        {
+            "lattice": {
+                "dim": {
+                    "x": 16,
+                    "y": 16
+                },
+                "velocities": "d2q9"
+            },
+            "geometry": [
+                {
+                    "x": [9, 12],
+                    "y": [3, 6],
+                    "boundary": "bounceback"
+                },
+                {
+                    "x": [9, 12],
+                    "y": [9, 12],
+                    "boundary": "bounceback"
+                }
+            ]
+        }
+
+    The register setup can be visualized by constructing a lattice object:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import ABLattice
+
+        ABLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": "D2Q9"},
+                "geometry": [],
+            }
+        ).circuit.draw("mpl")
+    """
 
     discretization: LatticeDiscretization
     """The discretization of the lattice, one of :class:`.LatticeDiscretization`."""
@@ -38,6 +113,7 @@ class ABLattice(AmplitudeLattice):
     """The number of qubits required to represent the lattice."""
 
     registers: Tuple[QuantumRegister, ...]
+    """The registers of the lattice."""
 
     def __init__(
         self,
@@ -108,7 +184,9 @@ class ABLattice(AmplitudeLattice):
     @override
     def velocity_index(self, dim: int | None = None) -> List[int]:
         if dim is not None:
-            raise LatticeException("ABLattice does not support a dimensional breakdown of velocities.")
+            raise LatticeException(
+                "ABLattice does not support a dimensional breakdown of velocities."
+            )
         return list(
             range(
                 self.num_grid_qubits,

@@ -509,6 +509,17 @@ class Lattice(ABC):
 
 
 class AmplitudeLattice(Lattice, ABC):
+    r"""
+    Abstract Lattice class for QLBM algorithms that use the ampltiude-based encoding.
+
+    The amplitude-based encoding generally maps LBM populations :math:`f_i` onto basis states as :math:`\sqrt{f_i}\ket{x}\ket{v}`,
+    with :math:`x` the position and :math:`v` the velocity.
+    Amplitude-based encdoings generally compress both the grid register and the velocity register into logarithmically
+    many qubits.
+
+    ``qlbm`` currently has 2 amplitude-based lattices: the :class:`.MSLattice` and :class:`.ABLattice` used in the :class:`.MSQLBM` and :class:`.ABQLBM`, respectively.
+    """
+
     def __init__(
         self,
         lattice_data,
@@ -587,7 +598,7 @@ class AmplitudeLattice(Lattice, ABC):
             If the dimension does not exist.
         """
         pass
-    
+
     @abstractmethod
     def velocity_index(self, dim: int | None = None) -> List[int]:
         """Get the indices of the qubits used that encode the velocity magnitude values for the specified dimension.

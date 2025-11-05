@@ -1,12 +1,12 @@
 """Algorithm-specific geometrical data encodings."""
 
+from .lqlga import LQLGAPointwiseReflectionData, LQLGAReflectionData
 from .ms import (
     DimensionalReflectionData,
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
 )
-from .lqlga import LQLGAPointwiseReflectionData, LQLGAReflectionData
 from .spacetime import (
     SpaceTimeDiagonalReflectionData,
     SpaceTimePWReflectionData,

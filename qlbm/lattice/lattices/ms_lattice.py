@@ -15,7 +15,10 @@ from .base import AmplitudeLattice
 
 class MSLattice(AmplitudeLattice):
     r"""
-    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.CQLBM` algorithm developed by :cite:t:`collisionless`.
+    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.MSQLBM` algorithm developed by :cite:t:`collisionless`.
+
+    This lattice is only built from multi-speed specifications.
+    For :math:`D_dQ_q` implementations, see :class:`.ABQLBM`.
 
     =========================== ======================================================================
     Attribute                   Summary

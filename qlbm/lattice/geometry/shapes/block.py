@@ -760,6 +760,28 @@ class Block(SpaceTimeShape, LQLGAShape):
     def get_lbm_wall_velocity_indices_to_reflect(
         self, discretization: LatticeDiscretization, dim: int, bound: bool
     ) -> List[int]:
+        """
+        Get the indices of the velocities that need to be reflected at gridpoints outside the wall of the object.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization of the lattice.
+        dim : int
+            The dimension that the wall reflects.
+        bounds : Tuple[bool, ...]
+            The bounds of the corner to address.
+
+        Returns
+        -------
+        List[int]
+            The list of velocity indices to reflect.
+
+        Raises
+        ------
+        LatticeException
+            If the discretization is not supported or if the dimension or bounds are inconsistent.
+        """
         if discretization not in self.ab_wall_indices_to_reset:
             raise LatticeException(
                 f"Discretization {discretization} not supported. Supported discretizations are: {self.ab_wall_indices_to_reset.keys()}"
@@ -775,6 +797,28 @@ class Block(SpaceTimeShape, LQLGAShape):
     def get_lbm_near_corner_velocity_indices_to_reflect(
         self, discretization: LatticeDiscretization, dim: int, bounds: Tuple[bool, ...]
     ) -> List[int]:
+        """
+        Get the indices of the velocities that need to be reflected at gridpoints near the corners of the object.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization of the lattice.
+        dim : int
+            The dimension outside of obstacle bounds.
+        bounds : Tuple[bool, ...]
+            The bounds of the corner to address.
+
+        Returns
+        -------
+        List[int]
+            The list of velocity indices to reflect.
+
+        Raises
+        ------
+        LatticeException
+            If the discretization is not supported or if the dimension or bounds are inconsistent.
+        """
         if discretization not in self.ab_near_corner_indices_to_reset:
             raise LatticeException(
                 f"Discretization {discretization} not supported. Supported discretizations are: {self.ab_wall_indices_to_reset.keys()}"
@@ -794,7 +838,27 @@ class Block(SpaceTimeShape, LQLGAShape):
 
     def get_lbm_outside_corner_indices_to_reflect(
         self, discretization: LatticeDiscretization, bounds: Tuple[bool, ...]
-    ):
+    ) -> List[int]:
+        """
+        Get the indices of the velocities that need to be reflected at the outside corners of the object.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization of the lattice.
+        bounds : Tuple[bool, ...]
+            The bounds of the corner to address.
+
+        Returns
+        -------
+        List[int]
+            The list of velocity indices to reflect.
+
+        Raises
+        ------
+        LatticeException
+            If the discretization is not supported or if the bounds are inconsistent.
+        """
         if discretization not in self.ab_corner_indices_to_reset:
             raise LatticeException(
                 f"Discretization {discretization} not supported. Supported discretizations are: {self.ab_wall_indices_to_reset.keys()}"
