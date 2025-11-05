@@ -1,3 +1,5 @@
+"""WIP."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 
@@ -12,7 +14,7 @@ from qlbm.tools.exceptions import LatticeException
 
 
 class ABEAveragedCollisionOperator(LBMOperator):
-    """TODO."""
+    """WIP."""
 
     lattice: ABLattice
 

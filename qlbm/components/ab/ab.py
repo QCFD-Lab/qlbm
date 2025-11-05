@@ -17,7 +17,32 @@ from .streaming import ABStreamingOperator
 
 
 class ABQLBM(LBMAlgorithm):
-    """TODO."""
+    """
+    Implementation of the **A** mplitude **B** ased QLBM (ABQLBM).
+
+    The algorithm consists of interleaving steps of streaming and boundary conditions.
+    Note that there is **no** collision in this algorithm as of yet.
+    Details of the general framework can be found in :cite:`collisionless`.
+    The ABQLBM works with :math:`D_dQ_q` discretizations only.
+    For multi-speed alternatives, see :class:`.MSQLBM`.
+
+    Eample usage:
+
+    .. code-block:: python
+
+        from qlbm.components.ab import ABQLBM
+        from qlbm.lattice import ABLattice
+
+        # Example with streaming only for simplicity.
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 16, "y": 8}, "velocities": "d2q9"},
+                "geometry": [],
+            }
+        )
+
+        ABQLBM(lattice).draw("mpl")
+    """
 
     def __init__(
         self,

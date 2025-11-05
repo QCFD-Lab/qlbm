@@ -3,7 +3,7 @@
 from .ab import ABQLBM
 from .initial import ABInitialConditions
 from .measurement import ABGridMeasurement
-from .reflection import ABEReflectionPermutation, ABReflectionOperator
+from .reflection import ABReflectionOperator, ABReflectionPermutation
 from .streaming import ABStreamingOperator
 
 __all__ = [
@@ -11,6 +11,6 @@ __all__ = [
     "ABInitialConditions",
     "ABGridMeasurement",
     "ABReflectionOperator",
-    "ABEReflectionPermutation",
+    "ABReflectionPermutation",
     "ABStreamingOperator",
 ]

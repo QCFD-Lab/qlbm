@@ -1,3 +1,5 @@
+"""Quantum circuits used for measurement in the :class:`ABQLBM` algorithm."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 
@@ -9,7 +11,27 @@ from qlbm.lattice.lattices.ab_lattice import ABLattice
 
 
 class ABGridMeasurement(LBMPrimitive):
-    """TODO."""
+    """
+    Grid measurement for the :class:`ABQLBM` algorithm.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABGridMeasurement
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 32, "y": 8}, "velocities": "d2q9"},
+                "geometry": [],
+            }
+        )
+
+        ABGridMeasurement(lattice).draw("mpl")
+
+    """
 
     def __init__(
         self,

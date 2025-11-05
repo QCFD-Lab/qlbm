@@ -1,3 +1,5 @@
+"""Quantum circuits used for reflection in the :class:`ABQLBM` algorithm."""
+
 from itertools import product
 from logging import Logger, getLogger
 from time import perf_counter_ns
@@ -19,7 +21,29 @@ from qlbm.tools.utils import flatten, get_qubits_to_invert
 
 
 class ABReflectionOperator(LBMOperator):
-    """TODO."""
+    """
+    Implements bounceback reflection in the amplitude-based encoding of :class:`.ABQLBM` for :math:`D_dQ_q` discretizations.
+
+    Example usage:
+
+    .. code-block:: python
+
+        from qlbm.components.ab import ABReflectionOperator
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
+                "geometry": [
+                    {"shape": "cuboid", "x": [1, 3], "y": [1, 3], "boundary": "bounceback"}
+                ],
+            }
+        )
+
+        # Drawing the circuit might take a while
+        ABReflectionOperator(lattice, blocks=lattice.shapes["bounceback"])
+
+    """
 
     lattice: ABLattice
 
@@ -52,7 +76,7 @@ class ABReflectionOperator(LBMOperator):
 
         # Mark populations inside the object
         for block in self.blocks:
-            circuit.compose(self.set_wall_ancilla_state(block), inplace=True)
+            circuit.compose(self.set_inside_wall_ancilla_state(block), inplace=True)
 
         circuit.compose(
             self.reset_ancilla_of_point_state(
@@ -107,7 +131,24 @@ class ABReflectionOperator(LBMOperator):
 
         return circuit
 
-    def set_wall_ancilla_state(self, block: Block):
+    def set_inside_wall_ancilla_state(self, block: Block) -> QuantumCircuit:
+        """
+        Sets the state of the ancilla qubit for all the gridpoints lying inside the walls of the block.
+
+        This is done using the :class:`.SpecularWallComparator` originally designed
+        for the :class:`MSQLBM` algorithm.
+        The inside corner points are not addressed.
+
+        Parameters
+        ----------
+        block : Block
+            The solid object to address.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit that sets the appropriate state on the object ancilla qubit.
+        """
         circuit = self.lattice.circuit.copy()
 
         for dim in range(self.lattice.num_dims):
@@ -150,7 +191,26 @@ class ABReflectionOperator(LBMOperator):
 
         return circuit
 
-    def reset_outside_wall_ancilla_state(self, block: Block):
+    def reset_outside_wall_ancilla_state(self, block: Block) -> QuantumCircuit:
+        """
+        Resets the state of the obstacle ancilla qubit for all the gridpoints that are directly adjacent to the object, but in the fluid domain.
+
+        This is done using the :class:`.SpecularWallComparator` originally designed
+        for the :class:`MSQLBM` algorithm. The state of obstacle ancilla of the
+        the near-corner gridpoints will be incorrect following the application of this primitive
+        and needs to be corrected.
+        The outside corner points are not addressed.
+
+        Parameters
+        ----------
+        block : Block
+            The solid object to address.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit that sets the appropriate state on the object ancilla qubit.
+        """
         circuit = self.lattice.circuit.copy()
 
         for dim in range(self.lattice.num_dims):
@@ -215,7 +275,22 @@ class ABReflectionOperator(LBMOperator):
         self,
         points_data: List[Tuple[ReflectionPoint, List[int]]],
         ignore_velocity_data: bool,
-    ):
+    ) -> QuantumCircuit:
+        """
+        Sets the state of the obstacle ancilla qubit of a given gridpoint, conditioned on the velocity profile.
+
+        Parameters
+        ----------
+        points_data : List[Tuple[ReflectionPoint, List[int]]]
+            The tuple of gridpoint and velocity profile to set the ancilla state for.
+        ignore_velocity_data : bool
+            Whether to ignore the velocity data. Setting this to ``True`` will flip the state of the ancilla qubit based on position alone.
+
+        Returns
+        -------
+        QuantumCircuit
+            The circuit that sets the appropriate state on the object ancilla qubit.
+        """
         circuit = self.lattice.circuit.copy()
 
         for point, velocities in points_data:
@@ -274,11 +349,19 @@ class ABReflectionOperator(LBMOperator):
         return circuit
 
     def permute_and_stream(self) -> QuantumCircuit:
+        """
+        Performs the permutation of basis states that implements bounceback reflection in the amplitude-based encoding.
+
+        Returns
+        -------
+        QuantumCircuit
+            The permutation acting on only the velocity register.
+        """
         circuit = self.lattice.circuit.copy()
 
         # Permute the velocities according to reflection rules
         circuit.compose(
-            ABEReflectionPermutation(
+            ABReflectionPermutation(
                 self.lattice.num_velocity_qubits,
                 self.lattice.discretization,
                 self.logger,
@@ -304,7 +387,32 @@ class ABReflectionOperator(LBMOperator):
         return f"[Operator ABStreaming with lattice {self.lattice}]"
 
 
-class ABEReflectionPermutation(LBMPrimitive):
+class ABReflectionPermutation(LBMPrimitive):
+    """
+    Permutes velocity state to implement reflection in the amplitude-based encoding for :math:`D_dQ_q` discretizations.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABReflectionPermutation
+        from qlbm.lattice import LatticeDiscretization
+
+        ABReflectionPermutation(4, LatticeDiscretization.D2Q9).draw("mpl") 
+
+    """
+
+    num_qubits: int
+    """
+    The number of qubits that encode the velocity state.
+    """
+
+    discretization: LatticeDiscretization
+    """
+    The lattice discretization the permutation adheres to.
+    """
+
     def __init__(
         self,
         num_qubits: int,
@@ -363,4 +471,4 @@ class ABEReflectionPermutation(LBMPrimitive):
 
     @override
     def __str__(self) -> str:
-        return f"[Primitive ABEReflectionPermutation with {self.num_qubits} qubits on {self.discretization}]"
+        return f"[Primitive ABReflectionPermutation with {self.num_qubits} qubits on {self.discretization}]"

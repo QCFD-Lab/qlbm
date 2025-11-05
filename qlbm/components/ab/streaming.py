@@ -1,3 +1,5 @@
+"""Quantum circuits used for streaming in the :class:`ABQLBM` algorithm."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
@@ -15,9 +17,44 @@ from qlbm.tools.utils import get_qubits_to_invert
 
 
 class ABStreamingOperator(LBMOperator):
-    """TODO."""
+    """
+    Streaming operator for the :class:`ABQLBM` algorithm.
+
+    Uses a variant of the Draper adder described in :cite:`collisionless`.
+    The operator works by applying QFTs in parallel to each dimension of the grid,
+    followed by phase gates that perform incrementation in the Fourier basis, and, finally,
+    by applying an inverse QFT mapping the qubits back to the computational basis.
+
+    Populations are streamed one after the other in Fourier space
+    by controlling phase gates on the state of the velocity qubits.
+    Additional controls qubits can be specified to restrict this operation.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABStreamingOperator
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 8}, "velocities": "d2q9"},
+                "geometry": [],
+            }
+        )
+
+        ABStreamingOperator(lattice).draw("mpl")
+
+    """
 
     lattice: ABLattice
+    """The lattice to construct the component for."""
+
+    additional_control_qubit_indices: List[int]
+    """The qubits (if any) that streaming should be controlled over.
+    This makes the operator useful for the application of boundary conditions.
+    Controls need only be applied to the phase gates and not the QFT blocks."""
 
     def __init__(
         self,

@@ -1,3 +1,5 @@
+"""Quantum circuits used for setting the initial state in the :class:`ABQLBM` algorithm."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 
@@ -10,7 +12,46 @@ from qlbm.lattice.lattices.ab_lattice import ABLattice
 
 
 class ABInitialConditions(LBMPrimitive):
-    """TODO."""
+    """
+    Initial conditions for the :class:`ABQLBM` algorithm.
+
+    This component creates an equal magnitude superposition of all velocity
+    basis states at position ``(0, 0)`` using the :class:`TruncatedQFT`.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABInitialConditions
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 16, "y": 8}, "velocities": "d2q9"},
+                "geometry": [],
+            }
+        )
+
+        ABInitialConditions(lattice).draw("mpl")
+
+    You can also get the low-level decomposition of the circuit as:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABInitialConditions
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
+                "geometry": [],
+            }
+        )
+
+        ABInitialConditions(lattice).circuit.decompose(reps=2).draw("mpl")
+    """
 
     def __init__(
         self,
