@@ -1,7 +1,7 @@
 import pytest
 
 from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 
 
 # 1D Lattices

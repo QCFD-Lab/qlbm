@@ -15,7 +15,7 @@ from qlbm.components.ab.ab import ABQLBM
 from qlbm.components.base import LBMAlgorithm
 from qlbm.components.ms.msqlbm import MSQLBM
 from qlbm.lattice import MSLattice
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.tools.exceptions import LatticeException
 

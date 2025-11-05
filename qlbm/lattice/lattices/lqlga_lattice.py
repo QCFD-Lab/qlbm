@@ -22,19 +22,19 @@ class LQLGALattice(Lattice):
     r"""
     Lattice class for the :class:`.LQLGA` algorithm.
 
-    ================================= ========================================================================================
-    Attribute                         Summary
-    ================================= ========================================================================================
-    :attr:`num_gridpoints`            The number of gridpoints in each dimension of the lattice.
-    :attr:`num_velocities`            The number of discrete velocities in each dimension of the lattice.
-    :attr:`num_dims`                  The number of dimensions of the lattice.
-    :attr:`discretization`            The discretization of the lattice.
-    :attr:`num_velocities_per_point`  The number of discrete velocities per gridpoint.
-    :attr:`num_base_qubits`           The number of qubits required to represent the lattice without velocities.
-    :attr:`num_total_qubits`          The total number of qubits required to represent the lattice, including velocities.
-    :attr:`registers`                 The list of quantum registers for the lattice, one for each gridpoint.
-    :attr:`circuit`                   The quantum circuit representing the lattice, initialized with the registers.
-    ================================ ========================================================================================
+    ==================================== ========================================================================================
+    Attribute                            Summary
+    ==================================== ========================================================================================
+    :attr:`num_gridpoints`               The number of gridpoints in each dimension of the lattice.
+    :attr:`num_velocities`               The number of discrete velocities in each dimension of the lattice.
+    :attr:`num_dims`                     The number of dimensions of the lattice.
+    :attr:`discretization`               The discretization of the lattice.
+    :attr:`num_velocities_per_point`     The number of discrete velocities per gridpoint.
+    :attr:`num_base_qubits`              The number of qubits required to represent the lattice without velocities.
+    :attr:`num_total_qubits`             The total number of qubits required to represent the lattice, including velocities.
+    :attr:`registers`                    The list of quantum registers for the lattice, one for each gridpoint.
+    :attr:`circuit`                      The quantum circuit representing the lattice, initialized with the registers.
+    ==================================== ========================================================================================
 
     The registers encoded in the lattice and their accessors are given below.
     For the size of each register,
@@ -347,7 +347,9 @@ class LQLGALattice(Lattice):
         For a given lattice (set number of gridpoints and velocity discretization),
         set multiple geometry configurations to simulate simultaneously.
 
-        .. code-block:: python
+        .. plot::
+            :include-source:
+
             from qlbm.lattice import LQLGALattice
 
             lattice = LQLGALattice(

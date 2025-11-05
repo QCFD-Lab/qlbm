@@ -6,14 +6,14 @@ from time import perf_counter_ns
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
-from qlbm.components.ab.reflection import ABEReflectionOperator
+from qlbm.components.ab.reflection import ABReflectionOperator
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten
 
-from .streaming import ABEStreamingOperator
+from .streaming import ABStreamingOperator
 
 
 class ABQLBM(LBMAlgorithm):
@@ -41,7 +41,7 @@ class ABQLBM(LBMAlgorithm):
         )
 
         circuit.compose(
-            ABEStreamingOperator(
+            ABStreamingOperator(
                 self.lattice,
                 logger=self.logger,
             ).circuit,
@@ -59,7 +59,7 @@ class ABQLBM(LBMAlgorithm):
                     )
 
         circuit.compose(
-            ABEReflectionOperator(
+            ABReflectionOperator(
                 self.lattice,
                 flatten(list(self.lattice.shapes.values())),  # type: ignore
                 logger=self.logger,

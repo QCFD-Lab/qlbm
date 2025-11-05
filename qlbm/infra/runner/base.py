@@ -20,8 +20,8 @@ from qlbm.infra.result import (
     QBMResult,
     SpaceTimeResult,
 )
-from qlbm.lattice import MSLattice, Lattice
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice import Lattice, MSLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException, ResultsException

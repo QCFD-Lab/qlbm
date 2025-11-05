@@ -12,8 +12,8 @@ from .geometry.shapes.block import (
 from .geometry.shapes.circle import (
     Circle,
 )
-from .lattices import MSLattice, Lattice
-from .lattices.abe_lattice import ABLattice
+from .lattices import Lattice, MSLattice
+from .lattices.ab_lattice import ABLattice
 from .lattices.lqlga_lattice import LQLGALattice
 from .lattices.spacetime_lattice import SpaceTimeLattice
 from .spacetime.properties_base import (

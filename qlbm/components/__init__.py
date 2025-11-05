@@ -1,5 +1,13 @@
 """Modular and extendible quantum circuits that perform parts of the QLBM algorithm."""
 
+from .ab import (
+    ABQLBM,
+    ABEReflectionPermutation,
+    ABGridMeasurement,
+    ABInitialConditions,
+    ABReflectionOperator,
+    ABStreamingOperator,
+)
 from .base import (
     LBMAlgorithm,
     LBMOperator,
@@ -75,4 +83,10 @@ __all__ = [
     "EQCPermutation",
     "EQCRedistribution",
     "HammingWeightAdder",
+    "ABQLBM",
+    "ABInitialConditions",
+    "ABGridMeasurement",
+    "ABReflectionOperator",
+    "ABEReflectionPermutation",
+    "ABStreamingOperator",
 ]

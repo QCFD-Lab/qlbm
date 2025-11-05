@@ -6,7 +6,7 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMOperator
 from qlbm.components.common.primitives import TruncatedQFT
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 

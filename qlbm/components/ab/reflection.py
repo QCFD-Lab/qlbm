@@ -7,18 +7,18 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
-from qlbm.components.ab.streaming import ABEStreamingOperator
+from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMOperator, LBMPrimitive
 from qlbm.components.ms.specular_reflection import SpecularWallComparator
 from qlbm.lattice.geometry.encodings.ms import ReflectionPoint
 from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten, get_qubits_to_invert
 
 
-class ABEReflectionOperator(LBMOperator):
+class ABReflectionOperator(LBMOperator):
     """TODO."""
 
     lattice: ABLattice
@@ -45,7 +45,7 @@ class ABEReflectionOperator(LBMOperator):
         if self.lattice.discretization == LatticeDiscretization.D2Q9:
             return self.__create_circuit_d2q9()
 
-        raise LatticeException("ABE reflection only currently supported in D2Q9")
+        raise LatticeException("AB reflection only currently supported in D2Q9")
 
     def __create_circuit_d2q9(self):
         circuit = self.lattice.circuit.copy()
@@ -291,7 +291,7 @@ class ABEReflectionOperator(LBMOperator):
         )
 
         circuit.compose(
-            ABEStreamingOperator(
+            ABStreamingOperator(
                 self.lattice, self.lattice.ancillae_obstacle_index(), self.logger
             ).circuit,
             inplace=True,
@@ -301,7 +301,7 @@ class ABEReflectionOperator(LBMOperator):
 
     @override
     def __str__(self) -> str:
-        return f"[Operator ABEStreaming with lattice {self.lattice}]"
+        return f"[Operator ABStreaming with lattice {self.lattice}]"
 
 
 class ABEReflectionPermutation(LBMPrimitive):

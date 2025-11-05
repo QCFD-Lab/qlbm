@@ -8,13 +8,13 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMOperator
 from qlbm.components.ms.streaming import PhaseShift
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import get_qubits_to_invert
 
 
-class ABEStreamingOperator(LBMOperator):
+class ABStreamingOperator(LBMOperator):
     """TODO."""
 
     lattice: ABLattice
@@ -164,4 +164,4 @@ class ABEStreamingOperator(LBMOperator):
 
     @override
     def __str__(self) -> str:
-        return f"[Operator ABEStreaming with lattice {self.lattice}]"
+        return f"[Operator ABStreaming with lattice {self.lattice}]"

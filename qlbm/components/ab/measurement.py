@@ -5,10 +5,10 @@ from qiskit import ClassicalRegister, QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.lattice.lattices.abe_lattice import ABLattice
+from qlbm.lattice.lattices.ab_lattice import ABLattice
 
 
-class ABEGridMeasurement(LBMPrimitive):
+class ABGridMeasurement(LBMPrimitive):
     """TODO."""
 
     def __init__(

@@ -240,7 +240,7 @@ class ControlledIncrementer(LBMPrimitive):
 
 
 class MSStreamingOperator(MSOperator):
-    """An operator that performs streaming in Fourier space as part of the :class:`.CQLBM` algorithm.
+    """An operator that performs streaming in Fourier space as part of the :class:`.MSQLBM` algorithm.
 
     Streaming is broken down into the following steps:
 

@@ -1,11 +1,16 @@
+"""Primitives and operators for the Amplitude Based QLBM."""
+
 from .ab import ABQLBM
-from .initial import ABEInitialConditions
-from .measurement import ABEGridMeasurement
-from .streaming import ABEStreamingOperator
+from .initial import ABInitialConditions
+from .measurement import ABGridMeasurement
+from .reflection import ABEReflectionPermutation, ABReflectionOperator
+from .streaming import ABStreamingOperator
 
 __all__ = [
     "ABQLBM",
-    "ABEInitialConditions",
-    "ABEGridMeasurement",
-    "ABEStreamingOperator",
+    "ABInitialConditions",
+    "ABGridMeasurement",
+    "ABReflectionOperator",
+    "ABEReflectionPermutation",
+    "ABStreamingOperator",
 ]
