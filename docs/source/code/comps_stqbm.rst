@@ -9,12 +9,12 @@ Space-Time Circuits
 
     from qlbm.components import (
         CQLBM,
-        CollisionlessStreamingOperator,
+        MSStreamingOperator,
         ControlledIncrementer,
         SpecularReflectionOperator,
         SpeedSensitivePhaseShift,
     )
-    from qlbm.lattice import CollisionlessLattice
+    from qlbm.lattice import MSLattice
     print("ok")
 
 .. testoutput::

@@ -24,10 +24,19 @@ Concretely, each :class:`.Lattice` fulfills the following functionality:
 #. Provide convenient indexing methods methods to access individual (or groups of) qubits based on their purpose.
 #. Encode additional information required for the automatic assembly of large quantum circuits.
 
-.. autoclass:: qlbm.lattice.lattices.collisionless_lattice.CollisionlessLattice
+.. autoclass:: qlbm.lattice.lattices.ms_lattice.AmplitudeLattice
+    :members:
+
+.. autoclass:: qlbm.lattice.lattices.ms_lattice.MSLattice
+    :members:
+
+.. autoclass:: qlbm.lattice.lattices.ab_lattice.ABLattice
     :members:
 
 .. autoclass:: qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice
+    :members:
+
+.. autoclass:: qlbm.lattice.lattices.lqlga_lattice.LQLGALattice
     :members:
 
 .. _geometry:

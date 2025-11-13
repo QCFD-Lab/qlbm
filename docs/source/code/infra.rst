@@ -62,7 +62,7 @@ Results
 .. autoclass:: qlbm.infra.result.base.QBMResult
     :members:
 
-.. autoclass:: qlbm.infra.result.collisionless_result.CollisionlessResult
+.. autoclass:: qlbm.infra.result.amplitude_result.AmplitudeResult
     :members:
 
 .. autoclass:: qlbm.infra.result.spacetime_result.SpaceTimeResult

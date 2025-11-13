@@ -35,7 +35,7 @@ Components Base
 
 .. autoclass:: qlbm.components.base.LBMOperator
 
-.. autoclass:: qlbm.components.base.CQLBMOperator
+.. autoclass:: qlbm.components.base.MSOperator
 
 .. autoclass:: qlbm.components.base.SpaceTimeOperator
 
