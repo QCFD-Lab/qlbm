@@ -77,9 +77,9 @@ class CQLBM(LBMAlgorithm):
     @override
     def create_circuit(self):
         if isinstance(self.lattice, MSLattice):
-            return MSQLBM(cast(MSLattice, self.lattice), self.logger)
+            return MSQLBM(cast(MSLattice, self.lattice), self.logger).circuit
         elif isinstance(self.lattice, ABLattice):
-            return ABQLBM(cast(ABLattice, self.lattice), self.logger)
+            return ABQLBM(cast(ABLattice, self.lattice), self.logger).circuit
         else:
             raise LatticeException(
                 f"CQLBM does not support lattices of type {type(self.lattice)}"
