@@ -9,7 +9,6 @@ from typing_extensions import override
 
 from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
-from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     LatticeDiscretizationProperties,
@@ -21,6 +20,92 @@ from .ab_lattice import ABLattice
 
 
 class OHLattice(ABLattice):
+    r"""
+    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.ABQLBM` for the **O** ne- **H** ot encoding.
+    
+    In the OH encoding, the grid is compressed into logarithmically many qubits,
+    while the the velocity register is not.
+    For a :math:`1024 \times 1024` lattice with a :math:`D_2Q_9` discretization, the
+    OH encoding requires `2\log 1024 + 9 = 29` qubits.
+    
+    Each of the discrete velocities is assigned a vector :math:`\ket{\mathbf{e}_j}`,
+    with entry :math:`1` at index :math:`j` and :math:`0` everywhere else.
+
+    This lattice is only built from :math:`D_dQ_q` specifications.
+    For multi-speed implementations, see :class:`.MSQLBM` and :class:`.MSLattice`.
+    For the fully compressed velocity register counterpart, see :class:`.ABLattice`.
+
+    The registers encoded in the lattice and their accessors are given below.
+    For the size of each register,
+    :math:`N_{g_j}` is the number of grid points of dimension :math:`j` (i.e., 64, 128),
+    :math:`q` is the number of discrete velocities, for instance, 9.
+
+    .. list-table:: Register allocation
+        :widths: 25 25 25 50
+        :header-rows: 1
+
+        * - Register
+          - Size
+          - Access Method
+          - Description
+        * - :attr:`grid_registers`
+          - :math:`\Sigma_{1\leq j \leq d} \left \lceil{\log N_{g_j}} \right \rceil`
+          - :meth:`grid_index`
+          - The qubits encoding the physical grid.
+        * - :attr:`velocity_registers`
+          - :math:`q`
+          - :meth:`velocity_index`
+          - The qubits encoding the :math:`q` discrete velocities.
+        * - :attr:`ancilla_obstacle_register`
+          - :math:`1`
+          - :meth:`ancillae_obstacle_index`
+          - The qubits used to detect whether particles have streamed into obstacles. Used for reflection.
+        * - :attr:`ancilla_comparator_register`
+          - :math:`2(d-1)`
+          - :meth:`ancillae_comparator_index`
+          - The qubits used to for :class:`.Comparator`\ s. Used for reflection.
+
+    A lattice can be constructed from from either an input file or a Python dictionary:
+
+    .. code-block:: json
+
+        {
+            "lattice": {
+                "dim": {
+                    "x": 16,
+                    "y": 16
+                },
+                "velocities": "d2q9"
+            },
+            "geometry": [
+                {
+                    "x": [9, 12],
+                    "y": [3, 6],
+                    "boundary": "bounceback"
+                },
+                {
+                    "x": [9, 12],
+                    "y": [9, 12],
+                    "boundary": "bounceback"
+                }
+            ]
+        }
+
+    The register setup can be visualized by constructing a lattice object:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import OHLattice
+
+        OHLattice(
+            {
+                "lattice": {"dim": {"x": 8, "y": 8}, "velocities": "D2Q9"},
+                "geometry": [],
+            }
+        ).circuit.draw("mpl")
+    """
+
     discretization: LatticeDiscretization
     """The discretization of the lattice, one of :class:`.LatticeDiscretization`."""
 

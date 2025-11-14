@@ -15,6 +15,7 @@ from .geometry.shapes.circle import (
 from .lattices import Lattice, MSLattice
 from .lattices.ab_lattice import ABLattice
 from .lattices.lqlga_lattice import LQLGALattice
+from .lattices.oh_lattice import OHLattice
 from .lattices.spacetime_lattice import SpaceTimeLattice
 from .spacetime.properties_base import (
     LatticeDiscretization,
@@ -25,6 +26,7 @@ __all__ = [
     "Lattice",
     "ABLattice",
     "MSLattice",
+    "OHLattice",
     "SpaceTimeLattice",
     "LQLGALattice",
     "DimensionalReflectionData",
