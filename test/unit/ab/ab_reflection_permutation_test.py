@@ -2,9 +2,10 @@ import pytest
 from qiskit import QuantumCircuit, transpile
 from qiskit_aer import AerSimulator
 
+from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.components.ab.reflection import ABReflectionPermutation
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
-from qlbm.tools.utils import bit_value, get_qubits_to_invert
+from qlbm.tools.utils import bit_value
 
 
 @pytest.mark.parametrize(
@@ -22,7 +23,10 @@ def test_reflectionpermutation_outcomes_d2q9(permutation_outcome_pairs):
             qc.x(q)
 
     qc.compose(
-        ABReflectionPermutation(nq, LatticeDiscretization.D2Q9).circuit, inplace=True
+        ABReflectionPermutation(
+            nq, LatticeDiscretization.D2Q9, ABEncodingType.AB
+        ).circuit,
+        inplace=True,
     )
     qc.measure_all()
     tqc = transpile(qc, sim, optimization_level=0)
