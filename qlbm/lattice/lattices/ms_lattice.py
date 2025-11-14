@@ -6,6 +6,7 @@ from typing import Dict, List, Tuple
 from qiskit import QuantumCircuit, QuantumRegister
 from typing_extensions import override
 
+from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter, flatten, is_two_pow
@@ -460,7 +461,11 @@ class MSLattice(AmplitudeLattice):
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
         return f"{self.num_dims}d-{gp_string}-{len(self.shape_list)}-obstacle"
-    
+
     @override
     def has_multiple_geometries(self):
-        return False # multiple geometries unsupported for CQBM
+        return False  # multiple geometries unsupported for MS
+
+    @override
+    def get_encoding(self):
+        return ABEncodingType.MS
