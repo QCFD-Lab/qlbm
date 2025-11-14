@@ -414,7 +414,7 @@ class ABReflectionOperator(LBMOperator):
                             )
                 case _:
                     raise LatticeException(
-                        f"Unsupported lattice encoding: {self.encoding}"
+                        f"Unsupported lattice encoding: {self.lattice.get_encoding()}"
                     )
             if grid_qubit_indices_to_invert:
                 circuit.x(grid_qubit_indices_to_invert)

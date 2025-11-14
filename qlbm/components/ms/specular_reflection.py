@@ -22,6 +22,7 @@ from qlbm.lattice.geometry.encodings.ms import (
     ReflectionWall,
 )
 from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
@@ -39,7 +40,7 @@ class SpecularWallComparator(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.AmplitudeLattice` based on which the properties of the operator are inferred.
     :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -68,7 +69,7 @@ class SpecularWallComparator(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: MSLattice,
+        lattice: AmplitudeLattice,
         wall: ReflectionWall,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
