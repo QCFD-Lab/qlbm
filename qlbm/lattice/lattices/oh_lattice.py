@@ -21,12 +21,12 @@ from .ab_lattice import ABLattice
 
 class OHLattice(ABLattice):
     r"""
-    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.ABQLBM` for the **O** ne- **H** ot encoding.
+    Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.ABQLBM` for the One-Hot (OH) encoding.
     
     In the OH encoding, the grid is compressed into logarithmically many qubits,
     while the the velocity register is not.
     For a :math:`1024 \times 1024` lattice with a :math:`D_2Q_9` discretization, the
-    OH encoding requires `2\log 1024 + 9 = 29` qubits.
+    OH encoding requires :math:`2\log_2 1024 + 9 = 29` qubits.
     
     Each of the discrete velocities is assigned a vector :math:`\ket{\mathbf{e}_j}`,
     with entry :math:`1` at index :math:`j` and :math:`0` everywhere else.
