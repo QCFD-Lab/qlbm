@@ -7,6 +7,17 @@ This page contains documentation about :ref:`lattices` and :ref:`geometry` class
 Lattices and geometry go hand-in-hand in that they do not themselves contain
 quantum components, but instead provide a convenient interface
 for accessing the information that determines the structure and composition of quantum components.
+``qlbm`` supports the following kinds of lattices:
+
+#. Amplitude-Based (AB) lattices. These are the most common encdoings in QLBM literature. All AB lattices compress the grid into logarithmically many qubits. 
+    #. :class:`.AmpltiudeLattice` is the abstract base class for all amplitude-based lattices.
+    #. :class:`.ABLattice` is the "standard" amplitude-based lattice, where both the grid and the velocities are logarithmically compressed. It supports only :math:`D_dQ_q` discretization.
+    #. :class:`.MSLattice` is the multi-speed lattice for the algorithm described in :cite:t:`collisionless`. It is the same as the :class:`.ABLattice`, except it supports different velocity discretizations.
+    #. :class:`.OHLattice` is the amplitude-based lattice where the grid is logarithmically compressed, but the :math:`D_dQ_q` velocities are not. It assigns one basis state per discrete velocity.
+
+#. LGA lattices. These rely on the computational basis state encoding (CBSE) and are used for QLGA algorithms.
+    #. :class:`.SpaceTimeLattice` is the realization of the space-time data encoding described in :cite:`spacetime` and :cite:`spacetime2`. It uses an expanded CBSE to accomodate multiple time steps.
+    #. :class:`.LQLGALattice` is the entirely uncompressed CBSE, encoding all velocity channels in the system.
 
 .. _lattices:
 
@@ -24,13 +35,13 @@ Concretely, each :class:`.Lattice` fulfills the following functionality:
 #. Provide convenient indexing methods methods to access individual (or groups of) qubits based on their purpose.
 #. Encode additional information required for the automatic assembly of large quantum circuits.
 
-.. autoclass:: qlbm.lattice.lattices.ms_lattice.AmplitudeLattice
-    :members:
-
 .. autoclass:: qlbm.lattice.lattices.ms_lattice.MSLattice
     :members:
 
 .. autoclass:: qlbm.lattice.lattices.ab_lattice.ABLattice
+    :members:
+
+.. autoclass:: qlbm.lattice.lattices.oh_lattice.OHLattice
     :members:
 
 .. autoclass:: qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice
