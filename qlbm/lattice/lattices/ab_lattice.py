@@ -1,4 +1,4 @@
-"""Implementation of the Amplitude-Based Encoding (ABE) lattice for generic DdQq discretizations."""
+"""Implementation of the Amplitude-Based (AB) encoding lattice for generic DdQq discretizations."""
 
 from logging import getLogger
 from typing import Dict, List, Tuple
@@ -7,6 +7,7 @@ from numpy import ceil, log2
 from qiskit import QuantumCircuit, QuantumRegister
 from typing_extensions import override
 
+from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
@@ -255,9 +256,11 @@ class ABLattice(AmplitudeLattice):
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         """Generates the encoding-specific register required for the streaming step.
 
-        For this encoding, different registers encode (i) the velocity direction,
-        (ii) the velocity discretization, (iii) the velocity ancillae,
-        and (iv) the grid encoding.
+        For this encoding, different registers encode
+        (i) the logarithmically compressed grid,
+        (ii) the logarithmically compressed discrete velocities,
+        (iii) the comparator qubits,
+        (iv) the object qubits.
 
         Returns
         -------
@@ -297,8 +300,12 @@ class ABLattice(AmplitudeLattice):
             gp_string += f"{gp + 1}"
             if c < len(self.num_gridpoints) - 1:
                 gp_string += "x"
-        return f"abelattice-{self.num_dims}d-{gp_string}-{len(flatten(list(self.shapes.values())))}-obstacle"
+        return f"ablattice-{self.num_dims}d-{gp_string}-{len(flatten(list(self.shapes.values())))}-obstacle"
 
     @override
     def has_multiple_geometries(self):
-        return False  # multiple geometries unsupported for CQBM
+        return False  # multiple geometries unsupported for ABQLBM right now
+
+    @override
+    def get_encoding(self) -> ABEncodingType:
+        return ABEncodingType.AB

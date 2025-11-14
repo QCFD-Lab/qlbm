@@ -7,6 +7,7 @@ from typing import Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
 
+from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.geometry.shapes.circle import Circle
@@ -620,5 +621,17 @@ class AmplitudeLattice(Lattice, ABC):
         ------
         LatticeException
             If the dimension does not exist.
+        """
+        pass
+
+    @abstractmethod
+    def get_encoding(self) -> ABEncodingType:
+        """
+        Get the type of encoding this lattice implements.
+
+        Returns
+        -------
+        ABEncodingType
+            The encoding of this lattice.
         """
         pass
