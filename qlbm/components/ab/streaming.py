@@ -8,9 +8,10 @@ from qiskit import QuantumCircuit
 from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
+from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.components.base import LBMOperator
 from qlbm.components.ms.streaming import PhaseShift
-from qlbm.lattice.lattices.ab_lattice import ABLattice
+from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import get_qubits_to_invert
@@ -48,7 +49,7 @@ class ABStreamingOperator(LBMOperator):
 
     """
 
-    lattice: ABLattice
+    lattice: AmplitudeLattice
     """The lattice to construct the component for."""
 
     additional_control_qubit_indices: List[int]
@@ -58,7 +59,7 @@ class ABStreamingOperator(LBMOperator):
 
     def __init__(
         self,
-        lattice: ABLattice,
+        lattice: AmplitudeLattice,
         additional_control_qubit_indices: List[int] = [],
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -162,34 +163,56 @@ class ABStreamingOperator(LBMOperator):
                 positive = bool(1 - direction)
 
                 for index in indices:
-                    velocity_inversion_qubits = [
-                        self.lattice.num_grid_qubits + q
-                        for q in get_qubits_to_invert(
-                            index, self.lattice.num_velocity_qubits
-                        )
-                    ]
-                    if velocity_inversion_qubits:
-                        circuit.x(velocity_inversion_qubits)
+                    match self.lattice.get_encoding():
+                        case ABEncodingType.OH:
+                            circuit.compose(
+                                PhaseShift(
+                                    num_qubits=len(self.lattice.grid_index(dim)),
+                                    positive=positive,
+                                    logger=self.logger,
+                                )
+                                .circuit.control(
+                                    1 + len(self.additional_control_qubit_indices)
+                                )
+                                .decompose(),
+                                qubits=self.additional_control_qubit_indices
+                                + [self.lattice.velocity_index()[index]]
+                                + self.lattice.grid_index(dim),
+                                inplace=True,
+                            )
+                        case ABEncodingType.AB:
+                            velocity_inversion_qubits = [
+                                self.lattice.num_grid_qubits + q
+                                for q in get_qubits_to_invert(
+                                    index, self.lattice.num_velocity_qubits
+                                )
+                            ]
+                            if velocity_inversion_qubits:
+                                circuit.x(velocity_inversion_qubits)
 
-                    circuit.compose(
-                        PhaseShift(
-                            num_qubits=len(self.lattice.grid_index(dim)),
-                            positive=positive,
-                            logger=self.logger,
-                        )
-                        .circuit.control(
-                            self.lattice.num_velocity_qubits
-                            + len(self.additional_control_qubit_indices)
-                        )
-                        .decompose(),
-                        qubits=self.additional_control_qubit_indices
-                        + self.lattice.velocity_index()
-                        + self.lattice.grid_index(dim),
-                        inplace=True,
-                    )
+                            circuit.compose(
+                                PhaseShift(
+                                    num_qubits=len(self.lattice.grid_index(dim)),
+                                    positive=positive,
+                                    logger=self.logger,
+                                )
+                                .circuit.control(
+                                    self.lattice.num_velocity_qubits
+                                    + len(self.additional_control_qubit_indices)
+                                )
+                                .decompose(),
+                                qubits=self.additional_control_qubit_indices
+                                + self.lattice.velocity_index()
+                                + self.lattice.grid_index(dim),
+                                inplace=True,
+                            )
 
-                    if velocity_inversion_qubits:
-                        circuit.x(velocity_inversion_qubits)
+                            if velocity_inversion_qubits:
+                                circuit.x(velocity_inversion_qubits)
+                        case _:
+                            raise LatticeException(
+                                f"Unsupported lattice encoding: {self.lattice.get_encoding()}"
+                            )
 
             circuit.compose(
                 QFT(len(self.lattice.grid_index(dim)), inverse=True),

@@ -9,12 +9,15 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
+from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMOperator, LBMPrimitive
 from qlbm.components.ms.specular_reflection import SpecularWallComparator
 from qlbm.lattice.geometry.encodings.ms import ReflectionPoint
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
+from qlbm.lattice.lattices.base import AmplitudeLattice
+from qlbm.lattice.lattices.oh_lattice import OHLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten, get_qubits_to_invert
@@ -35,7 +38,12 @@ class ABReflectionOperator(LBMOperator):
             {
                 "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
                 "geometry": [
-                    {"shape": "cuboid", "x": [1, 3], "y": [1, 3], "boundary": "bounceback"}
+                    {
+                        "shape": "cuboid",
+                        "x": [1, 3],
+                        "y": [1, 3],
+                        "boundary": "bounceback",
+                    }
                 ],
             }
         )
@@ -45,7 +53,7 @@ class ABReflectionOperator(LBMOperator):
 
     """
 
-    lattice: ABLattice
+    lattice: AmplitudeLattice
 
     def __init__(
         self,
@@ -79,7 +87,7 @@ class ABReflectionOperator(LBMOperator):
             circuit.compose(self.set_inside_wall_ancilla_state(block), inplace=True)
 
         circuit.compose(
-            self.reset_ancilla_of_point_state(
+            self.set_ancilla_of_point_state(
                 flatten(
                     [[(p, None) for p in block.corners_inside] for block in self.blocks]
                 ),
@@ -125,7 +133,7 @@ class ABReflectionOperator(LBMOperator):
         # Re-reset the ancilla state of the populations that
         # Shouldn't have been flipped in the previous step
         circuit.compose(
-            self.reset_ancilla_of_point_state(point_data, ignore_velocity_data=False),
+            self.set_ancilla_of_point_state(point_data, ignore_velocity_data=False),
             inplace=True,
         )
 
@@ -233,36 +241,65 @@ class ABReflectionOperator(LBMOperator):
                 for v in block.get_lbm_wall_velocity_indices_to_reflect(
                     self.lattice.discretization, dim, bool(bound)
                 ):
-                    qs = [
-                        self.lattice.velocity_index()[0] + q
-                        for q in get_qubits_to_invert(
-                            v, self.lattice.num_velocity_qubits
-                        )
-                    ]
+                    match self.lattice.get_encoding():
+                        case ABEncodingType.AB:
+                            qs = [
+                                self.lattice.velocity_index()[0] + q
+                                for q in get_qubits_to_invert(
+                                    v, self.lattice.num_velocity_qubits
+                                )
+                            ]
 
-                    if qs:
-                        circuit.x(qs)
+                            if qs:
+                                circuit.x(qs)
 
-                    control_qubits = (
-                        self.lattice.grid_index(wall.dim)
-                        + self.lattice.ancillae_comparator_index()
-                        + self.lattice.velocity_index()  # The reset step is additionally controlled on the velocity register
-                    )
+                            control_qubits = (
+                                self.lattice.grid_index(wall.dim)
+                                + self.lattice.ancillae_comparator_index()
+                                + self.lattice.velocity_index()  # The reset step is additionally controlled on the velocity register
+                            )
 
-                    target_qubits = self.lattice.ancillae_obstacle_index(0)
+                            target_qubits = self.lattice.ancillae_obstacle_index(0)
 
-                    circuit.compose(
-                        MCMTGate(
-                            XGate(),
-                            len(control_qubits),
-                            len(target_qubits),
-                        ),
-                        qubits=control_qubits + target_qubits,
-                        inplace=True,
-                    )
+                            circuit.compose(
+                                MCMTGate(
+                                    XGate(),
+                                    len(control_qubits),
+                                    len(target_qubits),
+                                ),
+                                qubits=control_qubits + target_qubits,
+                                inplace=True,
+                            )
 
-                    if qs:
-                        circuit.x(qs)
+                            if qs:
+                                circuit.x(qs)
+                        case ABEncodingType.OH:
+                            control_qubits = (
+                                self.lattice.grid_index(wall.dim)
+                                + self.lattice.ancillae_comparator_index()
+                                + [
+                                    self.lattice.velocity_index()[
+                                        v
+                                    ]  # Only one velocity index required here
+                                ]
+                            )
+
+                            target_qubits = self.lattice.ancillae_obstacle_index(0)
+
+                            circuit.compose(
+                                MCMTGate(
+                                    XGate(),
+                                    len(control_qubits),
+                                    len(target_qubits),
+                                ),
+                                qubits=control_qubits + target_qubits,
+                                inplace=True,
+                            )
+
+                        case _:
+                            raise LatticeException(
+                                f"Unsupported lattice encoding: {self.lattice.get_encoding()}"
+                            )
 
                 if grid_qubit_indices_to_invert:
                     circuit.x(grid_qubit_indices_to_invert)
@@ -271,7 +308,7 @@ class ABReflectionOperator(LBMOperator):
 
         return circuit
 
-    def reset_ancilla_of_point_state(
+    def set_ancilla_of_point_state(
         self,
         points_data: List[Tuple[ReflectionPoint, List[int]]],
         ignore_velocity_data: bool,
@@ -298,51 +335,88 @@ class ABReflectionOperator(LBMOperator):
                 self.lattice.grid_index(0)[0] + qubit
                 for qubit in point.qubits_to_invert
             ]
-            velocity_data = (
-                [
-                    [
-                        self.lattice.velocity_index()[0] + qubit
-                        for qubit in get_qubits_to_invert(
-                            velocity_index, self.lattice.num_velocity_qubits
-                        )
-                    ]
-                    for velocity_index in velocities
-                ]
-                if not ignore_velocity_data
-                else [[]]
-            )
             if grid_qubit_indices_to_invert:
                 circuit.x(grid_qubit_indices_to_invert)
 
-            # Reset the state for each velocity we care about:
-            for velocity_qubit_indices_to_invert in velocity_data:
-                if velocity_qubit_indices_to_invert:
-                    circuit.x(velocity_qubit_indices_to_invert)
-
-                control_qubits = (
-                    self.lattice.grid_index()
-                    + (
-                        self.lattice.velocity_index()
+            match self.lattice.get_encoding():
+                case ABEncodingType.AB:
+                    velocity_data = (
+                        [
+                            [
+                                self.lattice.velocity_index()[0] + qubit
+                                for qubit in get_qubits_to_invert(
+                                    velocity_index, self.lattice.num_velocity_qubits
+                                )
+                            ]
+                            for velocity_index in velocities
+                        ]
                         if not ignore_velocity_data
-                        else []
-                    )  # The reset step is additionally controlled on the velocity register
-                )
+                        else [[]]
+                    )
 
-                target_qubits = self.lattice.ancillae_obstacle_index(0)
+                    # Reset the state for each velocity we care about:
+                    for velocity_qubit_indices_to_invert in velocity_data:
+                        if velocity_qubit_indices_to_invert:
+                            circuit.x(velocity_qubit_indices_to_invert)
 
-                circuit.compose(
-                    MCMTGate(
-                        XGate(),
-                        len(control_qubits),
-                        len(target_qubits),
-                    ),
-                    qubits=control_qubits + target_qubits,
-                    inplace=True,
-                )
+                        control_qubits = (
+                            self.lattice.grid_index()
+                            + (
+                                self.lattice.velocity_index()
+                                if not ignore_velocity_data
+                                else []
+                            )  # The reset step is additionally controlled on the velocity register
+                        )
 
-                if velocity_qubit_indices_to_invert:
-                    circuit.x(velocity_qubit_indices_to_invert)
+                        target_qubits = self.lattice.ancillae_obstacle_index(0)
 
+                        circuit.compose(
+                            MCMTGate(
+                                XGate(),
+                                len(control_qubits),
+                                len(target_qubits),
+                            ),
+                            qubits=control_qubits + target_qubits,
+                            inplace=True,
+                        )
+                        if velocity_qubit_indices_to_invert:
+                            circuit.x(velocity_qubit_indices_to_invert)
+                case ABEncodingType.OH:
+                    if ignore_velocity_data:
+                        circuit.compose(
+                            MCMTGate(
+                                XGate(),
+                                len(self.lattice.grid_index()),
+                                len(self.lattice.ancillae_obstacle_index(0)),
+                            ),
+                            qubits=self.lattice.grid_index()
+                            + self.lattice.ancillae_obstacle_index(0),
+                            inplace=True,
+                        )
+                    else:
+                        for v in velocities:
+                            control_qubits = (
+                                self.lattice.grid_index()
+                                + (
+                                    [self.lattice.velocity_index()[v]]
+                                )  # Only one velocity control
+                            )
+
+                            target_qubits = self.lattice.ancillae_obstacle_index(0)
+
+                            circuit.compose(
+                                MCMTGate(
+                                    XGate(),
+                                    len(control_qubits),
+                                    len(target_qubits),
+                                ),
+                                qubits=control_qubits + target_qubits,
+                                inplace=True,
+                            )
+                case _:
+                    raise LatticeException(
+                        f"Unsupported lattice encoding: {self.encoding}"
+                    )
             if grid_qubit_indices_to_invert:
                 circuit.x(grid_qubit_indices_to_invert)
 
@@ -364,6 +438,7 @@ class ABReflectionOperator(LBMOperator):
             ABReflectionPermutation(
                 self.lattice.num_velocity_qubits,
                 self.lattice.discretization,
+                self.lattice.get_encoding(),
                 self.logger,
             )
             .circuit.control(1)
@@ -396,10 +471,10 @@ class ABReflectionPermutation(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.ab import ABReflectionPermutation
+        from qlbm.components.ab import ABEncodingType, ABReflectionPermutation
         from qlbm.lattice import LatticeDiscretization
 
-        ABReflectionPermutation(4, LatticeDiscretization.D2Q9).draw("mpl") 
+        ABReflectionPermutation(4, LatticeDiscretization.D2Q9, ABEncodingType.AB).draw("mpl")
 
     """
 
@@ -413,16 +488,23 @@ class ABReflectionPermutation(LBMPrimitive):
     The lattice discretization the permutation adheres to.
     """
 
+    encoding: ABEncodingType
+    """
+    The type of encoding to permute for.
+    """
+
     def __init__(
         self,
         num_qubits: int,
         discretization: LatticeDiscretization,
+        encoding: ABEncodingType,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
 
         self.num_qubits = num_qubits
         self.discretization = discretization
+        self.encoding = encoding
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -436,38 +518,48 @@ class ABReflectionPermutation(LBMPrimitive):
         if self.discretization == LatticeDiscretization.D2Q9:
             return self.__create_circuit_d2q9()
 
-        raise LatticeException("ABE reflection only currently supported in D2Q9")
+        raise LatticeException("AB reflection only currently supported in D2Q9")
 
     def __create_circuit_d2q9(self):
         circuit = QuantumCircuit(self.num_qubits)
+        match self.encoding:
+            case ABEncodingType.OH:
+                circuit.swap(1, 3)
+                circuit.swap(2, 4)
+                circuit.swap(5, 7)
+                circuit.swap(6, 8)
 
-        # 1 <-> 3
-        circuit.x([0, 1])
-        circuit.mcx([0, 1, 3], 2)
-        circuit.x([0, 1])
+            case ABEncodingType.AB:
+                # 1 <-> 3
+                circuit.x([0, 1])
+                circuit.mcx([0, 1, 3], 2)
+                circuit.x([0, 1])
 
-        # 2 <-> 4
-        circuit.x([0, 3])
-        circuit.cx(1, 2)
-        circuit.mcx([0, 2, 3], 1)
-        circuit.cx(1, 2)
-        circuit.x([0, 3])
+                # 2 <-> 4
+                circuit.x([0, 3])
+                circuit.cx(1, 2)
+                circuit.mcx([0, 2, 3], 1)
+                circuit.cx(1, 2)
+                circuit.x([0, 3])
 
-        # 5 <-> 7
-        circuit.x(0)
-        circuit.mcx([0, 1, 3], 2)
-        circuit.x(0)
+                # 5 <-> 7
+                circuit.x(0)
+                circuit.mcx([0, 1, 3], 2)
+                circuit.x(0)
 
-        # 6 <-> 8
-        circuit.cx(0, 1)
-        circuit.cx(0, 2)
-        circuit.x(3)
-        circuit.mcx([1, 2, 3], 0)
-        circuit.cx(0, 2)
-        circuit.cx(0, 1)
-        circuit.x(3)
+                # 6 <-> 8
+                circuit.cx(0, 1)
+                circuit.cx(0, 2)
+                circuit.x(3)
+                circuit.mcx([1, 2, 3], 0)
+                circuit.cx(0, 2)
+                circuit.cx(0, 1)
+                circuit.x(3)
 
-        return circuit.reverse_bits()
+            case _:
+                raise LatticeException(f"Unsupported lattice encoding: {self.encoding}")
+
+        return circuit.reverse_bits() if self.encoding == ABEncodingType.AB else circuit
 
     @override
     def __str__(self) -> str:
