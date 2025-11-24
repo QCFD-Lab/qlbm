@@ -1,0 +1,1852 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Infrastructure &#8212; qlbm 0.0.6 documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
+    <link rel="stylesheet" type="text/css" href="../_static/css/custom.css?v=b4fc2567" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../_static/documentation_options.js?v=1fd71caa"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+    <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/design-tabs.js?v=f930bc37"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'code/infra';</script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Other Tools" href="tools.html" />
+    <link rel="prev" title="QLGA Circuits" href="comps_lga.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="" />
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+  
+    <p class="title logo__title">qlbm 0.0.6 documentation</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Internal Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/qcfd-lab/qlbm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/qlbm/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="index.html">
+    Internal Documentation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../examples/index.html">
+    Tutorials
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item"><ul class="navbar-icon-links"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/qcfd-lab/qlbm" title="GitHub" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://pypi.org/project/qlbm/" title="PyPI" class="nav-link pst-navbar-icon" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><i class="fa-brands fa-python fa-lg" aria-hidden="true"></i>
+            <span class="sr-only">PyPI</span></a>
+        </li>
+</ul></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="lattice.html">Lattices and Geometry</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comps_base.html">Base Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comps_cqlbm.html">Amplitude-Based Circuits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="comps_lga.html">QLGA Circuits</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Infrastructure</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools.html">Other Tools</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Internal Documentation</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Infrastructure</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="infrastructure">
+<span id="infra"></span><h1>Infrastructure<a class="headerlink" href="#infrastructure" title="Link to this heading">#</a></h1>
+<p>Infrastructure concerns components of <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> that do not directly
+implement functionality related to QLBM quantum circuits.
+This includes the circuits’ integration with quantum simulators,
+compilers, and external tools.
+Making good use of such tools and their rapidly expanding ecosystems
+is crucial for accelerating QLBM research, as it allows
+researchers to focus on algorithm design rather than simulation techniques.</p>
+<p><code class="docutils literal notranslate"><span class="pre">qlbm</span></code> currently integrates the core quantum components with the following infrastructure:</p>
+<ol class="arabic simple">
+<li><p><a class="reference internal" href="#simulators"><span class="std std-ref">Runners</span></a> allow users to efficiently simulate quantum circuits. In addition to basic simulation, <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> offers features that allow for reinitialization between time steps, among other <a class="reference internal" href="#performance"><span class="std std-ref">Performance</span></a> improvements.</p></li>
+<li><p><a class="reference internal" href="#compilers"><span class="std std-ref">Compilers</span></a> enable users to convert high-level quantum circuits into hardware- or simulator-specific formats, as well as analyze the scalability of available methods.</p></li>
+<li><p><a class="reference internal" href="#results"><span class="std std-ref">Results</span></a> provide an interface between the counts generated by the quantum simulator and Paraview. Information is parsed into standard formats that increase the accessibility of QLBMs.</p></li>
+<li><p><a class="reference internal" href="#config"><span class="std std-ref">Simulation Config</span></a> provides a convenient interface that ties together simulators, compilers, and quantum circuits.</p></li>
+</ol>
+<section id="runners">
+<span id="simulators"></span><h2>Runners<a class="headerlink" href="#runners" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.runner.base.CircuitRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.runner.base.</span></span><span class="sig-name descname"><span class="pre">CircuitRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device='CPU'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/base.py#L32-L194"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.base.CircuitRunner" title="Link to this definition">#</a></dt>
+<dd><p>Base class for all simulator-specific runners.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">CircuitRunner</span></code> object uses the information provided in a <a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="qlbm.infra.runner.simulation_config.SimulationConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a>
+to efficiently simulate the QLBM circuit.
+This includes converting the initial conditions into a suitable
+format, concatenating circuits together, performing reinitialization,
+and processing results.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">config</span></code></p></td>
+<td><p>The <a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="qlbm.infra.runner.simulation_config.SimulationConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a> containing the simulation information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">reinitializer</span></code></p></td>
+<td><p>The <a class="reference internal" href="#qlbm.infra.reinitialize.base.Reinitializer" title="qlbm.infra.reinitialize.base.Reinitializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reinitializer</span></code></a> that performs the transition between time steps.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code></p></td>
+<td><p>Currently ignored.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="qlbm.infra.runner.simulation_config.SimulationConfig"><em>SimulationConfig</em></a>)</p></li>
+<li><p><strong>lattice</strong> (<a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><em>Lattice</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+<li><p><strong>device</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.base.CircuitRunner.run">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_shots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statevector_snapshots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/base.py#L74-L104"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.base.CircuitRunner.run" title="Link to this definition">#</a></dt>
+<dd><p>Simulates the provided configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_steps</strong> (<em>int</em>) – The number of time steps to simulate the system for.</p></li>
+<li><p><strong>num_shots</strong> (<em>int</em>) – The number of shots to perform for each time step.</p></li>
+<li><p><strong>output_directory</strong> (<em>str</em>) – The directory to which output will be stored.</p></li>
+<li><p><strong>output_file_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The root name for files containing time step artifacts, by default “step”.</p></li>
+<li><p><strong>statevector_snapshots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to utilize statevector snapshots, by default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed result of the simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qlbm.infra.result.base.QBMResult" title="qlbm.infra.result.base.QBMResult">QBMResult</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.base.CircuitRunner.new_result">
+<span class="sig-name descname"><span class="pre">new_result</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/base.py#L106-L144"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.base.CircuitRunner.new_result" title="Link to this definition">#</a></dt>
+<dd><p>Get a new result object for the current runner.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>output_directory</strong> (<em>str</em>) – The directory where the result data will be stored.</p></li>
+<li><p><strong>output_file_name</strong> (<em>str</em>) – The file name of the result data within the directory.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An empty result object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qlbm.infra.result.base.QBMResult" title="qlbm.infra.result.base.QBMResult">QBMResult</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.ResultsException" title="qlbm.tools.exceptions.ResultsException"><strong>ResultsException</strong></a> – If there is no matching result object for the runner’s lattice.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.base.CircuitRunner.new_reinitializer">
+<span class="sig-name descname"><span class="pre">new_reinitializer</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/base.py#L146-L176"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.base.CircuitRunner.new_reinitializer" title="Link to this definition">#</a></dt>
+<dd><p>Creates a new reinitializer for a simulated algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A suitable reinitializer.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#qlbm.infra.reinitialize.base.Reinitializer" title="qlbm.infra.reinitialize.base.Reinitializer">Reinitializer</a></p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.ResultsException" title="qlbm.tools.exceptions.ResultsException"><strong>ResultsException</strong></a> – If the underlying algorithm does not support reinitialization.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.base.CircuitRunner.statevector_to_circuit">
+<span class="sig-name descname"><span class="pre">statevector_to_circuit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statevector</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/base.py#L178-L194"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.base.CircuitRunner.statevector_to_circuit" title="Link to this definition">#</a></dt>
+<dd><p>Converts a given statevector to a qiskit quantum circuit representation for seamless circuit assembly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>statevector</strong> (<em>Statevector</em>) – The initial condition statevector.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The quantum circuit representation of the statevector.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QiskitQC</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.runner.qiskit_runner.QiskitRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.runner.qiskit_runner.</span></span><span class="sig-name descname"><span class="pre">QiskitRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device='CPU'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_statevector_to_disk=False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/qiskit_runner.py#L21-L267"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.qiskit_runner.QiskitRunner" title="Link to this definition">#</a></dt>
+<dd><p>Qiskit-specific implementation of the <code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitRunner</span></code>.</p>
+<p>A provided simulation configuration is compatible with this runner if the following conditions are met:</p>
+<ol class="arabic simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code> is either a <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> <a class="reference internal" href="comps_base.html#qlbm.components.base.QuantumComponent" title="qlbm.components.base.QuantumComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumComponent</span></code></a>, a Qiskit <code class="docutils literal notranslate"><span class="pre">Statevector</span></code> or a Qiskit``QuantumCircuit``.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">execution_backend</span></code> is a Qiskit <code class="docutils literal notranslate"><span class="pre">AerBackend</span></code>.</p></li>
+<li><p>If enabled, the <code class="docutils literal notranslate"><span class="pre">sampling_backend</span></code> is a Qiskit <code class="docutils literal notranslate"><span class="pre">AerBackend</span></code>.</p></li>
+</ol>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">config</span></code></p></td>
+<td><p>The <a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="qlbm.infra.runner.simulation_config.SimulationConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a> containing the simulation information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">reinitializer</span></code></p></td>
+<td><p>The <a class="reference internal" href="#qlbm.infra.reinitialize.base.Reinitializer" title="qlbm.infra.reinitialize.base.Reinitializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reinitializer</span></code></a> that performs the transition between time steps.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code></p></td>
+<td><p>Currently ignored.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Any simulator with a Qiskit <code class="docutils literal notranslate"><span class="pre">AerBackend</span></code> interface
+can be used as either <code class="docutils literal notranslate"><span class="pre">execution_backend</span></code> or <code class="docutils literal notranslate"><span class="pre">sampling_backend</span></code>
+in the config interface.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="qlbm.infra.runner.simulation_config.SimulationConfig"><em>SimulationConfig</em></a>)</p></li>
+<li><p><strong>lattice</strong> (<a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><em>Lattice</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+<li><p><strong>device</strong> (<em>str</em>)</p></li>
+<li><p><strong>save_statevector_to_disk</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.qiskit_runner.QiskitRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_shots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statevector_snapshots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recompile_each_step</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/qiskit_runner.py#L60-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.qiskit_runner.QiskitRunner.run" title="Link to this definition">#</a></dt>
+<dd><p>Simulates the provided configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_steps</strong> (<em>int</em>) – The number of time steps to simulate the system for.</p></li>
+<li><p><strong>num_shots</strong> (<em>int</em>) – The number of shots to perform for each time step.</p></li>
+<li><p><strong>output_directory</strong> (<em>str</em>) – The directory to which output will be stored.</p></li>
+<li><p><strong>output_file_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The root name for files containing time step artifacts, by default “step”.</p></li>
+<li><p><strong>statevector_snapshots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to utilize statevector snapshots, by default False.</p></li>
+<li><p><strong>recompile_each_step</strong> (<em>bool</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed result of the simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qlbm.infra.result.base.QBMResult" title="qlbm.infra.result.base.QBMResult">QBMResult</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.runner.qulacs_runner.QulacsRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.runner.qulacs_runner.</span></span><span class="sig-name descname"><span class="pre">QulacsRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device='CPU'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/qulacs_runner.py#L24-L260"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner" title="Link to this definition">#</a></dt>
+<dd><p>Qulacs-specific implementation of the <code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitRunner</span></code>.</p>
+<p>A provided simulation configuration is compatible with this runner if the following conditions are met:</p>
+<ol class="arabic simple">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">initial_conditions</span></code> is either a <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> <a class="reference internal" href="comps_base.html#qlbm.components.base.QuantumComponent" title="qlbm.components.base.QuantumComponent"><code class="xref py py-class docutils literal notranslate"><span class="pre">QuantumComponent</span></code></a>, a Qulacs <code class="docutils literal notranslate"><span class="pre">QuantumState</span></code> or a Qulacs <code class="docutils literal notranslate"><span class="pre">QuantumCircuit</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">execution_backend</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>. A Qulacs <code class="docutils literal notranslate"><span class="pre">QuantumSimulator</span></code> object is automatically built from the config.</p></li>
+<li><p>If enabled, the <code class="docutils literal notranslate"><span class="pre">sampling_backend</span></code> is a Qiskit <code class="docutils literal notranslate"><span class="pre">AerBackend</span></code>. The Qulacs <code class="docutils literal notranslate"><span class="pre">QuantumState</span></code> is automatically converted to the appropriate Qiskit interface when performing sampling.</p></li>
+</ol>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">config</span></code></p></td>
+<td><p>The <a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="qlbm.infra.runner.simulation_config.SimulationConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a> containing the simulation information.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">reinitializer</span></code></p></td>
+<td><p>The <a class="reference internal" href="#qlbm.infra.reinitialize.base.Reinitializer" title="qlbm.infra.reinitialize.base.Reinitializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reinitializer</span></code></a> that performs the transition between time steps.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">device</span></code></p></td>
+<td><p>Currently ignored.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="qlbm.infra.runner.simulation_config.SimulationConfig"><em>SimulationConfig</em></a>)</p></li>
+<li><p><strong>lattice</strong> (<a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><em>Lattice</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+<li><p><strong>device</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.qulacs_runner.QulacsRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_steps</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_shots</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statevector_snapshots</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/qulacs_runner.py#L57-L111"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner.run" title="Link to this definition">#</a></dt>
+<dd><p>Simulates the provided configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>num_steps</strong> (<em>int</em>) – The number of time steps to simulate the system for.</p></li>
+<li><p><strong>num_shots</strong> (<em>int</em>) – The number of shots to perform for each time step.</p></li>
+<li><p><strong>output_directory</strong> (<em>str</em>) – The directory to which output will be stored.</p></li>
+<li><p><strong>output_file_name</strong> (<em>str</em><em>, </em><em>optional</em>) – The root name for files containing time step artifacts, by default “step”.</p></li>
+<li><p><strong>statevector_snapshots</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to utilize statevector snapshots, by default False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The parsed result of the simulation.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#qlbm.infra.result.base.QBMResult" title="qlbm.infra.result.base.QBMResult">QBMResult</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.qulacs_runner.QulacsRunner.get_counts">
+<span class="sig-name descname"><span class="pre">get_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qulacs_samples</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_bits</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/qulacs_runner.py#L236-L256"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner.get_counts" title="Link to this definition">#</a></dt>
+<dd><p>Converts qulacs samples to qiskit <code class="docutils literal notranslate"><span class="pre">Counts</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>qulacs_samples</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – The samples generated through qulacs sampling.</p></li>
+<li><p><strong>num_bits</strong> (<em>int</em>) – The number of bits each sample contains.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The qiskit <code class="docutils literal notranslate"><span class="pre">Counts</span></code> representation of the object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Counts</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="performance">
+<span id="id1"></span><h2>Performance<a class="headerlink" href="#performance" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.base.Reinitializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.reinitialize.base.</span></span><span class="sig-name descname"><span class="pre">Reinitializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/base.py#L16-L95"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.base.Reinitializer" title="Link to this definition">#</a></dt>
+<dd><p>Base class for all algorithm-specific reinitializers.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">Reinitializer</span></code> uses the information at information available
+at the end of the simulation of 1 or more time steps
+to new initial conditions for the following time steps.
+Such information includes the quantum state and counts extracted from it.
+Novel initial conditions are inferred automatically based on
+the requirements of the algorithm under simulation, and
+an on-the-fly <a class="reference internal" href="#qlbm.infra.compiler.CircuitCompiler" title="qlbm.infra.compiler.CircuitCompiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitCompiler</span></code></a> automatically converts
+them to the appropriate format to enable compatibility with the already transpiled circuits.
+For convenience, all reinitializers provide a uniform <a class="reference internal" href="#qlbm.infra.reinitialize.base.Reinitializer.reinitialize" title="qlbm.infra.reinitialize.base.Reinitializer.reinitialize"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reinitialize()</span></code></a> interface,
+which takes as input both the quantum state and the counts performed during simulation.
+Its implementation may choose to ignore one of those inputs, depending on the
+algorithm and implementation.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">compiler</span></code></p></td>
+<td><p>The compiler that converts the novel initial conditions circuits.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><em>Lattice</em></a>)</p></li>
+<li><p><strong>compiler</strong> (<a class="reference internal" href="#qlbm.infra.compiler.CircuitCompiler" title="qlbm.infra.compiler.CircuitCompiler"><em>CircuitCompiler</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.base.Reinitializer.reinitialize">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reinitialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/base.py#L54-L81"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.base.Reinitializer.reinitialize" title="Link to this definition">#</a></dt>
+<dd><p>Parses the input statevector and counts, constructs a new initial conditions circuit, and transpiles it to the given backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>statevector</strong> (<em>Statevector</em>) – The statevector at the end of the simulation.</p></li>
+<li><p><strong>counts</strong> (<em>Counts</em>) – The counts extracted from the statevector at the end of the simulation.</p></li>
+<li><p><strong>backend</strong> (<em>AerBackend</em><em> | </em><em>None</em>) – The backend to compile to.k</p></li>
+<li><p><strong>optimization_level</strong> (<em>int</em><em>, </em><em>optional</em>) – The optimization level to pass to the circuit compiler, by default 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The compiled initial conditions circuit to use for the next time step.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QiskitQC | QulacsQC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.base.Reinitializer.requires_statevector">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">requires_statevector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/base.py#L83-L95"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.base.Reinitializer.requires_statevector" title="Link to this definition">#</a></dt>
+<dd><p>Whether the reinitializer requires a copy of the statevector.</p>
+<p>Omotting the statevector may significantly increase the perfomance of reinitialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether a statevector is needed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.reinitialize.identity_reinitializer.</span></span><span class="sig-name descname"><span class="pre">IdentityReinitializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/identity_reinitializer.py#L18-L90"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer" title="Link to this definition">#</a></dt>
+<dd><p>Implementation of the <a class="reference internal" href="#qlbm.infra.reinitialize.base.Reinitializer" title="qlbm.infra.reinitialize.base.Reinitializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reinitializer</span></code></a> that passes along the statevector to the following time step.</p>
+<p>Useful for the <a class="reference internal" href="comps_cqlbm.html#qlbm.components.CQLBM" title="qlbm.components.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> and <a class="reference internal" href="comps_lga.html#qlbm.components.LQLGA" title="qlbm.components.LQLGA"><code class="xref py py-class docutils literal notranslate"><span class="pre">LQLGA</span></code></a> algorithms.
+Compatible with both <a class="reference internal" href="#qlbm.infra.runner.qiskit_runner.QiskitRunner" title="qlbm.infra.runner.qiskit_runner.QiskitRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">QiskitRunner</span></code></a>s and <a class="reference internal" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner" title="qlbm.infra.runner.qulacs_runner.QulacsRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">QulacsRunner</span></code></a>s.
+To generate a new set of initial conditions for the CQLBM algorithm,
+the reinitializer simply returns the quantum state computed
+at the end of the previous simulation.
+This allows the reuse of a single quantum circuit for the simulation
+of arbitrarily many time steps.
+No copy of the statevector is required.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">compiler</span></code></p></td>
+<td><p>The compiler that converts the novel initial conditions circuits.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><em>Lattice</em></a>)</p></li>
+<li><p><strong>compiler</strong> (<a class="reference internal" href="#qlbm.infra.compiler.CircuitCompiler" title="qlbm.infra.compiler.CircuitCompiler"><em>CircuitCompiler</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer.reinitialize">
+<span class="sig-name descname"><span class="pre">reinitialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/identity_reinitializer.py#L54-L86"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer.reinitialize" title="Link to this definition">#</a></dt>
+<dd><p>Returns the provided <code class="docutils literal notranslate"><span class="pre">statevector</span></code> as a new Qiskit <code class="docutils literal notranslate"><span class="pre">Initialize</span></code> object that can be prepended to the time step circuit to resume simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>statevector</strong> (<em>Statevector</em>) – The statevector at the end of the simulation.</p></li>
+<li><p><strong>counts</strong> (<em>Counts</em>) – Ignored.</p></li>
+<li><p><strong>backend</strong> (<em>AerBackend</em><em> | </em><em>None</em>) – Ignored.</p></li>
+<li><p><strong>optimization_level</strong> (<em>int</em><em>, </em><em>optional</em>) – Ignored.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Qiskit <code class="docutils literal notranslate"><span class="pre">Initialize</span></code> object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QiskitQC | QulacsQC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer.requires_statevector">
+<span class="sig-name descname"><span class="pre">requires_statevector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/identity_reinitializer.py#L88-L90"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer.requires_statevector" title="Link to this definition">#</a></dt>
+<dd><p>Whether the reinitializer requires a copy of the statevector.</p>
+<p>Omotting the statevector may significantly increase the perfomance of reinitialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether a statevector is needed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.reinitialize.spacetime_reinitializer.</span></span><span class="sig-name descname"><span class="pre">SpaceTimeReinitializer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/spacetime_reinitializer.py#L23-L177"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer" title="Link to this definition">#</a></dt>
+<dd><p><a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a>-specific implementation of the <a class="reference internal" href="#qlbm.infra.reinitialize.base.Reinitializer" title="qlbm.infra.reinitialize.base.Reinitializer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Reinitializer</span></code></a>.</p>
+<p>Compatible with both <a class="reference internal" href="#qlbm.infra.runner.qiskit_runner.QiskitRunner" title="qlbm.infra.runner.qiskit_runner.QiskitRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">QiskitRunner</span></code></a>s and <a class="reference internal" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner" title="qlbm.infra.runner.qulacs_runner.QulacsRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">QulacsRunner</span></code></a>s.
+To generate a new set of initial conditions for the Space-Time encoding,
+the reinitializer simply returns the quantum state computed
+at the end of the previous simulation.
+This allows the reuse of a single quantum circuit for the simulation
+of arbitrarily many time steps.
+No copy of the statevector is required.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice" title="qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeLattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">compiler</span></code></p></td>
+<td><p>The compiler that converts the novel initial conditions circuits.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice" title="qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice"><em>SpaceTimeLattice</em></a>)</p></li>
+<li><p><strong>compiler</strong> (<a class="reference internal" href="#qlbm.infra.compiler.CircuitCompiler" title="qlbm.infra.compiler.CircuitCompiler"><em>CircuitCompiler</em></a>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.reinitialize">
+<span class="sig-name descname"><span class="pre">reinitialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/spacetime_reinitializer.py#L63-L97"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.reinitialize" title="Link to this definition">#</a></dt>
+<dd><p>Converts the input <code class="docutils literal notranslate"><span class="pre">counts</span></code> into a new <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.initial.PointWiseSpaceTimeInitialConditions" title="qlbm.components.spacetime.initial.PointWiseSpaceTimeInitialConditions"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointWiseSpaceTimeInitialConditions</span></code></a> object that can be prepended to the time step circuit to resume simulation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>statevector</strong> (<em>Statevector</em>) – Ignored.</p></li>
+<li><p><strong>counts</strong> (<em>Counts</em>) – The counts obtained from <code class="xref py py-class docutils literal notranslate"><span class="pre">SpacetimeGridVelocityMeasurement</span></code> at the end of the simulation.</p></li>
+<li><p><strong>backend</strong> (<em>AerBackend</em><em> | </em><em>None</em>) – The backend used for simulation.</p></li>
+<li><p><strong>optimization_level</strong> (<em>int</em><em>, </em><em>optional</em>) – The compiler optimization level.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The suitably compiles initial conditions circuit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QiskitQC | QulacsQC</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.counts_to_velocity_pairs">
+<span class="sig-name descname"><span class="pre">counts_to_velocity_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/spacetime_reinitializer.py#L99-L121"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.counts_to_velocity_pairs" title="Link to this definition">#</a></dt>
+<dd><p>Converts all counts into their grid and velocity components.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>counts</strong> (<em>Counts</em>) – The Qiskit <code class="docutils literal notranslate"><span class="pre">Count</span></code> output of the simulation.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The input counts split into their grid position and velocity profile.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.split_count">
+<span class="sig-name descname"><span class="pre">split_count</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">count</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/spacetime_reinitializer.py#L123-L173"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.split_count" title="Link to this definition">#</a></dt>
+<dd><p>Splits a given <code class="docutils literal notranslate"><span class="pre">Count</span></code> into its position and velocity components.</p>
+<p>Counts are assumed to be obtained from <code class="xref py py-class docutils literal notranslate"><span class="pre">SpacetimeGridVelocityMeasurement</span></code> objects,
+and split format is the same as the input to <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.initial.PointWiseSpaceTimeInitialConditions" title="qlbm.components.spacetime.initial.PointWiseSpaceTimeInitialConditions"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointWiseSpaceTimeInitialConditions</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>count</strong> (<em>str</em>) – The Qiskit <code class="docutils literal notranslate"><span class="pre">Count</span></code> output of the simulation.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The input count split into its grid position and velocity profile.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Tuple[int, int], Tuple[bool, bool, bool, bool]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.requires_statevector">
+<span class="sig-name descname"><span class="pre">requires_statevector</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/reinitialize/spacetime_reinitializer.py#L175-L177"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.requires_statevector" title="Link to this definition">#</a></dt>
+<dd><p>Whether the reinitializer requires a copy of the statevector.</p>
+<p>Omotting the statevector may significantly increase the perfomance of reinitialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Whether a statevector is needed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="compilers">
+<span id="id2"></span><h2>Compilers<a class="headerlink" href="#compilers" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.compiler.CircuitCompiler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.compiler.</span></span><span class="sig-name descname"><span class="pre">CircuitCompiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compiler_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/compiler.py#L22-L283"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.compiler.CircuitCompiler" title="Link to this definition">#</a></dt>
+<dd><p>Wrapper for Qiskit and Tket transpilers with flexible targets.</p>
+<p>This class provides a uniform interface for compiling <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> circuits
+to any Qiskit backend, as well as Qulacs.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">compiler_type</span></code></p></td>
+<td><p>Which transpiler platform to use. Should be either <code class="docutils literal notranslate"><span class="pre">&quot;QISKIT&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;TKET&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">compiler_target</span></code></p></td>
+<td><p>The platform to which the circuit should adhere. Should be either <code class="docutils literal notranslate"><span class="pre">&quot;QISKIT&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;QULACS&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">logger</span></code></p></td>
+<td><p>The performance logger, by default <code class="docutils literal notranslate"><span class="pre">getLogger(&quot;qlbm&quot;)</span></code>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Example usage: we will construct an end-to-end QLBM algorithm and compile it to a qiskit simulator using Tket.
+We begin by constructing a <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> algorithm for a <span class="math notranslate nohighlight">\(4 \times 8\)</span> lattice, with one time step.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.components.spacetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaceTimeQLBM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.infra</span><span class="w"> </span><span class="kn">import</span> <span class="n">CircuitCompiler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">qlbm.lattice</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpaceTimeLattice</span>
+
+<span class="c1"># Build an example lattice</span>
+<span class="n">lattice</span> <span class="o">=</span> <span class="n">SpaceTimeLattice</span><span class="p">(</span>
+    <span class="n">num_timesteps</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">lattice_data</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;lattice&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;dim&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;x&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="mi">8</span><span class="p">},</span> <span class="s2">&quot;velocities&quot;</span><span class="p">:</span> <span class="s2">&quot;D2Q4&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/55cb0058b56c813060e07f219ea6807f/infra-1.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>)</p>
+<p>We can first visualize the high-level quantum circuit the <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> infers:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Build a complex quantum circuit and visualize it</span>
+<span class="n">component</span> <span class="o">=</span> <span class="n">SpaceTimeQLBM</span><span class="p">(</span><span class="n">lattice</span><span class="o">=</span><span class="n">lattice</span><span class="p">)</span>
+
+<span class="n">component</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/aed306227839b353f542b791bb323cbf/infra-2.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>, <a class="reference download internal" download="" href="../_downloads/f7587d6ae2b00db9809756b87e687fda/infra-2.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/9ea1a1273fae1ed60510a0bf2ece0702/infra-2.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/1f46c11fb3481e61ab9d8b111f9b4a35/infra-2.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/infra-2.png" class="plot-directive" src="../_images/infra-2.png" />
+</figure>
+<p>To construct the compiler, we only need to specify that we intend to use Tket to compile to a Qiskit simulator:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Construct a compiler that uses Tket to target Qiskit</span>
+<span class="n">compiler</span> <span class="o">=</span> <span class="n">CircuitCompiler</span><span class="p">(</span><span class="s2">&quot;TKET&quot;</span><span class="p">,</span> <span class="s2">&quot;QISKIT&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/d6e46366ac33112cd6b943c88cb7401f/infra-3.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>)</p>
+<p>Compilation takes a single call to the <a class="reference internal" href="#qlbm.infra.compiler.CircuitCompiler.compile" title="qlbm.infra.compiler.CircuitCompiler.compile"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compile()</span></code></a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">qiskit_aer</span><span class="w"> </span><span class="kn">import</span> <span class="n">AerSimulator</span>
+
+<span class="c1"># Compiler the circuit to the qiskit AerSimulator</span>
+<span class="n">compiled_circuit</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">AerSimulator</span><span class="p">())</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/214c414241338f683c152aa5e9d09c88/infra-4.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>)</p>
+<p>The result is a Qiskit quantum circuit, which we can visualize the same way we would any <code class="docutils literal notranslate"><span class="pre">qlbm</span></code> component:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">compiled_circuit</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="s2">&quot;mpl&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/9fc2145db4c70ebd917bc22d1e2ababc/infra-5.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>)</p>
+<figure class="align-default" id="id4">
+<img alt="../_images/infra-5_00.png" class="plot-directive" src="../_images/infra-5_00.png" />
+<figcaption>
+<p><span class="caption-text">(<a class="reference download internal" download="" href="../_downloads/88bc48eb2d7991e64906cbc81bac05a3/infra-5_00.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/7baefa7df7a96c82176523e211bd74ba/infra-5_00.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/7ef83de584c8fd2444961424d2ddc3ac/infra-5_00.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</span><a class="headerlink" href="#id4" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<figure class="align-default" id="id5">
+<img alt="../_images/infra-5_01.png" class="plot-directive" src="../_images/infra-5_01.png" />
+<figcaption>
+<p><span class="caption-text">(<a class="reference download internal" download="" href="../_downloads/756390210ef2bfafa0b122dfeec72f99/infra-5_01.png"><code class="xref download docutils literal notranslate"><span class="pre">png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/89ec62bd49c611ddd3bdc811a7bba19e/infra-5_01.hires.png"><code class="xref download docutils literal notranslate"><span class="pre">hires.png</span></code></a>, <a class="reference download internal" download="" href="../_downloads/cd71bf12bd5d167823453b38fa68b246/infra-5_01.pdf"><code class="xref download docutils literal notranslate"><span class="pre">pdf</span></code></a>)</span><a class="headerlink" href="#id5" title="Link to this image">#</a></p>
+</figcaption>
+</figure>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.CompilerException" title="qlbm.tools.exceptions.CompilerException"><strong>CompilerException</strong></a> – If the compiler type is not supported.</p></li>
+<li><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.CompilerException" title="qlbm.tools.exceptions.CompilerException"><strong>CompilerException</strong></a> – If the compiler target is not supported.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>compiler_type</strong> (<em>str</em>)</p></li>
+<li><p><strong>compiler_target</strong> (<em>str</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.compiler.CircuitCompiler.compile">
+<span class="sig-name descname"><span class="pre">compile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compile_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/compiler.py#L143-L252"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.compiler.CircuitCompiler.compile" title="Link to this definition">#</a></dt>
+<dd><p>Compiles the provided object to the appropriate backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>compile_object</strong> (<em>QiskitQC</em><em> | </em><a class="reference internal" href="comps_base.html#qlbm.components.base.QuantumComponent" title="qlbm.components.base.QuantumComponent"><em>QuantumComponent</em></a>) – The object (<code class="docutils literal notranslate"><span class="pre">qlbm</span></code> component or quantum) circuit to compile.</p></li>
+<li><p><strong>backend</strong> (<em>AerBackend</em><em> | </em><em>None</em>) – The backend to compile to.</p></li>
+<li><p><strong>optimization_level</strong> (<em>int</em><em>, </em><em>optional</em>) – The compiler optimization level, by default 0.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The compiled circuit.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>QulacsQC | QiskitQC</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.CompilerException" title="qlbm.tools.exceptions.CompilerException"><strong>CompilerException</strong></a> – If the optimization level is not available.</p></li>
+<li><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.CompilerException" title="qlbm.tools.exceptions.CompilerException"><strong>CompilerException</strong></a> – If the compiler target and backend are incompatible.</p></li>
+<li><p><a class="reference internal" href="tools.html#qlbm.tools.exceptions.CompilerException" title="qlbm.tools.exceptions.CompilerException"><strong>CompilerException</strong></a> – If the compiler platform is not supported.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="results">
+<span id="id3"></span><h2>Results<a class="headerlink" href="#results" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.result.base.</span></span><span class="sig-name descname"><span class="pre">QBMResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L17-L192"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult" title="Link to this definition">#</a></dt>
+<dd><p>Base class for all algorithm-specific results.</p>
+<p>A <code class="docutils literal notranslate"><span class="pre">Result</span></code> object parses the counts extracted from the quantum state
+at the end of the simulation of some number of time steps.
+This information is then either translated into a visual representation
+of the encoded flow field or parsed into a format that is suitable for reinitialization.
+Results can additionally create visual representations of
+lattice geometry and save data to disk in compressed formats.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></p></td>
+<td><p>The <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">Lattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">directory</span></code></p></td>
+<td><p>The directory to which the results outputs data to.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">paraview_dir</span></code></p></td>
+<td><p>The subdirectory under <code class="docutils literal notranslate"><span class="pre">directory</span></code> which stores the Paraview files.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">output_file_name</span></code></p></td>
+<td><p>The root name for files containing time step artifacts, by default “step”.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.Lattice" title="qlbm.lattice.lattices.base.Lattice"><em>Lattice</em></a>)</p></li>
+<li><p><strong>directory</strong> (<em>str</em>)</p></li>
+<li><p><strong>output_file_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.visualize_geometry">
+<span class="sig-name descname"><span class="pre">visualize_geometry</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L62-L77"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.visualize_geometry" title="Link to this definition">#</a></dt>
+<dd><p>Creates <code class="docutils literal notranslate"><span class="pre">stl</span></code> files for each block in the lattice.</p>
+<p>Output files are formatted as <code class="docutils literal notranslate"><span class="pre">output_dir/paraview_dir/cube_&lt;x&gt;.stl</span></code>.
+The output is created through the <a class="reference internal" href="comps_base.html#qlbm.lattice.geometry.shapes.base.Shape" title="qlbm.lattice.geometry.shapes.base.Shape"><code class="xref py py-class docutils literal notranslate"><span class="pre">Shape</span></code></a>’s <a class="reference internal" href="comps_base.html#qlbm.lattice.geometry.shapes.base.Shape.stl_mesh" title="qlbm.lattice.geometry.shapes.base.Shape.stl_mesh"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Shape.stl_mesh()</span></code></a> method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.save_timestep_array">
+<span class="sig-name descname"><span class="pre">save_timestep_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">numpy_res</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_vis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_counts_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L79-L107"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.save_timestep_array" title="Link to this definition">#</a></dt>
+<dd><p>Saves the time step array to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>numpy_res</strong> (<em>np.ndarray</em>) – The result in array format.</p></li>
+<li><p><strong>timestep</strong> (<em>int</em>) – The time step to which the result corresponds.</p></li>
+<li><p><strong>create_vis</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create the visualization, by default True.</p></li>
+<li><p><strong>save_counts_array</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the raw counts object to a CSV file, by default False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.create_visualization">
+<span class="sig-name descname"><span class="pre">create_visualization</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L109-L142"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.create_visualization" title="Link to this definition">#</a></dt>
+<dd><p>Creates a <code class="docutils literal notranslate"><span class="pre">vtk</span></code> visual representation of the data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>np.ndarray</em><em> | </em><em>None</em>) – The <code class="docutils literal notranslate"><span class="pre">np.ndarray</span></code> representation of the population density at each grid location.</p></li>
+<li><p><strong>timestep</strong> (<em>int</em>) – The time step to which the data corresponds.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.save_timestep_counts">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">save_timestep_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_vis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L144-L166"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.save_timestep_counts" title="Link to this definition">#</a></dt>
+<dd><p>Saves the time step counts to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>counts</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>) – The result in Qiskit <code class="docutils literal notranslate"><span class="pre">Counts</span></code> format.</p></li>
+<li><p><strong>timestep</strong> (<em>int</em>) – The time step to which the result corresponds.k</p></li>
+<li><p><strong>create_vis</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create the visualization, by default True.</p></li>
+<li><p><strong>save_array</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the raw counts object to a CSV file, by default False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.visualize_all_numpy_data">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">visualize_all_numpy_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L168-L171"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.visualize_all_numpy_data" title="Link to this definition">#</a></dt>
+<dd><p>Converts all numpy data saved to disk to <code class="docutils literal notranslate"><span class="pre">vti</span></code> files.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.base.QBMResult.save_statevector">
+<span class="sig-name descname"><span class="pre">save_statevector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">statevector</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/base.py#L173-L192"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.base.QBMResult.save_statevector" title="Link to this definition">#</a></dt>
+<dd><p>Save a given statevector to disk.</p>
+<p>The statevector is saved as a numpy array in the <code class="docutils literal notranslate"><span class="pre">statevector</span></code> subdirectory of the result’s root directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>statevector</strong> (<em>Statevector</em>) – The statevector to save.</p></li>
+<li><p><strong>step</strong> (<em>int</em>) – The step this statevector corresponds to, for naming purposes.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.result.amplitude_result.AmplitudeResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.result.amplitude_result.</span></span><span class="sig-name descname"><span class="pre">AmplitudeResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/amplitude_result.py#L17-L157"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.amplitude_result.AmplitudeResult" title="Link to this definition">#</a></dt>
+<dd><p>Implementation of the <a class="reference internal" href="#qlbm.infra.result.base.QBMResult" title="qlbm.infra.result.base.QBMResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">QBMResult</span></code></a> for lattices inheriting from <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.AmplitudeLattice" title="qlbm.lattice.lattices.base.AmplitudeLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">AmplitudeLattice</span></code></a>.</p>
+<p>Processes counts sampled from <a class="reference internal" href="comps_cqlbm.html#qlbm.components.ms.primitives.GridMeasurement" title="qlbm.components.ms.primitives.GridMeasurement"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridMeasurement</span></code></a> primitives.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.lattice" title="qlbm.infra.result.amplitude_result.AmplitudeResult.lattice"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></a></p></td>
+<td><p>The <a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.AmplitudeLattice" title="qlbm.lattice.lattices.base.AmplitudeLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">AmplitudeLattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.directory" title="qlbm.infra.result.amplitude_result.AmplitudeResult.directory"><code class="xref py py-attr docutils literal notranslate"><span class="pre">directory</span></code></a></p></td>
+<td><p>The directory to which the results outputs data to.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.output_file_name" title="qlbm.infra.result.amplitude_result.AmplitudeResult.output_file_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">output_file_name</span></code></a></p></td>
+<td><p>The root name for files containing time step artifacts, by default “step”.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.AmplitudeLattice" title="qlbm.lattice.lattices.base.AmplitudeLattice"><em>AmplitudeLattice</em></a>)</p></li>
+<li><p><strong>directory</strong> (<em>str</em>)</p></li>
+<li><p><strong>output_file_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.amplitude_result.AmplitudeResult.num_steps">
+<span class="sig-name descname"><span class="pre">num_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.num_steps" title="Link to this definition">#</a></dt>
+<dd><p>The time step to which this result corresponds.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.amplitude_result.AmplitudeResult.directory">
+<span class="sig-name descname"><span class="pre">directory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.directory" title="Link to this definition">#</a></dt>
+<dd><p>The output directory for the results.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.amplitude_result.AmplitudeResult.output_file_name">
+<span class="sig-name descname"><span class="pre">output_file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.output_file_name" title="Link to this definition">#</a></dt>
+<dd><p>The name of the file to output the artifacts to.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.amplitude_result.AmplitudeResult.lattice">
+<span class="sig-name descname"><span class="pre">lattice</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="comps_base.html#qlbm.lattice.lattices.base.AmplitudeLattice" title="qlbm.lattice.lattices.base.AmplitudeLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">AmplitudeLattice</span></code></a></em><a class="headerlink" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.lattice" title="Link to this definition">#</a></dt>
+<dd><p>The lattice the result corresponds to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.amplitude_result.AmplitudeResult.save_timestep_counts">
+<span class="sig-name descname"><span class="pre">save_timestep_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_vis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/amplitude_result.py#L52-L128"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.save_timestep_counts" title="Link to this definition">#</a></dt>
+<dd><p>Saves the time step counts to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>counts</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>) – The result in Qiskit <code class="docutils literal notranslate"><span class="pre">Counts</span></code> format.</p></li>
+<li><p><strong>timestep</strong> (<em>int</em>) – The time step to which the result corresponds.k</p></li>
+<li><p><strong>create_vis</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create the visualization, by default True.</p></li>
+<li><p><strong>save_array</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the raw counts object to a CSV file, by default False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.amplitude_result.AmplitudeResult.visualize_all_numpy_data">
+<span class="sig-name descname"><span class="pre">visualize_all_numpy_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/amplitude_result.py#L130-L157"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.visualize_all_numpy_data" title="Link to this definition">#</a></dt>
+<dd><p>Converts all numpy data saved to disk to <code class="docutils literal notranslate"><span class="pre">vti</span></code> files.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.result.spacetime_result.SpaceTimeResult">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.result.spacetime_result.</span></span><span class="sig-name descname"><span class="pre">SpaceTimeResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lattice</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'step'</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/spacetime_result.py#L17-L145"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult" title="Link to this definition">#</a></dt>
+<dd><p><a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a>-specific implementation of the <a class="reference internal" href="#qlbm.infra.result.base.QBMResult" title="qlbm.infra.result.base.QBMResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">QBMResult</span></code></a>.</p>
+<p>Processes counts sampled from <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.measurement.SpaceTimeGridVelocityMeasurement" title="qlbm.components.spacetime.measurement.SpaceTimeGridVelocityMeasurement"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeGridVelocityMeasurement</span></code></a> primitives.</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Summary</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.lattice" title="qlbm.infra.result.spacetime_result.SpaceTimeResult.lattice"><code class="xref py py-attr docutils literal notranslate"><span class="pre">lattice</span></code></a></p></td>
+<td><p>The <a class="reference internal" href="lattice.html#qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice" title="qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeLattice</span></code></a> of the simulated system.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.directory" title="qlbm.infra.result.spacetime_result.SpaceTimeResult.directory"><code class="xref py py-attr docutils literal notranslate"><span class="pre">directory</span></code></a></p></td>
+<td><p>The directory to which the results outputs data to.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.output_file_name" title="qlbm.infra.result.spacetime_result.SpaceTimeResult.output_file_name"><code class="xref py py-attr docutils literal notranslate"><span class="pre">output_file_name</span></code></a></p></td>
+<td><p>The root name for files containing time step artifacts, by default “step”.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lattice</strong> (<a class="reference internal" href="lattice.html#qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice" title="qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice"><em>SpaceTimeLattice</em></a>)</p></li>
+<li><p><strong>directory</strong> (<em>str</em>)</p></li>
+<li><p><strong>output_file_name</strong> (<em>str</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.spacetime_result.SpaceTimeResult.num_steps">
+<span class="sig-name descname"><span class="pre">num_steps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></em><a class="headerlink" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.num_steps" title="Link to this definition">#</a></dt>
+<dd><p>The time step to which this result corresponds.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.spacetime_result.SpaceTimeResult.directory">
+<span class="sig-name descname"><span class="pre">directory</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.directory" title="Link to this definition">#</a></dt>
+<dd><p>The output directory for the results.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.spacetime_result.SpaceTimeResult.output_file_name">
+<span class="sig-name descname"><span class="pre">output_file_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></em><a class="headerlink" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.output_file_name" title="Link to this definition">#</a></dt>
+<dd><p>The name of the file to output the artifacts to.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="qlbm.infra.result.spacetime_result.SpaceTimeResult.lattice">
+<span class="sig-name descname"><span class="pre">lattice</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="lattice.html#qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice" title="qlbm.lattice.lattices.spacetime_lattice.SpaceTimeLattice"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeLattice</span></code></a></em><a class="headerlink" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.lattice" title="Link to this definition">#</a></dt>
+<dd><p>The lattice the result corresponds to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.spacetime_result.SpaceTimeResult.save_timestep_counts">
+<span class="sig-name descname"><span class="pre">save_timestep_counts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">counts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_vis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_array</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/spacetime_result.py#L52-L116"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.save_timestep_counts" title="Link to this definition">#</a></dt>
+<dd><p>Saves the time step counts to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>counts</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><em>float</em><em>]</em>) – The result in Qiskit <code class="docutils literal notranslate"><span class="pre">Counts</span></code> format.</p></li>
+<li><p><strong>timestep</strong> (<em>int</em>) – The time step to which the result corresponds.k</p></li>
+<li><p><strong>create_vis</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to create the visualization, by default True.</p></li>
+<li><p><strong>save_array</strong> (<em>bool</em><em>, </em><em>optional</em>) – Whether to save the raw counts object to a CSV file, by default False.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.result.spacetime_result.SpaceTimeResult.visualize_all_numpy_data">
+<span class="sig-name descname"><span class="pre">visualize_all_numpy_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/result/spacetime_result.py#L118-L145"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.visualize_all_numpy_data" title="Link to this definition">#</a></dt>
+<dd><p>Converts all numpy data saved to disk to <code class="docutils literal notranslate"><span class="pre">vti</span></code> files.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="simulation-config">
+<span id="config"></span><h2>Simulation Config<a class="headerlink" href="#simulation-config" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="qlbm.infra.runner.simulation_config.SimulationConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">qlbm.infra.runner.simulation_config.</span></span><span class="sig-name descname"><span class="pre">SimulationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">initial_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">algorithm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">postprocessing</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measurement</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_platform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_platform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_level</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">statevector_sampling</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">execution_backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sampling_backend</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger=&lt;Logger</span> <span class="pre">qlbm</span> <span class="pre">(WARNING)&gt;</span></span></em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/simulation_config.py#L17-L393"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.simulation_config.SimulationConfig" title="Link to this definition">#</a></dt>
+<dd><p>A <code class="docutils literal notranslate"><span class="pre">SimulationConfig</span></code> ties together algorithmic quantum components, circuit compilers, runners, and performance optimizations.</p>
+<p>This is the most convenient access point for performing simulations with <code class="docutils literal notranslate"><span class="pre">qlbm</span></code>.
+In total, the config contains 11 relevant class attributes that together
+allow users to customize their simulations in a declarative manner.
+For convenience, we split these attributes by the purpose they serve
+for the simulation workflow.</p>
+<p>Algorithmic attributes specify the complete, end-to-end, QLBM algorithm.
+This includes initial conditions, the time step circuit,
+an optional postprocessing step, and a final measurement procedure.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id6">
+<caption><span class="caption-text">Algorithmic attributes</span><a class="headerlink" href="#id6" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">initial_conditions</span></code></p></td>
+<td><p>The initial conditions of the simulations. For example, <a class="reference internal" href="comps_cqlbm.html#qlbm.components.ms.primitives.MSInitialConditions" title="qlbm.components.ms.primitives.MSInitialConditions"><code class="xref py py-class docutils literal notranslate"><span class="pre">MSInitialConditions</span></code></a> or <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.initial.PointWiseSpaceTimeInitialConditions" title="qlbm.components.spacetime.initial.PointWiseSpaceTimeInitialConditions"><code class="xref py py-class docutils literal notranslate"><span class="pre">PointWiseSpaceTimeInitialConditions</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">algorithm</span></code></p></td>
+<td><p>The algorithm that performs the QLBM time step computation. For example, <a class="reference internal" href="comps_cqlbm.html#qlbm.components.CQLBM" title="qlbm.components.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> or <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">postprocessing</span></code></p></td>
+<td><p>The quantum component concataned to the <code class="docutils literal notranslate"><span class="pre">algorithm</span></code>. Usually <code class="xref py py-class docutils literal notranslate"><span class="pre">EmptyPrimitive</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">measurement</span></code></p></td>
+<td><p>The circuit that samples the quantum state. For example, <a class="reference internal" href="comps_cqlbm.html#qlbm.components.ms.primitives.GridMeasurement" title="qlbm.components.ms.primitives.GridMeasurement"><code class="xref py py-class docutils literal notranslate"><span class="pre">GridMeasurement</span></code></a> or <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.measurement.SpaceTimeGridVelocityMeasurement" title="qlbm.components.spacetime.measurement.SpaceTimeGridVelocityMeasurement"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeGridVelocityMeasurement</span></code></a>.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Compiler-related attributes govern how compilers convert algorithmic attributes to the appropriate format.
+All quantum circuits will be compiled using the same settings.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id7">
+<caption><span class="caption-text">Compiler-related attributes</span><a class="headerlink" href="#id7" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">target_platform</span></code></p></td>
+<td><p>The platform that the simulation will be carried out on. Either <code class="docutils literal notranslate"><span class="pre">&quot;QISKIT&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;QULACS&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">compiler_platform</span></code></p></td>
+<td><p>The platform of the compiler to use. Either <code class="docutils literal notranslate"><span class="pre">&quot;QISKIT&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;TKET&quot;</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">optimization_level</span></code></p></td>
+<td><p>The compiler optimization level.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Runner-related attributes prescribe how the simulation should proceede.
+This includes the specific simulators that will execute the circuits,
+and performance optimization settings.</p>
+<div class="pst-scrollable-table-container"><table class="table" id="id8">
+<caption><span class="caption-text">Runner-related attributes</span><a class="headerlink" href="#id8" title="Link to this table">#</a></caption>
+<colgroup>
+<col style="width: 33.3%" />
+<col style="width: 66.7%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Attribute</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">execution_backend</span></code></p></td>
+<td><p>The specific <code class="docutils literal notranslate"><span class="pre">AerSimulator</span></code> use (if using Qiskit) or <code class="docutils literal notranslate"><span class="pre">None</span></code> if using Qulacs.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">sampling_backend</span></code></p></td>
+<td><p>The specific <code class="docutils literal notranslate"><span class="pre">AerSimulator</span></code> to use if <code class="docutils literal notranslate"><span class="pre">statevector_sampling</span></code> is enabled.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-attr docutils literal notranslate"><span class="pre">statevector_sampling</span></code></p></td>
+<td><p>Whether statevector sampling should be utilized.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example configuration: simulating <a class="reference internal" href="comps_lga.html#qlbm.components.spacetime.spacetime.SpaceTimeQLBM" title="qlbm.components.spacetime.spacetime.SpaceTimeQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpaceTimeQLBM</span></code></a> with Qiskit.
+First, we set up the config with the circuits we want to simulate,
+and the infrastructure we want to use.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">SimulationConfig</span><span class="p">(</span>
+    <span class="n">initial_conditions</span><span class="o">=</span><span class="n">SpaceTimeInitialConditions</span><span class="p">(</span>
+        <span class="n">lattice</span><span class="p">,</span> <span class="n">grid_data</span><span class="o">=</span><span class="p">[((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="kc">True</span><span class="p">))]</span>
+    <span class="p">),</span>
+    <span class="n">algorithm</span><span class="o">=</span><span class="n">SpaceTimeQLBM</span><span class="p">(</span><span class="n">lattice</span><span class="p">),</span>
+    <span class="n">postprocessing</span><span class="o">=</span><span class="n">EmptyPrimitive</span><span class="p">(</span><span class="n">lattice</span><span class="p">),</span>
+    <span class="n">measurement</span><span class="o">=</span><span class="n">SpaceTimeGridVelocityMeasurement</span><span class="p">(</span><span class="n">lattice</span><span class="p">),</span>
+    <span class="n">target_platform</span><span class="o">=</span><span class="s2">&quot;QISKIT&quot;</span><span class="p">,</span>
+    <span class="n">compiler_platform</span><span class="o">=</span><span class="s2">&quot;QISKIT&quot;</span><span class="p">,</span>
+    <span class="n">optimization_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">statevector_sampling</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">execution_backend</span><span class="o">=</span><span class="n">AerSimulator</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;statevector&quot;</span><span class="p">),</span>
+    <span class="n">sampling_backend</span><span class="o">=</span><span class="n">AerSimulator</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;statevector&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Once constructed, the <code class="docutils literal notranslate"><span class="pre">cfg</span></code> will figure out the appropriate
+compiler calls to convert the circuit to the appropriate format.
+All the user needs to do is call the <a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig.prepare_for_simulation" title="qlbm.infra.runner.simulation_config.SimulationConfig.prepare_for_simulation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_for_simulation()</span></code></a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">prepare_for_simulation</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The circuits are compiled in-place, which makes it
+easy to plug in the <code class="docutils literal notranslate"><span class="pre">cfg</span></code> object into a <a class="reference internal" href="#qlbm.infra.runner.qiskit_runner.QiskitRunner" title="qlbm.infra.runner.qiskit_runner.QiskitRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">QiskitRunner</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a runner object to simulate the circuit</span>
+<span class="n">runner</span> <span class="o">=</span> <span class="n">QiskitRunner</span><span class="p">(</span>
+    <span class="n">cfg</span><span class="p">,</span>
+    <span class="n">lattice</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Simulate the circuits</span>
+<span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="mi">10</span>
+    <span class="mi">2</span><span class="o">**</span><span class="mi">12</span><span class="p">,</span>
+    <span class="s2">&quot;output_dir&quot;</span><span class="p">,</span>
+    <span class="kc">False</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Example configuration: simulating <a class="reference internal" href="comps_cqlbm.html#qlbm.components.CQLBM" title="qlbm.components.CQLBM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CQLBM</span></code></a> with Qulacs and Tket.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span> <span class="o">=</span> <span class="n">SimulationConfig</span><span class="p">(</span>
+    <span class="n">initial_conditions</span><span class="o">=</span><span class="n">MSInitialConditions</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">logger</span><span class="p">),</span>
+    <span class="n">algorithm</span><span class="o">=</span><span class="n">CQLBM</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">logger</span><span class="p">),</span>
+    <span class="n">postprocessing</span><span class="o">=</span><span class="n">EmptyPrimitive</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">logger</span><span class="p">),</span>
+    <span class="n">measurement</span><span class="o">=</span><span class="n">GridMeasurement</span><span class="p">(</span><span class="n">lattice</span><span class="p">,</span> <span class="n">logger</span><span class="p">),</span>
+    <span class="n">target_platform</span><span class="o">=</span><span class="s2">&quot;QULACS&quot;</span><span class="p">,</span>
+    <span class="n">compiler_platform</span><span class="o">=</span><span class="s2">&quot;TKET&quot;</span><span class="p">,</span>
+    <span class="n">optimization_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">statevector_sampling</span><span class="o">=</span><span class="n">statevector_sampling</span><span class="p">,</span>
+    <span class="n">execution_backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">sampling_backend</span><span class="o">=</span><span class="n">AerSimulator</span><span class="p">(</span><span class="n">method</span><span class="o">=</span><span class="s2">&quot;statevector&quot;</span><span class="p">),</span>
+    <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Once constructed, the <code class="docutils literal notranslate"><span class="pre">cfg</span></code> will figure out the appropriate
+compiler calls to convert the circuit to the appropriate format.
+All the user needs to do is call the <a class="reference internal" href="#qlbm.infra.runner.simulation_config.SimulationConfig.prepare_for_simulation" title="qlbm.infra.runner.simulation_config.SimulationConfig.prepare_for_simulation"><code class="xref py py-meth docutils literal notranslate"><span class="pre">prepare_for_simulation()</span></code></a> method:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cfg</span><span class="o">.</span><span class="n">prepare_for_simulation</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The circuits are compiled in-place, which makes it
+easy to plug in the <code class="docutils literal notranslate"><span class="pre">cfg</span></code> object into a <a class="reference internal" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner" title="qlbm.infra.runner.qulacs_runner.QulacsRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">QulacsRunner</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a runner object to simulate the circuit</span>
+<span class="n">runner</span> <span class="o">=</span> <span class="n">QulacsRunner</span><span class="p">(</span>
+    <span class="n">cfg</span><span class="p">,</span>
+    <span class="n">lattice</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Simulate the circuits</span>
+<span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+    <span class="mi">10</span>
+    <span class="mi">2</span><span class="o">**</span><span class="mi">12</span><span class="p">,</span>
+    <span class="s2">&quot;output_dir&quot;</span><span class="p">,</span>
+    <span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>initial_conditions</strong> (<em>Statevector</em><em> | </em><em>QuantumCircuit</em><em> | </em><em>QuantumState</em><em> | </em><em>QuantumCircuit</em><em> | </em><a class="reference internal" href="comps_base.html#qlbm.components.base.QuantumComponent" title="qlbm.components.base.QuantumComponent"><em>QuantumComponent</em></a>)</p></li>
+<li><p><strong>algorithm</strong> (<em>QuantumCircuit</em><em> | </em><em>QuantumCircuit</em><em> | </em><a class="reference internal" href="comps_base.html#qlbm.components.base.QuantumComponent" title="qlbm.components.base.QuantumComponent"><em>QuantumComponent</em></a>)</p></li>
+<li><p><strong>postprocessing</strong> (<em>QuantumCircuit</em><em> | </em><em>QuantumCircuit</em><em> | </em><a class="reference internal" href="comps_base.html#qlbm.components.base.QuantumComponent" title="qlbm.components.base.QuantumComponent"><em>QuantumComponent</em></a>)</p></li>
+<li><p><strong>measurement</strong> (<em>QuantumCircuit</em><em> | </em><a class="reference internal" href="comps_base.html#qlbm.components.base.QuantumComponent" title="qlbm.components.base.QuantumComponent"><em>QuantumComponent</em></a>)</p></li>
+<li><p><strong>target_platform</strong> (<em>str</em>)</p></li>
+<li><p><strong>compiler_platform</strong> (<em>str</em>)</p></li>
+<li><p><strong>optimization_level</strong> (<em>int</em>)</p></li>
+<li><p><strong>statevector_sampling</strong> (<em>bool</em>)</p></li>
+<li><p><strong>execution_backend</strong> (<em>AerBackend</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>sampling_backend</strong> (<em>AerBackend</em>)</p></li>
+<li><p><strong>logger</strong> (<em>Logger</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.simulation_config.SimulationConfig.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/simulation_config.py#L252-L310"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.simulation_config.SimulationConfig.validate" title="Link to this definition">#</a></dt>
+<dd><p>Validates the configuration.</p>
+<p>This includes the following checks:</p>
+<ol class="arabic simple">
+<li><p>The algorithmic attributes are of compatible types.</p></li>
+<li><p>The target platform is available.</p></li>
+<li><p>The execution backend (if enabled) is compatible with the target platform.</p></li>
+<li><p>The sampling backend (if enabled) is compatible with the target platform.</p></li>
+</ol>
+<p>This function simply checks that the provided attributes are
+suitable - it does not perform any conversions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.simulation_config.SimulationConfig.prepare_for_simulation">
+<span class="sig-name descname"><span class="pre">prepare_for_simulation</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/simulation_config.py#L330-L337"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.simulation_config.SimulationConfig.prepare_for_simulation" title="Link to this definition">#</a></dt>
+<dd><p>Converts all algorithmic components to the target platform according to the specification, in place.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.simulation_config.SimulationConfig.get_execution_compiler">
+<span class="sig-name descname"><span class="pre">get_execution_compiler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/simulation_config.py#L339-L352"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.simulation_config.SimulationConfig.get_execution_compiler" title="Link to this definition">#</a></dt>
+<dd><p>Get the <code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitCompiler</span></code> that can converts the algorithmic attributes to the target <code class="docutils literal notranslate"><span class="pre">sampling_backend</span></code> simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A compatible circuit compiler.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#qlbm.infra.compiler.CircuitCompiler" title="qlbm.infra.compiler.CircuitCompiler">CircuitCompiler</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="qlbm.infra.runner.simulation_config.SimulationConfig.get_sampling_compiler">
+<span class="sig-name descname"><span class="pre">get_sampling_compiler</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/qcfd-lab/qlbm/tree/main/qlbm/infra/runner/simulation_config.py#L354-L367"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#qlbm.infra.runner.simulation_config.SimulationConfig.get_sampling_compiler" title="Link to this definition">#</a></dt>
+<dd><p>Get the <code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitCompiler</span></code> that can converts the algorithmic attributes to the target <code class="docutils literal notranslate"><span class="pre">execution_backend</span></code> simulator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>A compatible circuit compiler.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#qlbm.infra.compiler.CircuitCompiler" title="qlbm.infra.compiler.CircuitCompiler">CircuitCompiler</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="comps_lga.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">QLGA Circuits</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="tools.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Other Tools</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#runners">Runners</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.base.CircuitRunner"><code class="docutils literal notranslate"><span class="pre">CircuitRunner</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.base.CircuitRunner.run"><code class="docutils literal notranslate"><span class="pre">CircuitRunner.run()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.base.CircuitRunner.new_result"><code class="docutils literal notranslate"><span class="pre">CircuitRunner.new_result()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.base.CircuitRunner.new_reinitializer"><code class="docutils literal notranslate"><span class="pre">CircuitRunner.new_reinitializer()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.base.CircuitRunner.statevector_to_circuit"><code class="docutils literal notranslate"><span class="pre">CircuitRunner.statevector_to_circuit()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.qiskit_runner.QiskitRunner"><code class="docutils literal notranslate"><span class="pre">QiskitRunner</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.qiskit_runner.QiskitRunner.run"><code class="docutils literal notranslate"><span class="pre">QiskitRunner.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner"><code class="docutils literal notranslate"><span class="pre">QulacsRunner</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner.run"><code class="docutils literal notranslate"><span class="pre">QulacsRunner.run()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.qulacs_runner.QulacsRunner.get_counts"><code class="docutils literal notranslate"><span class="pre">QulacsRunner.get_counts()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#performance">Performance</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.base.Reinitializer"><code class="docutils literal notranslate"><span class="pre">Reinitializer</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.base.Reinitializer.reinitialize"><code class="docutils literal notranslate"><span class="pre">Reinitializer.reinitialize()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.base.Reinitializer.requires_statevector"><code class="docutils literal notranslate"><span class="pre">Reinitializer.requires_statevector()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer"><code class="docutils literal notranslate"><span class="pre">IdentityReinitializer</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer.reinitialize"><code class="docutils literal notranslate"><span class="pre">IdentityReinitializer.reinitialize()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.identity_reinitializer.IdentityReinitializer.requires_statevector"><code class="docutils literal notranslate"><span class="pre">IdentityReinitializer.requires_statevector()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer"><code class="docutils literal notranslate"><span class="pre">SpaceTimeReinitializer</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.reinitialize"><code class="docutils literal notranslate"><span class="pre">SpaceTimeReinitializer.reinitialize()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.counts_to_velocity_pairs"><code class="docutils literal notranslate"><span class="pre">SpaceTimeReinitializer.counts_to_velocity_pairs()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.split_count"><code class="docutils literal notranslate"><span class="pre">SpaceTimeReinitializer.split_count()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer.requires_statevector"><code class="docutils literal notranslate"><span class="pre">SpaceTimeReinitializer.requires_statevector()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compilers">Compilers</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.compiler.CircuitCompiler"><code class="docutils literal notranslate"><span class="pre">CircuitCompiler</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.compiler.CircuitCompiler.compile"><code class="docutils literal notranslate"><span class="pre">CircuitCompiler.compile()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#results">Results</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.base.QBMResult"><code class="docutils literal notranslate"><span class="pre">QBMResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.base.QBMResult.visualize_geometry"><code class="docutils literal notranslate"><span class="pre">QBMResult.visualize_geometry()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.base.QBMResult.save_timestep_array"><code class="docutils literal notranslate"><span class="pre">QBMResult.save_timestep_array()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.base.QBMResult.create_visualization"><code class="docutils literal notranslate"><span class="pre">QBMResult.create_visualization()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.base.QBMResult.save_timestep_counts"><code class="docutils literal notranslate"><span class="pre">QBMResult.save_timestep_counts()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.base.QBMResult.visualize_all_numpy_data"><code class="docutils literal notranslate"><span class="pre">QBMResult.visualize_all_numpy_data()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.base.QBMResult.save_statevector"><code class="docutils literal notranslate"><span class="pre">QBMResult.save_statevector()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.amplitude_result.AmplitudeResult"><code class="docutils literal notranslate"><span class="pre">AmplitudeResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.num_steps"><code class="docutils literal notranslate"><span class="pre">AmplitudeResult.num_steps</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.directory"><code class="docutils literal notranslate"><span class="pre">AmplitudeResult.directory</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.output_file_name"><code class="docutils literal notranslate"><span class="pre">AmplitudeResult.output_file_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.lattice"><code class="docutils literal notranslate"><span class="pre">AmplitudeResult.lattice</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.save_timestep_counts"><code class="docutils literal notranslate"><span class="pre">AmplitudeResult.save_timestep_counts()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.amplitude_result.AmplitudeResult.visualize_all_numpy_data"><code class="docutils literal notranslate"><span class="pre">AmplitudeResult.visualize_all_numpy_data()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult"><code class="docutils literal notranslate"><span class="pre">SpaceTimeResult</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.num_steps"><code class="docutils literal notranslate"><span class="pre">SpaceTimeResult.num_steps</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.directory"><code class="docutils literal notranslate"><span class="pre">SpaceTimeResult.directory</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.output_file_name"><code class="docutils literal notranslate"><span class="pre">SpaceTimeResult.output_file_name</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.lattice"><code class="docutils literal notranslate"><span class="pre">SpaceTimeResult.lattice</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.save_timestep_counts"><code class="docutils literal notranslate"><span class="pre">SpaceTimeResult.save_timestep_counts()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.result.spacetime_result.SpaceTimeResult.visualize_all_numpy_data"><code class="docutils literal notranslate"><span class="pre">SpaceTimeResult.visualize_all_numpy_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#simulation-config">Simulation Config</a><ul class="visible nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.simulation_config.SimulationConfig"><code class="docutils literal notranslate"><span class="pre">SimulationConfig</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.simulation_config.SimulationConfig.validate"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.validate()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.simulation_config.SimulationConfig.prepare_for_simulation"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.prepare_for_simulation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.simulation_config.SimulationConfig.get_execution_compiler"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.get_execution_compiler()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#qlbm.infra.runner.simulation_config.SimulationConfig.get_sampling_compiler"><code class="docutils literal notranslate"><span class="pre">SimulationConfig.get_sampling_compiler()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+<div id="searchbox"></div></div>
+
+  <div class="sidebar-secondary-item">
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/code/infra.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, qlbm authors.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.0.2.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
