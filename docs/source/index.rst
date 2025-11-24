@@ -25,11 +25,11 @@ The :ref:`tools` module contains miscellaneous utilities.
 
 #. **L**\ inear \ **Q**\ uantum **L**\ attice **G**\ as **A**\ utomata (LQLGA) described in :cite:p:`spacetime2`, :cite:p:`lqlga1`, and :cite:p:`lqlga2`.
 
-.. card:: Intro to QLBM
-    :link: internal_docs
-    :link-type: ref
+.. .. card:: Intro to QLBM
+..     :link: internal_docs
+..     :link-type: ref
     
-    :fas:`lightbulb;sd-text-primary` Check out the basics.
+..     :fas:`lightbulb;sd-text-primary` Check out the basics.
 
 .. card:: Internal Documentation
     :link: internal_docs
