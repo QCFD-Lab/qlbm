@@ -8,6 +8,7 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
+from qlbm.tools.utils import flatten
 
 
 class LQGLAInitialConditions(LBMPrimitive):
@@ -90,3 +91,81 @@ class LQGLAInitialConditions(LBMPrimitive):
     @override
     def __str__(self):
         return f"[Primitive LQGLAInitialConditions on lattice={self.lattice}, grid_data={self.grid_data})]"
+
+
+class LQGLAAveragedInitialConditions(LBMPrimitive):
+    """
+    Primitive for setting initial conditions in the :class:`.LQLGA` algorithm.
+
+    This operator creates an equal magnitude superposition over a set of gridpoints.
+    This is equivalent to starting the QLGA algorithm in all possible configurations
+    over the given set of gridpoints.
+
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.lattice import LQLGALattice
+        from qlbm.components.lqlga import LQGLAAveragedInitialConditions
+
+        lattice = LQLGALattice(
+            {
+                "lattice": {
+                    "dim": {"x": 5},
+                    "velocities": "D1Q3",
+                },
+                "geometry": [],
+            },
+        )
+        initial_conditions = LQGLAAveragedInitialConditions(lattice, [0, 2, 3])
+        initial_conditions.draw("mpl")
+
+    """
+
+    gridpoints: List[int]
+    """The gridpoints to create the uniform superposition over."""
+
+    def __init__(
+        self,
+        lattice: LQLGALattice,
+        gridpoints: List[int],
+        logger: Logger = getLogger("qlbm"),
+    ):
+        super().__init__(logger)
+
+        self.lattice = lattice
+        self.gridpoints = gridpoints
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self):
+        circuit = self.lattice.circuit.copy()
+
+        circuit.h(
+            flatten(
+                [
+                    list(
+                        range(
+                            gp * self.lattice.num_velocities_per_point,
+                            gp * self.lattice.num_velocities_per_point
+                            + self.lattice.num_velocities_per_point,
+                        )
+                    )
+                    for gp in self.gridpoints
+                ]
+            )
+        )
+
+        return circuit
+
+    @override
+    def __str__(self):
+        return f"[Primitive LQGLAAveragedInitialConditions on lattice={self.lattice}, gps={self.gridpoints})]"

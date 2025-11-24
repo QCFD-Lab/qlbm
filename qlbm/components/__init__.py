@@ -1,34 +1,29 @@
 """Modular and extendible quantum circuits that perform parts of the QLBM algorithm."""
 
+from .ab import (
+    ABQLBM,
+    ABGridMeasurement,
+    ABInitialConditions,
+    ABReflectionOperator,
+    ABReflectionPermutation,
+    ABStreamingOperator,
+)
 from .base import (
-    CQLBMOperator,
     LBMAlgorithm,
     LBMOperator,
     LBMPrimitive,
+    MSOperator,
     QuantumComponent,
     SpaceTimeOperator,
-)
-from .collisionless import (
-    CQLBM,
-    BounceBackReflectionOperator,
-    CollisionlessInitialConditions,
-    CollisionlessStreamingOperator,
-    GridMeasurement,
-    SpecularReflectionOperator,
-)
-from .collisionless.primitives import Comparator, ComparatorMode, SpeedSensitiveAdder
-from .collisionless.streaming import (
-    ControlledIncrementer,
-    PhaseShift,
-    SpeedSensitivePhaseShift,
-    StreamingAncillaPreparation,
 )
 from .common import (
     EmptyPrimitive,
     EQCCollisionOperator,
     EQCPermutation,
     EQCRedistribution,
+    HammingWeightAdder,
 )
+from .cqlbm import CQLBM
 from .lqlga import (
     LQLGA,
     GenericLQLGACollisionOperator,
@@ -38,13 +33,28 @@ from .lqlga import (
     LQLGAReflectionOperator,
     LQLGAStreamingOperator,
 )
+from .ms import (
+    MSQLBM,
+    BounceBackReflectionOperator,
+    GridMeasurement,
+    MSInitialConditions,
+    MSStreamingOperator,
+    SpecularReflectionOperator,
+)
+from .ms.primitives import Comparator, ComparatorMode, SpeedSensitiveAdder
+from .ms.streaming import (
+    ControlledIncrementer,
+    PhaseShift,
+    SpeedSensitivePhaseShift,
+    StreamingAncillaPreparation,
+)
 
 __all__ = [
     "QuantumComponent",
     "LBMPrimitive",
     "GenericLQLGACollisionOperator",
     "LBMOperator",
-    "CQLBMOperator",
+    "MSOperator",
     "SpaceTimeOperator",
     "LBMAlgorithm",
     "ComparatorMode",
@@ -56,14 +66,15 @@ __all__ = [
     "StreamingAncillaPreparation",
     "ControlledIncrementer",
     "GridMeasurement",
-    "CollisionlessInitialConditions",
-    "CollisionlessStreamingOperator",
+    "MSInitialConditions",
+    "MSStreamingOperator",
     "SpecularReflectionOperator",
     "BounceBackReflectionOperator",
-    "CQLBM",
+    "MSQLBM",
     "GenericLQLGACollisionOperator",
     "LQGLAInitialConditions",
     "LQLGA",
+    "CQLBM",
     "LQLGAGridVelocityMeasurement",
     "LQLGAMGReflectionOperator",
     "LQLGAReflectionOperator",
@@ -71,4 +82,11 @@ __all__ = [
     "EQCCollisionOperator",
     "EQCPermutation",
     "EQCRedistribution",
+    "HammingWeightAdder",
+    "ABQLBM",
+    "ABInitialConditions",
+    "ABGridMeasurement",
+    "ABReflectionOperator",
+    "ABReflectionPermutation",
+    "ABStreamingOperator",
 ]

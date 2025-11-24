@@ -4,7 +4,7 @@ Internal Documentation
 ================================
 
 ``qlbm`` is made up of 4 main modules.
-Together, the :ref:`base_components`, :ref:`cqlbm_components`, and :ref:`stqlbm_components`
+Together, the :ref:`base_components`, :ref:`amplitude_components`, and :ref:`qlga_components`
 module handle the parameterized creation of quantum circuits that compose QBMs.
 The :ref:`lattice` module parses external information into quantum
 registers and provides uniform interfaces for underlying algorithms.
@@ -14,12 +14,10 @@ The :ref:`tools` module contains miscellaneous utilities.
 
 .. toctree::
 
+   lattice
    comps_base
    comps_cqlbm
-   comps_collision
-   comps_stqbm
-   comps_lqlga
-   lattice
+   comps_lga
    infra
    tools
 

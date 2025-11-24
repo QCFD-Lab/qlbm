@@ -19,8 +19,8 @@ from qulacs import QuantumCircuitSimulator, QuantumState
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.infra.compiler import CircuitCompiler
-from qlbm.infra.result import CollisionlessResult
-from qlbm.lattice import CollisionlessLattice
+from qlbm.infra.result import AmplitudeResult
+from qlbm.lattice import MSLattice
 from qlbm.tools.utils import get_circuit_properties, qiskit_to_qulacs
 
 
@@ -29,7 +29,7 @@ class MPIQulacsRunner:
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         output_directory: str,
         output_file_name: str = "step",
         sampling_backend: AerSimulator = QasmSimulator(),
@@ -52,7 +52,7 @@ class MPIQulacsRunner:
         num_shots: int,
         snapshot_execution: bool = False,
         statevector_sampling: bool = False,
-    ) -> CollisionlessResult:
+    ) -> AmplitudeResult:
         """Simualtes the provided algorithm configuration.
 
         Parameters
@@ -76,7 +76,7 @@ class MPIQulacsRunner:
 
         Returns
         -------
-        CollisionlessResult
+        AmplitudeResult
             The result of the simulation.
         """
         measurement = CircuitCompiler("QISKIT", "QISKIT").compile(
@@ -104,7 +104,7 @@ class MPIQulacsRunner:
         num_shots: int,
         snapshot_execution: bool = False,
         statevector_sampling: bool = False,
-    ) -> CollisionlessResult:
+    ) -> AmplitudeResult:
         """
         Simualtes the provided algorithm configuration.
 
@@ -129,10 +129,10 @@ class MPIQulacsRunner:
 
         Returns
         -------
-        CollisionlessResult
+        AmplitudeResult
             The result of the simulation.
         """
-        simulation_result = CollisionlessResult(
+        simulation_result = AmplitudeResult(
             self.lattice, self.output_directory, self.output_file_name
         )
 

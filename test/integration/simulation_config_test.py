@@ -4,24 +4,24 @@ import pytest
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit_aer import AerSimulator
 
-from qlbm.components.collisionless import (
-    CQLBM,
-    CollisionlessInitialConditions,
-    GridMeasurement,
-)
 from qlbm.components.common import EmptyPrimitive
+from qlbm.components.ms import (
+    MSQLBM,
+    GridMeasurement,
+    MSInitialConditions,
+)
 from qlbm.infra.runner.simulation_config import SimulationConfig
-from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice import MSLattice
 from qlbm.tools.exceptions import ExecutionException
 
 
 @pytest.fixture
 def symmetric_2d_no_osbtacle_circuits():
-    lattice = CollisionlessLattice("test/resources/symmetric_2d_no_obstacles.json")
+    lattice = MSLattice("test/resources/symmetric_2d_no_obstacles.json")
 
     return {
-        "initial_conditions": CollisionlessInitialConditions(lattice),
-        "algorithm": CQLBM(lattice),
+        "initial_conditions": MSInitialConditions(lattice),
+        "algorithm": MSQLBM(lattice),
         "postprocessing": EmptyPrimitive(lattice),
         "measurement": GridMeasurement(lattice),
     }
@@ -29,11 +29,11 @@ def symmetric_2d_no_osbtacle_circuits():
 
 @pytest.fixture
 def symmetric_2d_one_osbtacle_circuits():
-    lattice = CollisionlessLattice("test/resources/symmetric_2d_1_obstacle.json")
+    lattice = MSLattice("test/resources/symmetric_2d_1_obstacle.json")
 
     return {
-        "initial_conditions": CollisionlessInitialConditions(lattice),
-        "algorithm": CQLBM(lattice),
+        "initial_conditions": MSInitialConditions(lattice),
+        "algorithm": MSQLBM(lattice),
         "postprocessing": EmptyPrimitive(lattice),
         "measurement": GridMeasurement(lattice),
     }

@@ -35,7 +35,7 @@ class CircuitCompiler:
     =========================== ======================================================================
 
     Example usage: we will construct an end-to-end QLBM algorithm and compile it to a qiskit simulator using Tket.
-    We begin by constructing a :class:`.SpaceTimeQLBM` algorithm for a :math:`4 \\times 8` lattice, with one time step.
+    We begin by constructing a :class:`.SpaceTimeQLBM` algorithm for a :math:`4 \times 8` lattice, with one time step.
 
     .. plot::
         :include-source:

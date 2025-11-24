@@ -25,7 +25,7 @@ class SpaceTimeReinitializer(Reinitializer):
     :class:`.SpaceTimeQLBM`-specific implementation of the :class:`.Reinitializer`.
 
     Compatible with both :class:`.QiskitRunner`\ s and :class:`.QulacsRunner`\ s.
-    To generate a new set of initial conditions for the CQLBM algorithm,
+    To generate a new set of initial conditions for the Space-Time encoding,
     the reinitializer simply returns the quantum state computed
     at the end of the previous simulation.
     This allows the reuse of a single quantum circuit for the simulation

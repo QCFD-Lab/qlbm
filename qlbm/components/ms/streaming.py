@@ -11,14 +11,14 @@ from qiskit.circuit.library import MCXGate
 from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
-from qlbm.components.base import CQLBMOperator, LBMPrimitive
-from qlbm.lattice import CollisionlessLattice
+from qlbm.components.base import LBMPrimitive, MSOperator
+from qlbm.lattice import MSLattice
 from qlbm.tools import CircuitException, bit_value
 
 
 class StreamingAncillaPreparation(LBMPrimitive):
     r"""
-    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the preparatory step of streaming necessary for the :class:`.CQLBM` method.
+    A primitive used in :class:`.MSStreamingOperator` that implements the preparatory step of streaming necessary for the :class:`.MSQLBM` method.
 
     This operator sets the ancilla qubits to :math:`\ket{1}` for the velocities that
     will be streamed in the next CFL time step.
@@ -26,7 +26,7 @@ class StreamingAncillaPreparation(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`velocities`        The velocities that need to be streamed within the next time step.
     :attr:`dim`               The dimension to which the velocities correspond.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
@@ -37,11 +37,11 @@ class StreamingAncillaPreparation(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import StreamingAncillaPreparation
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import StreamingAncillaPreparation
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [],
@@ -54,7 +54,7 @@ class StreamingAncillaPreparation(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         velocities: List[int],
         dim: int,
         logger: Logger = getLogger("qlbm"),
@@ -114,14 +114,14 @@ class StreamingAncillaPreparation(LBMPrimitive):
 
 class ControlledIncrementer(LBMPrimitive):
     r"""
-    A primitive used in :class:`.CollisionlessStreamingOperator` that implements the streaming operation on the states for which the ancilla qubits are in the state :math:`\ket{1}`.
+    A primitive used in :class:`.MSStreamingOperator` that implements the streaming operation on the states for which the ancilla qubits are in the state :math:`\ket{1}`.
 
     This primitive is applied after the primitive :class:`.StreamingAncillaPreparation` to compose the streaming operator.
 
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`reflection`        The reflection attribute decides the type of reflection that will take place. This should
                               be either "specular", "bounceback", or ``None``, and defaults to None. This parameter
                               governs which qubits are used as controls for the Fourier space phase shifts.
@@ -133,11 +133,11 @@ class ControlledIncrementer(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import ControlledIncrementer
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import ControlledIncrementer
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [],
@@ -152,7 +152,7 @@ class ControlledIncrementer(LBMPrimitive):
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         reflection: str | None = None,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -239,8 +239,8 @@ class ControlledIncrementer(LBMPrimitive):
         return f"[Primitive ControlledIncrementer with reflection {self.reflection}]"
 
 
-class CollisionlessStreamingOperator(CQLBMOperator):
-    """An operator that performs streaming in Fourier space as part of the :class:`.CQLBM` algorithm.
+class MSStreamingOperator(MSOperator):
+    """An operator that performs streaming in Fourier space as part of the :class:`.MSQLBM` algorithm.
 
     Streaming is broken down into the following steps:
 
@@ -253,7 +253,7 @@ class CollisionlessStreamingOperator(CQLBMOperator):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`velocities`        A list of velocities to increment. This is computed according to CFL counter.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -263,11 +263,11 @@ class CollisionlessStreamingOperator(CQLBMOperator):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import CollisionlessStreamingOperator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import MSStreamingOperator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
                 "geometry": [],
@@ -275,14 +275,14 @@ class CollisionlessStreamingOperator(CQLBMOperator):
         )
 
         # Streaming the velocity with index 2
-        CollisionlessStreamingOperator(lattice=lattice, velocities=[2]).draw("mpl")
+        MSStreamingOperator(lattice=lattice, velocities=[2]).draw("mpl")
     """
 
     circuit: QuantumCircuit
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         velocities: List[int],
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -330,7 +330,7 @@ class CollisionlessStreamingOperator(CQLBMOperator):
 
 class PhaseShift(LBMPrimitive):
     r"""
-    A primitive that applies the phase-shift as part of the :class:`.ControlledIncrementer` used in the :class:`.CollisionlessStreamingOperator`.
+    A primitive that applies the phase-shift as part of the :class:`.ControlledIncrementer` used in the :class:`.MSStreamingOperator`.
 
     The rotation applied is :math:`\pm\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
     For an in-depth mathematical explanation of the procedure, consult Section 4 of :cite:t:`collisionless`.
@@ -350,7 +350,7 @@ class PhaseShift(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import PhaseShift
+        from qlbm.components.ms import PhaseShift
 
         # A phase shift of 5 qubits
         PhaseShift(num_qubits=5, positive=False).draw("mpl")
@@ -414,7 +414,7 @@ class SpeedSensitivePhaseShift(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import SpeedSensitivePhaseShift
+        from qlbm.components.ms import SpeedSensitivePhaseShift
 
         # A phase shift of 5 qubits, controlled on speed index 2
         SpeedSensitivePhaseShift(num_qubits=5, speed=2, positive=True).draw("mpl")

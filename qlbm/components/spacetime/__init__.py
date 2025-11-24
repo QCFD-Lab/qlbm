@@ -1,4 +1,4 @@
-"""Modular qlbm quantum circuit components for the CQLBM algorithm :cite:p:`spacetime`."""
+"""Modular qlbm quantum circuit components for the Space-Time QLBM algorithm :cite:p:`spacetime`."""
 
 from .collision.d2q4_old import SpaceTimeD2Q4CollisionOperator
 from .initial.pointwise import PointWiseSpaceTimeInitialConditions

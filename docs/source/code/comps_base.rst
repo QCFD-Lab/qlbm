@@ -20,6 +20,9 @@ Lattice Base
 .. autoclass:: qlbm.lattice.lattices.base.Lattice
     :members:
 
+.. autoclass:: qlbm.lattice.lattices.base.AmplitudeLattice
+    :members:
+
 .. autoclass:: qlbm.lattice.geometry.shapes.base.Shape
     :members:
 
@@ -35,7 +38,7 @@ Components Base
 
 .. autoclass:: qlbm.components.base.LBMOperator
 
-.. autoclass:: qlbm.components.base.CQLBMOperator
+.. autoclass:: qlbm.components.base.MSOperator
 
 .. autoclass:: qlbm.components.base.SpaceTimeOperator
 

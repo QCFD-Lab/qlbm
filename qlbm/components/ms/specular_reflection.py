@@ -1,4 +1,4 @@
-"""Quantum comparator circuits for the implementation of bounce-back boundary conditions as described in :cite:t:`qmem`."""
+"""Quantum comparator circuits for the implementation of specular reflection boundary conditions as described in :cite:t:`collisionless`."""
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
@@ -8,19 +8,21 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
-from qlbm.components.base import CQLBMOperator, LBMPrimitive
-from qlbm.components.collisionless.primitives import (
+from qlbm.components.base import LBMPrimitive, MSOperator
+from qlbm.components.ms.primitives import (
     Comparator,
     ComparatorMode,
 )
-from qlbm.components.collisionless.specular_reflection import SpecularWallComparator
-from qlbm.lattice import CollisionlessLattice
-from qlbm.lattice.geometry.encodings.collisionless import (
+from qlbm.lattice import (
+    MSLattice,
+)
+from qlbm.lattice.geometry.encodings.ms import (
     ReflectionPoint,
     ReflectionResetEdge,
     ReflectionWall,
 )
 from qlbm.lattice.geometry.shapes.block import Block
+from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import flatten
 
@@ -28,17 +30,17 @@ from .primitives import EdgeComparator
 from .streaming import ControlledIncrementer
 
 
-class BounceBackWallComparator(LBMPrimitive):
+class SpecularWallComparator(LBMPrimitive):
     r"""
-    A primitive used in the collision :class:`BounceBackReflectionOperator` that implements the comparator for the BB boundary conditions as described in :cite:t:`qmem`.
+    A primitive used in the collisionless :class:`SpecularReflectionOperator` that implements the comparator for the specular reflection boundary conditions around the wall as described :cite:t:`collisionless`.
 
-    The comparator sets an ancilla qubit to :math:`\ket{1}` for the components of
+    The comparator sets the `d` ancilla qubits to :math:`\ket{1}` for the components of
     the quantum state whose grid qubits fall within the range spanned by the wall.
 
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.AmplitudeLattice` based on which the properties of the operator are inferred.
     :attr:`wall`              The :class:`.ReflectionWall` encoding the range spanned by the wall.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -48,26 +50,26 @@ class BounceBackWallComparator(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import BounceBackWallComparator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import SpecularWallComparator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
-                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
+                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "specular"}],
             }
         )
 
         # Comparing on the indices of the inside x-wall on the lower-bound of the obstacle
-        BounceBackWallComparator(
+        SpecularWallComparator(
             lattice=lattice, wall=lattice.shape_list[0].walls_inside[0][0]
         ).draw("mpl")
     """
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: AmplitudeLattice,
         wall: ReflectionWall,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -81,15 +83,11 @@ class BounceBackWallComparator(LBMPrimitive):
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
 
-        # If the wall is inside the object, we build the comparators
-        # Differently, as to not overlap
         lb_comparators = [
             Comparator(
                 self.lattice.num_gridpoints[wall_alignment_dim].bit_length() + 1,
                 self.wall.lower_bounds[c],
-                ComparatorMode.GE
-                if self.wall.bounceback_loose_bounds[self.wall.dim][c]
-                else ComparatorMode.GT,
+                ComparatorMode.GE,
                 logger=self.logger,
             ).circuit
             for c, wall_alignment_dim in enumerate(self.wall.alignment_dims)
@@ -99,9 +97,7 @@ class BounceBackWallComparator(LBMPrimitive):
             Comparator(
                 self.lattice.num_gridpoints[wall_alignment_dim].bit_length() + 1,
                 self.wall.upper_bounds[c],
-                ComparatorMode.LE
-                if self.wall.bounceback_loose_bounds[self.wall.dim][c]
-                else ComparatorMode.LT,
+                ComparatorMode.LE,
                 logger=self.logger,
             ).circuit
             for c, wall_alignment_dim in enumerate(self.wall.alignment_dims)
@@ -130,27 +126,27 @@ class BounceBackWallComparator(LBMPrimitive):
 
     @override
     def __str__(self) -> str:
-        return f"[Primitive BounceBackWallComparator on wall={self.wall}]"
+        return f"[Primitive SpecularWallComparator on wall={self.wall}]"
 
 
-class BounceBackReflectionOperator(CQLBMOperator):
-    """
-    Operator implementing the 2D and 3D Bounce-Back (BB) boundary conditions as described in :cite:t:`qmem`.
+class SpecularReflectionOperator(MSOperator):
+    r"""
+    Operator implementing the 2D and 3D Specular Reflection (SR) boundary conditions as described :cite:t:`collisionless`.
 
     The operator parses information encoded in :class:`.Block` objects to detect particles that
     have virtually streamed into the solid domain before placing them back to their
     previous positions in the fluid domain.
     The pseudocode for this procedure is as follows:
 
-    #. Components of the quantum state that encode particles that have streamed inside the obstacle are identified with :class:`.BounceBackWallComparator` objects;
-    #. These components have their velocity direction qubits flipped in all three dimensions;
+    #. Components of the quantum state that encode particles that have streamed inside the obstacle are identified with :class:`.SpecularWallComparator` objects;
+    #. These components have their velocity direction qubits flipped according to the wall they came in contact with. Where two or three walls come together, the two or three corresponding directions are inverted;
     #. Particles are streamed outside the solid domain with inverted velocity directions;
-    #. Once streamed outside the solid domain, components encoding affected particles have their obstacle ancilla qubit reset based on grid position, velocity direction, and whether they have streamed in the CFL timestep.
+    #. Once streamed outside the solid domain, components encoding affected particles have their obstacle ancilla qubits reset based on grid position, velocity direction, and whether they have streamed in the CFL timestep.
 
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`blocks`            A list of  :class:`.Block` objects for which to generate the BB boundary condition circuits.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
@@ -160,23 +156,23 @@ class BounceBackReflectionOperator(CQLBMOperator):
     .. plot::
         :include-source:
 
-        from qlbm.components.collisionless import BounceBackReflectionOperator
-        from qlbm.lattice import CollisionlessLattice
+        from qlbm.components.ms import SpecularReflectionOperator
+        from qlbm.lattice import MSLattice
 
         # Build an example lattice
-        lattice = CollisionlessLattice(
+        lattice = MSLattice(
             {
                 "lattice": {"dim": {"x": 8, "y": 8}, "velocities": {"x": 4, "y": 4}},
-                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "bounceback"}],
+                "geometry": [{"shape":"cuboid", "x": [5, 6], "y": [1, 2], "boundary": "specular"}],
             }
         )
 
-        BounceBackReflectionOperator(lattice=lattice, blocks=lattice.shape_list)
+        SpecularReflectionOperator(lattice=lattice, blocks=lattice.shape_list)
     """
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         blocks: List[Block],
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -231,7 +227,6 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
                 for point in block.overlapping_near_corner_edge_points_3d:
                     self.reset_point_state(circuit, point)
-
         else:
             raise CircuitException(
                 f"CQBM specular reflection is not supported for {self.lattice.num_dims} dimensions."
@@ -256,12 +251,12 @@ class BounceBackReflectionOperator(CQLBMOperator):
         #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
         #. Comparator circuits set the comparator ancilla qubits to :math:`\ket{1}` based on the size of the wall in the other dimension(s).
         #. Depending on the use, the directional velocity qubits are also set to :math:`\ket{1}` based on the dimension that the wall spans.
-        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubits of the particular dimension that the wall reflects, controlled on the qubits set in the previous steps.
         #. The control qubits are set back to their previous state.
 
         The wall reflection operation is versatile and can be used to both set and re-set the state
         of the obstacle ancilla qubit at different stages of reflection.
-        When performing BB reflection, this function is first used to flip the
+        When performing SR reflection, this function is first used to flip the
         ancilla obstacle qubit from :math:`\ket{0}` to :math:`\ket{1}`, irrespective of how particles arrived there.
         Subsequently, an additional controls are placed on the velocity direction qubits to reset the
         ancilla obstacle qubit to :math:`\ket{0}`, after particles have been streamed out of the solid domain.
@@ -269,27 +264,23 @@ class BounceBackReflectionOperator(CQLBMOperator):
         Parameters
         ----------
         circuit : QuantumCircuit
-            The circuit on which to perform BB reflection of the wall.
+            The circuit on which to perform resetting of the edge state.
         wall : ReflectionWall
             The wall encoding the reflection logic.
-        inside_obstacle : bool
-            Whether the wall is inside the obstacle.
 
         Returns
         -------
         QuantumCircuit
-            The circuit performing BB reflection of the wall.
+            The circuit performing specular reflection of the wall.
         """
-        comparator_circuit = (
-            BounceBackWallComparator(self.lattice, wall, self.logger).circuit
-            if not wall.data.is_outside_obstacle_bounds  # If the wall is outside the obstacle, the two comparators behave identically
-            else SpecularWallComparator(self.lattice, wall, self.logger).circuit
-        )
-
         grid_qubit_indices_to_invert = [
             self.lattice.grid_index(0)[0] + qubit
             for qubit in wall.data.qubits_to_invert
         ]
+
+        comparator_circuit = SpecularWallComparator(
+            self.lattice, wall, self.logger
+        ).circuit
 
         circuit.compose(comparator_circuit, inplace=True)
 
@@ -309,16 +300,12 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
         control_qubits = (
             self.lattice.ancillae_velocity_index(wall.dim)
-            + (
-                self.lattice.velocity_dir_index(wall.dim)
-                if wall.data.is_outside_obstacle_bounds
-                else []
-            )
+            + self.lattice.velocity_dir_index(wall.dim)
             + self.lattice.grid_index(wall.dim)
             + self.lattice.ancillae_comparator_index()
         )
 
-        target_qubits = self.lattice.ancillae_obstacle_index(0)
+        target_qubits = self.lattice.ancillae_obstacle_index(wall.dim)
 
         circuit.compose(
             MCMTGate(
@@ -351,7 +338,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
         #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the 2 dimensions that the edge spans.
         #. A comparator circuits sets the comparator ancilla qubits to :math:`\ket{1}` based on the size of the edge in the remaining dimension.
         #. The directional velocity qubits are also set to :math:`\ket{1}` on the specific velocity profile of the targeted particles.
-        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubits of the direction reflect by the wall(s) that the edge is next to, controlled on the qubits set in the previous steps.
         #. The control qubits are set back to their previous state.
 
         This function resets the ancilla obstacle qubit to :math:`\ket{0}` for particles
@@ -385,7 +372,12 @@ class BounceBackReflectionOperator(CQLBMOperator):
             ]
         ) + self.lattice.ancillae_comparator_index(0)
 
-        target_qubits = self.lattice.ancillae_obstacle_index(0)
+        target_qubits = flatten(
+            [
+                self.lattice.ancillae_obstacle_index(reflected_dim)
+                for reflected_dim in edge.reflected_velocities
+            ]
+        )
 
         circuit.compose(comparator_circuit, inplace=True)
 
@@ -426,7 +418,7 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
         #. A series of :math:`X` gates set the grid qubits to the :math:`\ket{1}` state for the dimension that the wall spans.
         #. The directional velocity qubits are also set to :math:`\ket{1}` based on the specific velocity profile of the targeted particles.
-        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubit, controlled on the qubits set in the previous steps.
+        #. A multi-controlled :math:`X` gate flips the obstacle ancilla qubits corresponding to the dimensions that particles would have traveled to arrive there via reflection, controlled on the qubits set in the previous steps.
         #. The control qubits are set back to their previous state.
 
         Parameters
@@ -464,7 +456,12 @@ class BounceBackReflectionOperator(CQLBMOperator):
             + self.lattice.grid_index()
         )
 
-        target_qubits = self.lattice.ancillae_obstacle_index(0)
+        target_qubits = flatten(
+            [
+                self.lattice.ancillae_obstacle_index(outside_dim_index)
+                for outside_dim_index in corner.dims_outside
+            ]
+        )
 
         circuit.compose(
             MCMTGate(
@@ -494,33 +491,26 @@ class BounceBackReflectionOperator(CQLBMOperator):
     ):
         """Flips the velocity direction qubit controlled on the ancilla obstacle qubit, before performing streaming.
 
-        Unlike in the regular :class:`.CollisionlessStreamingOperator`, the :class:`.ControlledIncrementer`
-        phase shift circuit is additionally controlled on the ancilla obstacle qubit, which
-        ensures that only particles whose grid position gets incremented (decremented) are those
+        Unlike in the regular :class:`.MSStreamingOperator`, the :class:`.ControlledIncrementer`
+        phase shift circuit is additionally controlled on the ancilla obstacle qubit of the streaming dimension,
+        which ensures that only particles whose grid position gets incremented (decremented) are those
         that have streamed inside the solid domain in this CFL time step.
 
         Parameters
         ----------
         circuit : QuantumCircuit
             The circuit on which to perform the flip and stream operation.
-
         """
-        control_qubits = self.lattice.ancillae_obstacle_index(0)
-        target_qubits = self.lattice.velocity_dir_index()
-
-        circuit.compose(
-            MCMTGate(
-                XGate(),
-                len(control_qubits),
-                len(target_qubits),
-            ),
-            qubits=control_qubits + target_qubits,
-            inplace=True,
-        )
+        for dim in range(self.lattice.num_dims):
+            # Flip the direction of the `d`-directional velocity qubit
+            circuit.cx(
+                self.lattice.ancillae_obstacle_index(dim)[0],
+                self.lattice.velocity_dir_index(dim)[0],
+            )
 
         circuit.compose(
             ControlledIncrementer(
-                self.lattice, reflection="bounceback", logger=self.logger
+                self.lattice, reflection="specular", logger=self.logger
             ).circuit,
             inplace=True,
         )
@@ -529,4 +519,6 @@ class BounceBackReflectionOperator(CQLBMOperator):
 
     @override
     def __str__(self) -> str:
-        return f"[Operator BounceBackReflectionOperator against shapes {self.lattice.shapes}]"
+        return (
+            f"[Operator SpecularReflectionOperator against shapes {self.lattice.shapes}]"
+        )

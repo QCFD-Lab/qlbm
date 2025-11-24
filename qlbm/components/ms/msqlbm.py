@@ -7,43 +7,43 @@ from qiskit import QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import LBMAlgorithm
-from qlbm.lattice import CollisionlessLattice
+from qlbm.lattice import MSLattice
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import get_time_series
 
 from .bounceback_reflection import BounceBackReflectionOperator
 from .specular_reflection import SpecularReflectionOperator
-from .streaming import CollisionlessStreamingOperator, StreamingAncillaPreparation
+from .streaming import MSStreamingOperator, StreamingAncillaPreparation
 
 
-class CQLBM(LBMAlgorithm):
-    """The end-to-end algorithm of the Collisionless Quantum Lattice Boltzmann Algorithm first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
+class MSQLBM(LBMAlgorithm):
+    """The end-to-end algorithm of the Multi-Speed Collisionless Quantum Lattice Boltzmann Algorithm first introduced in :cite:t:`collisionless` and later extended in :cite:t:`qmem`.
 
     This implementation supports 2D and 3D simulations with with cuboid objects
     with either bounce-back or specular reflection boundary conditions.
 
     The algorithm is composed of three steps that are repeated according to a CFL counter:
 
-    #. Streaming performed by the :class:`.CollisionlessStreamingOperator` increments or decrements the positions of particles on the grid.
-    #. :class:`.BounceBackReflectionOperator` and :class:`.SpecularReflectionOperator` reflect the particles that come in contact with :class:`.Block` obstacles encoded in the :class:`.CollisionlessLattice`.
+    #. Streaming performed by the :class:`.MSStreamingOperator` increments or decrements the positions of particles on the grid.
+    #. :class:`.BounceBackReflectionOperator` and :class:`.SpecularReflectionOperator` reflect the particles that come in contact with :class:`.Block` obstacles encoded in the :class:`.MSLattice`.
     #. The :class:`.StreamingAncillaPreparation` resets the state of the ancilla qubits for the next CFL counter substep.
 
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` based on which the properties of the operator are inferred.
+    :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """
 
     def __init__(
         self,
-        lattice: CollisionlessLattice,
+        lattice: MSLattice,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
-        self.lattice: CollisionlessLattice = lattice
+        self.lattice: MSLattice = lattice
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -63,7 +63,7 @@ class CQLBM(LBMAlgorithm):
 
         for velocities_to_increment in time_series:
             circuit.compose(
-                CollisionlessStreamingOperator(
+                MSStreamingOperator(
                     self.lattice,
                     velocities_to_increment,
                     logger=self.logger,
@@ -76,7 +76,7 @@ class CQLBM(LBMAlgorithm):
                     for shape in self.lattice.shapes["specular"]
                 ):
                     raise LatticeException(
-                        "All shapes with the 'specular' boundary condition must be of type Block for the CQLBM algorithm. "
+                        "All shapes with the 'specular' boundary condition must be of type Block for the MSQLBM algorithm. "
                     )
                 circuit.compose(
                     SpecularReflectionOperator(
@@ -87,14 +87,14 @@ class CQLBM(LBMAlgorithm):
                     inplace=True,
                 )
 
-            if self.lattice.shapes["bounceback"]:
-                if self.lattice.shapes["specular"]:
+            for bc in ["bounceback", "specular"]:
+                if self.lattice.shapes[bc]:
                     if not all(
                         isinstance(shape, Block)
                         for shape in self.lattice.shapes["specular"]
                     ):
                         raise LatticeException(
-                            "All shapes with the 'bounceback' boundary condition must be of type Block for the CQLBM algorithm. "
+                            f"All shapes with the {bc} boundary condition must be cuboids for the MSQLBM algorithm. "
                         )
                 circuit.compose(
                     BounceBackReflectionOperator(
@@ -119,4 +119,4 @@ class CQLBM(LBMAlgorithm):
 
     @override
     def __str__(self) -> str:
-        return f"[Algorithm CQLBM with lattice {self.lattice}]"
+        return f"[Algorithm MSQLBM with lattice {self.lattice}]"

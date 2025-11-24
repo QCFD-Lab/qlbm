@@ -6,14 +6,14 @@ and paraview integration for visualization.
 """
 
 from .compiler import CircuitCompiler
-from .result import CollisionlessResult, SpaceTimeResult
+from .result import AmplitudeResult, SpaceTimeResult
 from .runner import CircuitRunner, QiskitRunner, SimulationConfig
 
 __all__ = [
     "CircuitCompiler",
     "CircuitRunner",
     # "MPIQulacsRunner",
-    "CollisionlessResult",
+    "AmplitudeResult",
     "SpaceTimeResult",
     "QiskitRunner",
     "SimulationConfig",

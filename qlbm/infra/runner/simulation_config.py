@@ -35,7 +35,7 @@ class SimulationConfig:
         * - Attribute
           - Description
         * - :attr:`initial_conditions`
-          - The initial conditions of the simulations. For example, :class:`.CollisionlessInitialConditions` or :class:`.PointWiseSpaceTimeInitialConditions`.
+          - The initial conditions of the simulations. For example, :class:`.MSInitialConditions` or :class:`.PointWiseSpaceTimeInitialConditions`.
         * - :attr:`algorithm`
           - The algorithm that performs the QLBM time step computation. For example, :class:`.CQLBM` or :class:`.SpaceTimeQLBM`.
         * - :attr:`postprocessing`
@@ -132,7 +132,7 @@ class SimulationConfig:
         .. code-block:: python
 
             cfg = SimulationConfig(
-                initial_conditions=CollisionlessInitialConditions(lattice, logger),
+                initial_conditions=MSInitialConditions(lattice, logger),
                 algorithm=CQLBM(lattice, logger),
                 postprocessing=EmptyPrimitive(lattice, logger),
                 measurement=GridMeasurement(lattice, logger),

@@ -9,7 +9,7 @@ On this website, you can find the :ref:`internal_docs` of the source code compon
 A paper describing `qlbm` in detail is available on `here <https://doi.org/10.1016/j.cpc.2025.109699>`_ :cite:p:`qlbm`.
 
 ``qlbm`` is made up of 4 main modules.
-Together, the :ref:`base_components`, :ref:`cqlbm_components`, :ref:`stqlbm_components`, and :ref:`lqlga_components`
+Together, the :ref:`base_components`, :ref:`amplitude_components`, and :ref:`qlga_components`
 modules handle the parameterized creation of quantum circuits that compose QBMs.
 The :ref:`lattice` module parses external information into quantum
 registers and provides uniform interfaces for underlying algorithms.
@@ -24,6 +24,12 @@ The :ref:`tools` module contains miscellaneous utilities.
 #. **S**\ pace-\ **T**\ ime **QLBM** (STQLBM) described in :cite:p:`spacetime` and :cite:p:`spacetime2`.
 
 #. **L**\ inear \ **Q**\ uantum **L**\ attice **G**\ as **A**\ utomata (LQLGA) described in :cite:p:`spacetime2`, :cite:p:`lqlga1`, and :cite:p:`lqlga2`.
+
+.. .. card:: Intro to QLBM
+..     :link: internal_docs
+..     :link-type: ref
+    
+..     :fas:`lightbulb;sd-text-primary` Check out the basics.
 
 .. card:: Internal Documentation
     :link: internal_docs

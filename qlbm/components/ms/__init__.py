@@ -1,23 +1,23 @@
-"""Modular qlbm quantum circuit components for the CQLBM algorithm :cite:p:`collisionless`."""
+"""Modular qlbm quantum circuit components for the MSQLBM algorithm :cite:p:`collisionless`."""
 
 from .bounceback_reflection import (
     BounceBackReflectionOperator,
     BounceBackWallComparator,
 )
-from .cqlbm import CQLBM
+from .msqlbm import MSQLBM
 from .primitives import (
-    CollisionlessInitialConditions,
-    CollisionlessInitialConditions3DSlim,
     Comparator,
     ComparatorMode,
     EdgeComparator,
     GridMeasurement,
+    MSInitialConditions,
+    MSInitialConditions3DSlim,
     SpeedSensitiveAdder,
 )
 from .specular_reflection import SpecularReflectionOperator, SpecularWallComparator
 from .streaming import (
-    CollisionlessStreamingOperator,
     ControlledIncrementer,
+    MSStreamingOperator,
     PhaseShift,
     SpeedSensitivePhaseShift,
     StreamingAncillaPreparation,
@@ -31,14 +31,14 @@ __all__ = [
     "ControlledIncrementer",
     "GridMeasurement",
     "EdgeComparator",
-    "CollisionlessInitialConditions",
-    "CollisionlessInitialConditions3DSlim",
+    "MSInitialConditions",
+    "MSInitialConditions3DSlim",
     "PhaseShift",
     "SpeedSensitivePhaseShift",
-    "CollisionlessStreamingOperator",
+    "MSStreamingOperator",
     "SpecularReflectionOperator",
     "SpecularWallComparator",
     "BounceBackReflectionOperator",
     "BounceBackWallComparator",
-    "CQLBM",
+    "MSQLBM",
 ]

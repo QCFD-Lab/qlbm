@@ -49,11 +49,13 @@ class QiskitRunner(CircuitRunner):
         lattice: Lattice,
         logger: Logger = getLogger("qlbm"),
         device: str = "CPU",  # ! TODO reimplement
+        save_statevector_to_disk: bool = False,
     ) -> None:
         super().__init__(config, lattice, logger, device)
 
         self.execution_backend = self.config.execution_backend
         self.sampling_backend = self.config.sampling_backend
+        self.statevector_to_disk = save_statevector_to_disk
 
     @override
     def run(
@@ -181,6 +183,11 @@ class QiskitRunner(CircuitRunner):
 
                 simulation_result.save_timestep_counts(
                     qiskit_execution_result.get_counts(), step
+                )
+
+            if self.statevector_to_disk:
+                simulation_result.save_statevector(
+                    qiskit_execution_result.data(0)["step"], step=step
                 )
 
             # Update the initial conditions for the next step

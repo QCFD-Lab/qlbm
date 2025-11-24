@@ -1,6 +1,7 @@
 """Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.LQLGA` algorithm."""
 
 from itertools import product
+from logging import getLogger
 from math import prod
 from typing import Dict, List, Tuple, cast, override
 
@@ -21,19 +22,19 @@ class LQLGALattice(Lattice):
     r"""
     Lattice class for the :class:`.LQLGA` algorithm.
 
-    ================================= ========================================================================================
-    Attribute                         Summary
-    ================================= ========================================================================================
-    :attr:`num_gridpoints`            The number of gridpoints in each dimension of the lattice.
-    :attr:`num_velocities`            The number of discrete velocities in each dimension of the lattice.
-    :attr:`num_dims`                  The number of dimensions of the lattice.
-    :attr:`discretization`            The discretization of the lattice.
-    :attr:`num_velocities_per_point`  The number of discrete velocities per gridpoint.
-    :attr:`num_base_qubits`           The number of qubits required to represent the lattice without velocities.
-    :attr:`num_total_qubits`          The total number of qubits required to represent the lattice, including velocities.
-    :attr:`registers`                 The list of quantum registers for the lattice, one for each gridpoint.
-    :attr:`circuit`                   The quantum circuit representing the lattice, initialized with the registers.
-    ================================ ========================================================================================
+    ==================================== ========================================================================================
+    Attribute                            Summary
+    ==================================== ========================================================================================
+    :attr:`num_gridpoints`               The number of gridpoints in each dimension of the lattice.
+    :attr:`num_velocities`               The number of discrete velocities in each dimension of the lattice.
+    :attr:`num_dims`                     The number of dimensions of the lattice.
+    :attr:`discretization`               The discretization of the lattice.
+    :attr:`num_velocities_per_point`     The number of discrete velocities per gridpoint.
+    :attr:`num_base_qubits`              The number of qubits required to represent the lattice without velocities.
+    :attr:`num_total_qubits`             The total number of qubits required to represent the lattice, including velocities.
+    :attr:`registers`                    The list of quantum registers for the lattice, one for each gridpoint.
+    :attr:`circuit`                      The quantum circuit representing the lattice, initialized with the registers.
+    ==================================== ========================================================================================
 
     The registers encoded in the lattice and their accessors are given below.
     For the size of each register,
@@ -75,7 +76,11 @@ class LQLGALattice(Lattice):
     velocity_register: QuantumRegister
     """The quantum register representing the velocities of the lattice."""
 
-    def __init__(self, lattice_data, logger=...):
+    def __init__(
+        self,
+        lattice_data,
+        logger=getLogger("qlbm"),
+    ):
         super().__init__(lattice_data, logger)
 
         self.num_gridpoints, self.num_velocities, self.shapes, self.discretization = (
@@ -97,11 +102,19 @@ class LQLGALattice(Lattice):
             else 0
         )
 
+        self.num_accumulation_qubits = 0
+        self.indices_to_accumulate = []
+
+        self.__update_registers()
+
+    def __update_registers(self):
         self.num_total_qubits = self.num_base_qubits + self.num_marker_qubits
 
         temp_registers = self.get_registers()
 
-        self.velocity_register, self.marker_register = temp_registers
+        self.velocity_register, self.marker_register, self.accumulation_register = (
+            temp_registers
+        )
         self.registers = tuple(flatten(temp_registers))
 
         self.circuit = QuantumCircuit(*self.registers)
@@ -129,7 +142,13 @@ class LQLGALattice(Lattice):
             else []
         )
 
-        return (velocity_registers, marker_register)
+        accumulation_register = (
+            [QuantumRegister(self.num_accumulation_qubits, name="acc")]
+            if self.has_accumulation_register()
+            else []
+        )
+
+        return (velocity_registers, marker_register, accumulation_register)
 
     def gridpoint_index_tuple(self, gridpoint: Tuple[int, ...]) -> int:
         """
@@ -328,7 +347,9 @@ class LQLGALattice(Lattice):
         For a given lattice (set number of gridpoints and velocity discretization),
         set multiple geometry configurations to simulate simultaneously.
 
-        .. code-block:: python
+        .. plot::
+            :include-source:
+
             from qlbm.lattice import LQLGALattice
 
             lattice = LQLGALattice(
@@ -356,21 +377,73 @@ class LQLGALattice(Lattice):
             A list of geometries to simulate on the same lattice.
         """
         self.geometries = [self.parse_geometry_dict(g) for g in geometries]
-
-        # Update the class attribute that depend on the register setup
-        temp_registers = self.get_registers()
-
-        self.velocity_register, self.marker_register = temp_registers
-        self.registers = tuple(flatten(temp_registers))
         self.num_marker_qubits = (
             int(ceil(log2(len(self.geometries))))
             if self.has_multiple_geometries()
             else 0
         )
-
-        self.num_total_qubits = self.num_base_qubits + self.num_marker_qubits
-        self.circuit = QuantumCircuit(*self.registers)
+        self.__update_registers()
 
     @override
     def has_multiple_geometries(self) -> bool:
         return len(self.geometries) > 1
+
+    def has_accumulation_register(self) -> bool:
+        """
+        Whether the lattice has a register that accumulates quantities at each step.
+
+        Returns
+        -------
+        bool
+            Whether the lattice has a register that accumulates quantities at each step.
+        """
+        return self.num_accumulation_qubits > 0
+
+    def use_accumulation_register(self, size: int, indices_to_accumulate: List[int]):
+        """
+        Sets up the accumulation register of the lattice.
+
+        This register has a weighted value added to it at the end of each time step.
+        The value is a linear combination of the occupancy of several velocity channels.
+        This in turn allows for time-averaged calculations for values related to pressure,
+        mass, or drag/lift coefficients.
+
+        Parameters
+        ----------
+        size : int
+            The size of the register that accumulates the value.
+        indices_to_accumulate : List[int]
+            The qubit indices that contribute to the accumulated value.
+        """
+        if size <= 0:
+            raise LatticeException(
+                f"Accumulation register size has to be positive. Provided value: {size}"
+            )
+
+        if any(i < 0 or i >= self.num_base_qubits for i in indices_to_accumulate):
+            raise LatticeException(
+                f"Accumulation indices have to be between 0 and {self.num_base_qubits} for this lattice."
+            )
+
+        self.num_accumulation_qubits = size
+        self.indices_to_accumulate = indices_to_accumulate
+
+        self.__update_registers()
+
+    def accumulation_index(self) -> List[int]:
+        """
+        Get the indices of the qubits used for the accumulation register.
+
+        Returns
+        -------
+        List[int]
+            The absolute indices of the accumulation qubits.
+        """
+        return list(
+            range(
+                self.num_base_qubits + self.num_marker_qubits,
+                self.num_base_qubits
+                + self.num_marker_qubits
+                + self.num_accumulation_qubits,
+            )
+        )

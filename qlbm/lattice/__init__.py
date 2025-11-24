@@ -1,6 +1,6 @@
 """Lattice and Block utilitites."""
 
-from .geometry.encodings.collisionless import (
+from .geometry.encodings.ms import (
     DimensionalReflectionData,
     ReflectionPoint,
     ReflectionResetEdge,
@@ -12,8 +12,10 @@ from .geometry.shapes.block import (
 from .geometry.shapes.circle import (
     Circle,
 )
-from .lattices import CollisionlessLattice, Lattice
+from .lattices import Lattice, MSLattice
+from .lattices.ab_lattice import ABLattice
 from .lattices.lqlga_lattice import LQLGALattice
+from .lattices.oh_lattice import OHLattice
 from .lattices.spacetime_lattice import SpaceTimeLattice
 from .spacetime.properties_base import (
     LatticeDiscretization,
@@ -22,7 +24,9 @@ from .spacetime.properties_base import (
 
 __all__ = [
     "Lattice",
-    "CollisionlessLattice",
+    "ABLattice",
+    "MSLattice",
+    "OHLattice",
     "SpaceTimeLattice",
     "LQLGALattice",
     "DimensionalReflectionData",

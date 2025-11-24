@@ -4,8 +4,12 @@ from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List, Tuple
 
+import numpy as np
+from numpy import pi
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
+from qiskit.quantum_info import Operator
+from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
@@ -22,7 +26,7 @@ class EmptyPrimitive(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.CollisionlessLattice` or :class:`.SpaceTimeLattice` based on which the number of qubits is inferred.
+    :attr:`lattice`           The :class:`.MSLattice` or :class:`.SpaceTimeLattice` based on which the number of qubits is inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """
@@ -106,3 +110,145 @@ class MCSwap(LBMPrimitive):
     @override
     def __str__(self) -> str:
         return f"[Primitive MCSwap with lattice {self.lattice}]"
+
+
+class HammingWeightAdder(LBMPrimitive):
+    """
+    QFT-based Hamming Weight adder.
+
+    This primitive adds the hamming weight (number of 1s) in a given register :math:`x`
+    to the binary-encoded value of a second register :math:`y`.
+    """
+
+    x_register_size: int
+    """
+    The size of the register encoding the hamming weight value to add.
+    """
+
+    y_register_size: int
+    """
+    The size of the register to which the hamming weight is added.
+    """
+
+    def __init__(
+        self,
+        x_register_size: int,
+        y_register_size: int,
+        logger: Logger = getLogger("qlbm"),
+    ):
+        super().__init__(logger)
+        self.x_register_size = x_register_size
+        self.y_register_size = y_register_size
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self) -> QuantumCircuit:
+        circuit = QuantumCircuit(self.x_register_size + self.y_register_size)
+
+        circuit.compose(
+            QFT(self.y_register_size),
+            inplace=True,
+            qubits=list(
+                range(self.x_register_size, self.x_register_size + self.y_register_size)
+            ),
+        )
+
+        angles = np.zeros(self.y_register_size)
+        for i in range(self.y_register_size):
+            angles[i] = 2 * pi / (2 ** (self.y_register_size - i))
+
+        for xi in range(self.x_register_size):
+            for k, yi in enumerate(range(self.y_register_size)):
+                circuit.cp(angles[k], xi, self.x_register_size + yi)
+
+        circuit.compose(
+            QFT(self.y_register_size, inverse=True),
+            inplace=True,
+            qubits=list(
+                range(self.x_register_size, self.x_register_size + self.y_register_size)
+            ),
+        )
+
+        return circuit
+
+    @override
+    def __str__(self):
+        return f"[Primitive HWAdder with with register size {self.x_register_size} and {self.y_register_size}]"
+
+
+class TruncatedQFT(LBMPrimitive):
+    r"""Truncated Quantum Fourier Transform primitive used to create an equal magnitude superposition.
+
+    For a superposition of the first :math:`k` basis states encoded in :math:`n` qubits,
+    the operator consists of discrete fourier transform block of size :math:`k\times k`,
+    padded with :math:`2^n - k` :math:`1`s on the main diagonal.
+    The rationale and properties of this operator are described in :cite:`spacetime2`.
+    This primitive is used in both amplitude-based and computational basis state encodings.
+    In the :class:`ABInitialConditions`, it creates an equal magnitude superposition over the velocity space.
+    In the :class:`EQCRedistribution`, the superposition is over all basis states with an equivalent mass and momenta.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import TruncatedQFT
+
+        TruncatedQFT(4, 7).decompose(reps=2).draw("mpl")
+    """
+
+    num_qubits: int
+    """The number of qubits the operator acts on."""
+
+    dft_size: int
+    """The size of the discrete Fourier transform block."""
+
+    def __init__(
+        self,
+        num_qubits: int,
+        dft_size: int,
+        logger: Logger = getLogger("qlbm"),
+    ):
+        super().__init__(logger)
+        self.num_qubits = num_qubits
+        self.dft_size = dft_size
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self):
+        circuit = QuantumCircuit(self.num_qubits)
+
+        QFT = np.array(
+            [
+                [
+                    np.exp(2j * np.pi * i * j / self.dft_size) / np.sqrt(self.dft_size)
+                    for j in range(self.dft_size)
+                ]
+                for i in range(self.dft_size)
+            ]
+        )
+
+        U = np.eye(2**self.num_qubits, dtype=complex)
+        U[: self.dft_size, : self.dft_size] = QFT
+        op = Operator(U)
+        assert op.is_unitary()
+
+        circuit.append(op, list(range(self.num_qubits)))
+
+        return circuit
+
+    @override
+    def __str__(self):
+        return f"[Primitive TuncatedQFT({self.num_qubits}, {self.dft_size})]"
