@@ -139,7 +139,7 @@ class Lattice(ABC):
 
     shapes: Dict[str, List[Shape]]
     """
-    Contains all of the :class:`.Shape`s encoding the solid geometry of the lattice. The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
+    Contains all of the :class:`.Shape`\ s encoding the solid geometry of the lattice. The key of the dictionary is the specific kind of boundary condition of the obstacle (i.e., ``"bounceback"`` or ``"specular"``).
     """
 
     logger: Logger
