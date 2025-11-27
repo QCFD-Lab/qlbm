@@ -521,6 +521,15 @@ class AmplitudeLattice(Lattice, ABC):
     ``qlbm`` currently has 2 amplitude-based lattices: the :class:`.MSLattice` and :class:`.ABLattice` used in the :class:`.MSQLBM` and :class:`.ABQLBM`, respectively.
     """
 
+    num_base_qubits: int
+    """The number of qubits required to represent the lattice."""
+
+    num_ancilla_qubits: int
+    """The number of ancillary qubits used to perform the algorithm for, i.e., boundary conditions."""
+
+    num_marker_qubits: int
+    """The number of qubits used to identify geometries, if parallel lattices are being simulated."""
+
     def __init__(
         self,
         lattice_data,
@@ -621,6 +630,32 @@ class AmplitudeLattice(Lattice, ABC):
         ------
         LatticeException
             If the dimension does not exist.
+        """
+        pass
+
+    @abstractmethod
+    def marker_index(self) -> List[int]:
+        """
+        Get the indices of the qubits addressing the marker.
+
+        This is only useful if multiple lattice geometries are addressed simultaneously.
+
+        Returns
+        -------
+        List[int]
+            The absolute indices of the marker qubits.
+        """
+        pass
+
+    @abstractmethod
+    def accumulation_index(self) -> List[int]:
+        """
+        Get the indices of the qubits used for the accumulation register.
+
+        Returns
+        -------
+        List[int]
+            The absolute indices of the accumulation qubits.
         """
         pass
 
