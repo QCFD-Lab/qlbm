@@ -147,17 +147,38 @@ class ABLattice(AmplitudeLattice):
         self.num_comparator_qubits = 2 * (self.num_dims - 1)
         self.num_ancilla_qubits = self.num_comparator_qubits + self.num_obstacle_qubits
 
-        self.num_total_qubits = self.num_base_qubits + self.num_ancilla_qubits
+        self.num_marker_qubits = (
+            int(ceil(log2(len(self.geometries))))
+            if self.has_multiple_geometries()
+            else 0
+        )
 
-        temporary_registers = self.get_registers()
+        self.num_total_qubits = (
+            self.num_base_qubits + self.num_ancilla_qubits + self.num_marker_qubits
+        )
+
+        self.num_accumulation_qubits = 0
+
+        self.__update_registers()
+
+    def __update_registers(self):
+        self.num_total_qubits = (
+            self.num_base_qubits + self.num_ancilla_qubits + self.num_marker_qubits
+        )
+
+        temp_registers = self.get_registers()
+
         (
             self.grid_registers,
             self.velocity_registers,
             self.ancilla_comparator_register,
             self.ancilla_object_register,
-        ) = temporary_registers
+            self.marker_register,
+            self.accumulation_register,
+        ) = temp_registers
 
-        self.registers = tuple(flatten(temporary_registers))
+        self.registers = tuple(flatten(temp_registers))
+
         self.circuit = QuantumCircuit(*self.registers)
 
     @override
@@ -286,11 +307,30 @@ class ABLattice(AmplitudeLattice):
             for c, gp in enumerate(self.num_gridpoints)
         ]
 
+        marker_register = (
+            [
+                QuantumRegister(
+                    int(ceil(log2(len(self.geometries)))),
+                    name="m",
+                )
+            ]
+            if self.has_multiple_geometries()
+            else []
+        )
+
+        accumulation_register = (
+            [QuantumRegister(self.num_accumulation_qubits, name="acc")]
+            if self.has_accumulation_register()
+            else []
+        )
+
         return (
             grid_registers,
             velocity_registers,
             ancilla_comparator_register,
             ancilla_object_register,
+            marker_register,
+            accumulation_register,
         )
 
     @override
@@ -303,8 +343,52 @@ class ABLattice(AmplitudeLattice):
         return f"ablattice-{self.num_dims}d-{gp_string}-{len(flatten(list(self.shapes.values())))}-obstacle"
 
     @override
-    def has_multiple_geometries(self):
-        return False  # multiple geometries unsupported for ABQLBM right now
+    def has_multiple_geometries(self) -> bool:
+        return len(self.geometries) > 1
+
+    def has_accumulation_register(self) -> bool:
+        """
+        Whether the lattice has a register that accumulates quantities at each step.
+
+        Returns
+        -------
+        bool
+            Whether the lattice has a register that accumulates quantities at each step.
+        """
+        return self.num_accumulation_qubits > 0
+
+    def use_accumulation_register(self):
+        """
+        Sets up the accumulation register of the lattice.
+
+        The amplitude-based accumulation method is only currently supported for 1 time step,
+        at the end of the simulation. More detail on amplitude accumulation can be found
+        in :cite:t:`qsearch`.
+        """
+        self.num_accumulation_qubits = 1
+
+        self.__update_registers()
+
+    @override
+    def marker_index(self) -> List[int]:
+        return list(
+            range(
+                self.num_base_qubits + self.num_ancilla_qubits,
+                self.num_base_qubits + self.num_ancilla_qubits + self.num_marker_qubits,
+            )
+        )
+
+    @override
+    def accumulation_index(self) -> List[int]:
+        return list(
+            range(
+                self.num_base_qubits + self.num_ancilla_qubits + self.num_marker_qubits,
+                self.num_base_qubits
+                + self.num_ancilla_qubits
+                + self.num_marker_qubits
+                + self.num_accumulation_qubits,
+            )
+        )
 
     @override
     def get_encoding(self) -> ABEncodingType:

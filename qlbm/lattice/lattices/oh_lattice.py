@@ -22,12 +22,12 @@ from .ab_lattice import ABLattice
 class OHLattice(ABLattice):
     r"""
     Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.ABQLBM` for the One-Hot (OH) encoding.
-    
+
     In the OH encoding, the grid is compressed into logarithmically many qubits,
     while the the velocity register is not.
     For a :math:`1024 \times 1024` lattice with a :math:`D_2Q_9` discretization, the
     OH encoding requires :math:`2\log_2 1024 + 9 = 29` qubits.
-    
+
     Each of the discrete velocities is assigned a vector :math:`\ket{\mathbf{e}_j}`,
     with entry :math:`1` at index :math:`j` and :math:`0` everywhere else.
 
@@ -156,18 +156,41 @@ class OHLattice(ABLattice):
         self.num_comparator_qubits = 2 * (self.num_dims - 1)
         self.num_ancilla_qubits = self.num_comparator_qubits + self.num_obstacle_qubits
 
-        self.num_total_qubits = self.num_base_qubits + self.num_ancilla_qubits
+        self.num_total_qubits = (
+            self.num_base_qubits + self.num_ancilla_qubits + self.num_marker_qubits
+        )
 
-        temporary_registers = self.get_registers()
+        self.num_accumulation_qubits = 0
+
+        self.__update_registers()
+
+    def __update_registers(self):
+        self.num_total_qubits = (
+            self.num_base_qubits + self.num_ancilla_qubits + self.num_marker_qubits
+        )
+
+        temp_registers = self.get_registers()
+
         (
             self.grid_registers,
             self.velocity_registers,
             self.ancilla_comparator_register,
             self.ancilla_object_register,
-        ) = temporary_registers
+            self.marker_register,
+            self.accumulation_register,
+        ) = temp_registers
 
-        self.registers = tuple(flatten(temporary_registers))
+        self.registers = tuple(flatten(temp_registers))
+
         self.circuit = QuantumCircuit(*self.registers)
+
+    @override
+    def marker_index(self):
+        raise LatticeException("Multiple geometries not yet supported for OHLattice.")
+
+    @override
+    def accumulation_index(self):
+        raise LatticeException("Accumulation not yet supported for OHLattice.")
 
     @override
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
@@ -203,11 +226,30 @@ class OHLattice(ABLattice):
             for c, gp in enumerate(self.num_gridpoints)
         ]
 
+        marker_register = (
+            [
+                QuantumRegister(
+                    int(ceil(log2(len(self.geometries)))),
+                    name="m",
+                )
+            ]
+            if self.has_multiple_geometries()
+            else []
+        )
+
+        accumulation_register = (
+            [QuantumRegister(self.num_accumulation_qubits, name="acc")]
+            if self.has_accumulation_register()
+            else []
+        )
+
         return (
             grid_registers,
             velocity_registers,
             ancilla_comparator_register,
             ancilla_object_register,
+            marker_register,
+            accumulation_register,
         )
 
     @override
