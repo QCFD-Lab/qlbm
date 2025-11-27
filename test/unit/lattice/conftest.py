@@ -2,6 +2,7 @@ import pytest
 
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
+from qlbm.lattice.lattices.oh_lattice import OHLattice
 
 
 # 1D Lattices
@@ -22,16 +23,12 @@ def dummy_1d_lattice() -> ABLattice:
 def lattice_1d_16_1_obstacle() -> ABLattice:
     return ABLattice(
         {
-            "lattice": {
-                "dim": {"x": 16},
-                "velocities": "D1Q2"
-            },
+            "lattice": {"dim": {"x": 16}, "velocities": "D1Q2"},
             "geometry": [
                 {"shape": "cuboid", "x": [4, 6], "boundary": "bounceback"},
             ],
         },
     )
-
 
 
 # 2D Lattices
@@ -40,10 +37,7 @@ def dummy_2d_lattice() -> ABLattice:
     return ABLattice(
         0,
         {
-            "lattice": {
-                "dim": {"x": 32, "y": 32},
-                "velocities": "D2Q4"
-            },
+            "lattice": {"dim": {"x": 32, "y": 32}, "velocities": "D2Q4"},
         },
     )
 
@@ -52,10 +46,24 @@ def dummy_2d_lattice() -> ABLattice:
 def lattice_2d_16x16_1_obstacle() -> ABLattice:
     return ABLattice(
         {
-            "lattice": {
-                "dim": {"x": 16, "y": 16},
-                "velocities": "D2Q4"
-            },
+            "lattice": {"dim": {"x": 16, "y": 16}, "velocities": "D2Q4"},
+            "geometry": [
+                {
+                    "shape": "cuboid",
+                    "x": [2, 6],
+                    "y": [5, 10],
+                    "boundary": "bounceback",
+                },
+            ],
+        },
+    )
+
+
+@pytest.fixture
+def lattice_2d_16x16_1_obstacle_oh() -> OHLattice:
+    return OHLattice(
+        {
+            "lattice": {"dim": {"x": 16, "y": 16}, "velocities": "D2Q9"},
             "geometry": [
                 {
                     "shape": "cuboid",
