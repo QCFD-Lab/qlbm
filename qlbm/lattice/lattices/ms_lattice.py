@@ -477,3 +477,18 @@ class MSLattice(AmplitudeLattice):
     @override
     def get_encoding(self):
         return ABEncodingType.MS
+
+    @override
+    def get_base_circuit(self):
+        return QuantumCircuit(
+            *flatten(
+                [
+                    self.ancilla_velocity_register,
+                    self.ancilla_object_register,
+                    self.ancilla_comparator_register,
+                    self.grid_registers,
+                    self.velocity_registers,
+                    self.velocity_dir_registers,
+                ]
+            )
+        )

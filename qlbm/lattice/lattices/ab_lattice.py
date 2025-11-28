@@ -181,6 +181,46 @@ class ABLattice(AmplitudeLattice):
 
         self.circuit = QuantumCircuit(*self.registers)
 
+    def set_geometries(self, geometries):
+        """
+        Updates the geometry setup of the lattice.
+
+        For a given lattice (set number of gridpoints and velocity discretization),
+        set multiple geometry configurations to simulate simultaneously.
+
+        .. plot::
+            :include-source:
+
+            from qlbm.lattice import ABLattice
+
+            lattice = ABLattice(
+                {
+                    "lattice": {
+                        "dim": {"x": 16, "y": 16},
+                        "velocities": "D2Q9",
+                    },
+                },
+            )
+
+            lattice.circuit.draw("mpl")
+
+        Parameters
+        ----------
+        geometries : Dict
+            A list of geometries to simulate on the same lattice.
+        """
+        self.geometries = [self.parse_geometry_dict(g) for g in geometries]
+        if len(self.geometries) == 1:
+            # Remove this in the future...
+            self.shapes = self.geometries[0]
+
+        self.num_marker_qubits = (
+            int(ceil(log2(len(self.geometries))))
+            if self.has_multiple_geometries()
+            else 0
+        )
+        self.__update_registers()
+
     @override
     def grid_index(self, dim: int | None = None) -> List[int]:
         if dim is None:
@@ -393,3 +433,16 @@ class ABLattice(AmplitudeLattice):
     @override
     def get_encoding(self) -> ABEncodingType:
         return ABEncodingType.AB
+
+    @override
+    def get_base_circuit(self):
+        return QuantumCircuit(
+            *flatten(
+                [
+                    self.grid_registers,
+                    self.velocity_registers,
+                    self.ancilla_comparator_register,
+                    self.ancilla_object_register,
+                ]
+            ),
+        )

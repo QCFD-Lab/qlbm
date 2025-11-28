@@ -530,6 +530,9 @@ class AmplitudeLattice(Lattice, ABC):
     num_marker_qubits: int
     """The number of qubits used to identify geometries, if parallel lattices are being simulated."""
 
+    geometries: List[Dict[str, List[Shape]]]
+    """The list of geometries, if multiple geometries are simulated in parallel on this lattice."""
+
     def __init__(
         self,
         lattice_data,
@@ -669,4 +672,9 @@ class AmplitudeLattice(Lattice, ABC):
         ABEncodingType
             The encoding of this lattice.
         """
+        pass
+
+    @abstractmethod
+    def get_base_circuit(self) -> QuantumCircuit:
+        """Get the base quantum circuit, without any multi-geometry or accumulation qubits."""
         pass
