@@ -11,7 +11,6 @@ from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import flatten
 
 from .streaming import ABStreamingOperator
 
@@ -86,7 +85,6 @@ class ABQLBM(LBMAlgorithm):
         circuit.compose(
             ABReflectionOperator(
                 self.lattice,
-                flatten(list(self.lattice.shapes.values())),  # type: ignore
                 logger=self.logger,
             ).circuit,
             inplace=True,

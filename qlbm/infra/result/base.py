@@ -63,7 +63,7 @@ class QBMResult(ABC):
         """
         Creates ``stl`` files for each block in the lattice.
 
-        Output files are formatted as ``output_dir/paraview_dir/cube_<x>.stl``.
+        Output files are formatted as ``output_dir/paraview_dir/shape_<x>.stl``.
         The output is created through the :class:`.Shape`'s :meth:`.Shape.stl_mesh` method.
         """
         if not self.lattice.has_multiple_geometries():
