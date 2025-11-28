@@ -55,7 +55,6 @@ def test_hamming_adder_2plus0():
     counts = get_count_from_circuit(circuit)
 
     assert len(counts) == 1
-    print(counts)
     assert all(int(s[:4], 2) == 2 for s in counts)
 
 
@@ -72,7 +71,6 @@ def test_hamming_adder_2plus4():
     counts = get_count_from_circuit(circuit)
 
     assert len(counts) == 1
-    print(counts)
     assert all(int(s[:4], 2) == 6 for s in counts)
 
 
@@ -100,6 +98,5 @@ def test_hamming_adder_superposition_x():
     adder.measure_all()
     circuit.compose(adder, inplace=True)
     counts = get_count_from_circuit(circuit)
-    print(counts)
     assert len(counts) == 16
     assert all(int(s[:4], 2) == (hamming_weight(s[4:]) + 4) for s in counts)

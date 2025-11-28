@@ -111,8 +111,6 @@ class ABReflectionOperator(LBMOperator):
                         inplace=True,
                     )
 
-                    print(f"Geometry {c} done")
-
                     if qubits_to_invert:
                         circuit.x(qubits_to_invert)
         return circuit
@@ -191,8 +189,6 @@ class ABReflectionOperator(LBMOperator):
             inplace=True,
         )
 
-        print(f"Depth at the end: {circuit.depth()}")
-
         return circuit
 
     def set_inside_wall_ancilla_state(
@@ -257,8 +253,6 @@ class ABReflectionOperator(LBMOperator):
                     circuit.x(grid_qubit_indices_to_invert)
 
                 circuit.compose(comparator_circuit, inplace=True)
-
-        print(f"Depth inside wall ancilla state: {circuit.depth()}")
 
         return circuit
 
@@ -376,9 +370,6 @@ class ABReflectionOperator(LBMOperator):
                     circuit.x(grid_qubit_indices_to_invert)
 
                 circuit.compose(comparator_circuit, inplace=True)
-
-        print(f"Depth outside wall ancilla state: {circuit.depth()}")
-
         return circuit
 
     def set_ancilla_of_point_state(
@@ -504,8 +495,6 @@ class ABReflectionOperator(LBMOperator):
                     )
             if grid_qubit_indices_to_invert:
                 circuit.x(grid_qubit_indices_to_invert)
-
-        print(f"Depth point ancilla state: {circuit.depth()}")
 
         return circuit
 

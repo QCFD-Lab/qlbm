@@ -87,6 +87,8 @@ class ABInitialConditions(LBMPrimitive):
                     qubits=self.lattice.velocity_index(),
                     inplace=True,
                 )
+
+                circuit.h(self.lattice.grid_index(1))
             case ABEncodingType.OH:
                 nq = int(np.ceil(np.log2(self.lattice.num_velocity_qubits)))
                 circuit.compose(

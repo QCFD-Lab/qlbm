@@ -873,7 +873,6 @@ class Block(SpaceTimeShape, LQLGAShape):
 
     @override
     def get_lqlga_reflection_data_d1q2(self):
-        print(self.num_grid_qubits[0])
         return self.get_lqlga_reflection_data_1d_from_points(
             [tuple([self.bounds[0][0]])],
             0,
