@@ -3,7 +3,7 @@
 from itertools import product
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List, Tuple
+from typing import List, Tuple, cast
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate
@@ -57,12 +57,23 @@ class ABReflectionOperator(LBMOperator):
     def __init__(
         self,
         lattice: ABLattice,
-        blocks: List[Block],
+        blocks: List[Block] | None = None,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
 
-        self.blocks = blocks
+        self.blocks = (
+            (
+                cast(List[Block], flatten(list(self.lattice.geometries[0].values())))
+                if not self.lattice.has_multiple_geometries()
+                else [
+                    gdict["bounceback"] + gdict["specular"]  # type: ignore
+                    for gdict in self.lattice.geometries  # type: ignore
+                ]
+            )
+            if blocks is None
+            else blocks
+        )
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -73,24 +84,59 @@ class ABReflectionOperator(LBMOperator):
 
     @override
     def create_circuit(self) -> QuantumCircuit:
+        if self.lattice.discretization not in [LatticeDiscretization.D2Q9]:
+            raise LatticeException("AB reflection only currently supported in D2Q9")
+
         if self.lattice.discretization == LatticeDiscretization.D2Q9:
-            return self.__create_circuit_d2q9()
+            if not self.lattice.has_multiple_geometries():
+                return self.__create_circuit_d2q9(
+                    self.blocks, control_on_marker_state=False
+                )
+            else:
+                circuit = self.lattice.circuit.copy()
+                for c, blocks in enumerate(self.blocks):
+                    # Prepare the /ket{1} state in the marker register
+                    qubits_to_invert = [
+                        q + self.lattice.marker_index()[0]
+                        for q in get_qubits_to_invert(c, self.lattice.num_marker_qubits)
+                    ]
 
-        raise LatticeException("AB reflection only currently supported in D2Q9")
+                    if qubits_to_invert:
+                        circuit.x(qubits_to_invert)
 
-    def __create_circuit_d2q9(self):
+                    circuit.compose(
+                        self.__create_circuit_d2q9(
+                            blocks, control_on_marker_state=True
+                        ),
+                        inplace=True,
+                    )
+
+                    print(f"Geometry {c} done")
+
+                    if qubits_to_invert:
+                        circuit.x(qubits_to_invert)
+        return circuit
+
+    def __create_circuit_d2q9(self, blocks, control_on_marker_state: bool = False):
+        # Ignore accumulation and marker registers
         circuit = self.lattice.circuit.copy()
 
         # Mark populations inside the object
-        for block in self.blocks:
-            circuit.compose(self.set_inside_wall_ancilla_state(block), inplace=True)
+        for block in blocks:
+            circuit.compose(
+                self.set_inside_wall_ancilla_state(
+                    block, control_on_marker_state=control_on_marker_state
+                ),
+                inplace=True,
+            )
 
         circuit.compose(
             self.set_ancilla_of_point_state(
                 flatten(
-                    [[(p, None) for p in block.corners_inside] for block in self.blocks]
+                    [[(p, None) for p in block.corners_inside] for block in blocks]
                 ),
                 ignore_velocity_data=True,
+                control_on_marker_state=control_on_marker_state,
             ),
             inplace=True,
         )
@@ -99,13 +145,18 @@ class ABReflectionOperator(LBMOperator):
         circuit.compose(self.permute_and_stream(), inplace=True)
 
         # Reset the ancilla state of reflected populations
-        for block in self.blocks:
-            circuit.compose(self.reset_outside_wall_ancilla_state(block), inplace=True)
+        for block in blocks:
+            circuit.compose(
+                self.reset_outside_wall_ancilla_state(
+                    block, control_on_marker_state=control_on_marker_state
+                ),
+                inplace=True,
+            )
 
         # Re-reset near corner point ancillas
         point_data: List[Tuple[ReflectionPoint, List[int]]] = []
 
-        for block in self.blocks:
+        for block in blocks:
             for dim in range(self.lattice.num_dims):
                 for c, bounds in enumerate(
                     product(*[[False, True]] * self.lattice.num_dims)
@@ -132,13 +183,21 @@ class ABReflectionOperator(LBMOperator):
         # Re-reset the ancilla state of the populations that
         # Shouldn't have been flipped in the previous step
         circuit.compose(
-            self.set_ancilla_of_point_state(point_data, ignore_velocity_data=False),
+            self.set_ancilla_of_point_state(
+                point_data,
+                ignore_velocity_data=False,
+                control_on_marker_state=control_on_marker_state,
+            ),
             inplace=True,
         )
 
+        print(f"Depth at the end: {circuit.depth()}")
+
         return circuit
 
-    def set_inside_wall_ancilla_state(self, block: Block) -> QuantumCircuit:
+    def set_inside_wall_ancilla_state(
+        self, block: Block, control_on_marker_state: bool = False
+    ) -> QuantumCircuit:
         """
         Sets the state of the ancilla qubit for all the gridpoints lying inside the walls of the block.
 
@@ -179,6 +238,9 @@ class ABReflectionOperator(LBMOperator):
                     + self.lattice.ancillae_comparator_index()
                 )
 
+                if control_on_marker_state:
+                    control_qubits.extend(self.lattice.marker_index())
+
                 target_qubits = self.lattice.ancillae_obstacle_index(0)
 
                 circuit.compose(
@@ -196,9 +258,13 @@ class ABReflectionOperator(LBMOperator):
 
                 circuit.compose(comparator_circuit, inplace=True)
 
+        print(f"Depth inside wall ancilla state: {circuit.depth()}")
+
         return circuit
 
-    def reset_outside_wall_ancilla_state(self, block: Block) -> QuantumCircuit:
+    def reset_outside_wall_ancilla_state(
+        self, block: Block, control_on_marker_state: bool = False
+    ) -> QuantumCircuit:
         """
         Resets the state of the obstacle ancilla qubit for all the gridpoints that are directly adjacent to the object, but in the fluid domain.
 
@@ -258,6 +324,9 @@ class ABReflectionOperator(LBMOperator):
                                 + self.lattice.velocity_index()  # The reset step is additionally controlled on the velocity register
                             )
 
+                            if control_on_marker_state:
+                                control_qubits.extend(self.lattice.marker_index())
+
                             target_qubits = self.lattice.ancillae_obstacle_index(0)
 
                             circuit.compose(
@@ -283,6 +352,9 @@ class ABReflectionOperator(LBMOperator):
                                 ]
                             )
 
+                            if control_on_marker_state:
+                                control_qubits.extend(self.lattice.marker_index())
+
                             target_qubits = self.lattice.ancillae_obstacle_index(0)
 
                             circuit.compose(
@@ -305,12 +377,15 @@ class ABReflectionOperator(LBMOperator):
 
                 circuit.compose(comparator_circuit, inplace=True)
 
+        print(f"Depth outside wall ancilla state: {circuit.depth()}")
+
         return circuit
 
     def set_ancilla_of_point_state(
         self,
         points_data: List[Tuple[ReflectionPoint, List[int]]],
         ignore_velocity_data: bool,
+        control_on_marker_state: bool = False,
     ) -> QuantumCircuit:
         """
         Sets the state of the obstacle ancilla qubit of a given gridpoint, conditioned on the velocity profile.
@@ -367,6 +442,9 @@ class ABReflectionOperator(LBMOperator):
                             )  # The reset step is additionally controlled on the velocity register
                         )
 
+                        if control_on_marker_state:
+                            control_qubits.extend(self.lattice.marker_index())
+
                         target_qubits = self.lattice.ancillae_obstacle_index(0)
 
                         circuit.compose(
@@ -382,13 +460,18 @@ class ABReflectionOperator(LBMOperator):
                             circuit.x(velocity_qubit_indices_to_invert)
                 case ABEncodingType.OH:
                     if ignore_velocity_data:
+                        control_qubits = self.lattice.grid_index() + (
+                            self.lattice.marker_index()
+                            if control_on_marker_state
+                            else []
+                        )
                         circuit.compose(
                             MCMTGate(
                                 XGate(),
-                                len(self.lattice.grid_index()),
+                                len(control_qubits),
                                 len(self.lattice.ancillae_obstacle_index(0)),
                             ),
-                            qubits=self.lattice.grid_index()
+                            qubits=control_qubits
                             + self.lattice.ancillae_obstacle_index(0),
                             inplace=True,
                         )
@@ -400,6 +483,9 @@ class ABReflectionOperator(LBMOperator):
                                     [self.lattice.velocity_index()[v]]
                                 )  # Only one velocity control
                             )
+
+                            if control_on_marker_state:
+                                control_qubits.extend(self.lattice.marker_index())
 
                             target_qubits = self.lattice.ancillae_obstacle_index(0)
 
@@ -418,6 +504,8 @@ class ABReflectionOperator(LBMOperator):
                     )
             if grid_qubit_indices_to_invert:
                 circuit.x(grid_qubit_indices_to_invert)
+
+        print(f"Depth point ancilla state: {circuit.depth()}")
 
         return circuit
 
