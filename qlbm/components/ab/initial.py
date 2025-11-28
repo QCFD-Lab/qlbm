@@ -109,6 +109,9 @@ class ABInitialConditions(LBMPrimitive):
                     f"Encoding {self.lattice.get_encoding()} not supported."
                 )
 
+        if self.lattice.has_multiple_geometries():
+            circuit.h(self.lattice.marker_index())
+
         return circuit
 
     def __oh_permutation(self) -> QuantumCircuit:
