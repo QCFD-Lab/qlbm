@@ -23,6 +23,7 @@ from .common import (
     EQCRedistribution,
     HammingWeightAdder,
 )
+from .common.adders import ParameterizedDraperAdder, ParameterizedPhaseShift, PhaseShift
 from .cqlbm import CQLBM
 from .lqlga import (
     LQLGA,
@@ -41,11 +42,9 @@ from .ms import (
     MSStreamingOperator,
     SpecularReflectionOperator,
 )
-from .ms.primitives import Comparator, ComparatorMode, SpeedSensitiveAdder
+from .ms.primitives import Comparator, ComparatorMode
 from .ms.streaming import (
     ControlledIncrementer,
-    PhaseShift,
-    SpeedSensitivePhaseShift,
     StreamingAncillaPreparation,
 )
 
@@ -59,9 +58,9 @@ __all__ = [
     "LBMAlgorithm",
     "ComparatorMode",
     "Comparator",
-    "SpeedSensitiveAdder",
+    "ParameterizedDraperAdder",
     "PhaseShift",
-    "SpeedSensitivePhaseShift",
+    "ParameterizedPhaseShift",
     "EmptyPrimitive",
     "StreamingAncillaPreparation",
     "ControlledIncrementer",
