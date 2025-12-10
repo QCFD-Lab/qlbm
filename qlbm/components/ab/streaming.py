@@ -10,7 +10,7 @@ from typing_extensions import override
 
 from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.components.base import LBMOperator
-from qlbm.components.ms.streaming import PhaseShift
+from qlbm.components.common.adders import PhaseShift
 from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException

@@ -1,17 +1,16 @@
 """Quantum circuits for the implementation of QFT-based streaming as described in :cite:t:`collisionless`."""
 
 from logging import Logger, getLogger
-from math import pi
 from time import perf_counter_ns
 from typing import List
 
-import numpy as np
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCXGate
 from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive, MSOperator
+from qlbm.components.common.adders import PhaseShift
 from qlbm.lattice import MSLattice
 from qlbm.tools import CircuitException, bit_value
 
@@ -326,142 +325,3 @@ class MSStreamingOperator(MSOperator):
         return (
             f"[Operator StreamingOperator for velocities {self.velocities_to_stream}]"
         )
-
-
-class PhaseShift(LBMPrimitive):
-    r"""
-    A primitive that applies the phase-shift as part of the :class:`.ControlledIncrementer` used in the :class:`.MSStreamingOperator`.
-
-    The rotation applied is :math:`\pm\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
-    For an in-depth mathematical explanation of the procedure, consult Section 4 of :cite:t:`collisionless`.
-
-    ========================= ======================================================================
-    Attribute                  Summary
-    ========================= ======================================================================
-    :attr:`num_qubits`        The number of qubits to perform the phase shift for.
-    :attr:`positive`          Whether the phase shift is applied to increment (T)
-                              or decrement (F) the position of the particles.
-                              Defaults to ``False``.
-    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    ========================= ======================================================================
-
-    Example usage:
-
-    .. plot::
-        :include-source:
-
-        from qlbm.components.ms import PhaseShift
-
-        # A phase shift of 5 qubits
-        PhaseShift(num_qubits=5, positive=False).draw("mpl")
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        positive: bool = False,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-
-        self.num_qubits = num_qubits
-        self.positive = positive
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        circuit = QuantumCircuit(self.num_qubits)
-
-        for c, qubit_index in enumerate(range(self.num_qubits)):
-            # (2 * positive - 1) will flip the sign if positive is False
-            # This effectively inverts the circuit
-            phase = (2 * self.positive - 1) * pi / (2 ** (self.num_qubits - 1 - c))
-            circuit.p(phase, qubit_index)
-
-        return circuit
-
-    @override
-    def __str__(self) -> str:
-        return f"[Primitive PhaseShift of {self.num_qubits} qubits, in direction {self.positive}]"
-
-
-class SpeedSensitivePhaseShift(LBMPrimitive):
-    r"""A primitive that applies the phase-shift as part of the :class:`.SpeedSensitiveAdder` used in :class:`.Comparator`\ s.
-
-    The rotation applied is :math:`\pm \frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
-    Unlike the regular :class:`.PhaseShift`, the speed-sensitive version additionally depends on a specific speed index.
-    For an in-depth mathematical explanation of the procedure, consult Sections 4 and 5.5 of :cite:t:`collisionless`.
-
-    ========================= ======================================================================
-    Attribute                  Summary
-    ========================= ======================================================================
-    :attr:`num_qubits`        The number of qubits to perform the phase shift for.
-    :attr:`positive`          Whether the phase shift is applied to increment (T)
-                              or decrement (F) the position of the particles.
-                              Defaults to ``False``.
-    :attr:`speed`             The specific speed index to perform the phase shift for.
-    :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
-    ========================= ======================================================================
-
-    Example usage:
-
-    .. plot::
-        :include-source:
-
-        from qlbm.components.ms import SpeedSensitivePhaseShift
-
-        # A phase shift of 5 qubits, controlled on speed index 2
-        SpeedSensitivePhaseShift(num_qubits=5, speed=2, positive=True).draw("mpl")
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        speed: int,
-        positive: bool = False,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-
-        self.num_qubits = num_qubits
-        self.speed = speed
-        self.positive = positive
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        circuit = QuantumCircuit(self.num_qubits)
-        angles = np.zeros(self.num_qubits)
-
-        for qubit_index in range(self.num_qubits):
-            dig = bit_value(self.speed, qubit_index)
-            for i in range(self.num_qubits - qubit_index):
-                # (2 * positive - 1) will flip the sign if positive is False
-                # This effectively inverts the circuit
-                angles[i] += (
-                    (2 * self.positive - 1)
-                    * dig
-                    * pi
-                    / (2 ** (self.num_qubits - qubit_index - i - 1))
-                )
-
-        for qubit_index in range(self.num_qubits):
-            circuit.p(angles[qubit_index], qubit_index)
-
-        return circuit
-
-    @override
-    def __str__(self) -> str:
-        return f"[Primitive SpeedSensitivePhaseShift of {self.num_qubits} qubits, speed {self.speed}, in direction {self.positive}]"

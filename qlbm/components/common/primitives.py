@@ -2,7 +2,7 @@
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List, Tuple
+from typing import List, Tuple, cast
 
 import numpy as np
 from numpy import pi
@@ -13,7 +13,10 @@ from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
+from qlbm.components.common.adders import ParameterizedDraperAdder
+from qlbm.components.ms.streaming import ControlledIncrementer
 from qlbm.lattice import Lattice
+from qlbm.tools.utils import get_qubits_to_invert
 
 
 class EmptyPrimitive(LBMPrimitive):
@@ -252,3 +255,118 @@ class TruncatedQFT(LBMPrimitive):
     @override
     def __str__(self):
         return f"[Primitive TuncatedQFT({self.num_qubits}, {self.dft_size})]"
+
+
+class AdditionConversion(LBMPrimitive):
+    num_qubits: int
+    """The number of qubits the states are encoded in."""
+
+    state_from: int
+    """The starting state to convert."""
+
+    state_to: int
+    """The state to convert to."""
+
+    def __init__(
+        self,
+        num_qubits: int,
+        state_from: int,
+        state_to: int,
+        logger: Logger = getLogger("qlbm"),
+    ):
+        super().__init__(logger)
+        self.num_qubits = num_qubits
+        self.state_from = state_from
+        self.state_to = state_to
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self):
+        circuit = QuantumCircuit(self.num_qubits + 1)
+
+        state_setter_circ = StateSetter(
+            self.num_qubits, self.state_from, self.logger
+        ).circuit
+
+        circuit.compose(
+            state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
+        )
+        circuit.mcx(list(range(self.num_qubits)), self.num_qubits)
+        circuit.compose(
+            state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
+        )
+
+        circuit.compose(
+            ParameterizedDraperAdder(
+                self.num_qubits,
+                abs(self.state_to - self.state_from),
+                self.state_to > self.state_from,
+                1,
+                self.logger,
+            ).circuit,
+            inplace=True,
+        )
+
+        state_setter_circ = StateSetter(
+            self.num_qubits, self.state_to, self.logger
+        ).circuit
+
+        circuit.compose(
+            state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
+        )
+        circuit.mcx(list(range(self.num_qubits)), self.num_qubits)
+        circuit.compose(
+            state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
+        )
+
+        return circuit
+
+    @override
+    def __str__(self):
+        return f"[Primitive AdditionConversion({self.num_qubits}, {self.state_from}, {self.state_to})]"
+
+
+class StateSetter(LBMPrimitive):
+    num_qubits: int
+    """The number of qubits the state is encoded in."""
+
+    state_to_set: int
+    """The state to convert to :math:`\ket{1}^{\otimes n}`"""
+
+    def __init__(
+        self,
+        num_qubits: int,
+        state_to_set: int,
+        logger: Logger = getLogger("qlbm"),
+    ):
+        super().__init__(logger)
+        self.num_qubits = num_qubits
+        self.state_to_set = state_to_set
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self):
+        circuit = QuantumCircuit(self.num_qubits)
+
+        qs = get_qubits_to_invert(self.state_to_set, self.num_qubits)
+
+        if qs:
+            circuit.x(qs)
+
+        return circuit
+
+    @override
+    def __str__(self):
+        return f"[Primitive StateSetter({self.num_qubits}, {self.state_to_set}]"

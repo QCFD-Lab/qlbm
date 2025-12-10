@@ -1,5 +1,6 @@
 """Modular qlbm quantum circuit components for the MSQLBM algorithm :cite:p:`collisionless`."""
 
+from ..common.adders import PhaseShift, ParameterizedDraperAdder, ParameterizedPhaseShift
 from .bounceback_reflection import (
     BounceBackReflectionOperator,
     BounceBackWallComparator,
@@ -12,21 +13,18 @@ from .primitives import (
     GridMeasurement,
     MSInitialConditions,
     MSInitialConditions3DSlim,
-    SpeedSensitiveAdder,
 )
 from .specular_reflection import SpecularReflectionOperator, SpecularWallComparator
 from .streaming import (
     ControlledIncrementer,
     MSStreamingOperator,
-    PhaseShift,
-    SpeedSensitivePhaseShift,
     StreamingAncillaPreparation,
 )
 
 __all__ = [
     "ComparatorMode",
     "Comparator",
-    "SpeedSensitiveAdder",
+    "ParameterizedDraperAdder",
     "StreamingAncillaPreparation",
     "ControlledIncrementer",
     "GridMeasurement",
@@ -34,7 +32,7 @@ __all__ = [
     "MSInitialConditions",
     "MSInitialConditions3DSlim",
     "PhaseShift",
-    "SpeedSensitivePhaseShift",
+    "ParameterizedPhaseShift",
     "MSStreamingOperator",
     "SpecularReflectionOperator",
     "SpecularWallComparator",

@@ -6,11 +6,10 @@ from time import perf_counter_ns
 from typing import List
 
 from qiskit import ClassicalRegister, QuantumCircuit
-from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.components.ms.streaming import SpeedSensitivePhaseShift
+from qlbm.components.common.adders import ParameterizedDraperAdder
 from qlbm.lattice import MSLattice
 from qlbm.lattice.geometry.encodings.ms import ReflectionResetEdge
 from qlbm.tools import flatten
@@ -285,75 +284,6 @@ class ComparatorMode(Enum):
     GE = (4,)
 
 
-class SpeedSensitiveAdder(LBMPrimitive):
-    r"""A QFT-based incrementer used to perform streaming in the algorithms based on amplitude encodings.
-
-    Incrementation and decerementation are performed as rotations on grid qubits
-    that have been previously mapped to the Fourier basis.
-    This happens by nesting a :class:`.SpeedSensitivePhaseShift` primitive
-    between regular and inverse :math:`QFT`\ s.
-
-    ========================= ======================================================================
-    Attribute                  Summary
-    ========================= ======================================================================
-    :attr:`num_qubits`        Number of qubits of the circuit.
-    :attr:`speed`             The index of the speed to increment.
-    :attr:`positive`          Whether to increment the particles traveling at this speed in the positive (T) or negative (F) direction.
-    :attr:`logger`            The performance logger, by default getLogger("qlbm")
-    ========================= ======================================================================
-
-    Example usage:
-
-    .. plot::
-        :include-source:
-
-        from qlbm.components.ms import SpeedSensitiveAdder
-
-        SpeedSensitiveAdder(4, 1, True).draw("mpl")
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        speed: int,
-        positive: bool,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-        self.num_qubits = num_qubits
-        self.speed = speed
-        self.positive = positive
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        circuit = QuantumCircuit(self.num_qubits)
-
-        circuit.compose(QFT(self.num_qubits), inplace=True)
-        circuit.compose(
-            SpeedSensitivePhaseShift(
-                self.num_qubits,
-                self.speed,
-                self.positive,
-                logger=self.logger,
-            ).circuit,
-            inplace=True,
-        )
-        circuit.compose(QFT(self.num_qubits, inverse=True), inplace=True)
-
-        return circuit
-
-    @override
-    def __str__(self) -> str:
-        return f"[Primitive SimpleAdder on {self.num_qubits} qubits, on velocity {self.speed}, in direction {self.positive}]"
-
-
 class Comparator(LBMPrimitive):
     """
     Quantum comparator primitive that compares two a quantum state of ``num_qubits`` qubits and an integer ``num_to_compare`` with respect to a :class:`.ComparatorMode`.
@@ -412,13 +342,13 @@ class Comparator(LBMPrimitive):
         match mode:
             case ComparatorMode.LT:
                 circuit.compose(
-                    SpeedSensitiveAdder(
+                    ParameterizedDraperAdder(
                         num_qubits, num_to_compare, positive=False, logger=self.logger
                     ).circuit,
                     inplace=True,
                 )
                 circuit.compose(
-                    SpeedSensitiveAdder(
+                    ParameterizedDraperAdder(
                         num_qubits - 1,
                         num_to_compare,
                         positive=True,
