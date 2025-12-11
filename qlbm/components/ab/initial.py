@@ -11,7 +11,10 @@ from typing_extensions import override
 from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.components.ab.utils import BinaryToOHPermutation
 from qlbm.components.base import LBMPrimitive
-from qlbm.components.common.primitives import AdditionConversion, TruncatedQFT
+from qlbm.components.common.primitives import (
+    AdditionConversion,
+    UniformStatePrep,
+)
 from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import dimension_letter
@@ -22,7 +25,7 @@ class ABInitialConditions(LBMPrimitive):
     Initial conditions for the :class:`ABQLBM` algorithm.
 
     This component creates an equal magnitude superposition of all velocity
-    basis states at position ``(0, 0)`` using the :class:`TruncatedQFT`.
+    basis states at position ``(0, 0)`` using the :class:`UniformStatePrep`.
 
     Example usage:
 
@@ -82,7 +85,7 @@ class ABInitialConditions(LBMPrimitive):
 
         nq = int(np.ceil(np.log2(self.lattice.num_velocities_per_point)))
         circuit.compose(
-            TruncatedQFT(
+            UniformStatePrep(
                 nq,
                 self.lattice.num_velocity_qubits,
                 self.logger,
@@ -115,7 +118,45 @@ class ABInitialConditions(LBMPrimitive):
         return f"[Primitive ABEInitialConditions with lattice {self.lattice}]"
 
 
-class DiscreteUniformVelocityABInitialConditions(LBMPrimitive):
+class ABDiscreteUniformInitialConditions(LBMPrimitive):
+    """
+    Initial conditions for the :class:`ABQLBM` algorithm.
+
+    This component creates an equal magnitude superposition of a configurable set of velocity and grid indices.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABDiscreteUniformInitialConditions
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 16, "y": 8}, "velocities": "d2q9"},
+            }
+        )
+
+        ABDiscreteUniformInitialConditions(lattice, [1, 3, 4], ([], [])).draw("mpl")
+
+    The primitive can also applied to the :class:`.OHLattice`:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABDiscreteUniformInitialConditions
+        from qlbm.lattice import OHLattice
+
+        lattice = OHLattice(
+            {
+                "lattice": {"dim": {"x": 16, "y": 8}, "velocities": "d2q9"},
+            }
+        )
+
+        ABDiscreteUniformInitialConditions(lattice, [0, 1], ([0, 1], [0])).draw("mpl")
+    """
+
     velocity_indices: List[int]
 
     grid_qubits_to_superpose: Tuple[List[int], ...]
@@ -178,7 +219,7 @@ class DiscreteUniformVelocityABInitialConditions(LBMPrimitive):
         nq = int(np.ceil(np.log2(len(self.velocity_indices))))
 
         circuit.compose(
-            TruncatedQFT(
+            UniformStatePrep(
                 nq,
                 len(self.velocity_indices),
                 self.logger,

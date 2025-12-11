@@ -1,6 +1,10 @@
 """Modular qlbm quantum circuit components for the MSQLBM algorithm :cite:p:`collisionless`."""
 
-from ..common.adders import PhaseShift, ParameterizedDraperAdder, ParameterizedPhaseShift
+from ..common.adders import (
+    ParameterizedDraperAdder,
+    ParameterizedPhaseShift,
+    PhaseShift,
+)
 from .bounceback_reflection import (
     BounceBackReflectionOperator,
     BounceBackWallComparator,

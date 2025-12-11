@@ -2,13 +2,14 @@
 
 from .ab import ABQLBM
 from .encodings import ABEncodingType
-from .initial import ABInitialConditions
+from .initial import ABDiscreteUniformInitialConditions, ABInitialConditions
 from .measurement import ABGridMeasurement
 from .reflection import ABReflectionOperator, ABReflectionPermutation
 from .streaming import ABStreamingOperator
 
 __all__ = [
     "ABQLBM",
+    "ABDiscreteUniformInitialConditions",
     "ABInitialConditions",
     "ABGridMeasurement",
     "ABReflectionOperator",
