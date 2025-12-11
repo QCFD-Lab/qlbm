@@ -1,4 +1,3 @@
-import numpy as np
 
 from qlbm.lattice.eqc.eqc import EquivalenceClass
 from qlbm.lattice.eqc.eqc_generator import (

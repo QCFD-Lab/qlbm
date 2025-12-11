@@ -1,6 +1,7 @@
 from typing import List, Tuple
 
 import pytest
+
 from qlbm.components.lqlga.streaming import LQLGAStreamingOperator
 
 

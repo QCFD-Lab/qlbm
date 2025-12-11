@@ -1,11 +1,10 @@
 from itertools import product
 
 import pytest
-from qiskit import ClassicalRegister, QuantumCircuit, transpile
+from qiskit import ClassicalRegister, transpile
 from qiskit_aer import AerSimulator
 
 from qlbm.components.ab.initial import DiscreteUniformVelocityABInitialConditions
-from qlbm.tools.utils import bit_value
 
 
 @pytest.mark.parametrize(

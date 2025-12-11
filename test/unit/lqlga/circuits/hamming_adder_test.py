@@ -1,7 +1,6 @@
-import pytest
 from qiskit import QuantumCircuit, transpile
-from qiskit_aer import AerSimulator
 from qiskit.result import Counts
+from qiskit_aer import AerSimulator
 
 from qlbm.components.common import HammingWeightAdder
 
