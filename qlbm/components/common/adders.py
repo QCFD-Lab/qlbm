@@ -1,3 +1,5 @@
+"""Circuits implementing componenets of quantum adders. See :cite:`draper` and :cite:`adder`."""
+
 from logging import Logger, getLogger
 from math import pi
 from time import perf_counter_ns
@@ -217,7 +219,11 @@ class PhaseShift(LBMPrimitive):
     A primitive that applies the phase-shift as part of the :class:`.ControlledIncrementer` used in the :class:`.MSStreamingOperator`.
 
     The rotation applied is :math:`\pm\frac{\pi}{2^{n_q - 1 - j}}`, with :math:`j` the position of the qubit (indexed starting with 0).
-    For an in-depth mathematical explanation of the procedure, consult Section 4 of :cite:t:`collisionless`.
+    For an in-depth mathematical explanation of the procedure and its use within QLBM,
+    consult Section 4 of :cite:t:`collisionless`.
+    The Draper adder was originally formulated in :cite:`draper`, while the version implemented
+    here uses the one-register approach, which was
+    first described in :cite:`adder`.
 
     ========================= ======================================================================
     Attribute                  Summary
