@@ -4,7 +4,7 @@ import pytest
 from qiskit import ClassicalRegister, transpile
 from qiskit_aer import AerSimulator
 
-from qlbm.components.ab.initial import DiscreteUniformVelocityABInitialConditions
+from qlbm.components.ab.initial import ABDiscreteUniformInitialConditions
 
 
 @pytest.mark.parametrize(
@@ -23,7 +23,7 @@ def test_initial_ab_no_gird_superposition(velocities, lattice_fixture, request):
     qc = lattice.circuit.copy()
     qc.add_register(ClassicalRegister(4))
     qc.compose(
-        DiscreteUniformVelocityABInitialConditions(
+        ABDiscreteUniformInitialConditions(
             lattice, velocities, ([], [])
         ).circuit,
         inplace=True,
@@ -57,7 +57,7 @@ def test_initial_oh_no_gird_superposition(velocities, lattice_fixture, request):
     qc = lattice.circuit.copy()
     qc.add_register(ClassicalRegister(9))
     qc.compose(
-        DiscreteUniformVelocityABInitialConditions(
+        ABDiscreteUniformInitialConditions(
             lattice, velocities, ([], [])
         ).circuit,
         inplace=True,

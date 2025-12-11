@@ -400,6 +400,24 @@ class UniformStatePrep(LBMPrimitive):
 
 
 class AdditionConversion(LBMPrimitive):
+    """
+    Converts one basis state to another by incrementation/decrementation.
+
+    Useful for performing permutations in which the initial superposition contains no basis states
+    of the target superposition.
+
+    The circuit utilizes a :class:`.ParameterizedDraperAdder` which controlled on the state
+    of an ancilla qubit to add the difference only to the target basis state.
+
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import AdditionConversion
+
+        AdditionConversion(4, 2, 7).draw("mpl")
+    """
+
     num_qubits: int
     """The number of qubits the states are encoded in."""
 
@@ -475,6 +493,20 @@ class AdditionConversion(LBMPrimitive):
 
 
 class StateSetter(LBMPrimitive):
+    r"""
+    Permutes the superposition such that a target state :math:`\ket{k}` is permuted to :math:`\ket{1}^{\otimes n}`.
+
+    The primitive acts a single layer of :math:`\mathrm{X}` gates on the qubit
+    indices that have value :math:`\ket{0}` for the input state.
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import StateSetter
+
+        StateSetter(4, 6).draw("mpl")
+    """
+
     num_qubits: int
     """The number of qubits the state is encoded in."""
 

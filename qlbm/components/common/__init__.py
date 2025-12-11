@@ -3,13 +3,16 @@
 from .adders import ParameterizedDraperAdder, ParameterizedPhaseShift, PhaseShift
 from .cbse_collision import EQCCollisionOperator, EQCPermutation, EQCRedistribution
 from .primitives import (
+    AdditionConversion,
     EmptyPrimitive,
     HammingWeightAdder,
+    StateSetter,
     TruncatedQFT,
     UniformStatePrep,
 )
 
 __all__ = [
+    "AdditionConversion",
     "EmptyPrimitive",
     "EQCCollisionOperator",
     "EQCPermutation",
@@ -18,6 +21,7 @@ __all__ = [
     "ParameterizedDraperAdder",
     "ParameterizedPhaseShift",
     "PhaseShift",
+    "StateSetter",
     "TruncatedQFT",
-    "UniformStatePrep"
+    "UniformStatePrep",
 ]
