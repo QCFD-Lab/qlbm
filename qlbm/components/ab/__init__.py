@@ -6,6 +6,7 @@ from .initial import ABDiscreteUniformInitialConditions, ABInitialConditions
 from .measurement import ABGridMeasurement
 from .reflection import ABReflectionOperator, ABReflectionPermutation
 from .streaming import ABStreamingOperator
+from .utils import BinaryToOHPermutation
 
 __all__ = [
     "ABQLBM",
@@ -16,4 +17,5 @@ __all__ = [
     "ABReflectionPermutation",
     "ABStreamingOperator",
     "ABEncodingType",
+    "BinaryToOHPermutation",
 ]

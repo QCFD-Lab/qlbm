@@ -1,3 +1,5 @@
+"""Utilities for the Amplitude-Based QLBM."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 
@@ -11,6 +13,29 @@ from qlbm.lattice.lattices.ab_lattice import ABLattice
 
 
 class BinaryToOHPermutation(LBMPrimitive):
+    """
+    Permutes the first :math:`q` basis states of the binary encoding into the :math:`q` one-hot states of the OH encoding.
+
+    This operator is implemented as a decomposed permutation matrix.
+    As such, its decomposition will be exponentially expensive in the number of qubits.
+    By default, the unitary acts the :math:`q` qubits of the of the one hot encoding (in a :math:`D_dQ_q` discretization).
+
+    Example usage:
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import BinaryToOHPermutation
+        from qlbm.lattice import OHLattice
+
+        lattice = OHLattice(
+            {
+                "lattice": {"dim": {"x": 16, "y": 8}, "velocities": "d2q9"},
+            }
+        )
+
+        BinaryToOHPermutation(lattice).draw("mpl")
+    """
+
     lattice: ABLattice
 
     def __init__(
