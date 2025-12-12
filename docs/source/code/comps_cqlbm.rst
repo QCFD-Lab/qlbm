@@ -13,7 +13,7 @@ Amplitude-Based Circuits
         MSStreamingOperator,
         ControlledIncrementer,
         SpecularReflectionOperator,
-        SpeedSensitivePhaseShift,
+        ParameterizedPhaseShift,
     )
     from qlbm.lattice import MSLattice
     print("ok")
@@ -75,6 +75,8 @@ Initial Conditions
 
 .. autoclass:: qlbm.components.ms.primitives.MSInitialConditions3DSlim
 
+.. autoclass:: qlbm.components.ab.initial.ABDiscreteUniformInitialConditions
+
 .. autoclass:: qlbm.components.ab.initial.ABInitialConditions
 
 .. _cqlbm_streaming:
@@ -88,9 +90,9 @@ Streaming
 
 .. autoclass:: qlbm.components.ms.streaming.ControlledIncrementer
 
-.. autoclass:: qlbm.components.ms.primitives.SpeedSensitiveAdder
+.. autoclass:: qlbm.components.common.ParameterizedDraperAdder
 
-.. autoclass:: qlbm.components.ms.streaming.SpeedSensitivePhaseShift
+.. autoclass:: qlbm.components.common.ParameterizedPhaseShift
 
 .. autoclass:: qlbm.components.ms.streaming.PhaseShift
 
