@@ -223,7 +223,7 @@ class PhaseShift(LBMPrimitive):
     consult Section 4 of :cite:t:`collisionless`.
     The Draper adder was originally formulated in :cite:`draper`, while the version implemented
     here uses the one-register approach, which was
-    first described in :cite:`adder`.
+    first described in :cite:`qftadder`.
 
     ========================= ======================================================================
     Attribute                  Summary

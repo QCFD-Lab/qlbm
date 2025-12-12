@@ -25,7 +25,7 @@ class ABInitialConditions(LBMPrimitive):
     Initial conditions for the :class:`ABQLBM` algorithm.
 
     This component creates an equal magnitude superposition of all velocity
-    basis states at position ``(0, 0)`` using the :class:`UniformStatePrep`.
+    basis states at position ``(0, 0)`` using the :class:`.UniformStatePrep`.
 
     Example usage:
 

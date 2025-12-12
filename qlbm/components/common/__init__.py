@@ -6,6 +6,7 @@ from .primitives import (
     AdditionConversion,
     EmptyPrimitive,
     HammingWeightAdder,
+    MCSwap,
     StateSetter,
     TruncatedQFT,
     UniformStatePrep,
@@ -24,4 +25,5 @@ __all__ = [
     "StateSetter",
     "TruncatedQFT",
     "UniformStatePrep",
+    "MCSwap",
 ]

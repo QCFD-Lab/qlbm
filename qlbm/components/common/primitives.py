@@ -28,7 +28,7 @@ class EmptyPrimitive(LBMPrimitive):
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
-    :attr:`lattice`           The :class:`.MSLattice` or :class:`.SpaceTimeLattice` based on which the number of qubits is inferred.
+    :attr:`lattice`           The :class:`.Lattice` based on which the number of qubits is inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
     ========================= ======================================================================
     """
@@ -120,6 +120,16 @@ class HammingWeightAdder(LBMPrimitive):
 
     This primitive adds the hamming weight (number of 1s) in a given register :math:`x`
     to the binary-encoded value of a second register :math:`y`.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.common import HammingWeightAdder
+
+        # Add the Hamming weight of a 3-qubit register onto a 5-qubit register
+        HammingWeightAdder(3, 5).draw("mpl")
     """
 
     x_register_size: int
@@ -189,11 +199,11 @@ class TruncatedQFT(LBMPrimitive):
 
     For a superposition of the first :math:`k` basis states encoded in :math:`n` qubits,
     the operator consists of discrete fourier transform block of size :math:`k\times k`,
-    padded with :math:`2^n - k` :math:`1`s on the main diagonal.
+    padded with :math:`2^n - k` :math:`1`\ s on the main diagonal.
     The rationale and properties of this operator are described in :cite:`spacetime2`.
     This primitive is used in both amplitude-based and computational basis state encodings.
-    In the :class:`ABInitialConditions`, it creates an equal magnitude superposition over the velocity space.
-    In the :class:`EQCRedistribution`, the superposition is over all basis states with an equivalent mass and momenta.
+    In the :class:`.ABInitialConditions`, it creates an equal magnitude superposition over the velocity space.
+    In the :class:`.EQCRedistribution`, the superposition is over all basis states with an equivalent mass and momenta.
 
     Example usage:
 
@@ -202,7 +212,7 @@ class TruncatedQFT(LBMPrimitive):
 
         from qlbm.components.common import TruncatedQFT
 
-        TruncatedQFT(4, 7).decompose(reps=2).draw("mpl")
+        TruncatedQFT(4, 5).circuit.decompose(reps=2).draw("mpl")
     """
 
     num_qubits: int
@@ -270,7 +280,7 @@ class UniformStatePrep(LBMPrimitive):
 
         from qlbm.components.common import UniformStatePrep
 
-        UniformStatePrep(4, 7).decompose(reps=2).draw("mpl")
+        UniformStatePrep(4, 5).draw("mpl")
     """
 
     num_qubits: int
