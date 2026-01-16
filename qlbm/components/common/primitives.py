@@ -349,7 +349,7 @@ class UniformStatePrep(LBMPrimitive):
         if n_eff > self.num_qubits:
             raise CircuitException("Internal error: n_eff > num_qubits.")
 
-        # Binary decomposition: M = Σ_j 2^{l_j}, with 0 <= l0 < l1 < ... < lk
+        # Binary decomposition: M = \Sum_j 2^{l_j}, with 0 <= l0 < l1 < ... < lk
         bit_positions = [i for i in range(n_eff) if (self.num_states >> i) & 1]
         bit_positions.sort()
         l0 = bit_positions[0]
@@ -498,17 +498,22 @@ class AdditionConversion(LBMPrimitive):
     state_to: int
     """The state to convert to."""
 
+    num_ctrl_qubits: int
+    """The number of qubits to control the operation."""
+
     def __init__(
         self,
         num_qubits: int,
         state_from: int,
         state_to: int,
+        num_ctrl_qubits: int = 0,
         logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(logger)
         self.num_qubits = num_qubits
         self.state_from = state_from
         self.state_to = state_to
+        self.num_ctrl_qubits = num_ctrl_qubits
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -519,7 +524,7 @@ class AdditionConversion(LBMPrimitive):
 
     @override
     def create_circuit(self):
-        circuit = QuantumCircuit(self.num_qubits + 1)
+        circuit = QuantumCircuit(self.num_qubits + self.num_ctrl_qubits + 1)
 
         state_setter_circ = StateSetter(
             self.num_qubits, self.state_from, self.logger
@@ -528,7 +533,13 @@ class AdditionConversion(LBMPrimitive):
         circuit.compose(
             state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
         )
-        circuit.mcx(list(range(self.num_qubits)), self.num_qubits)
+        circuit.mcx(
+            list(range(self.num_qubits))
+            + list(
+                range(self.num_qubits + 1, self.num_qubits + 1 + self.num_ctrl_qubits)
+            ),
+            self.num_qubits,
+        )
         circuit.compose(
             state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
         )
@@ -538,7 +549,7 @@ class AdditionConversion(LBMPrimitive):
                 self.num_qubits,
                 abs(self.state_to - self.state_from),
                 self.state_to > self.state_from,
-                1,
+                self.num_ctrl_qubits + 1,
                 self.logger,
             ).circuit,
             inplace=True,
@@ -551,7 +562,13 @@ class AdditionConversion(LBMPrimitive):
         circuit.compose(
             state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
         )
-        circuit.mcx(list(range(self.num_qubits)), self.num_qubits)
+        circuit.mcx(
+            list(range(self.num_qubits))
+            + list(
+                range(self.num_qubits + 1, self.num_qubits + 1 + self.num_ctrl_qubits)
+            ),
+            self.num_qubits,
+        )
         circuit.compose(
             state_setter_circ, qubits=list(range(self.num_qubits)), inplace=True
         )
