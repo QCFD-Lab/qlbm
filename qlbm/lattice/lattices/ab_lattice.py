@@ -181,6 +181,11 @@ class ABLattice(AmplitudeLattice):
 
         self.circuit = QuantumCircuit(*self.registers)
 
+    def set_num_markers(self, num_markers: int):
+        self.num_marker_qubits = num_markers
+
+        self.__update_registers()
+
     def set_geometries(self, geometries):
         """
         Updates the geometry setup of the lattice.
@@ -347,16 +352,22 @@ class ABLattice(AmplitudeLattice):
             for c, gp in enumerate(self.num_gridpoints)
         ]
 
-        marker_register = (
-            [
+        if self.has_multiple_geometries():
+            marker_register = [
                 QuantumRegister(
                     int(ceil(log2(len(self.geometries)))),
                     name="m",
                 )
             ]
-            if self.has_multiple_geometries()
-            else []
-        )
+        elif self.num_marker_qubits > 0:
+            marker_register = [
+                QuantumRegister(
+                    self.num_marker_qubits,
+                    name="m",
+                )
+            ]
+        else:
+            marker_register = []
 
         accumulation_register = (
             [QuantumRegister(self.num_accumulation_qubits, name="acc")]
