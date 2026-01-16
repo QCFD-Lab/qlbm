@@ -7,7 +7,7 @@ from typing import List, Tuple
 import numpy as np
 from numpy import pi
 from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMTGate, XGate
+from qiskit.circuit.library import HGate, MCMTGate, XGate
 from qiskit.quantum_info import Operator
 from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
@@ -15,6 +15,7 @@ from typing_extensions import override
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
 from qlbm.lattice import Lattice
+from qlbm.tools.exceptions import CircuitException
 from qlbm.tools.utils import get_qubits_to_invert
 
 
@@ -293,11 +294,13 @@ class UniformStatePrep(LBMPrimitive):
         self,
         num_qubits: int,
         num_states: int,
+        num_ctrl_qubits: int = 0,
         logger: Logger = getLogger("qlbm"),
     ):
         super().__init__(logger)
         self.num_qubits = num_qubits
         self.num_states = num_states
+        self.num_ctrl_qubits = num_ctrl_qubits
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -309,7 +312,14 @@ class UniformStatePrep(LBMPrimitive):
     @override
     def create_circuit(self):
         circuit = QuantumCircuit(
-            self.num_qubits, name=f"UniformStatePrep{self.num_states}"
+            self.num_qubits + self.num_ctrl_qubits,
+            name=f"UniformStatePrep{self.num_states}",
+        )
+
+        ctrl_qubits = (
+            list(range(self.num_qubits, self.num_qubits + self.num_ctrl_qubits))
+            if self.num_ctrl_qubits > 0
+            else []
         )
 
         # M = 1 : do nothing, stays in |0...0>
@@ -321,7 +331,15 @@ class UniformStatePrep(LBMPrimitive):
         if is_power_of_two:
             r = int(np.log2(self.num_states))
             for q in range(r):
-                circuit.h(q)
+                if ctrl_qubits:
+                    circuit.compose(
+                        MCMTGate(HGate(), self.num_ctrl_qubits, 1),
+                        qubits=ctrl_qubits + [q],
+                        inplace=True,
+                    )
+                else:
+                    circuit.h(q)
+
             return circuit
 
         # --- General case: Algorithm 1 (Section 2.1 of the paper) ---
@@ -329,7 +347,7 @@ class UniformStatePrep(LBMPrimitive):
         # We only need n_eff = ceil(log2 M) active qubits; the rest stay in |0>
         n_eff = self._ceil_log2_M(self.num_states)
         if n_eff > self.num_qubits:
-            raise ValueError("Internal error: n_eff > num_qubits.")
+            raise CircuitException("Internal error: n_eff > num_qubits.")
 
         # Binary decomposition: M = Σ_j 2^{l_j}, with 0 <= l0 < l1 < ... < lk
         bit_positions = [i for i in range(n_eff) if (self.num_states >> i) & 1]
@@ -343,7 +361,10 @@ class UniformStatePrep(LBMPrimitive):
 
         # Step 4: Apply X on qubits at positions l1, l2, ..., lk
         for j in range(1, len(bit_positions)):
-            circuit.x(bit_positions[j])
+            if ctrl_qubits:
+                circuit.mcx(control_qubits=ctrl_qubits, target_qubit=bit_positions[j])
+            else:
+                circuit.x(bit_positions[j])
 
         # Step 5: M0 = 2^{l0}
         M_prev = 2**l0  # This is M_0 in the paper
@@ -351,19 +372,43 @@ class UniformStatePrep(LBMPrimitive):
         # Step 6–7: If l0 > 0, apply H on qubits 0..(l0-1)
         if l0 > 0:
             for q in range(l0):
-                circuit.h(q)
+                if ctrl_qubits:
+                    circuit.compose(
+                        MCMTGate(HGate(), self.num_ctrl_qubits, 1),
+                        qubits=ctrl_qubits + [q],
+                        inplace=True,
+                    )
+                else:
+                    circuit.h(q)
 
         # Step 8: Apply RY(theta0) on |q_{l1}>, theta0 = -2 arccos( sqrt(M0 / M) )
         l1 = bit_positions[1]
         theta0 = -2.0 * safe_acos(np.sqrt(M_prev / self.num_states))
-        circuit.ry(theta0, l1)
+
+        if ctrl_qubits:
+            circuit.mcry(theta0, ctrl_qubits, l1)
+        else:
+            circuit.ry(theta0, l1)
 
         # Step 9: Controlled H on qubits i in [l0, l1) with open control on q_{l1} == |0>
         ctrl = l1
-        circuit.x(ctrl)  # convert open control (on |0>) to normal control (on |1>)
+
+        if ctrl_qubits:
+            circuit.mcx(ctrl_qubits, ctrl)
+        else:
+            circuit.x(ctrl)  # convert open control (on |0>) to normal control (on |1>)
+
         for i in range(l0, l1):
-            circuit.ch(ctrl, i)
-        circuit.x(ctrl)
+            circuit.compose(
+                MCMTGate(HGate(), self.num_ctrl_qubits + 1, 1),
+                qubits=ctrl_qubits + [ctrl, i],
+                inplace=True,
+            )
+
+        if ctrl_qubits:
+            circuit.mcx(ctrl_qubits, ctrl)
+        else:
+            circuit.x(ctrl)
 
         # Steps 10–13: For-loop over remaining bits
         for m in range(1, k):
@@ -378,16 +423,32 @@ class UniformStatePrep(LBMPrimitive):
             # open control on q_{l_m}
             ctrl = l_m
             target = l_next
-            circuit.x(ctrl)
-            circuit.cry(theta_m, ctrl, target)
-            circuit.x(ctrl)
+            if ctrl_qubits:
+                circuit.mcx(ctrl_qubits, ctrl)
+            else:
+                circuit.x(ctrl)
+            circuit.mcry(theta_m, ctrl_qubits + [ctrl], target)
+            if ctrl_qubits:
+                circuit.mcx(ctrl_qubits, ctrl)
+            else:
+                circuit.x(ctrl)
 
             # Step 12: Controlled H on qubits i in [l_m, l_{m+1}) with open control on q_{l_{m+1}} == |0>
             ctrl_next = l_next
-            circuit.x(ctrl_next)
+            if ctrl_qubits:
+                circuit.mcx(ctrl_qubits, ctrl_next)
+            else:
+                circuit.x(ctrl_next)
             for i in range(l_m, l_next):
-                circuit.ch(ctrl_next, i)
-            circuit.x(ctrl_next)
+                circuit.compose(
+                    MCMTGate(HGate(), self.num_ctrl_qubits + 1, 1),
+                    qubits=ctrl_qubits + [ctrl_next] + [i],
+                    inplace=True,
+                )
+            if ctrl_qubits:
+                circuit.mcx(ctrl_qubits, ctrl_next)
+            else:
+                circuit.x(ctrl_next)
 
             # Step 13: M_m = M_{m-1} + 2^{l_m}
             M_prev += 2**l_m
