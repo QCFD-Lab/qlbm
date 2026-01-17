@@ -2,8 +2,10 @@
 
 from .ab import (
     ABQLBM,
+    ABDiscreteUniformInitialConditions,
     ABGridMeasurement,
     ABInitialConditions,
+    ABParallelDiscreteUniformInitialConditions,
     ABReflectionOperator,
     ABReflectionPermutation,
     ABStreamingOperator,
@@ -88,4 +90,6 @@ __all__ = [
     "ABReflectionOperator",
     "ABReflectionPermutation",
     "ABStreamingOperator",
+    "ABDiscreteUniformInitialConditions",
+    "ABParallelDiscreteUniformInitialConditions",
 ]
