@@ -181,8 +181,21 @@ class ABLattice(AmplitudeLattice):
 
         self.circuit = QuantumCircuit(*self.registers)
 
-    def set_num_markers(self, num_markers: int):
-        self.num_marker_qubits = num_markers
+    def set_num_marker_qubits(self, num_marker_qubits: int):
+        """
+        Sets the number of marker qubits and updates the registers accordingly.
+
+        Note that the previous marker logic, inferred by the geometry, is overwritten,
+        and therefore might be inconsistent.
+
+        Parameters
+        ----------
+        num_marker_qubits : int
+            The number of marker qubits that lattice circuits use.
+        """
+        if num_marker_qubits < 0:
+            raise LatticeException("Cannot set a negative number of markers.")
+        self.num_marker_qubits = num_marker_qubits
 
         self.__update_registers()
 

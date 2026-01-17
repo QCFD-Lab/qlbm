@@ -90,7 +90,7 @@ class ABInitialConditions(LBMPrimitive):
             UniformStatePrep(
                 nq,
                 self.lattice.num_velocity_qubits,
-                self.logger,
+                logger=self.logger,
             ).circuit,
             qubits=self.lattice.velocity_index()[:nq],
             inplace=True,
@@ -276,7 +276,35 @@ class ABDiscreteUniformInitialConditions(LBMPrimitive):
 
 class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
     """
-    TODO.
+    Marker-sensitive initial conditions for the :class:`ABQLBM` algorithm.
+
+    This component creates an equal magnitude superposition of a configurable set of velocity and grid indices,
+    entangled with the state of the marker register.
+    Used in parallel realizations of configurations.
+
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab import ABParallelDiscreteUniformInitialConditions
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 16, "y": 8}, "velocities": "d2q9"},
+            }
+        )
+
+        lattice.set_num_marker_qubits(2)
+
+        ABParallelDiscreteUniformInitialConditions(
+            lattice,
+            [[0, 1], [0, 3], [0], [0, 5]],
+            [([0], [0])] * 4,
+            [0, 1, 2, 3],
+        ).draw("mpl")
+
     """
 
     velocity_indices: List[List[int]]
@@ -285,14 +313,11 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
 
     lattice: ABLattice
 
-    marker_indices: List[int]
-
     def __init__(
         self,
         lattice: ABLattice,
         velocity_indices_list: List[List[int]],
         grid_qubits_to_superpose_list: List[Tuple[List[int], ...]],
-        marker_indices: List[int],
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
@@ -304,10 +329,13 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
                 "OHLattice does not currently support parallel initial conditions."
             )
 
-        if (len(velocity_indices_list) != len(marker_indices)) or (
-            len(velocity_indices_list) != len(grid_qubits_to_superpose_list)
-        ):
+        if len(velocity_indices_list) != len(grid_qubits_to_superpose_list):
             raise CircuitException("Input lists have mismatched lengths.")
+
+        if len(velocity_indices_list) > 2**self.lattice.num_marker_qubits:
+            raise LatticeException(
+                f"{self.lattice.num_marker_qubits} cannot encode {len(velocity_indices_list)} configurations."
+            )
 
         for velocity_indices, grid_qubits_to_superpose in zip(
             velocity_indices_list, grid_qubits_to_superpose_list
@@ -346,7 +374,6 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
             sorted(velocity_indices) for velocity_indices in velocity_indices_list
         ]
         self.grid_qubits_to_superpose_list = grid_qubits_to_superpose_list
-        self.marker_indices = marker_indices
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -363,7 +390,7 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
         circuit.compose(
             UniformStatePrep(
                 self.lattice.num_marker_qubits,
-                len(self.marker_indices),
+                len(self.velocity_indices_list),
                 logger=self.logger,
             ).circuit,
             qubits=self.lattice.marker_index(),
@@ -371,7 +398,7 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
         )
 
         for marker_index, velocity_indices, grid_qubits_to_superpose in zip(
-            self.marker_indices,
+            list(range(len(self.velocity_indices_list))),
             self.velocity_indices_list,
             self.grid_qubits_to_superpose_list,
         ):
@@ -446,4 +473,4 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
 
     @override
     def __str__(self) -> str:
-        return f"[Primitive ABParallelDiscreteUniformInitialConditions with lattice {self.lattice}, v={self.velocity_indices_list}, g={self.grid_qubits_to_superpose_list}, m={self.marker_indices}]"
+        return f"[Primitive ABParallelDiscreteUniformInitialConditions with lattice {self.lattice}, v={self.velocity_indices_list}, g={self.grid_qubits_to_superpose_list}]"
