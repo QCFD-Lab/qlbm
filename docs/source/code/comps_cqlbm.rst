@@ -77,6 +77,8 @@ Initial Conditions
 
 .. autoclass:: qlbm.components.ab.initial.ABDiscreteUniformInitialConditions
 
+.. autoclass:: qlbm.components.ab.initial.ABParallelDiscreteUniformInitialConditions
+
 .. autoclass:: qlbm.components.ab.initial.ABInitialConditions
 
 .. _cqlbm_streaming:
