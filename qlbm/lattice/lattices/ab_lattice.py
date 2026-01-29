@@ -368,7 +368,7 @@ class ABLattice(AmplitudeLattice):
         if self.has_multiple_geometries():
             marker_register = [
                 QuantumRegister(
-                    int(ceil(log2(len(self.geometries)))),
+                    self.num_marker_qubits,
                     name="m",
                 )
             ]
