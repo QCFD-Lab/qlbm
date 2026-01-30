@@ -85,14 +85,13 @@ class ABInitialConditions(LBMPrimitive):
     def create_circuit(self) -> QuantumCircuit:
         circuit = QuantumCircuit(*self.lattice.registers)
 
-        nq = int(np.ceil(np.log2(self.lattice.num_velocities_per_point)))
         circuit.compose(
             UniformStatePrep(
-                nq,
                 self.lattice.num_velocity_qubits,
+                self.lattice.num_velocities_per_point,
                 logger=self.logger,
             ).circuit,
-            qubits=self.lattice.velocity_index()[:nq],
+            qubits=self.lattice.velocity_index()[: self.lattice.num_velocity_qubits],
             inplace=True,
         )
 
@@ -302,7 +301,6 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
             lattice,
             [[0, 1], [0, 3], [0], [0, 5]],
             [([0], [0])] * 4,
-            [0, 1, 2, 3],
         ).draw("mpl")
 
     """
