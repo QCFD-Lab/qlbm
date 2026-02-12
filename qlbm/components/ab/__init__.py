@@ -8,7 +8,11 @@ from .initial import (
     ABParallelDiscreteUniformInitialConditions,
 )
 from .measurement import ABGridMeasurement
-from .reflection import ABReflectionOperator, ABReflectionPermutation
+from .reflection import (
+    ABReflectionOperator,
+    ABReflectionPermutation,
+    ABZoneAgnosticReflectionOperator,
+)
 from .streaming import ABStreamingOperator
 from .utils import BinaryToOHPermutation
 
@@ -23,4 +27,5 @@ __all__ = [
     "ABStreamingOperator",
     "ABEncodingType",
     "BinaryToOHPermutation",
+    "ABZoneAgnosticReflectionOperator"
 ]

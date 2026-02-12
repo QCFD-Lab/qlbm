@@ -6,7 +6,10 @@ from time import perf_counter_ns
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
-from qlbm.components.ab.reflection import ABReflectionOperator
+from qlbm.components.ab.reflection import (
+    ABReflectionOperator,
+    ABZoneAgnosticReflectionOperator,
+)
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
@@ -83,7 +86,7 @@ class ABQLBM(LBMAlgorithm):
                     )
 
         circuit.compose(
-            ABReflectionOperator(
+            ABZoneAgnosticReflectionOperator(
                 self.lattice,
                 logger=self.logger,
             ).circuit,

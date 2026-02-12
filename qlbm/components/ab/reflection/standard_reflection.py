@@ -1,17 +1,7 @@
-"""Quantum circuits used for reflection in the :class:`ABQLBM` algorithm."""
-
-from itertools import product
-from logging import Logger, getLogger
-from time import perf_counter_ns
-from typing import List, Tuple, cast
-
-from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMTGate, XGate
-from typing_extensions import override
-
 from qlbm.components.ab.encodings import ABEncodingType
+from qlbm.components.ab.reflection.common import ABReflectionPermutation
 from qlbm.components.ab.streaming import ABStreamingOperator
-from qlbm.components.base import LBMOperator, LBMPrimitive
+from qlbm.components.base import LBMOperator
 from qlbm.components.ms.specular_reflection import SpecularWallComparator
 from qlbm.lattice.geometry.encodings.ms import ReflectionPoint
 from qlbm.lattice.geometry.shapes.block import Block
@@ -20,6 +10,17 @@ from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten, get_qubits_to_invert
+
+
+from qiskit import QuantumCircuit
+from qiskit.circuit.library import MCMTGate, XGate
+
+
+from itertools import product
+from logging import Logger, getLogger
+from time import perf_counter_ns
+from typing import List, Tuple, cast
+from typing_extensions import override
 
 
 class ABReflectionOperator(LBMOperator):
@@ -536,207 +537,3 @@ class ABReflectionOperator(LBMOperator):
     @override
     def __str__(self) -> str:
         return f"[Operator ABReflection with lattice {self.lattice}]"
-
-
-class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
-    lattice: AmplitudeLattice
-
-    def __init__(
-        self,
-        lattice: ABLattice,
-        blocks: List[Block] | None = None,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(lattice, blocks, logger)
-
-        self.blocks = (
-            (
-                cast(List[Block], flatten(list(self.lattice.geometries[0].values())))
-                if not self.lattice.has_multiple_geometries()
-                else [
-                    gdict["bounceback"] + gdict["specular"]  # type: ignore
-                    for gdict in self.lattice.geometries  # type: ignore
-                ]
-            )
-            if blocks is None
-            else blocks
-        )
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        print("Ok!")
-
-        if self.lattice.discretization not in [LatticeDiscretization.D2Q9]:
-            raise LatticeException("AB reflection only currently supported in D2Q9")
-        circuit = self.lattice.circuit.copy()
-
-        for block in self.blocks:
-            circuit.compose(
-                self.set_inside_wall_ancilla_state(
-                    block, control_on_marker_state=False
-                ),
-                inplace=True,
-            )
-
-        circuit.compose(
-            self.set_ancilla_of_point_state(
-                flatten(
-                    [[(p, None) for p in block.corners_inside] for block in self.blocks]
-                ),
-                ignore_velocity_data=True,
-                control_on_marker_state=False,
-            ),
-            inplace=True,
-        )
-
-        # 3-4. controlled permutation and stream
-        circuit.compose(self.permute_and_stream(), inplace=True)
-
-        # 4-5. uncontrolled inverse stream
-        circuit.compose(
-            ABStreamingOperator(self.lattice, logger=self.logger).circuit.inverse(),
-            inplace=True,
-        )
-
-        # 5-6. oracle
-        for block in self.blocks:
-            circuit.compose(
-                self.set_inside_wall_ancilla_state(
-                    block, control_on_marker_state=False
-                ),
-                inplace=True,
-            )
-
-        circuit.compose(
-            self.set_ancilla_of_point_state(
-                flatten(
-                    [[(p, None) for p in block.corners_inside] for block in self.blocks]
-                ),
-                ignore_velocity_data=True,
-                control_on_marker_state=False,
-            ),
-            inplace=True,
-        )
-
-        # 6-7. uncontrolled regular stream
-        circuit.compose(
-            ABStreamingOperator(self.lattice, logger=self.logger).circuit,
-            inplace=True,
-        )
-
-        return circuit
-
-    @override
-    def __str__(self) -> str:
-        return f"[Operator ABZoneAgnosticReflection with lattice {self.lattice}]"
-
-
-class ABReflectionPermutation(LBMPrimitive):
-    """
-    Permutes velocity state to implement reflection in the amplitude-based encoding for :math:`D_dQ_q` discretizations.
-
-    Example usage:
-
-    .. plot::
-        :include-source:
-
-        from qlbm.components.ab import ABEncodingType, ABReflectionPermutation
-        from qlbm.lattice import LatticeDiscretization
-
-        ABReflectionPermutation(4, LatticeDiscretization.D2Q9, ABEncodingType.AB).draw("mpl")
-
-    """
-
-    num_qubits: int
-    """
-    The number of qubits that encode the velocity state.
-    """
-
-    discretization: LatticeDiscretization
-    """
-    The lattice discretization the permutation adheres to.
-    """
-
-    encoding: ABEncodingType
-    """
-    The type of encoding to permute for.
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        discretization: LatticeDiscretization,
-        encoding: ABEncodingType,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-
-        self.num_qubits = num_qubits
-        self.discretization = discretization
-        self.encoding = encoding
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        if self.discretization == LatticeDiscretization.D2Q9:
-            return self.__create_circuit_d2q9()
-
-        raise LatticeException("AB reflection only currently supported in D2Q9")
-
-    def __create_circuit_d2q9(self):
-        circuit = QuantumCircuit(self.num_qubits)
-        match self.encoding:
-            case ABEncodingType.OH:
-                circuit.swap(1, 3)
-                circuit.swap(2, 4)
-                circuit.swap(5, 7)
-                circuit.swap(6, 8)
-
-            case ABEncodingType.AB:
-                # 1 <-> 3
-                circuit.x([0, 1])
-                circuit.mcx([0, 1, 3], 2)
-                circuit.x([0, 1])
-
-                # 2 <-> 4
-                circuit.x([0, 3])
-                circuit.cx(1, 2)
-                circuit.mcx([0, 2, 3], 1)
-                circuit.cx(1, 2)
-                circuit.x([0, 3])
-
-                # 5 <-> 7
-                circuit.x(0)
-                circuit.mcx([0, 1, 3], 2)
-                circuit.x(0)
-
-                # 6 <-> 8
-                circuit.cx(0, 1)
-                circuit.cx(0, 2)
-                circuit.x(3)
-                circuit.mcx([1, 2, 3], 0)
-                circuit.cx(0, 2)
-                circuit.cx(0, 1)
-                circuit.x(3)
-
-            case _:
-                raise LatticeException(f"Unsupported lattice encoding: {self.encoding}")
-
-        return circuit.reverse_bits() if self.encoding == ABEncodingType.AB else circuit
-
-    @override
-    def __str__(self) -> str:
-        return f"[Primitive ABReflectionPermutation with {self.num_qubits} qubits on {self.discretization}]"
