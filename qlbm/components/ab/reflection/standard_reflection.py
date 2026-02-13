@@ -1,3 +1,12 @@
+from itertools import product
+from logging import Logger, getLogger
+from time import perf_counter_ns
+from typing import List, Tuple, cast
+
+from qiskit import QuantumCircuit
+from qiskit.circuit.library import MCMTGate, XGate
+from typing_extensions import override
+
 from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.components.ab.reflection.common import ABReflectionPermutation
 from qlbm.components.ab.streaming import ABStreamingOperator
@@ -10,17 +19,6 @@ from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten, get_qubits_to_invert
-
-
-from qiskit import QuantumCircuit
-from qiskit.circuit.library import MCMTGate, XGate
-
-
-from itertools import product
-from logging import Logger, getLogger
-from time import perf_counter_ns
-from typing import List, Tuple, cast
-from typing_extensions import override
 
 
 class ABReflectionOperator(LBMOperator):
