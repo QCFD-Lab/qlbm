@@ -123,6 +123,10 @@ Reflection
 
 .. autoclass:: qlbm.components.ab.reflection.ABReflectionOperator
 
+.. autoclass:: qlbm.components.ab.reflection.ABZoneAgnosticReflectionOperator 
+
+.. autoclass:: qlbm.components.ab.reflection.ABZoneAgnosticReflectionOracle
+
 .. _cqlbm_measurement:
 
 Measurement
