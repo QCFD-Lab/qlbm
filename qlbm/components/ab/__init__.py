@@ -12,6 +12,7 @@ from .reflection import (
     ABReflectionOperator,
     ABReflectionPermutation,
     ABZoneAgnosticReflectionOperator,
+    ABZoneAgnosticReflectionOracle,
 )
 from .streaming import ABStreamingOperator
 from .utils import BinaryToOHPermutation
@@ -27,5 +28,6 @@ __all__ = [
     "ABStreamingOperator",
     "ABEncodingType",
     "BinaryToOHPermutation",
-    "ABZoneAgnosticReflectionOperator"
+    "ABZoneAgnosticReflectionOperator",
+    "ABZoneAgnosticReflectionOracle",
 ]

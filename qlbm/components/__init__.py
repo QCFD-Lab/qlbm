@@ -9,6 +9,8 @@ from .ab import (
     ABReflectionOperator,
     ABReflectionPermutation,
     ABStreamingOperator,
+    ABZoneAgnosticReflectionOperator,
+    ABZoneAgnosticReflectionOracle,
 )
 from .base import (
     LBMAlgorithm,
@@ -92,4 +94,6 @@ __all__ = [
     "ABStreamingOperator",
     "ABDiscreteUniformInitialConditions",
     "ABParallelDiscreteUniformInitialConditions",
+    "ABZoneAgnosticReflectionOperator",
+    "ABZoneAgnosticReflectionOracle",
 ]

@@ -7,7 +7,6 @@ from qiskit import QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.ab.reflection import (
-    ABReflectionOperator,
     ABZoneAgnosticReflectionOperator,
 )
 from qlbm.components.base import LBMAlgorithm

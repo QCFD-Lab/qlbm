@@ -1,3 +1,5 @@
+"""Zone-agnostic reflection utilities for the :class:`.ABQLBM` algorithm."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List, cast
@@ -21,6 +23,38 @@ from qlbm.tools.utils import flatten
 
 
 class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
+    """
+    Implements bounceback reflection in the amplitude-based encoding of :class:`.ABQLBM` for :math:`D_dQ_q` discretizations.
+
+    Uses a zone-agnostic approach that relies on the existence of an oracle that marks the
+    basis states belonging to the inside of the solid geometry.
+    For more details on the oracle, see :class:`.ABZoneAgnosticReflectionOracle`.
+
+    Example usage:
+
+    .. code-block:: python
+
+        from qlbm.components.ab import ABZoneAgnosticReflectionOperator
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
+                "geometry": [
+                    {
+                        "shape": "cuboid",
+                        "x": [1, 3],
+                        "y": [1, 3],
+                        "boundary": "bounceback",
+                    }
+                ],
+            }
+        )
+
+        ABZoneAgnosticReflectionOperator(lattice, blocks=lattice.shapes["bounceback"]).draw("mpl")
+
+    """
+
     lattice: AmplitudeLattice
 
     def __init__(
@@ -57,14 +91,18 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
             raise LatticeException("AB reflection only currently supported in D2Q9")
         circuit = self.lattice.circuit.copy()
 
-        # 2-3. oracle
+        oracle = self.lattice.circuit.copy()
+        # build the oracle once
         for block in self.blocks:
-            circuit.compose(
+            oracle.compose(
                 ABZoneAgnosticReflectionOracle(
                     self.lattice, block, logger=self.logger
                 ).circuit,
                 inplace=True,
             )
+
+        # 2-3. oracle
+        circuit.compose(oracle, inplace=True)
 
         # 3-4. controlled permutation and stream
         circuit.compose(self.permute_and_stream(), inplace=True)
@@ -76,13 +114,7 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
         )
 
         # 5-6. oracle
-        for block in self.blocks:
-            circuit.compose(
-                ABZoneAgnosticReflectionOracle(
-                    self.lattice, block, logger=self.logger
-                ).circuit,
-                inplace=True,
-            )
+        circuit.compose(oracle, inplace=True)
 
         # 6-7. uncontrolled regular stream
         circuit.compose(
@@ -98,11 +130,51 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
 
 
 class ABZoneAgnosticReflectionOracle(LBMPrimitive):
+    r"""
+    Implementation of the oracle required for :class:`.ABZoneAgnosticReflectionOperator`.
+
+    An oracle is an operator :math:`U_{\omega}` for an obstacle's region
+    :math:`\omega` such that, in the amplitude-based encoding,
+    :math:`U_\omega\ket{x}\ket{v}\ket{0}_\mathbb{o} = \ket{x}\ket{v}\ket{x \in \omega}_\mathbb{o}`.
+    Intuitively, the operator flips the object ancilla qubit if and only if the position :math:`x`
+    falls within the bounds of the object.
+
+    Currently, the only available implementation is for 2D axis-aligned objects.
+    This is an improvement in asymptotic and practical complexity compared to
+    the methods described in :cite:`collisionless`.
+    This operation relies on basic arithmetic through the :class:`.ParameterizedDraperAdder` class
+    and comparison operation through the :class:`Comparator` circuits.
+
+    Example usage:
+
+    .. code-block:: python
+
+        from qlbm.components.ab import ABZoneAgnosticReflectionOperator
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
+                "geometry": [
+                    {
+                        "shape": "cuboid",
+                        "x": [1, 3],
+                        "y": [1, 3],
+                        "boundary": "bounceback",
+                    }
+                ],
+            }
+        )
+
+        ABZoneAgnosticReflectionOperator(lattice, blocks=lattice.shapes["bounceback"]).draw("mpl")
+
+    """
+
     lattice: AmplitudeLattice
 
     def __init__(
         self,
-        lattice: ABLattice,
+        lattice: AmplitudeLattice,
         shape: Shape,
         logger: Logger = getLogger("qlbm"),
     ) -> None:

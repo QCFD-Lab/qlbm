@@ -1,3 +1,5 @@
+"""Common utilities for reflection in the :class:`.ABQLBM` algorithm."""
+
 from logging import Logger, getLogger
 from time import perf_counter_ns
 

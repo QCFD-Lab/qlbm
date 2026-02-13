@@ -1,3 +1,6 @@
+"""Reflection utilities for the :class:`.ABQLBM` algorithm; generalizations of :cite:`collisionless`."""
+
+
 from itertools import product
 from logging import Logger, getLogger
 from time import perf_counter_ns
