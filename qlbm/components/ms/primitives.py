@@ -13,6 +13,7 @@ from qlbm.components.common.adders import ParameterizedDraperAdder
 from qlbm.lattice import MSLattice
 from qlbm.lattice.geometry.encodings.ms import ReflectionResetEdge
 from qlbm.tools import flatten
+from qlbm.tools.exceptions import LatticeException
 
 
 class GridMeasurement(LBMPrimitive):
@@ -282,6 +283,24 @@ class ComparatorMode(Enum):
     LE = (2,)
     GT = (3,)
     GE = (4,)
+
+    @classmethod
+    def from_string(cls, mode: str) -> "ComparatorMode":
+        mode_map = {
+            "<": cls.LT,
+            "<=": cls.LE,
+            ">": cls.GT,
+            ">=": cls.GE,
+        }
+
+        normalized_mode = mode.strip()
+
+        try:
+            return mode_map[normalized_mode]
+        except KeyError as exc:
+            raise LatticeException(
+                f"Unsupported comparator mode '{mode}'. Expected one of: <, <=, >, >=."
+            ) from exc
 
 
 class Comparator(LBMPrimitive):
