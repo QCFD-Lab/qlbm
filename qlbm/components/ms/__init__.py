@@ -1,5 +1,6 @@
 """Modular qlbm quantum circuit components for the MSQLBM algorithm :cite:p:`collisionless`."""
 
+from ...tools.utils import ComparatorMode
 from ..common.adders import (
     ParameterizedDraperAdder,
     ParameterizedPhaseShift,
@@ -12,7 +13,6 @@ from .bounceback_reflection import (
 from .msqlbm import MSQLBM
 from .primitives import (
     Comparator,
-    ComparatorMode,
     EdgeComparator,
     GridMeasurement,
     MSInitialConditions,

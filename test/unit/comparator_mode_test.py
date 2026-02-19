@@ -1,6 +1,6 @@
 import pytest
 
-from qlbm.components.ms import ComparatorMode
+from qlbm.tools.utils import ComparatorMode
 from qlbm.tools.exceptions import LatticeException
 
 

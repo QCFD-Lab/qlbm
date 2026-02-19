@@ -11,7 +11,7 @@ from qlbm.components.ab.reflection.standard_reflection import ABReflectionOperat
 from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
-from qlbm.components.ms.primitives import Comparator, ComparatorMode
+from qlbm.components.ms.primitives import Comparator
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.geometry.shapes.circle import Circle
@@ -19,7 +19,7 @@ from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import CircuitException, LatticeException
-from qlbm.tools.utils import flatten
+from qlbm.tools.utils import ComparatorMode, flatten
 
 
 class ABZoneAgnosticReflectionOperator(ABReflectionOperator):

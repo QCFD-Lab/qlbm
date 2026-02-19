@@ -1,5 +1,6 @@
 """Modular and extendible quantum circuits that perform parts of the QLBM algorithm."""
 
+from ..tools.utils import ComparatorMode
 from .ab import (
     ABQLBM,
     ABDiscreteUniformInitialConditions,
@@ -46,7 +47,7 @@ from .ms import (
     MSStreamingOperator,
     SpecularReflectionOperator,
 )
-from .ms.primitives import Comparator, ComparatorMode
+from .ms.primitives import Comparator
 from .ms.streaming import (
     ControlledIncrementer,
     StreamingAncillaPreparation,

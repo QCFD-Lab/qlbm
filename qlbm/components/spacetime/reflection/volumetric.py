@@ -8,11 +8,11 @@ from qiskit import QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.components.ms.primitives import Comparator, ComparatorMode
+from qlbm.components.ms.primitives import Comparator
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException
-from qlbm.tools.utils import flatten
+from qlbm.tools.utils import ComparatorMode, flatten
 
 
 class VolumetricSpaceTimeReflectionOperator(SpaceTimeOperator):

@@ -11,7 +11,6 @@ from typing_extensions import override
 from qlbm.components.base import LBMPrimitive, MSOperator
 from qlbm.components.ms.primitives import (
     Comparator,
-    ComparatorMode,
 )
 from qlbm.lattice import (
     MSLattice,
@@ -24,7 +23,7 @@ from qlbm.lattice.geometry.encodings.ms import (
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.tools.exceptions import CircuitException
-from qlbm.tools.utils import flatten
+from qlbm.tools.utils import ComparatorMode, flatten
 
 from .primitives import EdgeComparator
 from .streaming import ControlledIncrementer

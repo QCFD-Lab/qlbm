@@ -1,6 +1,5 @@
 """Primitives for the implementation of the Collisionless Quantum Lattice Boltzmann Method introduced in :cite:t:`collisionless`."""
 
-from enum import Enum
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
@@ -13,7 +12,7 @@ from qlbm.components.common.adders import ParameterizedDraperAdder
 from qlbm.lattice import MSLattice
 from qlbm.lattice.geometry.encodings.ms import ReflectionResetEdge
 from qlbm.tools import flatten
-from qlbm.tools.exceptions import LatticeException
+from qlbm.tools.utils import ComparatorMode
 
 
 class GridMeasurement(LBMPrimitive):
@@ -266,41 +265,6 @@ class MSInitialConditions3DSlim(LBMPrimitive):
     @override
     def __str__(self) -> str:
         return f"[Primitive InitialConditions with lattice {self.lattice}]"
-
-
-class ComparatorMode(Enum):
-    r"""Enumerator for the modes of quantum comparator circuits.
-
-    The modes are as follows:
-
-    * (1, ``ComparatorMode.LT``, :math:`<`);
-    * (2, ``ComparatorMode.LE``, :math:`\leq`);
-    * (3, ``ComparatorMode.GT``, :math:`>`);
-    * (4, ``ComparatorMode.GE``, :math:`\geq`).
-    """
-
-    LT = (1,)
-    LE = (2,)
-    GT = (3,)
-    GE = (4,)
-
-    @classmethod
-    def from_string(cls, mode: str) -> "ComparatorMode":
-        mode_map = {
-            "<": cls.LT,
-            "<=": cls.LE,
-            ">": cls.GT,
-            ">=": cls.GE,
-        }
-
-        normalized_mode = mode.strip()
-
-        try:
-            return mode_map[normalized_mode]
-        except KeyError as exc:
-            raise LatticeException(
-                f"Unsupported comparator mode '{mode}'. Expected one of: <, <=, >, >=."
-            ) from exc
 
 
 class Comparator(LBMPrimitive):
