@@ -9,7 +9,6 @@ from qlbm.lattice.lattices.oh_lattice import OHLattice
 @pytest.fixture
 def dummy_1d_lattice() -> ABLattice:
     return ABLattice(
-        0,
         {
             "lattice": {
                 "dim": {"x": 256},
@@ -35,7 +34,6 @@ def lattice_1d_16_1_obstacle() -> ABLattice:
 @pytest.fixture
 def dummy_2d_lattice() -> ABLattice:
     return ABLattice(
-        0,
         {
             "lattice": {"dim": {"x": 32, "y": 32}, "velocities": "D2Q4"},
         },
