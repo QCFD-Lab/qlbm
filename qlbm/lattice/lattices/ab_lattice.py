@@ -1,7 +1,7 @@
 """Implementation of the Amplitude-Based (AB) encoding lattice for generic DdQq discretizations."""
 
 from logging import getLogger
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, cast
 
 from numpy import ceil, log2
 from qiskit import QuantumCircuit, QuantumRegister
@@ -9,6 +9,7 @@ from typing_extensions import override
 
 from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
+from qlbm.lattice.geometry.shapes.ymonomial import YMonomial
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     LatticeDiscretizationProperties,
@@ -113,6 +114,15 @@ class ABLattice(AmplitudeLattice):
     num_base_qubits: int
     """The number of qubits required to represent the lattice."""
 
+    num_monomial_qubits: int
+    r"""The number of qubits used for the imposition of monomially-shaped BCs.
+    Currently, only the :class:`.YMonomial` is supported.
+    The number of qubits for a monomial with exponent :math:`n`
+    is :math:`(n+1)\lceil \log_2 N_{g_x}\rceil`.
+    The first :math:`\log_2 N_{g_x}\rceil`-sized register is allocated
+    to making a copy, while the other :math:`n` chunks
+    are allotted to the computation of the monomial via quantum arithmetic."""
+
     registers: Tuple[QuantumRegister, ...]
     """The registers of the lattice."""
 
@@ -144,7 +154,8 @@ class ABLattice(AmplitudeLattice):
         self.num_base_qubits = self.num_grid_qubits + self.num_velocity_qubits
 
         self.num_obstacle_qubits = self.__num_obstacle_qubits()
-        self.num_comparator_qubits = 2 * (self.num_dims - 1)
+        self.num_monomial_qubits = self.__num_monomial_qubits()
+        self.num_comparator_qubits = self.__num_comparator_qubits()
         self.num_ancilla_qubits = self.num_comparator_qubits + self.num_obstacle_qubits
 
         self.num_marker_qubits = (
@@ -158,24 +169,48 @@ class ABLattice(AmplitudeLattice):
         )
 
         self.num_accumulation_qubits = 0
+        self.shape_list = flatten(self.__geometry_shape_lists())
 
         self.__update_registers()
 
     def __update_registers(self):
+        self.num_obstacle_qubits = self.__num_obstacle_qubits()
+        self.num_monomial_qubits = self.__num_monomial_qubits()
+        self.num_comparator_qubits = self.__num_comparator_qubits()
+        self.num_ancilla_qubits = self.num_comparator_qubits + self.num_obstacle_qubits
+
         self.num_total_qubits = (
             self.num_base_qubits + self.num_ancilla_qubits + self.num_marker_qubits
         )
 
         temp_registers = self.get_registers()
 
-        (
-            self.grid_registers,
-            self.velocity_registers,
-            self.ancilla_comparator_register,
-            self.ancilla_object_register,
-            self.marker_register,
-            self.accumulation_register,
-        ) = temp_registers
+        if len(temp_registers) == 8:
+            (
+                self.grid_registers,
+                self.velocity_registers,
+                self.ancilla_comparator_register,
+                self.ancilla_object_register,
+                self.marker_register,
+                self.accumulation_register,
+                self.copy_register,
+                self.monomial_register,
+            ) = temp_registers
+        elif len(temp_registers) == 6:
+            (
+                self.grid_registers,
+                self.velocity_registers,
+                self.ancilla_comparator_register,
+                self.ancilla_object_register,
+                self.marker_register,
+                self.accumulation_register,
+            ) = temp_registers
+            self.copy_register = []
+            self.monomial_register = []
+        else:
+            raise LatticeException(
+                "Invalid register tuple returned by get_registers()."
+            )
 
         self.registers = tuple(flatten(temp_registers))
 
@@ -231,6 +266,7 @@ class ABLattice(AmplitudeLattice):
         if len(self.geometries) == 1:
             # Remove this in the future...
             self.shapes = self.geometries[0]
+        self.shape_list = flatten(self.__geometry_shape_lists())
 
         self.num_marker_qubits = (
             int(ceil(log2(len(self.geometries))))
@@ -276,11 +312,18 @@ class ABLattice(AmplitudeLattice):
 
     @override
     def ancillae_comparator_index(self, index: int | None = None) -> List[int]:
+        if self.num_comparator_qubits == 0:
+            if index is None:
+                return []
+            raise LatticeException(
+                "Cannot index ancilla comparator register because this lattice has no comparator qubits."
+            )
+
         if index is None:
             return list(
                 range(
                     self.num_base_qubits,
-                    self.num_base_qubits + 2 * (self.num_dims - 1),
+                    self.num_base_qubits + self.num_comparator_qubits,
                 )
             )
 
@@ -289,11 +332,21 @@ class ABLattice(AmplitudeLattice):
                 f"Cannot index ancilla comparator register for index {index} in {self.num_dims}-dimensional lattice. Maximum is {self.num_dims - 2}."
             )
 
-        return list(
-            range(
-                self.num_base_qubits, self.num_base_qubits + self.num_comparator_qubits
-            )
+        qubits_per_dim = (
+            2 if self.num_comparator_qubits >= 2 * (self.num_dims - 1) else 1
         )
+        previous_qubits = self.num_base_qubits + qubits_per_dim * index
+        final_qubit = min(
+            self.num_base_qubits + self.num_comparator_qubits,
+            previous_qubits + qubits_per_dim,
+        )
+
+        if previous_qubits >= final_qubit:
+            raise LatticeException(
+                f"Cannot index ancilla comparator register for index {index} in {self.num_dims}-dimensional lattice. Maximum is {self.num_dims - 2}."
+            )
+
+        return list(range(previous_qubits, final_qubit))
 
     @override
     def ancillae_obstacle_index(self, index: int | None = None) -> List[int]:
@@ -314,22 +367,112 @@ class ABLattice(AmplitudeLattice):
 
         return [self.num_base_qubits + self.num_comparator_qubits + index]
 
+    def ancillae_copy_index(self) -> List[int]:
+        """
+        Gets the index of the ancilla qubits used to copy the state of the x grid qubits.
+
+        Returns
+        -------
+        List[int]
+            The indices of the copy register qubits.
+        """
+        if self.num_monomial_qubits == 0:
+            raise LatticeException(
+                "This lattice does not have any copy register qubits."
+            )
+
+        return list(
+            range(
+                self.num_base_qubits
+                + self.num_comparator_qubits
+                + self.num_obstacle_qubits,
+                self.num_base_qubits
+                + self.num_comparator_qubits
+                + self.num_obstacle_qubits
+                + self.num_gridpoints[0].bit_length(),
+            )
+        )
+
+    def ancillae_monomial_index(self) -> List[int]:
+        """
+        Gets the index of the ancilla qubits used to compute the function of the x register for BC purposes.
+
+        Returns
+        -------
+        List[int]
+            The indices of the monomial register qubits.
+        """
+        if self.num_monomial_qubits == 0:
+            raise LatticeException("This lattice does not have any monomial BC qubits.")
+
+        return list(
+            range(
+                self.num_base_qubits
+                + self.num_comparator_qubits
+                + self.num_obstacle_qubits
+                + self.num_gridpoints[0].bit_length(),
+                self.num_base_qubits
+                + self.num_comparator_qubits
+                + self.num_obstacle_qubits
+                + self.num_monomial_qubits,
+            )
+        )
+
     def __num_obstacle_qubits(self) -> int:
-        all_obstacle_bounceback: bool = len(
+        return max(
             [
-                b
-                for b in flatten(list(self.shapes.values()))
-                if b.boundary_condition == "bounceback"
+                (
+                    1
+                    if len(
+                        [
+                            shape
+                            for shape in geometry_shapes
+                            if shape.boundary_condition == "bounceback"
+                        ]
+                    )
+                    == len(geometry_shapes)
+                    else self.num_dims
+                )
+                for geometry_shapes in self.__geometry_shape_lists()
             ]
-        ) == len(flatten(list(self.shapes.values())))
-        if all_obstacle_bounceback:
-            # A single qubit suffices to determine
-            # Whether particles have streamed inside the object
-            return 1
-        # If there is at least one object with specular reflection
-        # 2 ancilla qubits are required for velocity inversion
-        else:
-            return self.num_dims
+            + [1]
+        )
+
+    def __num_comparator_qubits(self) -> int:
+        comp_qs_cuboids = (
+            2 * (self.num_dims - 1)
+            if any(
+                shape.name() == "cuboid"
+                for shape in flatten(self.__geometry_shape_lists())
+            )
+            else 0
+        )
+        comp_qs_monomials = (
+            1
+            if any(
+                shape.name() == "ymonomial"
+                for shape in flatten(self.__geometry_shape_lists())
+            )
+            else 0
+        )
+        return max(comp_qs_cuboids, comp_qs_monomials)
+
+    def __num_monomial_qubits(self) -> int:
+        monomial_shapes_exponent = [
+            cast(YMonomial, x).exponent
+            for x in flatten(self.__geometry_shape_lists())
+            if x.name() == "ymonomial"
+        ]
+        # ! This only works for the y monomial example
+        return (
+            0
+            if not monomial_shapes_exponent
+            else (max(monomial_shapes_exponent) + 1)
+            * self.num_gridpoints[0].bit_length()
+        )
+
+    def __geometry_shape_lists(self) -> List[List[Shape]]:
+        return [flatten(list(geometry.values())) for geometry in self.geometries]
 
     @override
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
@@ -339,7 +482,8 @@ class ABLattice(AmplitudeLattice):
         (i) the logarithmically compressed grid,
         (ii) the logarithmically compressed discrete velocities,
         (iii) the comparator qubits,
-        (iv) the object qubits.
+        (iv) the object qubit(s),
+        (v) the monomial BC qubits, if present.
 
         Returns
         -------
@@ -352,9 +496,11 @@ class ABLattice(AmplitudeLattice):
         ]
 
         # 2(d-1) ancilla qubits
-        ancilla_comparator_register = [
-            QuantumRegister(self.num_comparator_qubits, name="a_c")
-        ]
+        ancilla_comparator_register = (
+            [QuantumRegister(self.num_comparator_qubits, name="a_c")]
+            if self.num_comparator_qubits > 0
+            else []
+        )
 
         # Velocity qubits
         velocity_registers = [QuantumRegister(self.num_velocity_qubits, name="v")]
@@ -364,6 +510,21 @@ class ABLattice(AmplitudeLattice):
             QuantumRegister(gp.bit_length(), name=f"g_{dimension_letter(c)}")
             for c, gp in enumerate(self.num_gridpoints)
         ]
+
+        # Monomial qubits
+        # ! Only works for Ymonomials
+        copy_register = (
+            [QuantumRegister(self.num_gridpoints[0].bit_length(), name="a_copy")]
+            if self.num_monomial_qubits > 0
+            else []
+        )
+
+        # ! Only works for Ymonomials
+        monomial_register = (
+            [QuantumRegister(self.num_monomial_qubits, name="monomial")]
+            if self.num_monomial_qubits > 0
+            else []
+        )
 
         if self.has_multiple_geometries():
             marker_register = [
@@ -395,6 +556,8 @@ class ABLattice(AmplitudeLattice):
             ancilla_object_register,
             marker_register,
             accumulation_register,
+            copy_register,
+            monomial_register,
         )
 
     @override

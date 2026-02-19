@@ -258,13 +258,11 @@ class Lattice(ABC):
         # Set for access to the geometry parsing utilities
         self.num_dims = num_dimensions
 
-        grid_list: List[int] = [
+        self.num_gridpoints: List[int] = [
             # -1 because the bit_length() would "overshoot" for powers of 2
             lattice_dict["dim"][dimension_letter(dim)] - 1
             for dim in range(num_dimensions)
         ]
-
-        self.num_gridpoints = grid_list
 
         discretization: LatticeDiscretization = LatticeDiscretization.CFLDISCRETIZATION
         velocity_list: List[int] = []
@@ -312,7 +310,7 @@ class Lattice(ABC):
 
         if "geometry" not in input_dict:
             return (
-                grid_list,
+                self.num_gridpoints,
                 velocity_list,
                 {"specular": [], "bounceback": []},
                 discretization,
@@ -322,7 +320,7 @@ class Lattice(ABC):
 
         parsed_obstacles = self.parse_geometry_dict(geometry_list)
 
-        return grid_list, velocity_list, parsed_obstacles, discretization
+        return self.num_gridpoints, velocity_list, parsed_obstacles, discretization
 
     def parse_geometry_dict(self, geometry_list) -> Dict[str, List[Shape]]:
         """
@@ -497,14 +495,16 @@ class Lattice(ABC):
                     dimension_letter(dim): self.num_gridpoints[dim] + 1
                     for dim in range(self.num_dims)
                 },
-                "velocities": {
-                    dimension_letter(dim): self.num_velocities[dim] + 1
-                    for dim in range(self.num_dims)
-                }
-                if self.discretization == LatticeDiscretization.CFLDISCRETIZATION
-                else LatticeDiscretizationProperties.string_representation[
-                    self.discretization
-                ],  # type: ignore
+                "velocities": (
+                    {
+                        dimension_letter(dim): self.num_velocities[dim] + 1
+                        for dim in range(self.num_dims)
+                    }
+                    if self.discretization == LatticeDiscretization.CFLDISCRETIZATION
+                    else LatticeDiscretizationProperties.string_representation[
+                        self.discretization
+                    ]
+                ),  # type: ignore
             },
         }
 
