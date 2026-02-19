@@ -65,6 +65,18 @@ class Shape(ABC):
         """
         pass
 
+    @abstractmethod
+    def name(self) -> str:
+        """
+        The name of the shape.
+
+        Returns
+        -------
+        str
+            The name of the shape.
+        """
+        pass
+
 
 class LQLGAShape(Shape):
     """Base class for all shapes compatible with the :class:`.LQLGA` algorithm."""
@@ -324,17 +336,5 @@ class SpaceTimeShape(Shape):
         -------
         List[SpaceTimeVolumetricReflectionData]
             The information encoding the reflections to be performed.
-        """
-        pass
-
-    @abstractmethod
-    def name(self) -> str:
-        """
-        The name of the shape.
-
-        Returns
-        -------
-        str
-            The name of the shape.
         """
         pass

@@ -11,12 +11,13 @@ from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.geometry.shapes.circle import Circle
+from qlbm.lattice.geometry.shapes.ymonomial import YMonomial
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     LatticeDiscretizationProperties,
 )
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import dimension_letter, flatten
+from qlbm.tools.utils import ComparatorMode, dimension_letter, flatten
 
 
 class Lattice(ABC):
@@ -356,9 +357,9 @@ class Lattice(ABC):
                     f"Obstacle {c + 1} specification includes no shape."
                 )
 
-            if obstacle_dict["shape"] not in ["cuboid", "sphere"]:
+            if obstacle_dict["shape"] not in ["cuboid", "sphere", "ymonomial"]:
                 raise LatticeException(
-                    f'Obstacle {c + 1} has unsupported shape "{obstacle_dict["shape"]}". Supported shapes are cuboid and sphere.'
+                    f'Obstacle {c + 1} has unsupported shape "{obstacle_dict["shape"]}". Supported shapes are cuboid, sphere, and ymonomial.'
                 )
             # Parsing blocks
             if obstacle_dict["shape"] == "cuboid":
@@ -432,6 +433,50 @@ class Lattice(ABC):
                             for numeric_dim_index in range(self.num_dims)
                         ],
                         obstacle_dict["boundary"],  # type: ignore
+                    )
+                )
+            elif obstacle_dict["shape"] == "ymonomial":
+                if self.num_dims != 2:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial is only supported for 2-dimensional lattices."
+                    )
+
+                if "exponent" not in obstacle_dict:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial obstacle does not specify an exponent."
+                    )
+
+                try:
+                    exponent = int(obstacle_dict["exponent"])
+                except (ValueError, TypeError):
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial exponent {obstacle_dict['exponent']} is not an integer."
+                    )
+
+                if exponent < 0:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial exponent {obstacle_dict['exponent']} must be non-negative."
+                    )
+
+                if "comparator" not in obstacle_dict:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial obstacle does not specify a comparator."
+                    )
+
+                if not isinstance(obstacle_dict["comparator"], str):
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial comparator must be a string."
+                    )
+
+                parsed_obstacles[obstacle_dict["boundary"]].append(  # type: ignore
+                    YMonomial(
+                        [
+                            (self.num_gridpoints[numeric_dim_index]).bit_length()
+                            for numeric_dim_index in range(self.num_dims)
+                        ],
+                        obstacle_dict["boundary"],  # type: ignore
+                        exponent,
+                        ComparatorMode.from_string(obstacle_dict["comparator"]),
                     )
                 )
 
