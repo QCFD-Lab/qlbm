@@ -5,16 +5,16 @@ from time import perf_counter_ns
 from typing import List, cast
 
 from qiskit import QuantumCircuit
+from qiskit.circuit.library import RGQFTMultiplier
 from typing_extensions import override
 
 from qlbm.components.ab.reflection.standard_reflection import ABReflectionOperator
 from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
-from qlbm.components.ms.primitives import Comparator
+from qlbm.components.ms.primitives import Comparator, TwoRegisterComparator
+from qlbm.lattice.geometry.shapes import Block, Circle, YMonomial
 from qlbm.lattice.geometry.shapes.base import Shape
-from qlbm.lattice.geometry.shapes.block import Block
-from qlbm.lattice.geometry.shapes.circle import Circle
 from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
@@ -60,12 +60,12 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
     def __init__(
         self,
         lattice: ABLattice,
-        blocks: List[Block] | None = None,
+        shapes: List[Shape] | None = None,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
-        super().__init__(lattice, blocks, logger)
+        super().__init__(lattice, [], logger)
 
-        self.blocks = (
+        self.shapes = (
             (
                 cast(List[Block], flatten(list(self.lattice.geometries[0].values())))
                 if not self.lattice.has_multiple_geometries()
@@ -74,9 +74,16 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
                     for gdict in self.lattice.geometries  # type: ignore
                 ]
             )
-            if blocks is None
-            else blocks
+            if shapes is None
+            else shapes
         )
+
+        supported_shapes = ["cuboid", "ymonomial"]
+
+        if any([x.name() not in supported_shapes for x in self.shapes]):
+            raise CircuitException(
+                f"Agnostic reflection operator only supports the following shapes: {supported_shapes}."
+            )
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -93,10 +100,10 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
 
         oracle = self.lattice.circuit.copy()
         # build the oracle once
-        for block in self.blocks:
+        for shape in self.shapes:
             oracle.compose(
                 ABZoneAgnosticReflectionOracle(
-                    self.lattice, block, logger=self.logger
+                    self.lattice, shape, logger=self.logger
                 ).circuit,
                 inplace=True,
             )
@@ -140,6 +147,14 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
     falls within the bounds of the object.
 
     Currently, the only available implementation is for 2D axis-aligned objects.
+
+    .. important::
+
+        The ``YMonomial`` implementation is a work in progress.
+        At present, only the :math:`x^2` monomial case is supported,
+        and only when the monomial result register width matches the :math:`y`
+        grid register width.
+
     This is an improvement in asymptotic and practical complexity compared to
     the methods described in :cite:`collisionless`.
     This operation relies on basic arithmetic through the :class:`.ParameterizedDraperAdder` class
@@ -170,11 +185,11 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
 
     """
 
-    lattice: AmplitudeLattice
+    lattice: ABLattice
 
     def __init__(
         self,
-        lattice: AmplitudeLattice,
+        lattice: ABLattice,
         shape: Shape,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
@@ -196,6 +211,8 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
             return self.__create_circuit_block()
         elif isinstance(self.shape, Circle):
             return self.__create_circuit_circle()
+        elif isinstance(self.shape, YMonomial):
+            return self.__create_circuit_ymonomial()
 
     def __create_circuit_block(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
@@ -255,6 +272,70 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
 
     def __create_circuit_circle(self) -> QuantumCircuit:
         raise CircuitException("Not implemented")
+
+    def __create_circuit_ymonomial(self) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+
+        ym: YMonomial = cast(YMonomial, self.shape)
+
+        if ym.exponent != 2:
+            raise CircuitException(
+                "YMonomial oracle is a work in progress: only exponent=2 (x^2) is currently supported."
+            )
+
+        # Qubits used in this oracle
+        grid_x_qubits = self.lattice.grid_index(0)
+        grid_y_qubits = self.lattice.grid_index(1)
+        copy_qubits = self.lattice.ancillae_copy_index()
+        result_qubits = self.lattice.ancillae_monomial_index()
+
+        if len(result_qubits) != len(grid_y_qubits):
+            raise CircuitException(
+                "YMonomial oracle is a work in progress: only configurations with equal y and monomial result register sizes are currently supported."
+            )
+
+        # circuits used more than once
+        multiplication_circuit = RGQFTMultiplier(
+            num_state_qubits=len(grid_x_qubits),
+            num_result_qubits=len(result_qubits),
+        )
+
+        comparator_circuit = TwoRegisterComparator(
+            len(grid_y_qubits), ym.comparator_mode
+        ).circuit
+
+        # Copy x into the copy register
+        for qc, qt in zip(grid_x_qubits, copy_qubits):
+            circuit.cx(qc, qt)
+
+        # Do the multiplication
+        circuit.compose(
+            multiplication_circuit,
+            qubits=grid_x_qubits + copy_qubits + result_qubits,
+            inplace=True,
+        )
+
+        # Comparator
+        circuit.compose(
+            comparator_circuit,
+            qubits=grid_y_qubits
+            + result_qubits
+            + self.lattice.ancillae_obstacle_index(),
+            inplace=True,
+        )
+
+        # Undo multiplication
+        circuit.compose(
+            multiplication_circuit.inverse(),
+            qubits=grid_x_qubits + copy_qubits + result_qubits,
+            inplace=True,
+        )
+
+        # Undo copy
+        for qc, qt in zip(grid_x_qubits, copy_qubits):
+            circuit.cx(qc, qt)
+
+        return circuit
 
     @override
     def __str__(self) -> str:

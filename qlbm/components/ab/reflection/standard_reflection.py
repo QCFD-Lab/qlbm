@@ -1,6 +1,5 @@
 """Reflection utilities for the :class:`.ABQLBM` algorithm; generalizations of :cite:`collisionless`."""
 
-
 from itertools import product
 from logging import Logger, getLogger
 from time import perf_counter_ns
@@ -16,6 +15,7 @@ from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMOperator
 from qlbm.components.ms.specular_reflection import SpecularWallComparator
 from qlbm.lattice.geometry.encodings.ms import ReflectionPoint
+from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.base import AmplitudeLattice
@@ -59,22 +59,22 @@ class ABReflectionOperator(LBMOperator):
     def __init__(
         self,
         lattice: ABLattice,
-        blocks: List[Block] | None = None,
+        shapes: List[Shape] | None = None,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
 
-        self.blocks = (
+        self.shapes = (
             (
-                cast(List[Block], flatten(list(self.lattice.geometries[0].values())))
+                flatten(list(self.lattice.geometries[0].values()))
                 if not self.lattice.has_multiple_geometries()
                 else [
                     gdict["bounceback"] + gdict["specular"]  # type: ignore
                     for gdict in self.lattice.geometries  # type: ignore
                 ]
             )
-            if blocks is None
-            else blocks
+            if shapes is None
+            else shapes
         )
 
         self.logger.info(f"Creating circuit {str(self)}...")
@@ -92,11 +92,11 @@ class ABReflectionOperator(LBMOperator):
         if self.lattice.discretization == LatticeDiscretization.D2Q9:
             if not self.lattice.has_multiple_geometries():
                 return self.__create_circuit_d2q9(
-                    self.blocks, control_on_marker_state=False
+                    self.shapes, control_on_marker_state=False
                 )
             else:
                 circuit = self.lattice.circuit.copy()
-                for c, blocks in enumerate(self.blocks):
+                for c, blocks in enumerate(self.shapes):
                     # Prepare the /ket{1} state in the marker register
                     qubits_to_invert = [
                         q + self.lattice.marker_index()[0]
@@ -426,14 +426,11 @@ class ABReflectionOperator(LBMOperator):
                         if velocity_qubit_indices_to_invert:
                             circuit.x(velocity_qubit_indices_to_invert)
 
-                        control_qubits = (
-                            self.lattice.grid_index()
-                            + (
-                                self.lattice.velocity_index()
-                                if not ignore_velocity_data
-                                else []
-                            )  # The reset step is additionally controlled on the velocity register
-                        )
+                        control_qubits = self.lattice.grid_index() + (
+                            self.lattice.velocity_index()
+                            if not ignore_velocity_data
+                            else []
+                        )  # The reset step is additionally controlled on the velocity register
 
                         if control_on_marker_state:
                             control_qubits.extend(self.lattice.marker_index())
@@ -470,12 +467,9 @@ class ABReflectionOperator(LBMOperator):
                         )
                     else:
                         for v in velocities:
-                            control_qubits = (
-                                self.lattice.grid_index()
-                                + (
-                                    [self.lattice.velocity_index()[v]]
-                                )  # Only one velocity control
-                            )
+                            control_qubits = self.lattice.grid_index() + (
+                                [self.lattice.velocity_index()[v]]
+                            )  # Only one velocity control
 
                             if control_on_marker_state:
                                 control_qubits.extend(self.lattice.marker_index())
