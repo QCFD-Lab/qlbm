@@ -118,10 +118,14 @@ class ABLattice(AmplitudeLattice):
     r"""The number of qubits used for the imposition of monomially-shaped BCs.
     Currently, only the :class:`.YMonomial` is supported.
     The number of qubits for a monomial with exponent :math:`n`
-    is :math:`(n+1)\lceil \log_2 N_{g_x}\rceil`.
-    The first :math:`\log_2 N_{g_x}\rceil`-sized register is allocated
-    to making a copy, while the other :math:`n` chunks
-    are allotted to the computation of the monomial via quantum arithmetic."""
+    is :math:`n\lceil \log_2 N_{g_x}\rceil`.
+    This does not include copy-register qubits, which are tracked separately
+    in :attr:`num_copy_qubits`."""
+
+    num_copy_qubits: int
+    r"""The number of qubits used to copy the :math:`x` coordinate register for monomial BCs.
+    If at least one :class:`.YMonomial` is present, this is :math:`\lceil \log_2 N_{g_x}\rceil`,
+    otherwise it is ``0``."""
 
     registers: Tuple[QuantumRegister, ...]
     """The registers of the lattice."""
@@ -154,6 +158,7 @@ class ABLattice(AmplitudeLattice):
         self.num_base_qubits = self.num_grid_qubits + self.num_velocity_qubits
 
         self.num_obstacle_qubits = self.__num_obstacle_qubits()
+        self.num_copy_qubits = self.__num_copy_qubits()
         self.num_monomial_qubits = self.__num_monomial_qubits()
         self.num_comparator_qubits = self.__num_comparator_qubits()
         self.num_ancilla_qubits = self.num_comparator_qubits + self.num_obstacle_qubits
@@ -175,6 +180,7 @@ class ABLattice(AmplitudeLattice):
 
     def __update_registers(self):
         self.num_obstacle_qubits = self.__num_obstacle_qubits()
+        self.num_copy_qubits = self.__num_copy_qubits()
         self.num_monomial_qubits = self.__num_monomial_qubits()
         self.num_comparator_qubits = self.__num_comparator_qubits()
         self.num_ancilla_qubits = self.num_comparator_qubits + self.num_obstacle_qubits
@@ -327,26 +333,17 @@ class ABLattice(AmplitudeLattice):
                 )
             )
 
-        if index >= self.num_dims - 1 or index < 0:
+        if index != 0:
             raise LatticeException(
-                f"Cannot index ancilla comparator register for index {index} in {self.num_dims}-dimensional lattice. Maximum is {self.num_dims - 2}."
+                f"Cannot index ancilla comparator register for index {index} in {self.num_dims}-dimensional lattice. Maximum is 0."
             )
 
-        qubits_per_dim = (
-            2 if self.num_comparator_qubits >= 2 * (self.num_dims - 1) else 1
-        )
-        previous_qubits = self.num_base_qubits + qubits_per_dim * index
-        final_qubit = min(
-            self.num_base_qubits + self.num_comparator_qubits,
-            previous_qubits + qubits_per_dim,
-        )
-
-        if previous_qubits >= final_qubit:
-            raise LatticeException(
-                f"Cannot index ancilla comparator register for index {index} in {self.num_dims}-dimensional lattice. Maximum is {self.num_dims - 2}."
+        return list(
+            range(
+                self.num_base_qubits,
+                self.num_base_qubits + self.num_comparator_qubits,
             )
-
-        return list(range(previous_qubits, final_qubit))
+        )
 
     @override
     def ancillae_obstacle_index(self, index: int | None = None) -> List[int]:
@@ -376,7 +373,7 @@ class ABLattice(AmplitudeLattice):
         List[int]
             The indices of the copy register qubits.
         """
-        if self.num_monomial_qubits == 0:
+        if self.num_copy_qubits == 0:
             raise LatticeException(
                 "This lattice does not have any copy register qubits."
             )
@@ -389,7 +386,7 @@ class ABLattice(AmplitudeLattice):
                 self.num_base_qubits
                 + self.num_comparator_qubits
                 + self.num_obstacle_qubits
-                + self.num_gridpoints[0].bit_length(),
+                + self.num_copy_qubits,
             )
         )
 
@@ -410,10 +407,11 @@ class ABLattice(AmplitudeLattice):
                 self.num_base_qubits
                 + self.num_comparator_qubits
                 + self.num_obstacle_qubits
-                + self.num_gridpoints[0].bit_length(),
+                + self.num_copy_qubits,
                 self.num_base_qubits
                 + self.num_comparator_qubits
                 + self.num_obstacle_qubits
+                + self.num_copy_qubits
                 + self.num_monomial_qubits,
             )
         )
@@ -439,23 +437,24 @@ class ABLattice(AmplitudeLattice):
         )
 
     def __num_comparator_qubits(self) -> int:
-        comp_qs_cuboids = (
-            2 * (self.num_dims - 1)
+        return (
+            self.num_dims
             if any(
                 shape.name() == "cuboid"
                 for shape in flatten(self.__geometry_shape_lists())
             )
             else 0
         )
-        comp_qs_monomials = (
-            1
+
+    def __num_copy_qubits(self) -> int:
+        return (
+            self.num_gridpoints[0].bit_length()
             if any(
                 shape.name() == "ymonomial"
                 for shape in flatten(self.__geometry_shape_lists())
             )
             else 0
         )
-        return max(comp_qs_cuboids, comp_qs_monomials)
 
     def __num_monomial_qubits(self) -> int:
         monomial_shapes_exponent = [
@@ -467,8 +466,7 @@ class ABLattice(AmplitudeLattice):
         return (
             0
             if not monomial_shapes_exponent
-            else (max(monomial_shapes_exponent) + 1)
-            * self.num_gridpoints[0].bit_length()
+            else max(monomial_shapes_exponent) * self.num_gridpoints[0].bit_length()
         )
 
     def __geometry_shape_lists(self) -> List[List[Shape]]:
@@ -514,14 +512,19 @@ class ABLattice(AmplitudeLattice):
         # Monomial qubits
         # ! Only works for Ymonomials
         copy_register = (
-            [QuantumRegister(self.num_gridpoints[0].bit_length(), name="a_copy")]
-            if self.num_monomial_qubits > 0
+            [QuantumRegister(self.num_copy_qubits, name="a_copy")]
+            if self.num_copy_qubits > 0
             else []
         )
 
         # ! Only works for Ymonomials
         monomial_register = (
-            [QuantumRegister(self.num_monomial_qubits, name="monomial")]
+            [
+                QuantumRegister(
+                    self.num_monomial_qubits,
+                    name="monomial",
+                )
+            ]
             if self.num_monomial_qubits > 0
             else []
         )

@@ -12,6 +12,7 @@ from .geometry.shapes.block import (
 from .geometry.shapes.circle import (
     Circle,
 )
+from .geometry.shapes.ymonomial import YMonomial
 from .lattices import Lattice, MSLattice
 from .lattices.ab_lattice import ABLattice
 from .lattices.lqlga_lattice import LQLGALattice
@@ -37,4 +38,5 @@ __all__ = [
     "Circle",
     "LatticeDiscretization",
     "LatticeDiscretizationProperties",
+    "YMonomial",
 ]

@@ -2,5 +2,6 @@
 
 from .block import Block
 from .circle import Circle
+from .ymonomial import YMonomial
 
-__all__ = ["Block", "Circle"]
+__all__ = ["Block", "Circle", "YMonomial"]
