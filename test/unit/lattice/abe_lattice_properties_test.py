@@ -73,11 +73,16 @@ def test_2d_lattice_no_cuboid_has_no_comparator_register():
         }
     )
 
-    assert lattice.num_comparator_qubits == 1
-    assert lattice.ancillae_comparator_index() == [10]
-    assert lattice.ancillae_comparator_index(0) == [10]
-    assert len(lattice.ancilla_comparator_register) == 1
-    assert lattice.ancillae_obstacle_index() == [11]
+    assert lattice.num_comparator_qubits == 0
+    assert lattice.ancillae_comparator_index() == []
+    assert len(lattice.ancilla_comparator_register) == 0
+    with pytest.raises(LatticeException) as excinfo:
+        lattice.ancillae_comparator_index(0)
+    assert (
+        "Cannot index ancilla comparator register because this lattice has no comparator qubits."
+        == str(excinfo.value)
+    )
+    assert lattice.ancillae_obstacle_index() == [10]
 
 
 def test_set_geometries_updates_comparator_register_allocation():
@@ -111,11 +116,16 @@ def test_set_geometries_updates_comparator_register_allocation():
         ]
     )
 
-    assert lattice.num_comparator_qubits == 1
-    assert lattice.ancillae_comparator_index() == [10]
-    assert lattice.ancillae_comparator_index(0) == [10]
-    assert len(lattice.ancilla_comparator_register) == 1
-    assert lattice.ancillae_obstacle_index() == [11]
+    assert lattice.num_comparator_qubits == 0
+    assert lattice.ancillae_comparator_index() == []
+    assert len(lattice.ancilla_comparator_register) == 0
+    with pytest.raises(LatticeException) as excinfo:
+        lattice.ancillae_comparator_index(0)
+    assert (
+        "Cannot index ancilla comparator register because this lattice has no comparator qubits."
+        == str(excinfo.value)
+    )
+    assert lattice.ancillae_obstacle_index() == [10]
 
 
 def test_2d_lattice_no_objects_has_no_comparator_register():
@@ -138,7 +148,7 @@ def test_2d_lattice_no_objects_has_no_comparator_register():
 
 
 @pytest.mark.parametrize(
-    "geometry, expected_comparator_qubits, expected_obstacle_qubits, expected_monomial_qubits",
+    "geometry, expected_comparator_qubits, expected_obstacle_qubits, expected_copy_qubits, expected_monomial_qubits",
     [
         (
             [
@@ -152,6 +162,7 @@ def test_2d_lattice_no_objects_has_no_comparator_register():
             2,
             1,
             0,
+            0,
         ),
         (
             [
@@ -162,9 +173,10 @@ def test_2d_lattice_no_objects_has_no_comparator_register():
                     "boundary": "bounceback",
                 }
             ],
+            0,
             1,
-            1,
-            12,
+            4,
+            8,
         ),
         (
             [
@@ -183,7 +195,8 @@ def test_2d_lattice_no_objects_has_no_comparator_register():
             ],
             2,
             2,
-            8,
+            4,
+            4,
         ),
         (
             [
@@ -200,9 +213,10 @@ def test_2d_lattice_no_objects_has_no_comparator_register():
                     "boundary": "bounceback",
                 },
             ],
+            0,
             1,
-            1,
-            20,
+            4,
+            16,
         ),
     ],
 )
@@ -210,6 +224,7 @@ def test_2d_ab_lattice_cuboid_ymonomial_combinations(
     geometry,
     expected_comparator_qubits,
     expected_obstacle_qubits,
+    expected_copy_qubits,
     expected_monomial_qubits,
 ):
     lattice = ABLattice(
@@ -221,6 +236,7 @@ def test_2d_ab_lattice_cuboid_ymonomial_combinations(
 
     assert lattice.num_comparator_qubits == expected_comparator_qubits
     assert lattice.num_obstacle_qubits == expected_obstacle_qubits
+    assert lattice.num_copy_qubits == expected_copy_qubits
     assert lattice.num_monomial_qubits == expected_monomial_qubits
     assert lattice.num_ancilla_qubits == (
         expected_comparator_qubits + expected_obstacle_qubits
@@ -229,10 +245,6 @@ def test_2d_ab_lattice_cuboid_ymonomial_combinations(
     if expected_comparator_qubits == 2:
         assert lattice.ancillae_comparator_index() == [10, 11]
         assert lattice.ancillae_comparator_index(0) == [10, 11]
-        assert len(lattice.ancilla_comparator_register) == 1
-    elif expected_comparator_qubits == 1:
-        assert lattice.ancillae_comparator_index() == [10]
-        assert lattice.ancillae_comparator_index(0) == [10]
         assert len(lattice.ancilla_comparator_register) == 1
     else:
         assert lattice.ancillae_comparator_index() == []
@@ -249,7 +261,7 @@ def test_2d_ab_lattice_cuboid_ymonomial_combinations(
 
 
 @pytest.mark.parametrize(
-    "new_geometries, expected_comparator_qubits, expected_obstacle_qubits, expected_monomial_qubits, expected_marker_qubits",
+    "new_geometries, expected_comparator_qubits, expected_obstacle_qubits, expected_copy_qubits, expected_monomial_qubits, expected_marker_qubits",
     [
         (
             [
@@ -272,7 +284,8 @@ def test_2d_ab_lattice_cuboid_ymonomial_combinations(
             ],
             2,
             1,
-            12,
+            4,
+            8,
             1,
         ),
         (
@@ -294,9 +307,10 @@ def test_2d_ab_lattice_cuboid_ymonomial_combinations(
                     }
                 ],
             ],
-            1,
+            0,
             2,
-            16,
+            4,
+            12,
             1,
         ),
         (
@@ -334,7 +348,8 @@ def test_2d_ab_lattice_cuboid_ymonomial_combinations(
             ],
             2,
             2,
-            24,
+            4,
+            20,
             2,
         ),
     ],
@@ -343,6 +358,7 @@ def test_set_geometries_updates_registers_for_ymonomial_cuboid_combinations(
     new_geometries,
     expected_comparator_qubits,
     expected_obstacle_qubits,
+    expected_copy_qubits,
     expected_monomial_qubits,
     expected_marker_qubits,
 ):
@@ -364,6 +380,7 @@ def test_set_geometries_updates_registers_for_ymonomial_cuboid_combinations(
 
     assert lattice.num_comparator_qubits == expected_comparator_qubits
     assert lattice.num_obstacle_qubits == expected_obstacle_qubits
+    assert lattice.num_copy_qubits == expected_copy_qubits
     assert lattice.num_monomial_qubits == expected_monomial_qubits
     assert lattice.num_marker_qubits == expected_marker_qubits
     assert lattice.has_multiple_geometries()
@@ -375,11 +392,58 @@ def test_set_geometries_updates_registers_for_ymonomial_cuboid_combinations(
         1 if expected_comparator_qubits > 0 else 0
     )
 
-    if expected_monomial_qubits > 0:
+    if expected_copy_qubits > 0:
         assert len(lattice.copy_register) == 1
-        assert len(lattice.monomial_register) == 1
     else:
         assert len(lattice.copy_register) == 0
+
+    if expected_monomial_qubits > 0:
+        assert len(lattice.monomial_register) == 1
+    else:
         assert len(lattice.monomial_register) == 0
 
     assert len(lattice.marker_index()) == expected_marker_qubits
+
+
+def test_2d_ymonomial_register_sizes_and_indices():
+    lattice = ABLattice(
+        {
+            "lattice": {"dim": {"x": 16, "y": 16}, "velocities": "D2Q4"},
+            "geometry": [
+                {
+                    "shape": "ymonomial",
+                    "exponent": 3,
+                    "comparator": "<=",
+                    "boundary": "bounceback",
+                }
+            ],
+        }
+    )
+
+    assert lattice.num_copy_qubits == 4
+    assert lattice.num_monomial_qubits == 12
+    assert len(lattice.ancillae_copy_index()) == 4
+    assert len(lattice.ancillae_monomial_index()) == 12
+    assert set(lattice.ancillae_copy_index()).isdisjoint(set(lattice.ancillae_monomial_index()))
+
+
+def test_3d_cuboid_comparator_qubits_equal_num_dims():
+    lattice = ABLattice(
+        {
+            "lattice": {"dim": {"x": 8, "y": 8, "z": 8}, "velocities": "D3Q6"},
+            "geometry": [
+                {
+                    "shape": "cuboid",
+                    "x": [1, 3],
+                    "y": [2, 4],
+                    "z": [0, 2],
+                    "boundary": "bounceback",
+                }
+            ],
+        }
+    )
+
+    assert lattice.num_dims == 3
+    assert lattice.num_comparator_qubits == 3
+    assert len(lattice.ancillae_comparator_index()) == 3
+    assert lattice.ancillae_comparator_index(0) == lattice.ancillae_comparator_index()
