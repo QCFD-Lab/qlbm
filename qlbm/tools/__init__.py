@@ -8,6 +8,7 @@ from .exceptions import (
     ResultsException,
 )
 from .utils import (
+    ComparatorMode,
     bit_value,
     create_directory_and_parents,
     dimension_letter,
@@ -34,4 +35,5 @@ __all__ = [
     "dimension_letter",
     "is_two_pow",
     "get_time_series",
+    "ComparatorMode",
 ]
