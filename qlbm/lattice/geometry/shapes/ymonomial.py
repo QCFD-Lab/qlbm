@@ -53,16 +53,25 @@ class YMonomial(Shape):
             The mesh representing the shape.
         """
         triangles: List[np.ndarray] = []
+        x_segments = 2 ** self.num_grid_qubits[0]
+        y_segments = 2 ** self.num_grid_qubits[1]
+        x_segment_width = (x_segments - 1) / x_segments
+        y_segment_height = (y_segments - 1) / y_segments
 
         for y, row in enumerate(self.boundary_points):
             for x, is_inside in enumerate(row):
                 if not is_inside:
                     continue
 
-                v00 = np.array([x, y, 1.0])
-                v10 = np.array([x + 1, y, 1.0])
-                v01 = np.array([x, y + 1, 1.0])
-                v11 = np.array([x + 1, y + 1, 1.0])
+                x0 = x * x_segment_width
+                x1 = (x + 1) * x_segment_width
+                y0 = y * y_segment_height
+                y1 = (y + 1) * y_segment_height
+
+                v00 = np.array([x0, y0, 1.0])
+                v10 = np.array([x1, y0, 1.0])
+                v01 = np.array([x0, y1, 1.0])
+                v11 = np.array([x1, y1, 1.0])
 
                 triangles.append(np.array([v00, v10, v11]))
                 triangles.append(np.array([v00, v11, v01]))
