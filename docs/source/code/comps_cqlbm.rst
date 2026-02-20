@@ -92,10 +92,6 @@ Streaming
 
 .. autoclass:: qlbm.components.ms.streaming.ControlledIncrementer
 
-.. autoclass:: qlbm.components.common.ParameterizedDraperAdder
-
-.. autoclass:: qlbm.components.common.ParameterizedPhaseShift
-
 .. autoclass:: qlbm.components.ms.streaming.PhaseShift
 
 .. autoclass:: qlbm.components.ab.streaming.ABStreamingOperator
@@ -116,10 +112,6 @@ Reflection
 .. autoclass:: qlbm.components.ms.specular_reflection.SpecularWallComparator
 
 .. autoclass:: qlbm.components.ms.primitives.EdgeComparator
-
-.. autoclass:: qlbm.components.ms.primitives.Comparator
-
-.. autoclass:: qlbm.components.ms.primitives.ComparatorMode
 
 .. autoclass:: qlbm.components.ab.reflection.ABReflectionOperator
 
