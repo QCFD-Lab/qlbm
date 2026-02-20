@@ -37,7 +37,7 @@ class ParameterizedPhaseShift(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components import ParameterizedPhaseShift
+        from qlbm.components.common.adders import ParameterizedPhaseShift
 
         # A phase shift of 5 qubits, adding the number 2
         ParameterizedPhaseShift(num_qubits=5, num_to_add=2, positive=True).draw("mpl")
@@ -47,7 +47,7 @@ class ParameterizedPhaseShift(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components import ParameterizedPhaseShift
+        from qlbm.components.common.adders import ParameterizedPhaseShift
 
         # A phase shift of 5 qubits, controlled subtracting the number 1
         ParameterizedPhaseShift(num_qubits=5, num_to_add=1, positive=False, num_ctrl_qubits=3).draw("mpl")
@@ -146,7 +146,7 @@ class ParameterizedDraperAdder(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components import ParameterizedDraperAdder
+        from qlbm.components.common.adders import ParameterizedDraperAdder
 
         ParameterizedDraperAdder(4, 1, True).draw("mpl")
     """
@@ -240,7 +240,7 @@ class PhaseShift(LBMPrimitive):
     .. plot::
         :include-source:
 
-        from qlbm.components.ms import PhaseShift
+        from qlbm.components.common.adders import PhaseShift
 
         # A phase shift of 5 qubits
         PhaseShift(num_qubits=5, positive=False).draw("mpl")

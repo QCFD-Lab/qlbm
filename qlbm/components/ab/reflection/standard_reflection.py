@@ -3,7 +3,7 @@
 from itertools import product
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List, Tuple, cast
+from typing import List, Tuple
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import MCMTGate, XGate

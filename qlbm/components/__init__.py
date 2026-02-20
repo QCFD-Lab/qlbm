@@ -1,6 +1,5 @@
 """Modular and extendible quantum circuits that perform parts of the QLBM algorithm."""
 
-from ..tools.utils import ComparatorMode
 from .ab import (
     ABQLBM,
     ABDiscreteUniformInitialConditions,
@@ -29,6 +28,7 @@ from .common import (
     HammingWeightAdder,
 )
 from .common.adders import ParameterizedDraperAdder, ParameterizedPhaseShift, PhaseShift
+from .common.comparators import SingleRegisterComparator
 from .cqlbm import CQLBM
 from .lqlga import (
     LQLGA,
@@ -47,7 +47,6 @@ from .ms import (
     MSStreamingOperator,
     SpecularReflectionOperator,
 )
-from .ms.primitives import Comparator
 from .ms.streaming import (
     ControlledIncrementer,
     StreamingAncillaPreparation,
@@ -61,8 +60,7 @@ __all__ = [
     "MSOperator",
     "SpaceTimeOperator",
     "LBMAlgorithm",
-    "ComparatorMode",
-    "Comparator",
+    "SingleRegisterComparator",
     "ParameterizedDraperAdder",
     "PhaseShift",
     "ParameterizedPhaseShift",

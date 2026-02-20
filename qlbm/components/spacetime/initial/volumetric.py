@@ -9,7 +9,7 @@ from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.components.ms.primitives import Comparator
+from qlbm.components.common.comparators import SingleRegisterComparator
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.utils import ComparatorMode, flatten
 
@@ -83,7 +83,7 @@ class VolumetricSpaceTimeInitialConditions(LBMPrimitive):
 
                 comparators = [
                     [
-                        Comparator(
+                        SingleRegisterComparator(
                             self.lattice.properties.get_num_grid_qubits() + 1,
                             pvb[0][bound],
                             self.__adjusted_comparator_mode(bound),

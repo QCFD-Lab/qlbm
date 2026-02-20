@@ -2,7 +2,7 @@ import pytest
 from qiskit import QuantumCircuit
 from qiskit.quantum_info import Statevector
 
-from qlbm.components.ms.primitives import TwoRegisterComparator
+from qlbm.components.common.comparators import TwoRegisterComparator
 from qlbm.tools.utils import ComparatorMode
 
 

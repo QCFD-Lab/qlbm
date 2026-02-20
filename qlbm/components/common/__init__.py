@@ -2,6 +2,7 @@
 
 from .adders import ParameterizedDraperAdder, ParameterizedPhaseShift, PhaseShift
 from .cbse_collision import EQCCollisionOperator, EQCPermutation, EQCRedistribution
+from .comparators import SingleRegisterComparator, TwoRegisterComparator
 from .primitives import (
     AdditionConversion,
     EmptyPrimitive,
@@ -26,4 +27,6 @@ __all__ = [
     "TruncatedQFT",
     "UniformStatePrep",
     "MCSwap",
+    "SingleRegisterComparator",
+    "TwoRegisterComparator",
 ]

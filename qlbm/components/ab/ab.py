@@ -10,9 +10,7 @@ from qlbm.components.ab.reflection import (
     ABZoneAgnosticReflectionOperator,
 )
 from qlbm.components.base import LBMAlgorithm
-from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
-from qlbm.tools.exceptions import LatticeException
 
 from .streaming import ABStreamingOperator
 

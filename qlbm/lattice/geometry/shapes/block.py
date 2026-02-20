@@ -79,7 +79,63 @@ class Block(SpaceTimeShape, LQLGAShape):
           - The ``List[ReflectionResetEdge]`` data encoding edges on the outside of the object that are adjacent either side of :attr:`corner_edges_3d`. These edges require additional logic in the quantum circuit for particles that have streamed without reflecting off the obstacle. There are 24 near-corner :class:`ReflectionResetEdge` \s per obstacle.
         * - :attr:`overlapping_near_corner_edge_points_3d`
           - The ``List[ReflectionPoint]`` data encoding the set of points at the intersections of :attr:`near_corner_edges_3d`. These points require additional logic in to account for the fact that the state of obstacle ancilla qubits was doubly reset (once by each edge). There are 24 such :class:`ReflectionPoint` \s per obstacle.
+        * - :attr:`num_gridpoints`
+          - The ``List[int]`` of gridpoint counts per dimension.
+        * - :attr:`mesh_vertices`
+          - The ``np.ndarray`` of obstacle mesh vertices used to build the ``stl`` representation.
+        * - :attr:`mesh_indices`
+          - The ``np.ndarray`` of triangle indices selecting faces from :attr:`mesh_vertices`.
+        * - :attr:`mesh_indices_list`
+          - A class-level ``List[np.ndarray]`` containing precomputed triangulations by dimensionality.
+        * - :attr:`ab_wall_indices_to_reset`
+          - A class-level lookup mapping wall configurations to velocity indices to reset for bounce-back schemes.
+        * - :attr:`ab_near_corner_indices_to_reset`
+          - A class-level lookup mapping near-corner configurations to velocity indices to reset.
+        * - :attr:`ab_corner_indices_to_reset`
+          - A class-level lookup mapping corner configurations to velocity indices to reset.
     """
+
+    bounds: List[Tuple[int, int]]
+    """Lower and upper bounds of the block in each spatial dimension."""
+
+    num_gridpoints: List[int]
+    """Number of gridpoints in each spatial dimension."""
+
+    mesh_vertices: np.ndarray
+    """Vertices of the polygonal surface representation used for ``stl`` export."""
+
+    mesh_indices: np.ndarray
+    """Triangle index array selecting faces from :attr:`mesh_vertices`."""
+
+    inside_points_data: List[Tuple[DimensionalReflectionData, ...]]
+    """Per-dimension lower/upper reflection metadata for points inside the obstacle."""
+
+    outside_points_data: List[Tuple[DimensionalReflectionData, ...]]
+    """Per-dimension lower/upper reflection metadata for points outside the obstacle."""
+
+    walls_inside: List[List[ReflectionWall]]
+    """Reflection wall metadata for interior-facing obstacle walls by dimension."""
+
+    walls_outside: List[List[ReflectionWall]]
+    """Reflection wall metadata for exterior-facing obstacle walls by dimension."""
+
+    corners_inside: List[ReflectionPoint]
+    """Corner reflection points located on the interior boundary of the obstacle."""
+
+    corners_outside: List[ReflectionPoint]
+    """Corner reflection points located on the exterior boundary of the obstacle."""
+
+    near_corner_points_2d: List[ReflectionPoint]
+    """2D points adjacent to interior corners that require extra non-reflection logic."""
+
+    corner_edges_3d: List[ReflectionResetEdge]
+    """3D exterior edges adjacent to corners, used to reset ancilla state."""
+
+    near_corner_edges_3d: List[ReflectionResetEdge]
+    """3D exterior edges adjacent to :attr:`corner_edges_3d` requiring extra handling."""
+
+    overlapping_near_corner_edge_points_3d: List[ReflectionPoint]
+    """3D points where near-corner edge reset effects overlap and need compensation."""
 
     mesh_indices_list: List[np.ndarray] = [
         np.array([[0, 1, 2], [1, 2, 3]]),
@@ -100,6 +156,7 @@ class Block(SpaceTimeShape, LQLGAShape):
             ]
         ),
     ]
+    """Precomputed triangle-index templates by dimensionality for ``stl`` generation."""
 
     ab_wall_indices_to_reset: Dict[
         LatticeDiscretization, Dict[Tuple[int, bool], List[int]]
@@ -111,6 +168,7 @@ class Block(SpaceTimeShape, LQLGAShape):
             (1, True): [2, 5, 6],
         }
     }
+    """Lookup of bounce-back velocity indices to reset for wall reflections."""
 
     ab_near_corner_indices_to_reset: Dict[
         LatticeDiscretization, Dict[int, Dict[Tuple[bool, ...], List[int]]]
@@ -130,6 +188,7 @@ class Block(SpaceTimeShape, LQLGAShape):
             },
         }
     }
+    """Lookup of bounce-back velocity indices to reset for near-corner reflections."""
 
     ab_corner_indices_to_reset: Dict[
         LatticeDiscretization, Dict[Tuple[bool, ...], List[int]]
@@ -141,6 +200,7 @@ class Block(SpaceTimeShape, LQLGAShape):
             (True, True): [5],
         }
     }
+    """Lookup of bounce-back velocity indices to reset for corner reflections."""
 
     def __init__(
         self,

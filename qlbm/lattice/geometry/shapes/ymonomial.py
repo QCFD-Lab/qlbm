@@ -12,7 +12,44 @@ from .base import Shape
 
 
 class YMonomial(Shape):
-    """Base class for all geometrical shapes."""
+    r"""
+    Shape representing boundaries shaped by comparisons to monomials.
+
+    Represents a 2D discretized shape defined by a comparison between the :math:`y`
+    coordinate and the :math:`x` coordinate raised to a given exponent (i.e. the set of
+    points satisfying ``y [comparator] x**exp``). The comparison operator is
+    provided via a ComparatorMode instance and the spatial resolution is determined
+    by the number of grid qubits per dimension.
+
+    .. important::
+
+        The ``YMonomial`` implementation is a work in progress.
+        At present, only the :math:`x^2` monomial case is supported,
+        and only when the monomial result register width matches the :math:`y`
+        grid register width.
+
+    .. list-table:: Class attributes
+            :widths: 25 50
+            :header-rows: 1
+
+            * - Attribute
+              - Description
+            * - :attr:`comparator_mode`
+              - The :class:`.ComparatorMode` used to compare :math:`y` and :math:`x^\mathrm{exp}`.
+            * - :attr:`exponent`
+              - The monomial exponent used to evaluate :math:`x^\mathrm{exp}`.
+            * - :attr:`boundary_points`
+              - A ``List[List[bool]]`` occupancy grid indicating whether each point satisfies the monomial comparator.
+    """
+
+    comparator_mode: ComparatorMode
+    """Comparator mode defining the boundary predicate ``y [op] x**exponent``."""
+
+    exponent: int
+    """Exponent of the monomial evaluated on the :math:`x` coordinate register."""
+
+    boundary_points: List[List[bool]]
+    """Boolean occupancy grid indicating which lattice points satisfy the monomial boundary."""
 
     def __init__(
         self,

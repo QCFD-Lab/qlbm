@@ -47,10 +47,28 @@ class Circle(SpaceTimeShape):
 
         * - Attribute
           - Description
+        * - :attr:`center`
+          - The ``Tuple[int, ...]`` center coordinate of the circle.
+        * - :attr:`radius`
+          - The ``int`` radius of the circle in gridpoint units.
+        * - :attr:`num_mesh_segments`
+          - The ``int`` number of angular segments used for smooth ``stl`` mesh generation.
         * - :attr:`perimeter_points`
           - The ``List[Tuple[int, int]]`` of all gridpoints that lie on the perimeter of the circle, and are therefore relevant for boundary conditions.
 
     """
+
+    center: Tuple[int, ...]
+    """Center coordinate of the circle in lattice grid coordinates."""
+
+    radius: int
+    """Circle radius in lattice gridpoint units."""
+
+    num_mesh_segments: int
+    """Number of angular segments used for smooth ``stl`` mesh construction."""
+
+    perimeter_points: List[Tuple[int, int]]
+    """All discrete gridpoints on the circle perimeter used for boundary handling."""
 
     def __init__(
         self,

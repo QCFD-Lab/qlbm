@@ -12,7 +12,10 @@ from qlbm.components.ab.reflection.standard_reflection import ABReflectionOperat
 from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
-from qlbm.components.ms.primitives import Comparator, TwoRegisterComparator
+from qlbm.components.common.comparators import (
+    SingleRegisterComparator,
+    TwoRegisterComparator,
+)
 from qlbm.lattice.geometry.shapes import Block, Circle, YMonomial
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.lattices.ab_lattice import ABLattice
@@ -32,7 +35,8 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
 
     Example usage:
 
-    .. code-block:: python
+    .. plot::
+        :include-source:
 
         from qlbm.components.ab import ABZoneAgnosticReflectionOperator
         from qlbm.lattice import ABLattice
@@ -51,7 +55,7 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
             }
         )
 
-        ABZoneAgnosticReflectionOperator(lattice, blocks=lattice.shapes["bounceback"]).draw("mpl")
+        ABZoneAgnosticReflectionOperator(lattice, shapes=lattice.shapes["bounceback"]).draw("mpl")
 
     """
 
@@ -103,7 +107,7 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
         for shape in self.shapes:
             oracle.compose(
                 ABZoneAgnosticReflectionOracle(
-                    self.lattice, shape, logger=self.logger
+                    self.lattice, shape, logger=self.logger  # type: ignore
                 ).circuit,
                 inplace=True,
             )
@@ -140,13 +144,14 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
     r"""
     Implementation of the oracle required for :class:`.ABZoneAgnosticReflectionOperator`.
 
-    An oracle is an operator :math:`U_{\omega}` for an obstacle's region
-    :math:`\omega` such that, in the amplitude-based encoding,
-    :math:`U_\omega\ket{x}\ket{v}\ket{0}_\mathbb{o} = \ket{x}\ket{v}\ket{x \in \omega}_\mathbb{o}`.
+    An oracle is an operator :math:`U_{\Omega}` for an obstacle's region
+    :math:`\Omega` such that, in the amplitude-based encoding,
+    :math:`U_\Omega\ket{x}\ket{v}\ket{0}_\mathbb{o} = \ket{x}\ket{v}\ket{x \in \Omega}_\mathbb{o}`.
     Intuitively, the operator flips the object ancilla qubit if and only if the position :math:`x`
     falls within the bounds of the object.
 
-    Currently, the only available implementation is for 2D axis-aligned objects.
+    Currently, the only available implementation is for 2D axis-aligned :class:`.Block`
+    and :class:`.YMonomial` objects.
 
     .. important::
 
@@ -160,16 +165,17 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
     This operation relies on basic arithmetic through the :class:`.ParameterizedDraperAdder` class
     and comparison operation through the :class:`Comparator` circuits.
 
-    Example usage:
+    Example usage for a cuboid :class:`.Block`:
 
-    .. code-block:: python
+    .. plot::
+        :include-source:
 
-        from qlbm.components.ab import ABZoneAgnosticReflectionOperator
+        from qlbm.components.ab.reflection import ABZoneAgnosticReflectionOracle
         from qlbm.lattice import ABLattice
 
         lattice = ABLattice(
             {
-                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
+                "lattice": {"dim": {"x": 4, "y": 16}, "velocities": "d2q9"},
                 "geometry": [
                     {
                         "shape": "cuboid",
@@ -181,7 +187,32 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
             }
         )
 
-        ABZoneAgnosticReflectionOperator(lattice, blocks=lattice.shapes["bounceback"]).draw("mpl")
+        ABZoneAgnosticReflectionOracle(lattice, shape=lattice.shapes["bounceback"][0]).draw("mpl")
+
+    And for a :class:`.YMonomial`:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab.reflection import ABZoneAgnosticReflectionOracle
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 16}, "velocities": "d2q9"},
+                "geometry": [
+                    {
+                        "shape": "ymonomial",
+                        "exponent": 2,
+                        "comparator": "<",
+                        "boundary": "bounceback",
+                    }
+                ],
+            }
+        )
+
+        ABZoneAgnosticReflectionOracle(lattice, shape=lattice.shapes["bounceback"][0]).draw("mpl")
+
 
     """
 
@@ -231,7 +262,7 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
             )
 
             circuit.compose(
-                Comparator(
+                SingleRegisterComparator(
                     num_qubits=len(self.lattice.grid_index(dim)) + 1,
                     num_to_compare=block.bounds[dim][1] - block.bounds[dim][0],
                     mode=ComparatorMode.LE,
@@ -248,7 +279,7 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
 
         for dim in range(self.lattice.num_dims):
             circuit.compose(
-                Comparator(
+                SingleRegisterComparator(
                     num_qubits=len(self.lattice.grid_index(dim)) + 1,
                     num_to_compare=block.bounds[dim][1] - block.bounds[dim][0],
                     mode=ComparatorMode.LE,
