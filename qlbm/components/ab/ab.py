@@ -74,19 +74,10 @@ class ABQLBM(LBMAlgorithm):
             inplace=True,
         )
 
-        for bc in ["bounceback", "specular"]:
-            if self.lattice.shapes[bc]:
-                if not all(
-                    isinstance(shape, Block)
-                    for shape in self.lattice.shapes["specular"]
-                ):
-                    raise LatticeException(
-                        f"All shapes with the {bc} boundary condition must be cuboids for the ABQLBM algorithm. "
-                    )
-
         circuit.compose(
             ABZoneAgnosticReflectionOperator(
                 self.lattice,
+                self.lattice.shape_list,
                 logger=self.logger,
             ).circuit,
             inplace=True,
