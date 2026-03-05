@@ -467,7 +467,7 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
                 state_setter_circ, qubits=self.lattice.marker_index(), inplace=True
             )
 
-        return circuit
+        return circuit.decompose(reps=2)
 
     @override
     def __str__(self) -> str:
