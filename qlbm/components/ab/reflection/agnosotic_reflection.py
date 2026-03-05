@@ -84,7 +84,7 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
 
         supported_shapes = ["cuboid", "ymonomial"]
 
-        if any([x.name() not in supported_shapes for x in self.shapes]):
+        if any([x.name() not in supported_shapes for x in self.shapes]):  # type: ignore
             raise CircuitException(
                 f"Agnostic reflection operator only supports the following shapes: {supported_shapes}."
             )
