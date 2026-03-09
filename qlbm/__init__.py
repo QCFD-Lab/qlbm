@@ -24,6 +24,5 @@ __all__ = [
     "CQLBM",
     "CircuitCompiler",
     "QiskitRunner",
-    "QulacsRunner",
     "AmplitudeResult",
 ]
