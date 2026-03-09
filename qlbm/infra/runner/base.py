@@ -2,29 +2,17 @@
 
 from abc import ABC, abstractmethod
 from logging import Logger, getLogger
-from typing import List, cast
+from typing import List
 
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit.circuit.library import Initialize
 from qiskit.quantum_info import Statevector
 from qiskit_aer import AerSimulator
 
-from qlbm.infra.reinitialize import (
-    Reinitializer,
-    SpaceTimeReinitializer,
-)
-from qlbm.infra.reinitialize.identity_reinitializer import IdentityReinitializer
-from qlbm.infra.result import (
-    AmplitudeResult,
-    LQLGAResult,
-    QBMResult,
-    SpaceTimeResult,
-)
-from qlbm.lattice import Lattice, MSLattice
-from qlbm.lattice.lattices.ab_lattice import ABLattice
-from qlbm.lattice.lattices.lqlga_lattice import LQLGALattice
-from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
-from qlbm.tools.exceptions import CircuitException, ResultsException
+from qlbm.infra.reinitialize.base import Reinitializer
+from qlbm.infra.result.base import QBMResult
+from qlbm.lattice import Lattice
+from qlbm.tools.exceptions import CircuitException
 
 from .simulation_config import SimulationConfig
 
@@ -107,6 +95,8 @@ class CircuitRunner(ABC):
         """
         Get a new result object for the current runner.
 
+        Delegates to the lattice's :meth:`.Lattice.create_result` factory method.
+
         Parameters
         ----------
         output_directory : str
@@ -118,62 +108,23 @@ class CircuitRunner(ABC):
         -------
         QBMResult
             An empty result object.
-
-        Raises
-        ------
-        ResultsException
-            If there is no matching result object for the runner's lattice.
         """
-        if isinstance(self.lattice, MSLattice) or isinstance(
-            self.lattice, ABLattice
-        ):
-            return AmplitudeResult(
-                self.lattice,  # type: ignore
-                output_directory,
-                output_file_name,
-            )
-        elif isinstance(self.lattice, SpaceTimeLattice):
-            return SpaceTimeResult(
-                cast(SpaceTimeLattice, self.lattice), output_directory, output_file_name
-            )
-        elif isinstance(self.lattice, LQLGALattice):
-            return LQLGAResult(
-                cast(LQLGALattice, self.lattice), output_directory, output_file_name
-            )
-        else:
-            raise ResultsException(f"Unsupported lattice: {self.lattice}.")
+        return self.lattice.create_result(output_directory, output_file_name)
 
     def new_reinitializer(self) -> Reinitializer:
         """
         Creates a new reinitializer for a simulated algorithm.
 
+        Delegates to the lattice's :meth:`.Lattice.create_reinitializer` factory method.
+
         Returns
         -------
         Reinitializer
             A suitable reinitializer.
-
-        Raises
-        ------
-        ResultsException
-            If the underlying algorithm does not support reinitialization.
         """
-        if (
-            isinstance(self.lattice, MSLattice)
-            or isinstance(self.lattice, LQLGALattice)
-            or isinstance(self.lattice, ABLattice)
-        ):
-            return IdentityReinitializer(
-                self.lattice,
-                self.config.get_execution_compiler(),
-                self.logger,
-            )
-        elif isinstance(self.lattice, SpaceTimeLattice):
-            return SpaceTimeReinitializer(
-                cast(SpaceTimeLattice, self.lattice),
-                self.config.get_execution_compiler(),
-            )
-        else:
-            raise ResultsException(f"Unsupported lattice: {self.lattice}.")
+        return self.lattice.create_reinitializer(
+            self.config.get_execution_compiler(), self.logger
+        )
 
     def statevector_to_circuit(self, statevector: Statevector) -> QiskitQC:
         """

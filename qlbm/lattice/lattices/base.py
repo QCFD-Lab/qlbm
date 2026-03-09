@@ -1,11 +1,19 @@
 """Base class for all algorithm-specific Lattices."""
 
+from __future__ import annotations
+
 import json
 from abc import ABC, abstractmethod
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
+from typing_extensions import override
+
+if TYPE_CHECKING:
+    from qlbm.infra.compiler import CircuitCompiler
+    from qlbm.infra.reinitialize.base import Reinitializer
+    from qlbm.infra.result.base import QBMResult
 
 from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
@@ -553,6 +561,48 @@ class Lattice(ABC):
         """
         pass
 
+    @abstractmethod
+    def create_result(self, output_directory: str, output_file_name: str) -> QBMResult:
+        """
+        Create the appropriate result object for this lattice type.
+
+        Parameters
+        ----------
+        output_directory : str
+            The directory where the result data will be stored.
+        output_file_name : str
+            The file name of the result data within the directory.
+
+        Returns
+        -------
+        QBMResult
+            A result object specific to this lattice type.
+        """
+        pass
+
+    @abstractmethod
+    def create_reinitializer(
+        self,
+        compiler: CircuitCompiler,
+        logger: Logger = getLogger("qlbm"),
+    ) -> Reinitializer:
+        """
+        Create the appropriate reinitializer for this lattice type.
+
+        Parameters
+        ----------
+        compiler : CircuitCompiler
+            The compiler that converts the novel initial conditions circuits.
+        logger : Logger, optional
+            The performance logger, by default ``getLogger("qlbm")``.
+
+        Returns
+        -------
+        Reinitializer
+            A reinitializer specific to this lattice type.
+        """
+        pass
+
 
 class AmplitudeLattice(Lattice, ABC):
     r"""
@@ -584,6 +634,24 @@ class AmplitudeLattice(Lattice, ABC):
         logger=getLogger("qlbm"),
     ):
         super(AmplitudeLattice, self).__init__(lattice_data, logger)
+
+    @override
+    def create_result(self, output_directory: str, output_file_name: str) -> QBMResult:
+        from qlbm.infra.result import AmplitudeResult
+
+        return AmplitudeResult(self, output_directory, output_file_name)
+
+    @override
+    def create_reinitializer(
+        self,
+        compiler: CircuitCompiler,
+        logger: Logger = getLogger("qlbm"),
+    ) -> Reinitializer:
+        from qlbm.infra.reinitialize.identity_reinitializer import (
+            IdentityReinitializer,
+        )
+
+        return IdentityReinitializer(self, compiler, logger)
 
     @abstractmethod
     def grid_index(self, dim: int | None = None) -> List[int]:
