@@ -8,9 +8,10 @@ from qiskit import QuantumCircuit
 from qiskit.circuit.library import RGQFTMultiplier
 from typing_extensions import override
 
+from qlbm.components.ab.reflection.common import ABReflectionPermutation
 from qlbm.components.ab.reflection.standard_reflection import ABReflectionOperator
 from qlbm.components.ab.streaming import ABStreamingOperator
-from qlbm.components.base import LBMPrimitive
+from qlbm.components.base import LBMOperator, LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
 from qlbm.components.common.comparators import (
     SingleRegisterComparator,
@@ -22,10 +23,10 @@ from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.lattice.spacetime.properties_base import LatticeDiscretization
 from qlbm.tools.exceptions import CircuitException, LatticeException
-from qlbm.tools.utils import ComparatorMode, flatten
+from qlbm.tools.utils import ComparatorMode, flatten, get_qubits_to_invert
 
 
-class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
+class ABZoneAgnosticReflectionOperator(LBMOperator):
     """
     Implements bounceback reflection in the amplitude-based encoding of :class:`.ABQLBM` for :math:`D_dQ_q` discretizations.
 
@@ -67,11 +68,11 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
         shapes: List[Shape] | None = None,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
-        super().__init__(lattice, [], logger)
+        super().__init__(lattice, logger)
 
         self.shapes = (
             (
-                cast(List[Block], flatten(list(self.lattice.geometries[0].values())))
+                flatten(list(self.lattice.geometries[0].values()))
                 if not self.lattice.has_multiple_geometries()
                 else [
                     gdict["bounceback"] + gdict["specular"]  # type: ignore
@@ -84,7 +85,15 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
 
         supported_shapes = ["cuboid", "ymonomial"]
 
-        if any([x.name() not in supported_shapes for x in self.shapes]):  # type: ignore
+        # For multi-geometry, self.shapes is a list of lists;
+        # for single geometry, it is a flat list.
+        all_shapes = (
+            flatten(self.shapes)
+            if self.lattice.has_multiple_geometries() and shapes is None
+            else self.shapes
+        )
+
+        if any([x.name() not in supported_shapes for x in all_shapes]):  # type: ignore
             raise CircuitException(
                 f"Agnostic reflection operator only supports the following shapes: {supported_shapes}."
             )
@@ -100,10 +109,27 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
     def create_circuit(self) -> QuantumCircuit:
         if self.lattice.discretization not in [LatticeDiscretization.D2Q9]:
             raise LatticeException("AB reflection only currently supported in D2Q9")
+
+        if not self.lattice.has_multiple_geometries():
+            return self.__create_circuit_single_geometry()
+        else:
+            return self.__create_circuit_multi_geometry()
+
+    def __create_circuit_single_geometry(self) -> QuantumCircuit:
+        r"""Create the zone-agnostic reflection circuit for a single geometry.
+
+        The circuit structure is:
+
+        .. math::
+
+            U = S \cdot O \cdot S^{-1} \cdot (Perm \cdot S)_{\text{ctrl}\ a_o} \cdot O
+
+        where :math:`O` is the oracle, :math:`S` is the streaming operator,
+        and :math:`Perm` is the velocity permutation.
+        """
         circuit = self.lattice.circuit.copy()
 
         oracle = self.lattice.circuit.copy()
-        # build the oracle once
         for shape in self.shapes:
             oracle.compose(
                 ABZoneAgnosticReflectionOracle(
@@ -112,24 +138,133 @@ class ABZoneAgnosticReflectionOperator(ABReflectionOperator):
                 inplace=True,
             )
 
-        # 2-3. oracle
         circuit.compose(oracle, inplace=True)
-
-        # 3-4. controlled permutation and stream
         circuit.compose(self.permute_and_stream(), inplace=True)
-
-        # 4-5. uncontrolled inverse stream
         circuit.compose(
             ABStreamingOperator(self.lattice, logger=self.logger).circuit.inverse(),
             inplace=True,
         )
-
-        # 5-6. oracle
         circuit.compose(oracle, inplace=True)
-
-        # 6-7. uncontrolled regular stream
         circuit.compose(
             ABStreamingOperator(self.lattice, logger=self.logger).circuit,
+            inplace=True,
+        )
+
+        return circuit
+
+    def __create_circuit_multi_geometry(self) -> QuantumCircuit:
+        r"""Create the zone-agnostic reflection circuit for multiple geometries.
+
+        For :math:`m` geometries, a combined oracle :math:`O_{\text{combined}}`
+        is built by applying each geometry's oracle :math:`O_c` controlled on
+        the marker register being in state :math:`\ket{c}`.
+        Since different marker states occupy orthogonal subspaces, the oracles
+        do not interfere and the obstacle ancilla is correctly set for each
+        geometry independently.
+
+        The circuit structure is:
+
+        .. math::
+
+            U = S \cdot O_\text{combined} \cdot S^{-1}
+                \cdot (Perm \cdot S)_{\text{ctrl}\ a_o}
+                \cdot O_\text{combined}
+
+        Only the oracle is controlled on the marker state; the permutation,
+        streaming, and inverse streaming are shared across all geometries.
+        The permutation and streaming are implicitly geometry-specific because
+        they are controlled on the obstacle ancilla, which the marker-controlled
+        oracle has already set correctly.
+        """
+        circuit = self.lattice.circuit.copy()
+
+        oracle = self.__build_combined_oracle()
+
+        circuit.compose(oracle, inplace=True)
+        circuit.compose(self.permute_and_stream(), inplace=True)
+        circuit.compose(
+            ABStreamingOperator(self.lattice, logger=self.logger).circuit.inverse(),
+            inplace=True,
+        )
+        circuit.compose(oracle, inplace=True)
+        circuit.compose(
+            ABStreamingOperator(self.lattice, logger=self.logger).circuit,
+            inplace=True,
+        )
+
+        return circuit
+
+    def __build_combined_oracle(self) -> QuantumCircuit:
+        r"""Build the combined oracle for all geometries.
+
+        For each geometry index :math:`c`, the marker register qubits are
+        flipped so that geometry :math:`c` maps to the all-ones state.
+        The oracle for that geometry is then applied with its central MCX gate
+        additionally controlled on the marker register.
+        Finally, the marker qubits are unflipped to restore the original state.
+
+        Returns
+        -------
+        QuantumCircuit
+            The combined oracle circuit.
+        """
+        oracle = self.lattice.circuit.copy()
+
+        for c, shapes_for_geometry in enumerate(self.shapes):
+            qubits_to_invert = [
+                q + self.lattice.marker_index()[0]
+                for q in get_qubits_to_invert(c, self.lattice.num_marker_qubits)
+            ]
+
+            if qubits_to_invert:
+                oracle.x(qubits_to_invert)
+
+            for shape in shapes_for_geometry:
+                oracle.compose(
+                    ABZoneAgnosticReflectionOracle(
+                        self.lattice,  # type: ignore[arg-type]
+                        shape,
+                        control_on_marker_state=True,
+                        logger=self.logger,
+                    ).circuit,
+                    inplace=True,
+                )
+
+            if qubits_to_invert:
+                oracle.x(qubits_to_invert)
+
+        return oracle
+
+    def permute_and_stream(self) -> QuantumCircuit:
+        """
+        Performs the permutation of basis states that implements bounceback reflection in the amplitude-based encoding.
+
+        Returns
+        -------
+        QuantumCircuit
+            The permutation acting on only the velocity register.
+        """
+        circuit = self.lattice.circuit.copy()
+
+        # Permute the velocities according to reflection rules
+        circuit.compose(
+            ABReflectionPermutation(
+                self.lattice.num_velocity_qubits,
+                self.lattice.discretization,
+                self.lattice.get_encoding(),
+                self.logger,
+            )
+            .circuit.control(1)
+            .decompose(),
+            qubits=self.lattice.ancillae_obstacle_index()
+            + self.lattice.velocity_index(),
+            inplace=True,
+        )
+
+        circuit.compose(
+            ABStreamingOperator(
+                self.lattice, self.lattice.ancillae_obstacle_index(), self.logger
+            ).circuit,
             inplace=True,
         )
 
@@ -164,6 +299,20 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
     the methods described in :cite:`collisionless`.
     This operation relies on basic arithmetic through the :class:`.ParameterizedDraperAdder` class
     and comparison operation through the :class:`Comparator` circuits.
+
+    When ``control_on_marker_state`` is ``True``, the oracle additionally conditions
+    the obstacle ancilla flip on the marker register being in the all-ones state.
+    This is used for parallel boundary conditions where multiple geometries
+    are simulated on the same lattice, each identified by a marker state.
+    Only the central MCX gate (for cuboids) is controlled on the marker,
+    since the surrounding adder and comparator operations are self-inverse
+    and their net effect on the grid register is zero.
+
+    .. important::
+
+        Marker-controlled oracles for :class:`.YMonomial` shapes are not yet supported.
+        Passing ``control_on_marker_state=True`` with a ``YMonomial`` shape will raise
+        a :class:`.CircuitException`.
 
     Example usage for a cuboid :class:`.Block`:
 
@@ -218,16 +367,21 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
 
     lattice: ABLattice
 
+    control_on_marker_state: bool
+    """Whether the oracle is additionally controlled on the marker register."""
+
     def __init__(
         self,
         lattice: ABLattice,
         shape: Shape,
+        control_on_marker_state: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
 
         self.lattice = lattice
         self.shape = shape
+        self.control_on_marker_state = control_on_marker_state
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -243,6 +397,11 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
         elif isinstance(self.shape, Circle):
             return self.__create_circuit_circle()
         elif isinstance(self.shape, YMonomial):
+            if self.control_on_marker_state:
+                raise CircuitException(
+                    "Marker-controlled oracles for YMonomial shapes are not yet supported. "
+                    "Parallel boundary conditions with YMonomial geometries require a future extension."
+                )
             return self.__create_circuit_ymonomial()
 
     def __create_circuit_block(self) -> QuantumCircuit:
@@ -272,8 +431,15 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
                 inplace=True,
             )
 
+        control_qubits = self.lattice.ancillae_comparator_index(0)[
+            : self.lattice.num_dims
+        ]
+
+        if self.control_on_marker_state:
+            control_qubits = control_qubits + self.lattice.marker_index()
+
         circuit.mcx(
-            self.lattice.ancillae_comparator_index(0)[: self.lattice.num_dims],
+            control_qubits,
             self.lattice.ancillae_obstacle_index()[0],
         )
 

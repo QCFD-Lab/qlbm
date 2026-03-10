@@ -75,7 +75,7 @@ class ABQLBM(LBMAlgorithm):
         circuit.compose(
             ABZoneAgnosticReflectionOperator(
                 self.lattice,
-                self.lattice.shape_list,
+                None,
                 logger=self.logger,
             ).circuit,
             inplace=True,
