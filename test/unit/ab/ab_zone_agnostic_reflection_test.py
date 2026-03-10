@@ -253,7 +253,9 @@ class TestOracleWithMarkerControl:
             grid_qubits = lattice.grid_index()
             original_grid_probs = original_sv.probabilities(grid_qubits)
             after_grid_probs = after_sv.probabilities(grid_qubits)
-            np.testing.assert_allclose(original_grid_probs, after_grid_probs, atol=1e-10)
+            np.testing.assert_allclose(
+                original_grid_probs, after_grid_probs, atol=1e-10
+            )
 
     def test_ymonomial_raises_with_marker_control(self):
         """YMonomial oracle should raise when control_on_marker_state=True."""
@@ -275,9 +277,7 @@ class TestOracleWithMarkerControl:
         shape = lattice.shapes["bounceback"][0]
 
         with pytest.raises(CircuitException, match="Marker-controlled oracles"):
-            ABZoneAgnosticReflectionOracle(
-                lattice, shape, control_on_marker_state=True
-            )
+            ABZoneAgnosticReflectionOracle(lattice, shape, control_on_marker_state=True)
 
 
 # =============================================================================
@@ -299,7 +299,7 @@ class TestCombinedOracle:
         operator = ABZoneAgnosticReflectionOperator(lattice)
 
         # Access the combined oracle through the private method
-        oracle = operator._ABZoneAgnosticReflectionOperator__build_combined_oracle()
+        oracle = operator.build_combined_oracle()
 
         # Position (1, 1) is inside geometry 0 ([1,2]x[1,2]) but also inside geometry 1 ([0,1]x[0,1])
         # With marker=0, only geometry 0's oracle fires
@@ -315,7 +315,7 @@ class TestCombinedOracle:
         lattice = _make_multi_geometry_lattice()
         operator = ABZoneAgnosticReflectionOperator(lattice)
 
-        oracle = operator._ABZoneAgnosticReflectionOperator__build_combined_oracle()
+        oracle = operator.build_combined_oracle()
 
         # Position (0, 0) is inside geometry 1 ([0,1]x[0,1]) but NOT inside geometry 0
         # With marker=1, geometry 1's oracle fires
@@ -331,7 +331,7 @@ class TestCombinedOracle:
         lattice = _make_multi_geometry_lattice()
         operator = ABZoneAgnosticReflectionOperator(lattice)
 
-        oracle = operator._ABZoneAgnosticReflectionOperator__build_combined_oracle()
+        oracle = operator.build_combined_oracle()
 
         # Position (0, 0) is inside geometry 1 but NOT geometry 0
         # With marker=0, geometry 0's oracle fires but position is outside geo 0
@@ -347,7 +347,7 @@ class TestCombinedOracle:
         lattice = _make_multi_geometry_lattice()
         operator = ABZoneAgnosticReflectionOperator(lattice)
 
-        oracle = operator._ABZoneAgnosticReflectionOperator__build_combined_oracle()
+        oracle = operator.build_combined_oracle()
 
         # Position (3, 3) is outside both geometry 0 ([1,2]x[1,2]) and geometry 1 ([0,1]x[0,1])
         for marker_val in [0, 1]:
@@ -365,7 +365,7 @@ class TestCombinedOracle:
         lattice = _make_multi_geometry_lattice()
         operator = ABZoneAgnosticReflectionOperator(lattice)
 
-        oracle = operator._ABZoneAgnosticReflectionOperator__build_combined_oracle()
+        oracle = operator.build_combined_oracle()
 
         for marker_val in [0, 1]:
             for x, y in [(1, 1), (0, 0), (3, 3)]:

@@ -14,6 +14,8 @@ After 1 algorithm step (collision + streaming + reflection):
   - Periodic wrapping applies at lattice boundaries
 """
 
+from typing import Dict
+
 import numpy as np
 import pytest
 
@@ -31,7 +33,7 @@ def _decode_lqlga_state(sv, num_gridpoints: int, num_velocities: int):
     """
     data = np.array(sv)
     nonzero = np.where(np.abs(data) > 1e-8)[0]
-    occupied = {}
+    occupied: Dict = {}
     for idx in nonzero:
         for gp in range(num_gridpoints):
             for v in range(num_velocities):

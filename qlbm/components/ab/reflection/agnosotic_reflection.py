@@ -9,7 +9,6 @@ from qiskit.circuit.library import RGQFTMultiplier
 from typing_extensions import override
 
 from qlbm.components.ab.reflection.common import ABReflectionPermutation
-from qlbm.components.ab.reflection.standard_reflection import ABReflectionOperator
 from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMOperator, LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
@@ -178,7 +177,7 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
         """
         circuit = self.lattice.circuit.copy()
 
-        oracle = self.__build_combined_oracle()
+        oracle = self.build_combined_oracle()
 
         circuit.compose(oracle, inplace=True)
         circuit.compose(self.permute_and_stream(), inplace=True)
@@ -194,7 +193,7 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
 
         return circuit
 
-    def __build_combined_oracle(self) -> QuantumCircuit:
+    def build_combined_oracle(self) -> QuantumCircuit:
         r"""Build the combined oracle for all geometries.
 
         For each geometry index :math:`c`, the marker register qubits are
