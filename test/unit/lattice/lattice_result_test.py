@@ -97,10 +97,6 @@ def temp_dir():
     shutil.rmtree(d)
 
 
-# ========================
-# create_result tests
-# ========================
-
 
 class TestCreateResult:
     """Tests for the create_result factory method across all lattice types."""
