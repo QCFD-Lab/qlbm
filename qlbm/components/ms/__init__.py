@@ -6,35 +6,25 @@ from .bounceback_reflection import (
 )
 from .msqlbm import MSQLBM
 from .primitives import (
-    Comparator,
-    ComparatorMode,
     EdgeComparator,
     GridMeasurement,
     MSInitialConditions,
     MSInitialConditions3DSlim,
-    SpeedSensitiveAdder,
 )
 from .specular_reflection import SpecularReflectionOperator, SpecularWallComparator
 from .streaming import (
     ControlledIncrementer,
     MSStreamingOperator,
-    PhaseShift,
-    SpeedSensitivePhaseShift,
     StreamingAncillaPreparation,
 )
 
 __all__ = [
-    "ComparatorMode",
-    "Comparator",
-    "SpeedSensitiveAdder",
     "StreamingAncillaPreparation",
     "ControlledIncrementer",
     "GridMeasurement",
     "EdgeComparator",
     "MSInitialConditions",
     "MSInitialConditions3DSlim",
-    "PhaseShift",
-    "SpeedSensitivePhaseShift",
     "MSStreamingOperator",
     "SpecularReflectionOperator",
     "SpecularWallComparator",

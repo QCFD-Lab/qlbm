@@ -93,6 +93,9 @@ The :class:`.SpaceTimeQLBM` algorithm on makes use of the following:
 .. autoclass:: qlbm.lattice.geometry.Circle
     :members:
 
+.. autoclass:: qlbm.lattice.geometry.YMonomial
+    :members:
+
 .. autoclass:: qlbm.lattice.geometry.DimensionalReflectionData
 
 .. autoclass:: qlbm.lattice.geometry.ReflectionPoint

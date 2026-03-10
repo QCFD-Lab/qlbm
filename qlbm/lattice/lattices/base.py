@@ -1,22 +1,31 @@
 """Base class for all algorithm-specific Lattices."""
 
+from __future__ import annotations
+
 import json
 from abc import ABC, abstractmethod
 from logging import Logger, getLogger
-from typing import Dict, List, Tuple
+from typing import TYPE_CHECKING, Dict, List, Tuple
 
 from qiskit import QuantumCircuit, QuantumRegister
+from typing_extensions import override
+
+if TYPE_CHECKING:
+    from qlbm.infra.compiler import CircuitCompiler
+    from qlbm.infra.reinitialize.base import Reinitializer
+    from qlbm.infra.result.base import QBMResult
 
 from qlbm.components.ab.encodings import ABEncodingType
 from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.geometry.shapes.circle import Circle
+from qlbm.lattice.geometry.shapes.ymonomial import YMonomial
 from qlbm.lattice.spacetime.properties_base import (
     LatticeDiscretization,
     LatticeDiscretizationProperties,
 )
 from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import dimension_letter, flatten
+from qlbm.tools.utils import ComparatorMode, dimension_letter, flatten
 
 
 class Lattice(ABC):
@@ -257,13 +266,11 @@ class Lattice(ABC):
         # Set for access to the geometry parsing utilities
         self.num_dims = num_dimensions
 
-        grid_list: List[int] = [
+        self.num_gridpoints: List[int] = [
             # -1 because the bit_length() would "overshoot" for powers of 2
             lattice_dict["dim"][dimension_letter(dim)] - 1
             for dim in range(num_dimensions)
         ]
-
-        self.num_gridpoints = grid_list
 
         discretization: LatticeDiscretization = LatticeDiscretization.CFLDISCRETIZATION
         velocity_list: List[int] = []
@@ -311,7 +318,7 @@ class Lattice(ABC):
 
         if "geometry" not in input_dict:
             return (
-                grid_list,
+                self.num_gridpoints,
                 velocity_list,
                 {"specular": [], "bounceback": []},
                 discretization,
@@ -321,7 +328,7 @@ class Lattice(ABC):
 
         parsed_obstacles = self.parse_geometry_dict(geometry_list)
 
-        return grid_list, velocity_list, parsed_obstacles, discretization
+        return self.num_gridpoints, velocity_list, parsed_obstacles, discretization
 
     def parse_geometry_dict(self, geometry_list) -> Dict[str, List[Shape]]:
         """
@@ -356,9 +363,9 @@ class Lattice(ABC):
                     f"Obstacle {c + 1} specification includes no shape."
                 )
 
-            if obstacle_dict["shape"] not in ["cuboid", "sphere"]:
+            if obstacle_dict["shape"] not in ["cuboid", "sphere", "ymonomial"]:
                 raise LatticeException(
-                    f'Obstacle {c + 1} has unsupported shape "{obstacle_dict["shape"]}". Supported shapes are cuboid and sphere.'
+                    f'Obstacle {c + 1} has unsupported shape "{obstacle_dict["shape"]}". Supported shapes are cuboid, sphere, and ymonomial.'
                 )
             # Parsing blocks
             if obstacle_dict["shape"] == "cuboid":
@@ -434,6 +441,50 @@ class Lattice(ABC):
                         obstacle_dict["boundary"],  # type: ignore
                     )
                 )
+            elif obstacle_dict["shape"] == "ymonomial":
+                if self.num_dims != 2:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial is only supported for 2-dimensional lattices."
+                    )
+
+                if "exponent" not in obstacle_dict:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial obstacle does not specify an exponent."
+                    )
+
+                try:
+                    exponent = int(obstacle_dict["exponent"])
+                except (ValueError, TypeError):
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial exponent {obstacle_dict['exponent']} is not an integer."
+                    )
+
+                if exponent < 0:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial exponent {obstacle_dict['exponent']} must be non-negative."
+                    )
+
+                if "comparator" not in obstacle_dict:
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial obstacle does not specify a comparator."
+                    )
+
+                if not isinstance(obstacle_dict["comparator"], str):
+                    raise LatticeException(
+                        f"Obstacle {c + 1}: ymonomial comparator must be a string."
+                    )
+
+                parsed_obstacles[obstacle_dict["boundary"]].append(  # type: ignore
+                    YMonomial(
+                        [
+                            (self.num_gridpoints[numeric_dim_index]).bit_length()
+                            for numeric_dim_index in range(self.num_dims)
+                        ],
+                        obstacle_dict["boundary"],  # type: ignore
+                        exponent,
+                        ComparatorMode.from_string(obstacle_dict["comparator"]),
+                    )
+                )
 
         return parsed_obstacles
 
@@ -452,14 +503,16 @@ class Lattice(ABC):
                     dimension_letter(dim): self.num_gridpoints[dim] + 1
                     for dim in range(self.num_dims)
                 },
-                "velocities": {
-                    dimension_letter(dim): self.num_velocities[dim] + 1
-                    for dim in range(self.num_dims)
-                }
-                if self.discretization == LatticeDiscretization.CFLDISCRETIZATION
-                else LatticeDiscretizationProperties.string_representation[
-                    self.discretization
-                ],  # type: ignore
+                "velocities": (
+                    {
+                        dimension_letter(dim): self.num_velocities[dim] + 1
+                        for dim in range(self.num_dims)
+                    }
+                    if self.discretization == LatticeDiscretization.CFLDISCRETIZATION
+                    else LatticeDiscretizationProperties.string_representation[
+                        self.discretization
+                    ]
+                ),  # type: ignore
             },
         }
 
@@ -508,6 +561,48 @@ class Lattice(ABC):
         """
         pass
 
+    @abstractmethod
+    def create_result(self, output_directory: str, output_file_name: str) -> QBMResult:
+        """
+        Create the appropriate result object for this lattice type.
+
+        Parameters
+        ----------
+        output_directory : str
+            The directory where the result data will be stored.
+        output_file_name : str
+            The file name of the result data within the directory.
+
+        Returns
+        -------
+        QBMResult
+            A result object specific to this lattice type.
+        """
+        pass
+
+    @abstractmethod
+    def create_reinitializer(
+        self,
+        compiler: CircuitCompiler,
+        logger: Logger = getLogger("qlbm"),
+    ) -> Reinitializer:
+        """
+        Create the appropriate reinitializer for this lattice type.
+
+        Parameters
+        ----------
+        compiler : CircuitCompiler
+            The compiler that converts the novel initial conditions circuits.
+        logger : Logger, optional
+            The performance logger, by default ``getLogger("qlbm")``.
+
+        Returns
+        -------
+        Reinitializer
+            A reinitializer specific to this lattice type.
+        """
+        pass
+
 
 class AmplitudeLattice(Lattice, ABC):
     r"""
@@ -521,12 +616,42 @@ class AmplitudeLattice(Lattice, ABC):
     ``qlbm`` currently has 2 amplitude-based lattices: the :class:`.MSLattice` and :class:`.ABLattice` used in the :class:`.MSQLBM` and :class:`.ABQLBM`, respectively.
     """
 
+    num_base_qubits: int
+    """The number of qubits required to represent the lattice."""
+
+    num_ancilla_qubits: int
+    """The number of ancillary qubits used to perform the algorithm for, i.e., boundary conditions."""
+
+    num_marker_qubits: int
+    """The number of qubits used to identify geometries, if parallel lattices are being simulated."""
+
+    geometries: List[Dict[str, List[Shape]]]
+    """The list of geometries, if multiple geometries are simulated in parallel on this lattice."""
+
     def __init__(
         self,
         lattice_data,
         logger=getLogger("qlbm"),
     ):
         super(AmplitudeLattice, self).__init__(lattice_data, logger)
+
+    @override
+    def create_result(self, output_directory: str, output_file_name: str) -> QBMResult:
+        from qlbm.infra.result import AmplitudeResult
+
+        return AmplitudeResult(self, output_directory, output_file_name)
+
+    @override
+    def create_reinitializer(
+        self,
+        compiler: CircuitCompiler,
+        logger: Logger = getLogger("qlbm"),
+    ) -> Reinitializer:
+        from qlbm.infra.reinitialize.identity_reinitializer import (
+            IdentityReinitializer,
+        )
+
+        return IdentityReinitializer(self, compiler, logger)
 
     @abstractmethod
     def grid_index(self, dim: int | None = None) -> List[int]:
@@ -625,6 +750,32 @@ class AmplitudeLattice(Lattice, ABC):
         pass
 
     @abstractmethod
+    def marker_index(self) -> List[int]:
+        """
+        Get the indices of the qubits addressing the marker.
+
+        This is only useful if multiple lattice geometries are addressed simultaneously.
+
+        Returns
+        -------
+        List[int]
+            The absolute indices of the marker qubits.
+        """
+        pass
+
+    @abstractmethod
+    def accumulation_index(self) -> List[int]:
+        """
+        Get the indices of the qubits used for the accumulation register.
+
+        Returns
+        -------
+        List[int]
+            The absolute indices of the accumulation qubits.
+        """
+        pass
+
+    @abstractmethod
     def get_encoding(self) -> ABEncodingType:
         """
         Get the type of encoding this lattice implements.
@@ -634,4 +785,9 @@ class AmplitudeLattice(Lattice, ABC):
         ABEncodingType
             The encoding of this lattice.
         """
+        pass
+
+    @abstractmethod
+    def get_base_circuit(self) -> QuantumCircuit:
+        """Get the base quantum circuit, without any multi-geometry or accumulation qubits."""
         pass

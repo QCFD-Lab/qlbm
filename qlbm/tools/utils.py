@@ -1,9 +1,11 @@
 """General qlbm utilities."""
 
 import re
+from enum import Enum
 from math import pi
+from operator import ge, gt, le, lt
 from pathlib import Path
-from typing import List, Tuple
+from typing import Callable, List, Tuple
 
 import numpy as np
 from pytket.extensions.qiskit import qiskit_to_tk
@@ -12,6 +14,8 @@ from qiskit import QuantumCircuit as QiskitQC
 from qiskit.qasm2 import dumps
 from qulacs import QuantumCircuit as QulacsQC
 from qulacs.converter import convert_QASM_to_qulacs_circuit
+
+from qlbm.tools.exceptions import LatticeException
 
 
 def create_directory_and_parents(directory: str) -> None:
@@ -272,3 +276,86 @@ def get_qubits_to_invert(number_encoded: int, num_qubits: int) -> List[int]:
         The indices of the (qu)bits that have value 0.
     """
     return [i for i in range(num_qubits) if not bit_value(number_encoded, i)]
+
+
+class ComparatorMode(Enum):
+    r"""Enumerator for the modes of quantum comparator circuits.
+
+    The modes are as follows:
+
+    * (1, ``ComparatorMode.LT``, :math:`<`);
+    * (2, ``ComparatorMode.LE``, :math:`\leq`);
+    * (3, ``ComparatorMode.GT``, :math:`>`);
+    * (4, ``ComparatorMode.GE``, :math:`\geq`).
+    """
+
+    LT = (1,)
+    LE = (2,)
+    GT = (3,)
+    GE = (4,)
+
+    @classmethod
+    def from_string(cls, mode: str) -> "ComparatorMode":
+        """
+        Parses inequality strings to :class:`.ComparatorMode` objects.
+
+        Parameters
+        ----------
+        mode : str
+            One of ">=", ">", "<=", and "<".
+
+        Returns
+        -------
+        ComparatorMode
+            The :class:`ComparatorMode` representing the inequality
+        """
+        mode_map = {
+            "<": cls.LT,
+            "<=": cls.LE,
+            ">": cls.GT,
+            ">=": cls.GE,
+        }
+
+        normalized_mode = mode.strip()
+
+        try:
+            return mode_map[normalized_mode]
+        except KeyError as exc:
+            raise LatticeException(
+                f"Unsupported comparator mode '{mode}'. Expected one of: <, <=, >, >=."
+            ) from exc
+
+    def to_string(self) -> str:
+        """
+        Get the string representation of this object.
+
+        Returns
+        -------
+        str
+            One of "<", "<=", ">", ">=".
+        """
+        comparator_strings = {
+            ComparatorMode.LT: "<",
+            ComparatorMode.LE: "<=",
+            ComparatorMode.GT: ">",
+            ComparatorMode.GE: ">=",
+        }
+
+        return comparator_strings[self]
+
+    def to_operator(self) -> Callable[[int, int], bool]:
+        """
+        Get the Python comparison operator represented by this mode.
+
+        Returns
+        -------
+        Callable[[int, int], bool]
+            The function taking to integers and returning a boolean representing the comparison of the integers.
+        """
+        comparator_operations = {
+            ComparatorMode.LT: lt,
+            ComparatorMode.LE: le,
+            ComparatorMode.GT: gt,
+            ComparatorMode.GE: ge,
+        }
+        return comparator_operations[self]

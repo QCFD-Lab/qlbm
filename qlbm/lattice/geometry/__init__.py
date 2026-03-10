@@ -11,7 +11,7 @@ from .encodings import (
     SpaceTimePWReflectionData,
     SpaceTimeVolumetricReflectionData,
 )
-from .shapes import Block, Circle
+from .shapes import Block, Circle, YMonomial
 
 __all__ = [
     "DimensionalReflectionData",
@@ -25,4 +25,5 @@ __all__ = [
     "Circle",
     "LQLGAPointwiseReflectionData",
     "LQLGAReflectionData",
+    "YMonomial",
 ]

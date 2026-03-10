@@ -1,7 +1,7 @@
 """Contains custom exceptions for the QLBM package."""
 
 
-class LatticeException(BaseException):
+class LatticeException(Exception):
     """Exception raised when encountering invalid or misaligned lattice properties."""
 
     def __init__(self, message: str) -> None:
@@ -9,7 +9,7 @@ class LatticeException(BaseException):
         super().__init__(self.message)
 
 
-class ResultsException(BaseException):
+class ResultsException(Exception):
     """Exception raised during the processing of :class:`QBMResults` objects."""
 
     def __init__(self, message: str) -> None:
@@ -17,7 +17,7 @@ class ResultsException(BaseException):
         super().__init__(self.message)
 
 
-class CompilerException(BaseException):
+class CompilerException(Exception):
     """Exception raised when encountering a circuit compilation exception."""
 
     def __init__(self, message: str) -> None:
@@ -25,7 +25,7 @@ class CompilerException(BaseException):
         super().__init__(self.message)
 
 
-class CircuitException(BaseException):
+class CircuitException(Exception):
     """Exception raised when attempting to compile to an unsupported target."""
 
     def __init__(self, message: str) -> None:
@@ -33,7 +33,7 @@ class CircuitException(BaseException):
         super().__init__(self.message)
 
 
-class ExecutionException(BaseException):
+class ExecutionException(Exception):
     """Exception raised when attempting to execute circuits with mismatched properties."""
 
     def __init__(self, message: str) -> None:

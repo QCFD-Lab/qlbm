@@ -1,4 +1,4 @@
-"""Quantum circuits used for reflection in the :class:`ABQLBM` algorithm."""
+"""Reflection utilities for the :class:`.ABQLBM` algorithm; generalizations of :cite:`collisionless`."""
 
 from itertools import product
 from logging import Logger, getLogger
@@ -10,10 +10,12 @@ from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.ab.encodings import ABEncodingType
+from qlbm.components.ab.reflection.common import ABReflectionPermutation
 from qlbm.components.ab.streaming import ABStreamingOperator
-from qlbm.components.base import LBMOperator, LBMPrimitive
+from qlbm.components.base import LBMOperator
 from qlbm.components.ms.specular_reflection import SpecularWallComparator
 from qlbm.lattice.geometry.encodings.ms import ReflectionPoint
+from qlbm.lattice.geometry.shapes.base import Shape
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.base import AmplitudeLattice
@@ -57,12 +59,23 @@ class ABReflectionOperator(LBMOperator):
     def __init__(
         self,
         lattice: ABLattice,
-        blocks: List[Block],
+        shapes: List[Shape] | None = None,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
 
-        self.blocks = blocks
+        self.shapes = (
+            (
+                flatten(list(self.lattice.geometries[0].values()))
+                if not self.lattice.has_multiple_geometries()
+                else [
+                    gdict["bounceback"] + gdict["specular"]  # type: ignore
+                    for gdict in self.lattice.geometries  # type: ignore
+                ]
+            )
+            if shapes is None
+            else shapes
+        )
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -73,24 +86,57 @@ class ABReflectionOperator(LBMOperator):
 
     @override
     def create_circuit(self) -> QuantumCircuit:
+        if self.lattice.discretization not in [LatticeDiscretization.D2Q9]:
+            raise LatticeException("AB reflection only currently supported in D2Q9")
+
         if self.lattice.discretization == LatticeDiscretization.D2Q9:
-            return self.__create_circuit_d2q9()
+            if not self.lattice.has_multiple_geometries():
+                return self.__create_circuit_d2q9(
+                    self.shapes, control_on_marker_state=False
+                )
+            else:
+                circuit = self.lattice.circuit.copy()
+                for c, blocks in enumerate(self.shapes):
+                    # Prepare the /ket{1} state in the marker register
+                    qubits_to_invert = [
+                        q + self.lattice.marker_index()[0]
+                        for q in get_qubits_to_invert(c, self.lattice.num_marker_qubits)
+                    ]
 
-        raise LatticeException("AB reflection only currently supported in D2Q9")
+                    if qubits_to_invert:
+                        circuit.x(qubits_to_invert)
 
-    def __create_circuit_d2q9(self):
+                    circuit.compose(
+                        self.__create_circuit_d2q9(
+                            blocks, control_on_marker_state=True
+                        ),
+                        inplace=True,
+                    )
+
+                    if qubits_to_invert:
+                        circuit.x(qubits_to_invert)
+        return circuit
+
+    def __create_circuit_d2q9(self, blocks, control_on_marker_state: bool = False):
+        # Ignore accumulation and marker registers
         circuit = self.lattice.circuit.copy()
 
         # Mark populations inside the object
-        for block in self.blocks:
-            circuit.compose(self.set_inside_wall_ancilla_state(block), inplace=True)
+        for block in blocks:
+            circuit.compose(
+                self.set_inside_wall_ancilla_state(
+                    block, control_on_marker_state=control_on_marker_state
+                ),
+                inplace=True,
+            )
 
         circuit.compose(
             self.set_ancilla_of_point_state(
                 flatten(
-                    [[(p, None) for p in block.corners_inside] for block in self.blocks]
+                    [[(p, None) for p in block.corners_inside] for block in blocks]
                 ),
                 ignore_velocity_data=True,
+                control_on_marker_state=control_on_marker_state,
             ),
             inplace=True,
         )
@@ -99,13 +145,18 @@ class ABReflectionOperator(LBMOperator):
         circuit.compose(self.permute_and_stream(), inplace=True)
 
         # Reset the ancilla state of reflected populations
-        for block in self.blocks:
-            circuit.compose(self.reset_outside_wall_ancilla_state(block), inplace=True)
+        for block in blocks:
+            circuit.compose(
+                self.reset_outside_wall_ancilla_state(
+                    block, control_on_marker_state=control_on_marker_state
+                ),
+                inplace=True,
+            )
 
         # Re-reset near corner point ancillas
         point_data: List[Tuple[ReflectionPoint, List[int]]] = []
 
-        for block in self.blocks:
+        for block in blocks:
             for dim in range(self.lattice.num_dims):
                 for c, bounds in enumerate(
                     product(*[[False, True]] * self.lattice.num_dims)
@@ -132,13 +183,19 @@ class ABReflectionOperator(LBMOperator):
         # Re-reset the ancilla state of the populations that
         # Shouldn't have been flipped in the previous step
         circuit.compose(
-            self.set_ancilla_of_point_state(point_data, ignore_velocity_data=False),
+            self.set_ancilla_of_point_state(
+                point_data,
+                ignore_velocity_data=False,
+                control_on_marker_state=control_on_marker_state,
+            ),
             inplace=True,
         )
 
         return circuit
 
-    def set_inside_wall_ancilla_state(self, block: Block) -> QuantumCircuit:
+    def set_inside_wall_ancilla_state(
+        self, block: Block, control_on_marker_state: bool = False
+    ) -> QuantumCircuit:
         """
         Sets the state of the ancilla qubit for all the gridpoints lying inside the walls of the block.
 
@@ -179,6 +236,9 @@ class ABReflectionOperator(LBMOperator):
                     + self.lattice.ancillae_comparator_index()
                 )
 
+                if control_on_marker_state:
+                    control_qubits.extend(self.lattice.marker_index())
+
                 target_qubits = self.lattice.ancillae_obstacle_index(0)
 
                 circuit.compose(
@@ -198,7 +258,9 @@ class ABReflectionOperator(LBMOperator):
 
         return circuit
 
-    def reset_outside_wall_ancilla_state(self, block: Block) -> QuantumCircuit:
+    def reset_outside_wall_ancilla_state(
+        self, block: Block, control_on_marker_state: bool = False
+    ) -> QuantumCircuit:
         """
         Resets the state of the obstacle ancilla qubit for all the gridpoints that are directly adjacent to the object, but in the fluid domain.
 
@@ -258,6 +320,9 @@ class ABReflectionOperator(LBMOperator):
                                 + self.lattice.velocity_index()  # The reset step is additionally controlled on the velocity register
                             )
 
+                            if control_on_marker_state:
+                                control_qubits.extend(self.lattice.marker_index())
+
                             target_qubits = self.lattice.ancillae_obstacle_index(0)
 
                             circuit.compose(
@@ -283,6 +348,9 @@ class ABReflectionOperator(LBMOperator):
                                 ]
                             )
 
+                            if control_on_marker_state:
+                                control_qubits.extend(self.lattice.marker_index())
+
                             target_qubits = self.lattice.ancillae_obstacle_index(0)
 
                             circuit.compose(
@@ -304,13 +372,13 @@ class ABReflectionOperator(LBMOperator):
                     circuit.x(grid_qubit_indices_to_invert)
 
                 circuit.compose(comparator_circuit, inplace=True)
-
         return circuit
 
     def set_ancilla_of_point_state(
         self,
         points_data: List[Tuple[ReflectionPoint, List[int]]],
         ignore_velocity_data: bool,
+        control_on_marker_state: bool = False,
     ) -> QuantumCircuit:
         """
         Sets the state of the obstacle ancilla qubit of a given gridpoint, conditioned on the velocity profile.
@@ -358,14 +426,14 @@ class ABReflectionOperator(LBMOperator):
                         if velocity_qubit_indices_to_invert:
                             circuit.x(velocity_qubit_indices_to_invert)
 
-                        control_qubits = (
-                            self.lattice.grid_index()
-                            + (
-                                self.lattice.velocity_index()
-                                if not ignore_velocity_data
-                                else []
-                            )  # The reset step is additionally controlled on the velocity register
-                        )
+                        control_qubits = self.lattice.grid_index() + (
+                            self.lattice.velocity_index()
+                            if not ignore_velocity_data
+                            else []
+                        )  # The reset step is additionally controlled on the velocity register
+
+                        if control_on_marker_state:
+                            control_qubits.extend(self.lattice.marker_index())
 
                         target_qubits = self.lattice.ancillae_obstacle_index(0)
 
@@ -382,24 +450,29 @@ class ABReflectionOperator(LBMOperator):
                             circuit.x(velocity_qubit_indices_to_invert)
                 case ABEncodingType.OH:
                     if ignore_velocity_data:
+                        control_qubits = self.lattice.grid_index() + (
+                            self.lattice.marker_index()
+                            if control_on_marker_state
+                            else []
+                        )
                         circuit.compose(
                             MCMTGate(
                                 XGate(),
-                                len(self.lattice.grid_index()),
+                                len(control_qubits),
                                 len(self.lattice.ancillae_obstacle_index(0)),
                             ),
-                            qubits=self.lattice.grid_index()
+                            qubits=control_qubits
                             + self.lattice.ancillae_obstacle_index(0),
                             inplace=True,
                         )
                     else:
                         for v in velocities:
-                            control_qubits = (
-                                self.lattice.grid_index()
-                                + (
-                                    [self.lattice.velocity_index()[v]]
-                                )  # Only one velocity control
-                            )
+                            control_qubits = self.lattice.grid_index() + (
+                                [self.lattice.velocity_index()[v]]
+                            )  # Only one velocity control
+
+                            if control_on_marker_state:
+                                control_qubits.extend(self.lattice.marker_index())
 
                             target_qubits = self.lattice.ancillae_obstacle_index(0)
 
@@ -458,108 +531,4 @@ class ABReflectionOperator(LBMOperator):
 
     @override
     def __str__(self) -> str:
-        return f"[Operator ABStreaming with lattice {self.lattice}]"
-
-
-class ABReflectionPermutation(LBMPrimitive):
-    """
-    Permutes velocity state to implement reflection in the amplitude-based encoding for :math:`D_dQ_q` discretizations.
-
-    Example usage:
-
-    .. plot::
-        :include-source:
-
-        from qlbm.components.ab import ABEncodingType, ABReflectionPermutation
-        from qlbm.lattice import LatticeDiscretization
-
-        ABReflectionPermutation(4, LatticeDiscretization.D2Q9, ABEncodingType.AB).draw("mpl")
-
-    """
-
-    num_qubits: int
-    """
-    The number of qubits that encode the velocity state.
-    """
-
-    discretization: LatticeDiscretization
-    """
-    The lattice discretization the permutation adheres to.
-    """
-
-    encoding: ABEncodingType
-    """
-    The type of encoding to permute for.
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        discretization: LatticeDiscretization,
-        encoding: ABEncodingType,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-
-        self.num_qubits = num_qubits
-        self.discretization = discretization
-        self.encoding = encoding
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        if self.discretization == LatticeDiscretization.D2Q9:
-            return self.__create_circuit_d2q9()
-
-        raise LatticeException("AB reflection only currently supported in D2Q9")
-
-    def __create_circuit_d2q9(self):
-        circuit = QuantumCircuit(self.num_qubits)
-        match self.encoding:
-            case ABEncodingType.OH:
-                circuit.swap(1, 3)
-                circuit.swap(2, 4)
-                circuit.swap(5, 7)
-                circuit.swap(6, 8)
-
-            case ABEncodingType.AB:
-                # 1 <-> 3
-                circuit.x([0, 1])
-                circuit.mcx([0, 1, 3], 2)
-                circuit.x([0, 1])
-
-                # 2 <-> 4
-                circuit.x([0, 3])
-                circuit.cx(1, 2)
-                circuit.mcx([0, 2, 3], 1)
-                circuit.cx(1, 2)
-                circuit.x([0, 3])
-
-                # 5 <-> 7
-                circuit.x(0)
-                circuit.mcx([0, 1, 3], 2)
-                circuit.x(0)
-
-                # 6 <-> 8
-                circuit.cx(0, 1)
-                circuit.cx(0, 2)
-                circuit.x(3)
-                circuit.mcx([1, 2, 3], 0)
-                circuit.cx(0, 2)
-                circuit.cx(0, 1)
-                circuit.x(3)
-
-            case _:
-                raise LatticeException(f"Unsupported lattice encoding: {self.encoding}")
-
-        return circuit.reverse_bits() if self.encoding == ABEncodingType.AB else circuit
-
-    @override
-    def __str__(self) -> str:
-        return f"[Primitive ABReflectionPermutation with {self.num_qubits} qubits on {self.discretization}]"
+        return f"[Operator ABReflection with lattice {self.lattice}]"

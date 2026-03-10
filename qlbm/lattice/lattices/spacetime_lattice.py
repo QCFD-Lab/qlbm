@@ -471,5 +471,17 @@ class SpaceTimeLattice(Lattice):
 
 
     @override
+    def create_result(self, output_directory, output_file_name):
+        from qlbm.infra.result import SpaceTimeResult
+
+        return SpaceTimeResult(self, output_directory, output_file_name)
+
+    @override
+    def create_reinitializer(self, compiler, logger=getLogger("qlbm")):
+        from qlbm.infra.reinitialize import SpaceTimeReinitializer
+
+        return SpaceTimeReinitializer(self, compiler, logger)
+
+    @override
     def has_multiple_geometries(self):
         return False # multiple geometries unsupported for STQBM

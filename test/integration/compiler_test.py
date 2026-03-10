@@ -3,7 +3,6 @@ from itertools import product
 import pytest
 from qiskit import QuantumCircuit as QiskitQC
 from qiskit_aer import AerSimulator
-from qulacs import QuantumCircuit as QulacsQC
 
 from qlbm.components import MSStreamingOperator
 from qlbm.infra import (

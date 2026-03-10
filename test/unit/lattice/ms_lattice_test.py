@@ -399,7 +399,7 @@ def test_lattice_exception_unsupported_shape():
         )
 
     assert (
-        'Obstacle 1 has unsupported shape "cuboidz". Supported shapes are cuboid and sphere.'
+        'Obstacle 1 has unsupported shape "cuboidz". Supported shapes are cuboid, sphere, and ymonomial.'
         == str(excinfo.value)
     )
 

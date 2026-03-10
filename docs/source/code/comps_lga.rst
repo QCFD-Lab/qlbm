@@ -19,7 +19,7 @@ QLGA Circuits
         MSStreamingOperator,
         ControlledIncrementer,
         SpecularReflectionOperator,
-        SpeedSensitivePhaseShift,
+        ParameterizedPhaseShift,
     )
     from qlbm.lattice import MSLattice, LQLGALattice
     print("ok")

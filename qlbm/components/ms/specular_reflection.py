@@ -9,9 +9,8 @@ from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive, MSOperator
-from qlbm.components.ms.primitives import (
-    Comparator,
-    ComparatorMode,
+from qlbm.components.common.comparators import (
+    SingleRegisterComparator,
 )
 from qlbm.lattice import (
     MSLattice,
@@ -24,7 +23,7 @@ from qlbm.lattice.geometry.encodings.ms import (
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.base import AmplitudeLattice
 from qlbm.tools.exceptions import CircuitException
-from qlbm.tools.utils import flatten
+from qlbm.tools.utils import ComparatorMode, flatten
 
 from .primitives import EdgeComparator
 from .streaming import ControlledIncrementer
@@ -84,7 +83,7 @@ class SpecularWallComparator(LBMPrimitive):
         circuit = self.lattice.circuit.copy()
 
         lb_comparators = [
-            Comparator(
+            SingleRegisterComparator(
                 self.lattice.num_gridpoints[wall_alignment_dim].bit_length() + 1,
                 self.wall.lower_bounds[c],
                 ComparatorMode.GE,
@@ -94,7 +93,7 @@ class SpecularWallComparator(LBMPrimitive):
         ]
 
         ub_comparators = [
-            Comparator(
+            SingleRegisterComparator(
                 self.lattice.num_gridpoints[wall_alignment_dim].bit_length() + 1,
                 self.wall.upper_bounds[c],
                 ComparatorMode.LE,

@@ -6,12 +6,11 @@ from time import perf_counter_ns
 from qiskit import QuantumCircuit
 from typing_extensions import override
 
-from qlbm.components.ab.reflection import ABReflectionOperator
+from qlbm.components.ab.reflection import (
+    ABZoneAgnosticReflectionOperator,
+)
 from qlbm.components.base import LBMAlgorithm
-from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.ab_lattice import ABLattice
-from qlbm.tools.exceptions import LatticeException
-from qlbm.tools.utils import flatten
 
 from .streaming import ABStreamingOperator
 
@@ -73,20 +72,10 @@ class ABQLBM(LBMAlgorithm):
             inplace=True,
         )
 
-        for bc in ["bounceback", "specular"]:
-            if self.lattice.shapes[bc]:
-                if not all(
-                    isinstance(shape, Block)
-                    for shape in self.lattice.shapes["specular"]
-                ):
-                    raise LatticeException(
-                        f"All shapes with the {bc} boundary condition must be cuboids for the ABQLBM algorithm. "
-                    )
-
         circuit.compose(
-            ABReflectionOperator(
+            ABZoneAgnosticReflectionOperator(
                 self.lattice,
-                flatten(list(self.lattice.shapes.values())),  # type: ignore
+                None,
                 logger=self.logger,
             ).circuit,
             inplace=True,

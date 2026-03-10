@@ -13,7 +13,7 @@ Amplitude-Based Circuits
         MSStreamingOperator,
         ControlledIncrementer,
         SpecularReflectionOperator,
-        SpeedSensitivePhaseShift,
+        ParameterizedPhaseShift,
     )
     from qlbm.lattice import MSLattice
     print("ok")
@@ -75,6 +75,10 @@ Initial Conditions
 
 .. autoclass:: qlbm.components.ms.primitives.MSInitialConditions3DSlim
 
+.. autoclass:: qlbm.components.ab.initial.ABDiscreteUniformInitialConditions
+
+.. autoclass:: qlbm.components.ab.initial.ABParallelDiscreteUniformInitialConditions
+
 .. autoclass:: qlbm.components.ab.initial.ABInitialConditions
 
 .. _cqlbm_streaming:
@@ -87,10 +91,6 @@ Streaming
 .. autoclass:: qlbm.components.ms.streaming.StreamingAncillaPreparation
 
 .. autoclass:: qlbm.components.ms.streaming.ControlledIncrementer
-
-.. autoclass:: qlbm.components.ms.primitives.SpeedSensitiveAdder
-
-.. autoclass:: qlbm.components.ms.streaming.SpeedSensitivePhaseShift
 
 .. autoclass:: qlbm.components.ms.streaming.PhaseShift
 
@@ -113,11 +113,11 @@ Reflection
 
 .. autoclass:: qlbm.components.ms.primitives.EdgeComparator
 
-.. autoclass:: qlbm.components.ms.primitives.Comparator
-
-.. autoclass:: qlbm.components.ms.primitives.ComparatorMode
-
 .. autoclass:: qlbm.components.ab.reflection.ABReflectionOperator
+
+.. autoclass:: qlbm.components.ab.reflection.ABZoneAgnosticReflectionOperator 
+
+.. autoclass:: qlbm.components.ab.reflection.ABZoneAgnosticReflectionOracle
 
 .. _cqlbm_measurement:
 

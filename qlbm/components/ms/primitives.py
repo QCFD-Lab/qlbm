@@ -1,19 +1,18 @@
 """Primitives for the implementation of the Collisionless Quantum Lattice Boltzmann Method introduced in :cite:t:`collisionless`."""
 
-from enum import Enum
 from logging import Logger, getLogger
 from time import perf_counter_ns
 from typing import List
 
 from qiskit import ClassicalRegister, QuantumCircuit
-from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
-from qlbm.components.ms.streaming import SpeedSensitivePhaseShift
+from qlbm.components.common.comparators import SingleRegisterComparator
 from qlbm.lattice import MSLattice
 from qlbm.lattice.geometry.encodings.ms import ReflectionResetEdge
 from qlbm.tools import flatten
+from qlbm.tools.utils import ComparatorMode
 
 
 class GridMeasurement(LBMPrimitive):
@@ -268,194 +267,6 @@ class MSInitialConditions3DSlim(LBMPrimitive):
         return f"[Primitive InitialConditions with lattice {self.lattice}]"
 
 
-class ComparatorMode(Enum):
-    r"""Enumerator for the modes of quantum comparator circuits.
-
-    The modes are as follows:
-
-    * (1, ``ComparatorMode.LT``, :math:`<`);
-    * (2, ``ComparatorMode.LE``, :math:`\leq`);
-    * (3, ``ComparatorMode.GT``, :math:`>`);
-    * (4, ``ComparatorMode.GE``, :math:`\geq`).
-    """
-
-    LT = (1,)
-    LE = (2,)
-    GT = (3,)
-    GE = (4,)
-
-
-class SpeedSensitiveAdder(LBMPrimitive):
-    r"""A QFT-based incrementer used to perform streaming in the algorithms based on amplitude encodings.
-
-    Incrementation and decerementation are performed as rotations on grid qubits
-    that have been previously mapped to the Fourier basis.
-    This happens by nesting a :class:`.SpeedSensitivePhaseShift` primitive
-    between regular and inverse :math:`QFT`\ s.
-
-    ========================= ======================================================================
-    Attribute                  Summary
-    ========================= ======================================================================
-    :attr:`num_qubits`        Number of qubits of the circuit.
-    :attr:`speed`             The index of the speed to increment.
-    :attr:`positive`          Whether to increment the particles traveling at this speed in the positive (T) or negative (F) direction.
-    :attr:`logger`            The performance logger, by default getLogger("qlbm")
-    ========================= ======================================================================
-
-    Example usage:
-
-    .. plot::
-        :include-source:
-
-        from qlbm.components.ms import SpeedSensitiveAdder
-
-        SpeedSensitiveAdder(4, 1, True).draw("mpl")
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        speed: int,
-        positive: bool,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-        self.num_qubits = num_qubits
-        self.speed = speed
-        self.positive = positive
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        circuit = QuantumCircuit(self.num_qubits)
-
-        circuit.compose(QFT(self.num_qubits), inplace=True)
-        circuit.compose(
-            SpeedSensitivePhaseShift(
-                self.num_qubits,
-                self.speed,
-                self.positive,
-                logger=self.logger,
-            ).circuit,
-            inplace=True,
-        )
-        circuit.compose(QFT(self.num_qubits, inverse=True), inplace=True)
-
-        return circuit
-
-    @override
-    def __str__(self) -> str:
-        return f"[Primitive SimpleAdder on {self.num_qubits} qubits, on velocity {self.speed}, in direction {self.positive}]"
-
-
-class Comparator(LBMPrimitive):
-    """
-    Quantum comparator primitive that compares two a quantum state of ``num_qubits`` qubits and an integer ``num_to_compare`` with respect to a :class:`.ComparatorMode`.
-
-    ========================= ======================================================================
-    Attribute                  Summary
-    ========================= ======================================================================
-    :attr:`num_qubits`        Number of qubits encoding the integer to compare.
-    :attr:`num_to_compare`    The integer to compare against.
-    :attr:`mode`              The :class:`.ComparatorMode` used to compare the two numbers.
-    :attr:`logger`            The performance logger, by default getLogger("qlbm")
-    ========================= ======================================================================
-
-    Example usage:
-
-    .. plot::
-        :include-source:
-
-        from qlbm.components.ms import Comparator, ComparatorMode
-
-        # On a 5 qubit register, compare the number 3
-        Comparator(num_qubits=5,
-                   num_to_compare=3,
-                   mode=ComparatorMode.LT).draw("mpl")
-    """
-
-    def __init__(
-        self,
-        num_qubits: int,
-        num_to_compare: int,
-        mode: ComparatorMode,
-        logger: Logger = getLogger("qlbm"),
-    ) -> None:
-        super().__init__(logger)
-
-        self.num_qubits = num_qubits
-        self.num_to_compare = num_to_compare
-        self.mode = mode
-
-        self.logger.info(f"Creating circuit {str(self)}...")
-        circuit_creation_start_time = perf_counter_ns()
-        self.circuit = self.create_circuit()
-        self.logger.info(
-            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
-        )
-
-    @override
-    def create_circuit(self) -> QuantumCircuit:
-        return self.__create_circuit(self.num_qubits, self.num_to_compare, self.mode)
-
-    def __create_circuit(
-        self, num_qubits: int, num_to_compare: int, mode: ComparatorMode
-    ) -> QuantumCircuit:
-        circuit = QuantumCircuit(num_qubits)
-
-        match mode:
-            case ComparatorMode.LT:
-                circuit.compose(
-                    SpeedSensitiveAdder(
-                        num_qubits, num_to_compare, positive=False, logger=self.logger
-                    ).circuit,
-                    inplace=True,
-                )
-                circuit.compose(
-                    SpeedSensitiveAdder(
-                        num_qubits - 1,
-                        num_to_compare,
-                        positive=True,
-                        logger=self.logger,
-                    ).circuit,
-                    inplace=True,
-                    qubits=range(num_qubits - 1),
-                )
-                return circuit
-            case ComparatorMode.LE:
-                if num_to_compare == 2 ** (num_qubits - 1) - 1:
-                    return self.__create_circuit(num_qubits, 0, ComparatorMode.GE)
-
-                return self.__create_circuit(
-                    num_qubits, num_to_compare + 1, ComparatorMode.LT
-                )
-            case ComparatorMode.GT:
-                if num_to_compare == 2 ** (num_qubits - 1) - 1:
-                    return circuit
-                else:
-                    return self.__create_circuit(
-                        num_qubits, num_to_compare + 1, ComparatorMode.GE
-                    )
-            case ComparatorMode.GE:
-                circuit = self.__create_circuit(
-                    num_qubits, num_to_compare, ComparatorMode.LT
-                )
-                circuit.x(num_qubits - 1)
-                return circuit
-            case _:
-                raise ValueError("Invalid Comparator Mode")
-
-    @override
-    def __str__(self) -> str:
-        return f"[Primitive Comparator of {self.num_qubits} and {self.num_to_compare}, mode={self.mode}]"
-
-
 class EdgeComparator(LBMPrimitive):
     """
     A primitive used in the 3D collisionless :class:`SpecularReflectionOperator` and :class:`BounceBackReflectionOperator` described in :cite:t:`collisionless`.
@@ -506,13 +317,13 @@ class EdgeComparator(LBMPrimitive):
     @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
-        lb_comparator = Comparator(
+        lb_comparator = SingleRegisterComparator(
             self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
             self.edge.bounds_disconnected_dim[0],
             ComparatorMode.GE,
             logger=self.logger,
         ).circuit
-        ub_comparator = Comparator(
+        ub_comparator = SingleRegisterComparator(
             self.lattice.num_gridpoints[self.edge.dim_disconnected].bit_length() + 1,
             self.edge.bounds_disconnected_dim[1],
             ComparatorMode.LE,

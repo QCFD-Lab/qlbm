@@ -17,7 +17,40 @@ from qlbm.tools.utils import flatten, get_qubits_to_invert
 class Shape(ABC):
     """Base class for all geometrical shapes."""
 
+    num_grid_qubits: List[int]
+    """Number of grid-encoding qubits for each spatial dimension."""
+
+    boundary_condition: str
+    """Boundary condition mode associated with this shape."""
+
+    num_dims: int
+    """Number of spatial dimensions inferred from :attr:`num_grid_qubits`."""
+
+    previous_qubits: List[int]
+    """Cumulative per-dimension qubit offsets used for flattened indexing."""
+
     def __init__(self, num_grid_qubits: List[int], boundary_condition: str):
+        """
+        Initialize a geometrical shape base object.
+
+        Parameters
+        ----------
+        num_grid_qubits : List[int]
+            Number of grid-encoding qubits per dimension.
+        boundary_condition : str
+            Boundary condition mode associated with this shape.
+
+        Attributes
+        ----------
+        num_grid_qubits : List[int]
+            Number of grid-encoding qubits per dimension.
+        boundary_condition : str
+            Boundary condition mode associated with this shape.
+        num_dims : int
+            Number of spatial dimensions inferred from ``num_grid_qubits``.
+        previous_qubits : List[int]
+            Cumulative qubit offsets used to flatten dimension-local qubit indices.
+        """
         super().__init__()
 
         self.num_grid_qubits = num_grid_qubits
@@ -62,6 +95,18 @@ class Shape(ABC):
         -------
         Dict[str, List[int] | str]
             A dictionary representation of the bounds and boundary conditions of the shape.
+        """
+        pass
+
+    @abstractmethod
+    def name(self) -> str:
+        """
+        The name of the shape.
+
+        Returns
+        -------
+        str
+            The name of the shape.
         """
         pass
 
@@ -324,17 +369,5 @@ class SpaceTimeShape(Shape):
         -------
         List[SpaceTimeVolumetricReflectionData]
             The information encoding the reflections to be performed.
-        """
-        pass
-
-    @abstractmethod
-    def name(self) -> str:
-        """
-        The name of the shape.
-
-        Returns
-        -------
-        str
-            The name of the shape.
         """
         pass

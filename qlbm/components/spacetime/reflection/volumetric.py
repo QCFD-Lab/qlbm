@@ -8,11 +8,11 @@ from qiskit import QuantumCircuit
 from typing_extensions import override
 
 from qlbm.components.base import SpaceTimeOperator
-from qlbm.components.ms.primitives import Comparator, ComparatorMode
+from qlbm.components.common.comparators import SingleRegisterComparator
 from qlbm.lattice.geometry.shapes.block import Block
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
 from qlbm.tools.exceptions import CircuitException
-from qlbm.tools.utils import flatten
+from qlbm.tools.utils import ComparatorMode, flatten
 
 
 class VolumetricSpaceTimeReflectionOperator(SpaceTimeOperator):
@@ -100,7 +100,7 @@ class VolumetricSpaceTimeReflectionOperator(SpaceTimeOperator):
                     # Assemble the comparators only once
                     comparators = [
                         [
-                            Comparator(
+                            SingleRegisterComparator(
                                 self.lattice.properties.get_num_grid_qubits() + 1,
                                 pvb[0][bound],
                                 self.__adjusted_comparator_mode(bound),

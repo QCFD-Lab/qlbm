@@ -1,7 +1,7 @@
 """Implementation of the :class:`.Lattice` base specific to the 2D and 3D :class:`.LQLGA` algorithm."""
 
 from itertools import product
-from logging import getLogger
+from logging import Logger, getLogger
 from math import prod
 from typing import Dict, List, Tuple, cast, override
 
@@ -330,6 +330,24 @@ class LQLGALattice(Lattice):
             + line_index
             + self.num_velocities_per_point // 2,
         )
+
+    @override
+    def create_result(self, output_directory, output_file_name):
+        from qlbm.infra.result import LQLGAResult
+
+        return LQLGAResult(self, output_directory, output_file_name)
+
+    @override
+    def create_reinitializer(
+        self,
+        compiler,
+        logger: Logger = getLogger("qlbm"),
+    ):
+        from qlbm.infra.reinitialize.identity_reinitializer import (
+            IdentityReinitializer,
+        )
+
+        return IdentityReinitializer(self, compiler, logger)
 
     @override
     def logger_name(self) -> str:

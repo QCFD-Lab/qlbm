@@ -2,11 +2,15 @@
 
 from .ab import (
     ABQLBM,
+    ABDiscreteUniformInitialConditions,
     ABGridMeasurement,
     ABInitialConditions,
+    ABParallelDiscreteUniformInitialConditions,
     ABReflectionOperator,
     ABReflectionPermutation,
     ABStreamingOperator,
+    ABZoneAgnosticReflectionOperator,
+    ABZoneAgnosticReflectionOracle,
 )
 from .base import (
     LBMAlgorithm,
@@ -23,6 +27,8 @@ from .common import (
     EQCRedistribution,
     HammingWeightAdder,
 )
+from .common.adders import ParameterizedDraperAdder, ParameterizedPhaseShift, PhaseShift
+from .common.comparators import SingleRegisterComparator
 from .cqlbm import CQLBM
 from .lqlga import (
     LQLGA,
@@ -41,11 +47,8 @@ from .ms import (
     MSStreamingOperator,
     SpecularReflectionOperator,
 )
-from .ms.primitives import Comparator, ComparatorMode, SpeedSensitiveAdder
 from .ms.streaming import (
     ControlledIncrementer,
-    PhaseShift,
-    SpeedSensitivePhaseShift,
     StreamingAncillaPreparation,
 )
 
@@ -57,11 +60,10 @@ __all__ = [
     "MSOperator",
     "SpaceTimeOperator",
     "LBMAlgorithm",
-    "ComparatorMode",
-    "Comparator",
-    "SpeedSensitiveAdder",
+    "SingleRegisterComparator",
+    "ParameterizedDraperAdder",
     "PhaseShift",
-    "SpeedSensitivePhaseShift",
+    "ParameterizedPhaseShift",
     "EmptyPrimitive",
     "StreamingAncillaPreparation",
     "ControlledIncrementer",
@@ -89,4 +91,8 @@ __all__ = [
     "ABReflectionOperator",
     "ABReflectionPermutation",
     "ABStreamingOperator",
+    "ABDiscreteUniformInitialConditions",
+    "ABParallelDiscreteUniformInitialConditions",
+    "ABZoneAgnosticReflectionOperator",
+    "ABZoneAgnosticReflectionOracle",
 ]

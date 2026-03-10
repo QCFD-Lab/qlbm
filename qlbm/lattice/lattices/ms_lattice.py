@@ -384,6 +384,14 @@ class MSLattice(AmplitudeLattice):
 
         return [previous_qubits + dim]
 
+    @override
+    def marker_index(self):
+        raise LatticeException("Multiple geometries not yet supported for MSLattice.")
+
+    @override
+    def accumulation_index(self):
+        raise LatticeException("Accumulation not yet supported for MSLattice.")
+
     def get_registers(self) -> Tuple[List[QuantumRegister], ...]:
         """Generates the encoding-specific register required for the streaming step.
 
@@ -469,3 +477,18 @@ class MSLattice(AmplitudeLattice):
     @override
     def get_encoding(self):
         return ABEncodingType.MS
+
+    @override
+    def get_base_circuit(self):
+        return QuantumCircuit(
+            *flatten(
+                [
+                    self.ancilla_velocity_register,
+                    self.ancilla_object_register,
+                    self.ancilla_comparator_register,
+                    self.grid_registers,
+                    self.velocity_registers,
+                    self.velocity_dir_registers,
+                ]
+            )
+        )
