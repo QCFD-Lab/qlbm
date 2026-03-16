@@ -2,16 +2,20 @@
 
 from logging import Logger, getLogger
 from time import perf_counter_ns
-from typing import List, cast
+from typing import Dict, List, Tuple, cast
 
 from qiskit import QuantumCircuit
 from qiskit.circuit.library import RGQFTMultiplier
+from qiskit.synthesis import synth_qft_full as QFT
 from typing_extensions import override
 
-from qlbm.components.ab.reflection.common import ABReflectionPermutation
+from qlbm.components.ab.reflection.common import (
+    ABBounceBackReflectionPermutation,
+    ABSpecularReflectionPermutation,
+)
 from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMOperator, LBMPrimitive
-from qlbm.components.common.adders import ParameterizedDraperAdder
+from qlbm.components.common.adders import ParameterizedDraperAdder, PhaseShift
 from qlbm.components.common.comparators import (
     SingleRegisterComparator,
     TwoRegisterComparator,
@@ -59,7 +63,7 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
 
     """
 
-    lattice: AmplitudeLattice
+    lattice: ABLattice
 
     def __init__(
         self,
@@ -137,8 +141,18 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
                 inplace=True,
             )
 
+        # sr_oracle = self.lattice.circuit.copy()
+        # for shape in self.shapes:
+        #     sr_oracle.compose(
+        #         ABZoneAgnosticReflectionOracle(
+        #             self.lattice, shape, additional_control_qubits=self.lattice.velocity_index()[:2], logger=self.logger  # type: ignore
+        #         ).circuit,
+        #         inplace=True,
+        #     )
+
         circuit.compose(oracle, inplace=True)
-        circuit.compose(self.permute_and_stream(), inplace=True)
+        circuit.compose(self.permute_and_stream_specular(oracle), inplace=True)
+        # circuit.compose(self.permute_and_stream_bounceback(), inplace=True)
         circuit.compose(
             ABStreamingOperator(self.lattice, logger=self.logger).circuit.inverse(),
             inplace=True,
@@ -180,7 +194,7 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
         oracle = self.build_combined_oracle()
 
         circuit.compose(oracle, inplace=True)
-        circuit.compose(self.permute_and_stream(), inplace=True)
+        # circuit.compose(self.permute_and_stream(), inplace=True)
         circuit.compose(
             ABStreamingOperator(self.lattice, logger=self.logger).circuit.inverse(),
             inplace=True,
@@ -234,7 +248,110 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
 
         return oracle
 
-    def permute_and_stream(self) -> QuantumCircuit:
+    def permute_and_stream_specular(self, oracle: QuantumCircuit) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+
+        # Apply the SR check
+        circuit.compose(
+            ABZoneAgnosticSRCheck(
+                self.lattice,
+                self.lattice.discretization,
+                oracle,
+                reset=False,
+                logger=self.logger,
+            ).circuit,
+            inplace=True,
+        )
+
+        # Only the x component is reflected:
+        circuit.x(self.lattice.ancillae_obstacle_index(2))
+        circuit.compose(
+            ABSpecularReflectionPermutation(
+                self.lattice.num_velocity_qubits,
+                self.lattice.discretization,
+                self.lattice.get_encoding(),
+                (True, False),
+                self.logger,
+            )
+            .circuit.control(self.lattice.num_obstacle_qubits)
+            .decompose(),
+            qubits=self.lattice.ancillae_obstacle_index()
+            + self.lattice.velocity_index(),
+            inplace=True,
+        )
+        circuit.x(self.lattice.ancillae_obstacle_index(2))
+
+        # Only the y component is reflected:
+        circuit.x(self.lattice.ancillae_obstacle_index(1))
+        circuit.compose(
+            ABSpecularReflectionPermutation(
+                self.lattice.num_velocity_qubits,
+                self.lattice.discretization,
+                self.lattice.get_encoding(),
+                (False, True),
+                self.logger,
+            )
+            .circuit.control(self.lattice.num_obstacle_qubits)
+            .decompose(),
+            qubits=self.lattice.ancillae_obstacle_index()
+            + self.lattice.velocity_index(),
+            inplace=True,
+        )
+        circuit.x(self.lattice.ancillae_obstacle_index(1))
+
+        #  Both x and y components are reflected:
+        circuit.compose(
+            ABSpecularReflectionPermutation(
+                self.lattice.num_velocity_qubits,
+                self.lattice.discretization,
+                self.lattice.get_encoding(),
+                (True, True),
+                self.logger,
+            )
+            .circuit.control(self.lattice.num_obstacle_qubits)
+            .decompose(),
+            qubits=self.lattice.ancillae_obstacle_index()
+            + self.lattice.velocity_index(),
+            inplace=True,
+        )
+        circuit.x(self.lattice.ancillae_obstacle_index()[1:])
+        circuit.compose(
+            ABSpecularReflectionPermutation(
+                self.lattice.num_velocity_qubits,
+                self.lattice.discretization,
+                self.lattice.get_encoding(),
+                (True, True),
+                self.logger,
+            )
+            .circuit.control(self.lattice.num_obstacle_qubits)
+            .decompose(),
+            qubits=self.lattice.ancillae_obstacle_index()
+            + self.lattice.velocity_index(),
+            inplace=True,
+        )
+        circuit.x(self.lattice.ancillae_obstacle_index()[1:])
+
+        circuit.compose(
+            ABZoneAgnosticSRCheck(
+                self.lattice,
+                self.lattice.discretization,
+                oracle,
+                reset=True,
+                logger=self.logger,
+            ).circuit.inverse(),
+            inplace=True,
+        )
+
+        circuit.compose(
+            ABStreamingOperator(
+                self.lattice, self.lattice.ancillae_obstacle_index(0), self.logger
+            ).circuit,
+            inplace=True,
+        )
+
+        return circuit
+
+    def permute_and_stream_bounceback(self) -> QuantumCircuit:
         """
         Performs the permutation of basis states that implements bounceback reflection in the amplitude-based encoding.
 
@@ -247,7 +364,7 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
 
         # Permute the velocities according to reflection rules
         circuit.compose(
-            ABReflectionPermutation(
+            ABBounceBackReflectionPermutation(
                 self.lattice.num_velocity_qubits,
                 self.lattice.discretization,
                 self.lattice.get_encoding(),
@@ -255,14 +372,14 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
             )
             .circuit.control(1)
             .decompose(),
-            qubits=self.lattice.ancillae_obstacle_index()
+            qubits=self.lattice.ancillae_obstacle_index(0)
             + self.lattice.velocity_index(),
             inplace=True,
         )
 
         circuit.compose(
             ABStreamingOperator(
-                self.lattice, self.lattice.ancillae_obstacle_index(), self.logger
+                self.lattice, self.lattice.ancillae_obstacle_index(0), self.logger
             ).circuit,
             inplace=True,
         )
@@ -374,6 +491,7 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
         lattice: ABLattice,
         shape: Shape,
         control_on_marker_state: bool = False,
+        additional_control_qubits: List[int] = [],
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(logger)
@@ -381,6 +499,7 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
         self.lattice = lattice
         self.shape = shape
         self.control_on_marker_state = control_on_marker_state
+        self.additional_control_qubits = additional_control_qubits
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -430,9 +549,10 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
                 inplace=True,
             )
 
-        control_qubits = self.lattice.ancillae_comparator_index(0)[
-            : self.lattice.num_dims
-        ]
+        control_qubits = (
+            self.lattice.ancillae_comparator_index(0)[: self.lattice.num_dims]
+            + self.additional_control_qubits
+        )
 
         if self.control_on_marker_state:
             control_qubits = control_qubits + self.lattice.marker_index()
@@ -516,7 +636,7 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
             comparator_circuit,
             qubits=grid_y_qubits
             + result_qubits
-            + self.lattice.ancillae_obstacle_index(),
+            + self.lattice.ancillae_obstacle_index(0),
             inplace=True,
         )
 
@@ -536,3 +656,198 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
     @override
     def __str__(self) -> str:
         return f"[Primitive ABZoneAgnosticReflectionOracle with lattice {self.lattice}, shape={self.shape}]"
+
+
+class ABZoneAgnosticSRCheck(LBMPrimitive):
+    sr_velocities_to_unstream: Dict[
+        LatticeDiscretization, Dict[int, Tuple[bool, ...]]
+    ] = {
+        LatticeDiscretization.D2Q9: {
+            5: (True, True),
+            6: (False, True),
+            7: (False, False),
+            8: (True, False),
+        }
+    }
+
+    def __init__(
+        self,
+        lattice: ABLattice,
+        discretization: LatticeDiscretization,
+        oracle_circuit: QuantumCircuit,
+        reset: bool,
+        additional_control_qubit_indices: List[int] = [],
+        logger: Logger = getLogger("qlbm"),
+    ) -> None:
+        super().__init__(logger)
+
+        self.lattice = lattice
+        self.discretization = discretization
+        self.oracle_circuit = oracle_circuit
+        self.reset = reset
+        self.additional_control_qubit_indices = additional_control_qubit_indices
+
+        if discretization not in self.sr_velocities_to_unstream:
+            raise LatticeException(
+                f"Specular Reflection BCs not supported for {discretization}"
+            )
+
+        self.logger.info(f"Creating circuit {str(self)}...")
+        circuit_creation_start_time = perf_counter_ns()
+        self.circuit = self.create_circuit()
+        self.logger.info(
+            f"Creating circuit {str(self)} took {perf_counter_ns() - circuit_creation_start_time} (ns)"
+        )
+
+    @override
+    def create_circuit(self) -> QuantumCircuit:
+        circuit = self.lattice.circuit.copy()
+
+        for dim in range(self.lattice.num_dims):
+            # Unstream by applying one QFT and then specific controlled phases for all velocities
+            circuit.compose(
+                QFT(len(self.lattice.grid_index(dim))),
+                qubits=self.lattice.grid_index(dim),
+                inplace=True,
+            )
+            for velocity_to_unstream in self.sr_velocities_to_unstream[
+                self.discretization
+            ]:
+                positive = not self.sr_velocities_to_unstream[self.discretization][
+                    velocity_to_unstream
+                ][dim]
+                if self.reset:
+                    positive = not positive
+
+                velocity_inversion_qubits = [
+                    self.lattice.num_grid_qubits + q
+                    for q in get_qubits_to_invert(
+                        velocity_to_unstream, self.lattice.num_velocity_qubits
+                    )
+                ]
+                if velocity_inversion_qubits:
+                    circuit.x(velocity_inversion_qubits)
+
+                circuit.compose(
+                    PhaseShift(
+                        num_qubits=len(self.lattice.grid_index(dim)),
+                        positive=positive,
+                        logger=self.logger,
+                    )
+                    .circuit.control(
+                        self.lattice.num_velocity_qubits
+                        + len(self.additional_control_qubit_indices)
+                    )
+                    .decompose(),
+                    qubits=self.additional_control_qubit_indices
+                    + self.lattice.velocity_index()
+                    + self.lattice.grid_index(dim),
+                    inplace=True,
+                )
+
+                if velocity_inversion_qubits:
+                    circuit.x(velocity_inversion_qubits)
+            # Finish streaming
+            circuit.compose(
+                QFT(len(self.lattice.grid_index(dim)), inverse=True),
+                qubits=self.lattice.grid_index(dim),
+                inplace=True,
+            )
+
+            # Apply oracle
+            # After the we un-streamed the velocities only in the dimension
+            # That we care about, we apply the oracle
+            # To check whether it was the streaming component
+            # In THAT dimension that took it into the obstacle
+            # First, we swap since the oracle acts on the 0th
+            # Obstacle index by default
+            circuit.swap(
+                self.lattice.ancillae_obstacle_index(0),
+                self.lattice.ancillae_obstacle_index(dim + 1),
+            )
+
+            # # Control to only apply the oracle to the diagonal velocities
+            # circuit.cx(
+            #     self.lattice.velocity_index()[0], self.lattice.velocity_index()[1]
+            # )
+            # circuit.x(self.lattice.velocity_index()[2:])
+            # circuit.mcx(
+            #     self.lattice.velocity_index()[1:], self.lattice.velocity_index()[0]
+            # )
+            # circuit.x(self.lattice.velocity_index()[2:])
+            # circuit.x(self.lattice.velocity_index()[0])
+            circuit.compose(self.oracle_circuit, inplace=True)
+            # We are now checking whether unstreaming
+            # Takes us out of the oracle
+            circuit.x(self.lattice.ancillae_obstacle_index(0))
+            # # Undo the permutation
+            # circuit.x(self.lattice.velocity_index()[0])
+            # circuit.x(self.lattice.velocity_index()[2:])
+            # circuit.mcx(
+            #     self.lattice.velocity_index()[1:], self.lattice.velocity_index()[0]
+            # )
+            # circuit.x(self.lattice.velocity_index()[2:])
+            # circuit.cx(
+            #     self.lattice.velocity_index()[0], self.lattice.velocity_index()[1]
+            # )
+
+            circuit.swap(
+                self.lattice.ancillae_obstacle_index(0),
+                self.lattice.ancillae_obstacle_index(dim + 1),
+            )
+
+            # Stream back
+            circuit.compose(
+                QFT(len(self.lattice.grid_index(dim))),
+                qubits=self.lattice.grid_index(dim),
+                inplace=True,
+            )
+            for velocity_to_unstream in self.sr_velocities_to_unstream[
+                self.discretization
+            ]:
+                positive = self.sr_velocities_to_unstream[self.discretization][
+                    velocity_to_unstream
+                ][dim]
+                if self.reset:
+                    positive = not positive
+
+                velocity_inversion_qubits = [
+                    self.lattice.num_grid_qubits + q
+                    for q in get_qubits_to_invert(
+                        velocity_to_unstream, self.lattice.num_velocity_qubits
+                    )
+                ]
+                if velocity_inversion_qubits:
+                    circuit.x(velocity_inversion_qubits)
+
+                circuit.compose(
+                    PhaseShift(
+                        num_qubits=len(self.lattice.grid_index(dim)),
+                        positive=positive,
+                        logger=self.logger,
+                    )
+                    .circuit.control(
+                        self.lattice.num_velocity_qubits
+                        + len(self.additional_control_qubit_indices)
+                    )
+                    .decompose(),
+                    qubits=self.additional_control_qubit_indices
+                    + self.lattice.velocity_index()
+                    + self.lattice.grid_index(dim),
+                    inplace=True,
+                )
+
+                if velocity_inversion_qubits:
+                    circuit.x(velocity_inversion_qubits)
+            # Finish streaming back
+            circuit.compose(
+                QFT(len(self.lattice.grid_index(dim)), inverse=True),
+                qubits=self.lattice.grid_index(dim),
+                inplace=True,
+            )
+
+        return circuit
+
+    @override
+    def __str__(self):
+        return f"[Primitive ABZoneAgnosticSRCheck with lattice {self.lattice}]"

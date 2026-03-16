@@ -10,7 +10,7 @@ from qiskit.circuit.library import MCMTGate, XGate
 from typing_extensions import override
 
 from qlbm.components.ab.encodings import ABEncodingType
-from qlbm.components.ab.reflection.common import ABReflectionPermutation
+from qlbm.components.ab.reflection.common import ABBounceBackReflectionPermutation
 from qlbm.components.ab.streaming import ABStreamingOperator
 from qlbm.components.base import LBMOperator
 from qlbm.components.ms.specular_reflection import SpecularWallComparator
@@ -507,7 +507,7 @@ class ABReflectionOperator(LBMOperator):
 
         # Permute the velocities according to reflection rules
         circuit.compose(
-            ABReflectionPermutation(
+            ABBounceBackReflectionPermutation(
                 self.lattice.num_velocity_qubits,
                 self.lattice.discretization,
                 self.lattice.get_encoding(),
