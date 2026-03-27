@@ -430,6 +430,7 @@ class ABLattice(AmplitudeLattice):
                     )
                     == len(geometry_shapes)
                     else self.num_dims
+                    + 2  # 1 qubit for the oracle, 2 for x and y separately and 1 for xy.
                 )
                 for geometry_shapes in self.__geometry_shape_lists()
             ]

@@ -9,8 +9,11 @@ from .initial import (
 )
 from .measurement import ABGridMeasurement
 from .reflection import (
+    ABBounceBackReflectionOperator,
+    ABBounceBackReflectionPermutation,
     ABReflectionOperator,
-    ABReflectionPermutation,
+    ABSpecularReflectionOperator,
+    ABSpecularReflectionPermutation,
     ABZoneAgnosticReflectionOperator,
     ABZoneAgnosticReflectionOracle,
 )
@@ -24,7 +27,10 @@ __all__ = [
     "ABInitialConditions",
     "ABGridMeasurement",
     "ABReflectionOperator",
-    "ABReflectionPermutation",
+    "ABBounceBackReflectionOperator",
+    "ABSpecularReflectionOperator",
+    "ABBounceBackReflectionPermutation",
+    "ABSpecularReflectionPermutation",
     "ABStreamingOperator",
     "ABEncodingType",
     "BinaryToOHPermutation",
