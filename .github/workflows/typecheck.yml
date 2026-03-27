@@ -18,7 +18,15 @@ jobs:
         with:
           python-version: 3.12.5
           architecture: x64
-          cache: "pip" # caching pip dependencies
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}
+          key: pip-typecheck-3.12.5-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            pip-typecheck-3.12.5-
       - name: Install mypy
         run: |
           pip install --upgrade pip

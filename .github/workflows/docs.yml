@@ -23,7 +23,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.12.5
-    
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pip
+            ${{ env.pythonLocation }}
+          key: pip-docs-3.12.5-${{ hashFiles('pyproject.toml') }}
+          restore-keys: |
+            pip-docs-3.12.5-
+
       - name: Install dependencies
         run: |
           sudo apt-get install -y -qq pandoc libglfw3-dev libgles2-mesa-dev
@@ -37,8 +47,8 @@ jobs:
         run: |
           make -C docs doctest
 
-      - name: Build docs
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      - name: Build Docs
+        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           sphinx-build docs/source _build
 
