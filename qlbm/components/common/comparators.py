@@ -10,7 +10,7 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
-from qlbm.tools.utils import ComparatorMode
+from qlbm.tools import ComparatorMode
 
 
 class TwoRegisterComparator(LBMPrimitive):
@@ -25,7 +25,7 @@ class TwoRegisterComparator(LBMPrimitive):
         :include-source:
 
         from qlbm.components.common.comparators import TwoRegisterComparator
-        from qlbm.tools.utils import ComparatorMode
+        from qlbm.tools import ComparatorMode
 
         # Compare two registers of size 4
         TwoRegisterComparator(num_qubits=4, mode=ComparatorMode.LT).draw("mpl")

@@ -164,26 +164,12 @@ class ABReflectionOperator(LBMOperator):
     r"""
     Implements reflection boundary conditions in the amplitude-based encoding of :class:`.ABQLBM` for :math:`D_dQ_q` discretizations.
 
-    This is the top-level entrypoint that delegates to
-    :class:`ABBounceBackReflectionOperator` and
-    :class:`ABSpecularReflectionOperator` based on the boundary condition
-    types present in the geometry.
-
-    Parameters
-    ----------
-    lattice : ABLattice
-        The lattice on which to build the reflection circuit.
-    shapes : Dict[str, List[Shape]] or None
-        A dictionary mapping boundary condition type (``"bounceback"``,
-        ``"specular"``) to lists of :class:`.Shape` objects. When
-        ``None``, the shapes are inferred from
-        ``lattice.geometries``.
-    logger : Logger
-        The performance logger.
+    This is the top-level entrypoint that delegates to :class:`ABBounceBackReflectionOperator` and :class:`ABSpecularReflectionOperator` based on the boundary condition types present in the geometry.
 
     Example usage:
 
-    .. code-block:: python
+    .. plot::
+        :include-source:
 
         from qlbm.components.ab import ABReflectionOperator
         from qlbm.lattice import ABLattice
@@ -202,7 +188,7 @@ class ABReflectionOperator(LBMOperator):
             }
         )
 
-        ABReflectionOperator(lattice)
+        ABReflectionOperator(lattice).draw("mpl")
 
     """
 
@@ -325,17 +311,6 @@ class ABBounceBackReflectionOperator(LBMOperator):
        outside wall comparators.
     5. **Corner corrections** -- Fix near-corner and outside-corner
        ancilla residuals.
-
-    Parameters
-    ----------
-    lattice : ABLattice
-        The lattice on which to build the reflection circuit.
-    blocks : List[Shape]
-        The list of bounce-back :class:`.Block` objects.
-    control_on_marker_state : bool
-        Whether to control all MCX gates on the marker register.
-    logger : Logger
-        The performance logger.
     """
 
     lattice: AmplitudeLattice
@@ -604,9 +579,7 @@ class ABBounceBackReflectionOperator(LBMOperator):
         """
         Perform the bounce-back velocity permutation followed by streaming.
 
-        The permutation reverses all velocity components. Streaming is
-        controlled on the obstacle ancilla so that only reflected
-        particles are moved.
+        The permutation reverses all velocity components.
 
         Returns
         -------
@@ -641,11 +614,6 @@ class ABBounceBackReflectionOperator(LBMOperator):
     @override
     def __str__(self) -> str:
         return f"[Operator ABBounceBackReflection with lattice {self.lattice}]"
-
-
-# =====================================================================
-# Specular reflection
-# =====================================================================
 
 
 class ABSpecularReflectionOperator(LBMOperator):
@@ -742,10 +710,6 @@ class ABSpecularReflectionOperator(LBMOperator):
 
         return circuit
 
-    # ------------------------------------------------------------------
-    # Phase 1: mark inner walls
-    # ------------------------------------------------------------------
-
     def _set_inside_wall_ancilla_per_dim(
         self, block: Block, dim: int
     ) -> QuantumCircuit:
@@ -807,10 +771,6 @@ class ABSpecularReflectionOperator(LBMOperator):
 
         return circuit
 
-    # ------------------------------------------------------------------
-    # Phase 1b: correct inner corner ancillae
-    # ------------------------------------------------------------------
-
     def _correct_inner_corner_ancillae(self) -> QuantumCircuit:
         """Unset per-dimension ancillae at inner corners for non-entering velocities.
 
@@ -862,10 +822,6 @@ class ABSpecularReflectionOperator(LBMOperator):
 
         return circuit
 
-    # ------------------------------------------------------------------
-    # Phase 2: specular permutations
-    # ------------------------------------------------------------------
-
     def _specular_permutations(self) -> QuantumCircuit:
         """Apply per-dimension specular velocity permutations.
 
@@ -898,10 +854,6 @@ class ABSpecularReflectionOperator(LBMOperator):
             )
 
         return circuit
-
-    # ------------------------------------------------------------------
-    # Phase 3: dimension-selective streaming
-    # ------------------------------------------------------------------
 
     def _dim_selective_stream(self) -> QuantumCircuit:
         r"""Stream reflected particles back, one spatial dimension at a time.
@@ -988,27 +940,9 @@ class ABSpecularReflectionOperator(LBMOperator):
 
         return circuit
 
-    # ------------------------------------------------------------------
-    # Phase 4: reset outer walls
-    # ------------------------------------------------------------------
-
     def _reset_outside_wall_ancilla_per_dim(
         self, block: Block, dim: int
     ) -> QuantumCircuit:
-        """Reset ``ancilla[dim]`` using the outside-wall comparators.
-
-        Parameters
-        ----------
-        block : Block
-            The obstacle.
-        dim : int
-            The spatial dimension whose outside walls to process.
-
-        Returns
-        -------
-        QuantumCircuit
-            Sub-circuit that resets the outside walls of *dim*.
-        """
         circuit = self.lattice.circuit.copy()
 
         for bound, wall in enumerate(block.walls_outside[dim]):
@@ -1068,35 +1002,7 @@ class ABSpecularReflectionOperator(LBMOperator):
 
         return circuit
 
-    # ------------------------------------------------------------------
-    # Phase 5: corner corrections
-    # ------------------------------------------------------------------
-
     def _corner_corrections(self) -> QuantumCircuit:
-        """Correct obstacle ancilla residuals at near-corner and outside-corner points.
-
-        Two sub-steps:
-
-        1. **Same-dimension near-corner** -- The outside-wall reset
-           overshoots at near-corner points for one diagonal velocity
-           per point. This is identical to the bounce-back correction.
-        2. **Outside corners** -- Diagonal velocities at inner corners
-           end up at the outside corner with both ancillae still set.
-           Both must be toggled.
-
-        .. note::
-
-           A previous third sub-step (cross-dimension near-corner) was
-           removed because Phase 1b now prevents the root cause: per-
-           dimension ancillae at inner corners are only set for
-           velocities that actually enter through the corresponding
-           wall.
-
-        Returns
-        -------
-        QuantumCircuit
-            Sub-circuit with all corner corrections.
-        """
         circuit = self.lattice.circuit.copy()
 
         for block in self.blocks:

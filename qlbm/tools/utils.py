@@ -15,7 +15,7 @@ from qiskit.qasm2 import dumps
 from qulacs import QuantumCircuit as QulacsQC
 from qulacs.converter import convert_QASM_to_qulacs_circuit
 
-from qlbm.tools.exceptions import LatticeException
+from ..tools.exceptions import LatticeException
 
 
 def create_directory_and_parents(directory: str) -> None:

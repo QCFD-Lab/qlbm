@@ -58,7 +58,7 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
             }
         )
 
-        ABZoneAgnosticReflectionOperator(lattice, shapes=lattice.shapes["bounceback"]).draw("mpl")
+        ABZoneAgnosticReflectionOperator(lattice).draw("mpl")
 
     """
 
@@ -829,18 +829,30 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
     ``ancillae_obstacle_index(dim + 1)`` directly, avoiding the need for
     swap-based ancilla management.
 
-    Parameters
-    ----------
-    lattice : ABLattice
-        The lattice defining the register layout.
-    discretization : LatticeDiscretization
-        The velocity discretization (must be D2Q9).
-    shapes : List[Shape]
-        The obstacle shapes, used to construct per-dimension oracles.
-    additional_control_qubit_indices : List[int]
-        Optional additional control qubits for the streaming phase shifts.
-    logger : Logger
-        Logger instance.
+    Example usage:
+
+    .. plot::
+        :include-source:
+
+        from qlbm.components.ab.reflection.agnosotic_reflection import ABZoneAgnosticSRCheck
+        from qlbm.lattice import ABLattice
+
+        lattice = ABLattice(
+            {
+                "lattice": {"dim": {"x": 4, "y": 4}, "velocities": "d2q9"},
+                "geometry": [
+                    {
+                        "shape": "cuboid",
+                        "x": [1, 3],
+                        "y": [1, 3],
+                        "boundary": "specular",
+                    }
+                ],
+            }
+        )
+
+        ABZoneAgnosticSRCheck(lattice, lattice.discretization, lattice.shapes["specular"]).draw("mpl")
+
     """
 
     sr_velocities_to_unstream: Dict[

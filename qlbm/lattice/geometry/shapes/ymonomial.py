@@ -6,7 +6,7 @@ from typing import Dict, List, override
 import numpy as np
 from stl import mesh
 
-from qlbm.tools.utils import ComparatorMode
+from qlbm.tools import ComparatorMode
 
 from .base import Shape
 
