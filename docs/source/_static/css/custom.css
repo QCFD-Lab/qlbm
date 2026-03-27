@@ -3,16 +3,40 @@
   }
 
 .bd-page-width {
-    max-width: 80%;  /* default is 88rem */
+  max-width: 92%;
   }
 
 .sphinxsidebarwrapper {  overflow-y: scroll; }
 
 .bd-sidebar-primary {
-  max-width: 230px
+  max-width: 190px;
+}
+
+html {
+  --pst-sidebar-secondary: 13rem;
+}
+
+@media (min-width: 960px) {
+  .bd-sidebar-primary {
+    width: 18%;
+    min-width: 160px;
+    max-width: 190px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .bd-sidebar-secondary {
+    width: var(--pst-sidebar-secondary);
+  }
 }
 
 table.center-align-col {
     margin-left: auto;
     margin-right: auto;
+}
+
+table.center-align-col th,
+table.center-align-col td {
+  text-align: center;
+  vertical-align: middle;
 }
