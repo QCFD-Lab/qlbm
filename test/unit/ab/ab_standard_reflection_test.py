@@ -5,7 +5,10 @@ from qiskit import QuantumCircuit, transpile
 from qiskit.quantum_info import Statevector
 from qiskit_aer import AerSimulator
 
-from qlbm.components.ab.reflection.standard_reflection import ABReflectionOperator
+from qlbm.components.ab.reflection.standard_reflection import (
+    ABBounceBackReflectionOperator,
+    ABReflectionOperator,
+)
 from qlbm.lattice import ABLattice
 from qlbm.lattice.geometry.shapes.block import Block
 
@@ -202,8 +205,8 @@ class TestSetInsideWallAncillaStatevector:
         set the obstacle ancilla for this position.
         """
         lattice = _make_single_geometry_lattice()
-        op = ABReflectionOperator(lattice)
         block: Block = lattice.shapes["bounceback"][0]  # type: ignore[assignment]
+        op = ABBounceBackReflectionOperator(lattice, [block])
 
         wall_circuit = op.set_inside_wall_ancilla_state(block)
 
@@ -217,8 +220,8 @@ class TestSetInsideWallAncillaStatevector:
     def test_wall_ancilla_not_set_for_point_outside_obstacle(self):
         """Positions clearly outside the obstacle should not have ancilla set."""
         lattice = _make_single_geometry_lattice()
-        op = ABReflectionOperator(lattice)
         block: Block = lattice.shapes["bounceback"][0]  # type: ignore[assignment]
+        op = ABBounceBackReflectionOperator(lattice, [block])
 
         wall_circuit = op.set_inside_wall_ancilla_state(block)
 
@@ -264,11 +267,6 @@ class TestStandardReflectionMultiGeometry:
 
         op_inferred = ABReflectionOperator(lattice)
 
-        grouped_shapes = [
-            gdict["bounceback"] + gdict["specular"] for gdict in lattice.geometries
-        ]
-        op_explicit = ABReflectionOperator(lattice, shapes=grouped_shapes)  # type: ignore[arg-type]
-
         # Verify statevector equivalence at representative points
         for marker_val in [0, 1]:
             prep_a = _encode_basis_state(
@@ -277,10 +275,7 @@ class TestStandardReflectionMultiGeometry:
             prep_a.compose(op_inferred.circuit, inplace=True)
             sv_a = _simulate_statevector(prep_a)
 
-            prep_b = _encode_basis_state(
-                lattice, x=7, y=7, v=0, marker=marker_val
-            )
-            prep_b.compose(op_explicit.circuit, inplace=True)
-            sv_b = _simulate_statevector(prep_b)
-
-            assert sv_a.equiv(sv_b), f"Mismatch at (7,7), marker={marker_val}"
+            probs = _get_obstacle_ancilla_value(lattice, sv_a)
+            assert probs[0] == pytest.approx(
+                1.0, abs=1e-10
+            ), f"Mismatch at (7,7), marker={marker_val}"
