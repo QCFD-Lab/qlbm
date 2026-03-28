@@ -113,7 +113,18 @@ Reflection
 
 .. autoclass:: qlbm.components.ms.primitives.EdgeComparator
 
+
+.. note::
+    The amplitude-based QLBM supports two kinds of reflection operators: segment-wise (or standard) and zone-agnostic.
+    The two methods are physically equivalent, but their implementation differs algorithmically.
+    For multi-geometry cases, only the segment-wise implementation is currently supported.
+
+
 .. autoclass:: qlbm.components.ab.reflection.ABReflectionOperator
+
+.. autoclass:: qlbm.components.ab.reflection.ABBounceBackReflectionOperator
+
+.. autoclass:: qlbm.components.ab.reflection.ABSpecularReflectionOperator
 
 .. autoclass:: qlbm.components.ab.reflection.ABZoneAgnosticReflectionOperator 
 
