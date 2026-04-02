@@ -73,18 +73,18 @@ class AmplitudeResult(QBMResult):
         if self.lattice.num_dims == 1:
             # The second dimension is a dirty rendering trick for VTK and Paraview
             count_history = np.zeros((self.lattice.num_gridpoints[0] + 1, 2))
+            num_grid_bits = self.lattice.num_grid_qubits
             for count in counts:
-                x = int(
-                    count[self.lattice.num_velocity_qubits :],
-                    2,
+                x = int(count[-num_grid_bits:], 2)
+                velocity_bits = count[:-num_grid_bits]
+                rest_bonus = (
+                    int(velocity_bits == "0" * self.lattice.num_velocity_qubits)
+                    if velocity_bits
+                    else 0
                 )
                 # Another dirty rendering trick for VTK and Paraview
-                count_history[x][0] += counts[count] * (
-                    1 + (int(count[: self.lattice.num_velocity_qubits] == "00"))
-                )
-                count_history[x][1] += counts[count] * (
-                    1 + (int(count[: self.lattice.num_velocity_qubits] == "00"))
-                )
+                count_history[x][0] += counts[count] * (1 + rest_bonus)
+                count_history[x][1] += counts[count] * (1 + rest_bonus)
 
         elif self.lattice.num_dims == 2:
             count_history = np.zeros(

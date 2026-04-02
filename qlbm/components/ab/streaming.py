@@ -85,8 +85,6 @@ class ABStreamingOperator(LBMOperator):
         raise LatticeException("ABE only currently supported in D1Q3 and D2Q9")
 
     def __create_circuit_d1q3(self):
-        # TODO Remove?
-        # TODO add geometry
         circuit = self.lattice.circuit.copy()
 
         circuit.compose(
@@ -95,41 +93,48 @@ class ABStreamingOperator(LBMOperator):
             inplace=True,
         )
 
-        # 01 streaming in the positive direction
-        circuit.x(self.lattice.velocity_index()[0])
+        # D1Q3 velocity indices:
+        #   index 0 = rest (no streaming)
+        #   index 1 = positive (+1)
+        #   index 2 = negative (-1)
+        dim_indices = [
+            [1],  # positive direction: velocity index 1
+            [2],  # negative direction: velocity index 2
+        ]
 
-        # Controlled Phase Gates for the positive direction
-        circuit.compose(
-            PhaseShift(
-                num_qubits=len(self.lattice.grid_index()),
-                positive=True,
-                logger=self.logger,
-            )
-            .circuit.control(2)
-            .decompose(),
-            qubits=self.lattice.velocity_index() + self.lattice.grid_index(),
-            inplace=True,
-        )
+        for direction, indices in enumerate(dim_indices):
+            positive = bool(1 - direction)
 
-        # 10 Streaming in the negative direction (and resetting the previous state prep)
-        circuit.x(self.lattice.velocity_index())
+            for index in indices:
+                velocity_inversion_qubits = [
+                    self.lattice.num_grid_qubits + q
+                    for q in get_qubits_to_invert(
+                        index, self.lattice.num_velocity_qubits
+                    )
+                ]
+                if velocity_inversion_qubits:
+                    circuit.x(velocity_inversion_qubits)
 
-        circuit.compose(
-            PhaseShift(
-                num_qubits=len(self.lattice.grid_index()),
-                positive=False,  # Negative this time
-                logger=self.logger,
-            )
-            .circuit.control(2)
-            .decompose(),
-            qubits=self.lattice.velocity_index() + self.lattice.grid_index(),
-            inplace=True,
-        )
+                circuit.compose(
+                    PhaseShift(
+                        num_qubits=len(self.lattice.grid_index()),
+                        positive=positive,
+                        logger=self.logger,
+                    )
+                    .circuit.control(
+                        self.lattice.num_velocity_qubits
+                        + len(self.additional_control_qubit_indices)
+                    )
+                    .decompose(),
+                    qubits=self.additional_control_qubit_indices
+                    + self.lattice.velocity_index()
+                    + self.lattice.grid_index(),
+                    inplace=True,
+                )
 
-        # Undo the second state prep
-        circuit.x(self.lattice.velocity_index()[1])
+                if velocity_inversion_qubits:
+                    circuit.x(velocity_inversion_qubits)
 
-        # Inverse QFT to return the grid to the computational basis
         circuit.compose(
             QFT(self.lattice.num_grid_qubits, inverse=True),
             qubits=self.lattice.grid_index(),
