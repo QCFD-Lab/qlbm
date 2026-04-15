@@ -158,10 +158,8 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
         oracle = self.__build_oracle("specular")
 
         # Step 1: Oracle (sets a_o)
-        print("Op: Applying oracle")
         circuit.compose(oracle, inplace=True)
         # Step 2: SR check (sets a_x, a_y for diagonals)
-        print("Op: SRP")
         circuit.compose(
             ABZoneAgnosticSRCheck(
                 self.lattice,
@@ -173,21 +171,17 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
             inplace=True,
         )
         # Step 3: Permutations (velocity changes, position unchanged)
-        print("Op: Permutation")
         circuit.compose(self.__apply_permutations_sr(), inplace=True)
         # Step 4: Dim-selective stream for diagonals (ctrl a_o AND a_{d+1})
-        print("Op: dimensional reflection")
         circuit.compose(self.__dim_selective_stream(), inplace=True)
 
         # Step 5: Inverse stream
-        print("Op: Unstream")
         circuit.compose(
             ABStreamingOperator(self.lattice, logger=self.logger).circuit.inverse(),
             inplace=True,
         )
 
         # Step 6: SR check in the positive direction
-        print("Op: SRP")
         circuit.compose(
             ABZoneAgnosticSRCheck(
                 self.lattice,
@@ -199,10 +193,8 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
             inplace=True,
         )
         # Step 7: Oracle (unitarily uncomputes a_o)
-        print("Op: Oracle")
         circuit.compose(oracle, inplace=True)
         # Step 8: Stream
-        print("Op: Stream")
         circuit.compose(
             ABStreamingOperator(self.lattice, logger=self.logger).circuit,
             inplace=True,
@@ -426,9 +418,6 @@ class ABZoneAgnosticReflectionOperator(LBMOperator):
             for direction, indices in enumerate(dim_indices[dim]):
                 positive = bool(1 - direction)
                 for index in indices:
-                    print(
-                        f"DRF: index {index}, in dim {dim}, direction {positive}, qubits={control_qubits}"
-                    )
                     velocity_inversion_qubits = [
                         self.lattice.num_grid_qubits + q
                         for q in get_qubits_to_invert(
@@ -838,9 +827,7 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
             for qc, qt in zip(grid_x_qubits, copy_qubits):
                 circuit.cx(qc, qt)
         else:
-            comparator_circuit = TwoRegisterComparator(
-                n_y, ym.comparator_mode
-            ).circuit
+            comparator_circuit = TwoRegisterComparator(n_y, ym.comparator_mode).circuit
 
             circuit.compose(
                 comparator_circuit,
@@ -983,11 +970,7 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
     @override
     def create_circuit(self) -> QuantumCircuit:
         circuit = self.lattice.circuit.copy()
-        print(
-            f"SRP checking {'negative' if self.check_negative_direction else 'positive'} direction"
-        )
         if not self.check_negative_direction:
-            print(f"SRP: unsetting xy ancilla")
             # If we are inside the obstacle, but neither x nor y contributed individually to getting her,
             # Then it must have been their combination.
             circuit.x(self.lattice.ancillae_obstacle_index()[1:-1])
@@ -999,7 +982,6 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
 
         for dim in range(self.lattice.num_dims):
             # --- Unstream diagonal velocities in this dimension ---
-            print("SRP: Forward pass")
             circuit.compose(
                 QFT(len(self.lattice.grid_index(dim))),
                 qubits=self.lattice.grid_index(dim),
@@ -1016,13 +998,12 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
 
                 if self.check_negative_direction:
                     positive = not positive
-                print(f"SRP: vel {velocity_idx}, in dim {dim}, direction {positive}")
-                velocity_inversion_qubits = [
-                    self.lattice.num_grid_qubits + q
-                    for q in get_qubits_to_invert(
-                        velocity_idx, self.lattice.num_velocity_qubits
-                    )
-                ]
+                    velocity_inversion_qubits = [
+                        self.lattice.num_grid_qubits + q
+                        for q in get_qubits_to_invert(
+                            velocity_idx, self.lattice.num_velocity_qubits
+                        )
+                    ]
                 if velocity_inversion_qubits:
                     circuit.x(velocity_inversion_qubits)
 
@@ -1061,8 +1042,6 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
             circuit.compose(self.__build_oracle_for_dim(dim), inplace=True)
             circuit.x(self.lattice.ancillae_obstacle_index(dim + 1))
 
-            print("SRP: Dimensional oracle applied")
-            print("SRP: Backward pass")
             # --- Restream diagonal velocities in this dimension ---
             circuit.compose(
                 QFT(len(self.lattice.grid_index(dim))),
@@ -1078,7 +1057,6 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
                 positive = not vel_signs[dim]
                 if self.check_negative_direction:
                     positive = not positive
-                print(f"SRP: vel {velocity_idx}, in dim {dim}, direction {positive}")
                 velocity_inversion_qubits = [
                     self.lattice.num_grid_qubits + q
                     for q in get_qubits_to_invert(
@@ -1115,7 +1093,6 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
             )
 
         if self.check_negative_direction:
-            print(f"SRP: setting xy ancilla")
             # If we are inside the obstacle, but neither x nor y contributed individually to getting her,
             # Then it must have been their combination.
             circuit.x(self.lattice.ancillae_obstacle_index()[1:-1])
@@ -1124,7 +1101,6 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
                 self.lattice.ancillae_obstacle_index()[-1],
             )
             circuit.x(self.lattice.ancillae_obstacle_index()[1:-1])
-        print("SRP: done")
         return circuit
 
     @override
