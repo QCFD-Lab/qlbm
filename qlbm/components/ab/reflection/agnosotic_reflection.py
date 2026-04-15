@@ -998,12 +998,12 @@ class ABZoneAgnosticSRCheck(LBMPrimitive):
 
                 if self.check_negative_direction:
                     positive = not positive
-                    velocity_inversion_qubits = [
-                        self.lattice.num_grid_qubits + q
-                        for q in get_qubits_to_invert(
-                            velocity_idx, self.lattice.num_velocity_qubits
-                        )
-                    ]
+                velocity_inversion_qubits = [
+                    self.lattice.num_grid_qubits + q
+                    for q in get_qubits_to_invert(
+                        velocity_idx, self.lattice.num_velocity_qubits
+                    )
+                ]
                 if velocity_inversion_qubits:
                     circuit.x(velocity_inversion_qubits)
 
