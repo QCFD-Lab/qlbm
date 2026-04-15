@@ -759,40 +759,94 @@ class ABZoneAgnosticReflectionOracle(LBMPrimitive):
         copy_qubits = self.lattice.ancillae_copy_index()
         result_qubits = self.lattice.ancillae_monomial_index()
 
-        if len(result_qubits) != len(grid_y_qubits):
-            raise CircuitException(
-                "YMonomial oracle is a work in progress: only configurations with equal y and monomial result register sizes are currently supported."
+        n_y = len(grid_y_qubits)
+        n_monomial = len(result_qubits)
+        n_copy = len(copy_qubits)
+        needs_padding = n_monomial != n_y
+
+        if needs_padding:
+            padding_needed = abs(n_monomial - n_y)
+            if padding_needed > n_copy:
+                raise CircuitException(
+                    f"YMonomial oracle: register size mismatch requires "
+                    f"{padding_needed} padding qubits but only {n_copy} "
+                    f"copy-register qubits are available. "
+                    f"Grid must satisfy |2*n_x - n_y| <= n_x."
+                )
+            self.logger.warning(
+                "YMonomial oracle: monomial register (%d qubits) differs "
+                "from y grid register (%d qubits). Using %d copy-register "
+                "qubits as zero-padding for the comparison.",
+                n_monomial,
+                n_y,
+                padding_needed,
             )
 
-        # circuits used more than once
         multiplication_circuit = RGQFTMultiplier(
             num_state_qubits=len(grid_x_qubits),
-            num_result_qubits=len(result_qubits),
+            num_result_qubits=n_monomial,
         )
-
-        comparator_circuit = TwoRegisterComparator(
-            len(grid_y_qubits), ym.comparator_mode
-        ).circuit
 
         # Copy x into the copy register
         for qc, qt in zip(grid_x_qubits, copy_qubits):
             circuit.cx(qc, qt)
 
-        # Do the multiplication
+        # Multiply x * copy -> result
         circuit.compose(
             multiplication_circuit,
             qubits=grid_x_qubits + copy_qubits + result_qubits,
             inplace=True,
         )
 
-        # Comparator
-        circuit.compose(
-            comparator_circuit,
-            qubits=grid_y_qubits
-            + result_qubits
-            + self.lattice.ancillae_obstacle_index(self.target_obstacle_index),
-            inplace=True,
+        obstacle_qubits = self.lattice.ancillae_obstacle_index(
+            self.target_obstacle_index
         )
+
+        if needs_padding:
+            # Free the copy register by undoing the copy operation.
+            # This leaves all copy qubits in |0>, so a subset can
+            # serve as zero-padding for the shorter register in the
+            # TwoRegisterComparator.  The comparator preserves both
+            # input registers, so the padding qubits remain |0>
+            # afterwards and the copy can be safely restored.
+            for qc, qt in zip(grid_x_qubits, copy_qubits):
+                circuit.cx(qc, qt)
+
+            comparator_size = max(n_y, n_monomial)
+            padding_qubits = copy_qubits[: abs(n_monomial - n_y)]
+
+            if n_monomial > n_y:
+                # Pad y with zeros in the high bits
+                comparator_x_reg = grid_y_qubits + padding_qubits
+                comparator_y_reg = result_qubits
+            else:
+                # Pad result with zeros in the high bits
+                comparator_x_reg = grid_y_qubits
+                comparator_y_reg = result_qubits + padding_qubits
+
+            comparator_circuit = TwoRegisterComparator(
+                comparator_size, ym.comparator_mode
+            ).circuit
+
+            circuit.compose(
+                comparator_circuit,
+                qubits=comparator_x_reg + comparator_y_reg + obstacle_qubits,
+                inplace=True,
+            )
+
+            # Restore the copy register for the inverse multiplication
+            for qc, qt in zip(grid_x_qubits, copy_qubits):
+                circuit.cx(qc, qt)
+        else:
+            comparator_circuit = TwoRegisterComparator(
+                n_y, ym.comparator_mode
+            ).circuit
+
+            circuit.compose(
+                comparator_circuit,
+                qubits=grid_y_qubits + result_qubits + obstacle_qubits,
+                inplace=True,
+            )
 
         # Undo multiplication
         circuit.compose(
