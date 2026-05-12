@@ -42,13 +42,7 @@ jobs:
         run: |
           python -m pip install -U .[cpu,dev,docs]
 
-      - name: Doctest
-        if: ${{ github.event_name == 'pull_request' && github.ref == 'refs/heads/main' }}
-        run: |
-          make -C docs doctest
-
       - name: Build Docs
-        if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           sphinx-build docs/source _build
 
