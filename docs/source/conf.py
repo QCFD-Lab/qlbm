@@ -19,7 +19,7 @@ sys.path.append(os.path.abspath("../.."))
 sys.path.append(os.path.abspath(".."))
 
 project = "qlbm"
-copyright = "2024, qlbm authors"
+# copyright = "2024, qlbm authors"
 author = "qlbm authors"
 release = "0.0.6"
 
@@ -59,7 +59,7 @@ autodoc_member_order = "bysource"
 
 html_theme_options = {
     "secondary_sidebar_items": {
-        "**": ["page-toc", "searchbox", "sourcelink"],
+        "**": ["page-toc", "searchbox"],
     },
     "icon_links": [
         {
@@ -91,6 +91,7 @@ html_context = {
 }
 
 html_static_path = ["_static"]
+html_show_sourcelink = False
 
 html_css_files = [
     "css/custom.css",

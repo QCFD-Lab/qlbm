@@ -599,7 +599,7 @@ class StateSetter(LBMPrimitive):
     """The number of qubits the state is encoded in."""
 
     state_to_set: int
-    """The state to convert to :math:`\ket{1}^{\otimes n}`"""
+    r"""The state to convert to :math:`\ket{1}^{\otimes n}`"""
 
     def __init__(
         self,

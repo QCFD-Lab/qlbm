@@ -9,8 +9,10 @@ from typing_extensions import override
 from qlbm.components.ab.reflection import (
     ABZoneAgnosticReflectionOperator,
 )
+from qlbm.components.ab.reflection.standard_reflection import ABReflectionOperator
 from qlbm.components.base import LBMAlgorithm
 from qlbm.lattice.lattices.ab_lattice import ABLattice
+from qlbm.tools.exceptions import CircuitException
 
 from .streaming import ABStreamingOperator
 
@@ -46,10 +48,13 @@ class ABQLBM(LBMAlgorithm):
     def __init__(
         self,
         lattice: ABLattice,
+        use_agnostic_bcs: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
         self.lattice: ABLattice = lattice
+
+        self.use_agnostic_bcs = use_agnostic_bcs
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -72,14 +77,31 @@ class ABQLBM(LBMAlgorithm):
             inplace=True,
         )
 
-        circuit.compose(
-            ABZoneAgnosticReflectionOperator(
-                self.lattice,
-                None,
-                logger=self.logger,
-            ).circuit,
-            inplace=True,
-        )
+        if self.use_agnostic_bcs and self.lattice.has_multiple_geometries():
+            raise CircuitException(
+                "Zone-agnostic boundary conditions are not supported "
+                "with multiple geometries. Use use_agnostic_bcs=False "
+                "or specify a single geometry."
+            )
+
+        if self.use_agnostic_bcs:
+            circuit.compose(
+                ABZoneAgnosticReflectionOperator(
+                    self.lattice,
+                    None,
+                    logger=self.logger,
+                ).circuit,
+                inplace=True,
+            )
+        else:
+            circuit.compose(
+                ABReflectionOperator(
+                    self.lattice,
+                    None,
+                    logger=self.logger,
+                ).circuit,
+                inplace=True,
+            )
 
         return circuit
 

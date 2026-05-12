@@ -10,12 +10,12 @@ from typing_extensions import override
 
 from qlbm.components.base import LBMPrimitive
 from qlbm.components.common.adders import ParameterizedDraperAdder
-from qlbm.tools.utils import ComparatorMode
+from qlbm.tools import ComparatorMode
 
 
 class TwoRegisterComparator(LBMPrimitive):
     """
-    Quantum comparator primitive that compares the states of 2 registers of ``num_qubits`` qubits a :class:`.ComparatorMode`.
+    Quantum comparator primitive that compares the states of 2 registers of ``num_qubits`` qubits a :class:`~qlbm.tools.ComparatorMode`.
 
     The generate circuit is of size ``2*num_qubits+1``, where the last qubit of the register holds the boolean result.
 
@@ -25,7 +25,7 @@ class TwoRegisterComparator(LBMPrimitive):
         :include-source:
 
         from qlbm.components.common.comparators import TwoRegisterComparator
-        from qlbm.tools.utils import ComparatorMode
+        from qlbm.tools import ComparatorMode
 
         # Compare two registers of size 4
         TwoRegisterComparator(num_qubits=4, mode=ComparatorMode.LT).draw("mpl")
@@ -102,14 +102,14 @@ class TwoRegisterComparator(LBMPrimitive):
 
 class SingleRegisterComparator(LBMPrimitive):
     """
-    Quantum comparator primitive that compares a quantum state of ``num_qubits`` qubits and an integer ``num_to_compare`` with respect to a :class:`.ComparatorMode`.
+    Quantum comparator primitive that compares a quantum state of ``num_qubits`` qubits and an integer ``num_to_compare`` with respect to a :class:`~qlbm.tools.ComparatorMode`.
 
     ========================= ======================================================================
     Attribute                  Summary
     ========================= ======================================================================
     :attr:`num_qubits`        Number of qubits encoding the integer to compare.
     :attr:`num_to_compare`    The integer to compare against.
-    :attr:`mode`              The :class:`.ComparatorMode` used to compare the two numbers.
+    :attr:`mode`              The :class:`~qlbm.tools.ComparatorMode` used to compare the two numbers.
     :attr:`logger`            The performance logger, by default getLogger("qlbm")
     ========================= ======================================================================
 

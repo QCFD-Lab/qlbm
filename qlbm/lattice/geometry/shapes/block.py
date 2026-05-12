@@ -202,6 +202,63 @@ class Block(SpaceTimeShape, LQLGAShape):
     }
     """Lookup of bounce-back velocity indices to reset for corner reflections."""
 
+    ab_sr_inner_corner_non_entering_velocity_indices: Dict[
+        LatticeDiscretization, Dict[int, Dict[bool, List[int]]]
+    ] = {
+        LatticeDiscretization.D2Q9: {
+            0: {
+                False: [0, 2, 3, 4, 6, 7],
+                True: [0, 1, 2, 4, 5, 8],
+            },
+            1: {
+                False: [0, 1, 3, 4, 7, 8],
+                True: [0, 1, 2, 3, 5, 6],
+            },
+        }
+    }
+    """Velocity indices that do NOT enter through wall *d* at the given bound.
+
+    At inner corner gridpoints both per-dimension obstacle ancillae are
+    set by the wall comparators (Phase 1), but ``a_d`` should only be
+    set for velocities whose *d*-component points into the obstacle
+    through wall *d*.  This table lists the velocities for which
+    ``a_d`` must be **unset** at each inner corner.
+
+    Keyed by ``[discretization][dim][bound]`` where *bound* is
+    ``False`` for the lower wall and ``True`` for the upper wall of
+    dimension *dim*.
+    """
+
+    ab_sr_near_corner_cross_dim_indices: Dict[
+        LatticeDiscretization, Dict[int, Dict[Tuple[bool, ...], List[int]]]
+    ] = {
+        LatticeDiscretization.D2Q9: {
+            0: {
+                (False, False): [3],
+                (False, True): [3],
+                (True, False): [1],
+                (True, True): [1],
+            },
+            1: {
+                (False, False): [4],
+                (False, True): [2],
+                (True, False): [4],
+                (True, True): [2],
+            },
+        }
+    }
+    """Lookup of specular reflection cross-dimension velocity indices to reset at near-corner points.
+
+    When a cardinal velocity particle sits at an inner corner, both per-dimension
+    obstacle ancillae are set but only one dimension's reflection applies.
+    The other dimension's ancilla must be corrected at the near-corner point
+    where the particle ends up after streaming.
+
+    The outer key is the dimension that is *outside* the obstacle (same as
+    for ``ab_near_corner_indices_to_reset``). The correction targets the
+    ancilla of the *other* dimension.
+    """
+
     def __init__(
         self,
         bounds: List[Tuple[int, int]],
@@ -930,6 +987,114 @@ class Block(SpaceTimeShape, LQLGAShape):
             )
 
         return self.ab_corner_indices_to_reset[discretization][bounds]
+
+    def get_lbm_sr_near_corner_cross_dim_velocity_indices(
+        self,
+        discretization: LatticeDiscretization,
+        dim: int,
+        bounds: Tuple[bool, ...],
+    ) -> List[int]:
+        """
+        Get the cross-dimension velocity indices that need correction at specular near-corner points.
+
+        At inner corners both per-dimension obstacle ancillae are set, but
+        cardinal velocities only trigger reflection in one dimension. The
+        other dimension's ancilla must be corrected at the near-corner
+        point where the reflected particle lands.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization of the lattice.
+        dim : int
+            The dimension that is *outside* the obstacle bounds at this
+            near-corner point (same convention as
+            :meth:`get_lbm_near_corner_velocity_indices_to_reflect`).
+        bounds : Tuple[bool, ...]
+            The bound combination identifying the specific near-corner
+            point.
+
+        Returns
+        -------
+        List[int]
+            The velocity indices whose cross-dimension ancilla needs
+            correction.
+
+        Raises
+        ------
+        LatticeException
+            If the discretization, dimension, or bounds are unsupported.
+        """
+        if discretization not in self.ab_sr_near_corner_cross_dim_indices:
+            raise LatticeException(
+                f"Discretization {discretization} not supported. "
+                f"Supported: {list(self.ab_sr_near_corner_cross_dim_indices.keys())}"
+            )
+
+        if dim not in self.ab_sr_near_corner_cross_dim_indices[discretization]:
+            raise LatticeException(
+                f"{dim} is not a valid dimension for {discretization}."
+            )
+
+        if bounds not in self.ab_sr_near_corner_cross_dim_indices[discretization][dim]:
+            raise LatticeException(
+                f"{bounds} is not a valid near-corner bound for {discretization}."
+            )
+
+        return self.ab_sr_near_corner_cross_dim_indices[discretization][dim][bounds]
+
+    def get_lbm_sr_inner_corner_non_entering_velocity_indices(
+        self,
+        discretization: LatticeDiscretization,
+        dim: int,
+        bound: bool,
+    ) -> List[int]:
+        """
+        Get velocity indices that do NOT enter through wall *dim* at a given bound.
+
+        At inner corner gridpoints Phase 1 sets ``a_d`` for all
+        velocities, but only those whose *d*-component points into the
+        obstacle through wall *d* should have ``a_d`` set.  This method
+        returns the velocities for which ``a_d`` should be toggled back
+        to 0.
+
+        Parameters
+        ----------
+        discretization : LatticeDiscretization
+            The discretization of the lattice.
+        dim : int
+            The dimension of the wall.
+        bound : bool
+            ``False`` for the lower wall, ``True`` for the upper wall.
+
+        Returns
+        -------
+        List[int]
+            The velocity indices that do not enter through wall *dim*.
+
+        Raises
+        ------
+        LatticeException
+            If the discretization, dimension, or bound are unsupported.
+        """
+        tbl = self.ab_sr_inner_corner_non_entering_velocity_indices
+        if discretization not in tbl:
+            raise LatticeException(
+                f"Discretization {discretization} not supported. "
+                f"Supported: {list(tbl.keys())}"
+            )
+
+        if dim not in tbl[discretization]:
+            raise LatticeException(
+                f"{dim} is not a valid dimension for {discretization}."
+            )
+
+        if bound not in tbl[discretization][dim]:
+            raise LatticeException(
+                f"{bound} is not a valid bound for dim={dim} in {discretization}."
+            )
+
+        return tbl[discretization][dim][bound]
 
     @override
     def get_lqlga_reflection_data_d1q2(self):

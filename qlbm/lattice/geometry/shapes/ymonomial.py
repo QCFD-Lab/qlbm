@@ -6,7 +6,7 @@ from typing import Dict, List, override
 import numpy as np
 from stl import mesh
 
-from qlbm.tools.utils import ComparatorMode
+from qlbm.tools import ComparatorMode
 
 from .base import Shape
 
@@ -24,9 +24,9 @@ class YMonomial(Shape):
     .. important::
 
         The ``YMonomial`` implementation is a work in progress.
-        At present, only the :math:`x^2` monomial case is supported,
-        and only when the monomial result register width matches the :math:`y`
-        grid register width.
+        At present, only the :math:`x^2` monomial case is supported.
+        Arbitrary grid sizes are allowed provided
+        :math:`n_x \leq n_y` (square and tall grids).
 
     .. list-table:: Class attributes
             :widths: 25 50
@@ -35,7 +35,7 @@ class YMonomial(Shape):
             * - Attribute
               - Description
             * - :attr:`comparator_mode`
-              - The :class:`.ComparatorMode` used to compare :math:`y` and :math:`x^\mathrm{exp}`.
+              - The :class:`~qlbm.tools.ComparatorMode` used to compare :math:`y` and :math:`x^\mathrm{exp}`.
             * - :attr:`exponent`
               - The monomial exponent used to evaluate :math:`x^\mathrm{exp}`.
             * - :attr:`boundary_points`
