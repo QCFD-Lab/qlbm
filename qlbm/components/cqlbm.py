@@ -17,7 +17,7 @@ from qlbm.components.ms.msqlbm import MSQLBM
 from qlbm.lattice import MSLattice
 from qlbm.lattice.lattices.ab_lattice import ABLattice
 from qlbm.lattice.lattices.base import AmplitudeLattice
-from qlbm.tools.exceptions import LatticeException
+from qlbm.tools.exceptions import CircuitException, LatticeException
 
 
 class CQLBM(LBMAlgorithm):
@@ -62,10 +62,12 @@ class CQLBM(LBMAlgorithm):
     def __init__(
         self,
         lattice: AmplitudeLattice,
+        use_agnostic_bcs: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
         self.lattice: AmplitudeLattice = lattice
+        self.use_agnostic_bcs = use_agnostic_bcs
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -77,9 +79,15 @@ class CQLBM(LBMAlgorithm):
     @override
     def create_circuit(self):
         if isinstance(self.lattice, MSLattice):
+            if self.use_agnostic_bcs:
+                raise CircuitException("Agnostic BCs are not supported for the MSQLBM.")
             return MSQLBM(cast(MSLattice, self.lattice), self.logger).circuit
         elif isinstance(self.lattice, ABLattice):
-            return ABQLBM(cast(ABLattice, self.lattice), self.logger).circuit
+            return ABQLBM(
+                cast(ABLattice, self.lattice),
+                use_agnostic_bcs=self.use_agnostic_bcs,
+                logger=self.logger,
+            ).circuit
         else:
             raise LatticeException(
                 f"CQLBM does not support lattices of type {type(self.lattice)}"
