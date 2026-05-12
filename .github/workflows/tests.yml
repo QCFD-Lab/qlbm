@@ -29,10 +29,20 @@ jobs:
           key: pip-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
           restore-keys: |
             pip-${{ matrix.python-version }}-
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        id: cache-apt
+        with:
+          path: /var/cache/apt/archives
+          key: apt-${{ runner.os }}-libboost-cmake-${{ hashFiles('.github/workflows/tests.yml') }}
+          restore-keys: |
+            apt-${{ runner.os }}-libboost-cmake-
       - name: Install dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y -qq libboost-all-dev cmake
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq libboost-all-dev cmake
       - name: Install qlbm
+        id: pip-install
         run: |
           pip install --upgrade pip
           pip install -e .[cpu,dev]
