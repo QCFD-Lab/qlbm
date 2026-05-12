@@ -34,16 +34,19 @@ class MSQLBM(LBMAlgorithm):
     ========================= ======================================================================
     :attr:`lattice`           The :class:`.MSLattice` based on which the properties of the operator are inferred.
     :attr:`logger`            The performance logger, by default ``getLogger("qlbm")``.
+    :attr:`group_velocities`  Whether to group velocities into 1 streaming step in the CFL series.
     ========================= ======================================================================
     """
 
     def __init__(
         self,
         lattice: MSLattice,
+        group_velocities: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
         self.lattice: MSLattice = lattice
+        self.group_velocities = group_velocities
 
         self.logger.info(f"Creating circuit {str(self)}...")
         circuit_creation_start_time = perf_counter_ns()
@@ -55,8 +58,12 @@ class MSQLBM(LBMAlgorithm):
     @override
     def create_circuit(self):
         # Assumes equal velocities in all dimensions
-        # ! TODO adapt to DnQm discretization
-        time_series = get_time_series(2 ** self.lattice.num_velocities[0].bit_length())
+        time_series = get_time_series(
+            2 ** self.lattice.num_velocities[0].bit_length(),
+            group_velocities=self.group_velocities,
+        )
+
+        print(time_series)
         circuit = QuantumCircuit(
             *self.lattice.registers,
         )
