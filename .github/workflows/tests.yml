@@ -38,6 +38,7 @@ jobs:
           restore-keys: |
             apt-${{ runner.os }}-libboost-cmake-
       - name: Install dependencies
+        if: steps.cache-apt.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq libboost-all-dev cmake
