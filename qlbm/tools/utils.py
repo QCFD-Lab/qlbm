@@ -182,10 +182,50 @@ def is_two_pow(num: int) -> bool:
     return (num & (num - 1) == 0) and num != 0
 
 
+def greedy_grouping(schedule: List[List[int]]) -> List[List[int]]:
+    """
+    Greedily groups schedule into maximally sized groups.
+
+    This function is designed to be used with the ordered output of
+    get_time_series. Using this function with arbitrary schedules
+    might not give optimal groupings.
+
+    Parameters
+    ----------
+    schedule : List[List[int]]
+        The ouput of the cfl counter in get_time_series
+
+    Returns
+    -------
+    List[List[int]]
+        Maximally grouped schedule
+    """
+    flattened_schedule = np.concatenate(schedule).tolist()
+
+    groups = []
+    current_group: List[int] = []
+    seen = set()
+
+    for mag in flattened_schedule:
+        if mag in seen:
+            groups.append(current_group)
+            current_group = [mag]
+            seen = {mag}
+        else:
+            current_group.append(mag)
+            seen.add(mag)
+
+    if current_group:
+        groups.append(current_group)
+
+    return groups
+
+
 def get_time_series(
     num_discrete_velocities: int,
     max_allowed_iters: int = 10000,
     tolerance: float = 1e-6,
+    group_velocities: bool = True,
 ) -> List[List[int]]:
     """
     Compute a time series of the streaming velocities for a given number of discrete velocities.
@@ -198,6 +238,8 @@ def get_time_series(
         The number of iterations before truncating the time series, by default 10000
     tolerance : float, optional
         The level of precision required to truncate the time sries, by default 1e-6
+    group_velocities : bool, optional
+        When True, runs greedy grouping before returning schedule
 
     Returns
     -------
@@ -255,6 +297,9 @@ def get_time_series(
             == num_velocity_magnitudes
         ):
             break
+
+    if group_velocities:
+        speed_controls = greedy_grouping(speed_controls)
 
     return speed_controls  # type: ignore
 

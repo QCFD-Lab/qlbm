@@ -81,7 +81,9 @@ class CQLBM(LBMAlgorithm):
         if isinstance(self.lattice, MSLattice):
             if self.use_agnostic_bcs:
                 raise CircuitException("Agnostic BCs are not supported for the MSQLBM.")
-            return MSQLBM(cast(MSLattice, self.lattice), self.logger).circuit
+            return MSQLBM(
+                cast(MSLattice, self.lattice), group_velocities=True, logger=self.logger
+            ).circuit
         elif isinstance(self.lattice, ABLattice):
             return ABQLBM(
                 cast(ABLattice, self.lattice),
