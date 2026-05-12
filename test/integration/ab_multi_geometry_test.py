@@ -149,11 +149,9 @@ def _extract_state(lattice, sv):
     grid_y_q = lattice.grid_index(1)
     vel_q = lattice.velocity_index()
     marker_q = lattice.marker_index() if lattice.num_marker_qubits > 0 else []
-    ancilla_q = (
-        lattice.ancillae_comparator_index() + lattice.ancillae_obstacle_index()
-    )
+    ancilla_q = lattice.ancillae_comparator_index() + lattice.ancillae_obstacle_index()
 
-    physical = {}
+    physical = {}  # type: ignore
     dirty = False
 
     for idx, amp in enumerate(sv.data):
@@ -192,7 +190,7 @@ def _assert_reflection_correct(lattice, op_circuit, x, y, v, marker, bc_type):
     assert not dirty, f"Dirty ancillae for {tag}"
     assert len(phys) == 1, f"Expected 1 basis state, got {len(phys)} for {tag}"
 
-    (ox, oy, ov, om) = next(iter(phys.keys()))
+    ox, oy, ov, om = next(iter(phys.keys()))
     assert om == marker, f"Marker changed for {tag}: expected {marker}, got {om}"
 
 
@@ -205,10 +203,15 @@ def _assert_no_interaction(lattice, op_circuit, x, y, v, marker):
     tag = f"far_outside (x={x}, y={y}, v={v}, marker={marker})"
 
     # Physical state should be unchanged (no reflection)
-    assert (x, y, v, marker) in phys, f"State changed for {tag}: got {list(phys.keys())}"
-    assert abs(phys[(x, y, v, marker)]) == pytest.approx(1.0, abs=1e-8), (
-        f"Amplitude not 1.0 for {tag}"
-    )
+    assert (
+        x,
+        y,
+        v,
+        marker,
+    ) in phys, f"State changed for {tag}: got {list(phys.keys())}"
+    assert abs(phys[(x, y, v, marker)]) == pytest.approx(
+        1.0, abs=1e-8
+    ), f"Amplitude not 1.0 for {tag}"
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -285,9 +288,7 @@ class TestMultiGeometryReflection:
 
         fx, fy = _FAR_OUTSIDE
         for geom_idx in range(len(bc_types)):
-            _assert_no_interaction(
-                lattice, op.circuit, fx, fy, v=0, marker=geom_idx
-            )
+            _assert_no_interaction(lattice, op.circuit, fx, fy, v=0, marker=geom_idx)
 
     @pytest.mark.parametrize("bc_types", _COMBINATIONS)
     def test_geometry_isolation(self, bc_types):
