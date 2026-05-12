@@ -35,7 +35,7 @@ class YMonomial(Shape):
             * - Attribute
               - Description
             * - :attr:`comparator_mode`
-              - The :class:`.ComparatorMode` used to compare :math:`y` and :math:`x^\mathrm{exp}`.
+              - The :class:`~qlbm.tools.ComparatorMode` used to compare :math:`y` and :math:`x^\mathrm{exp}`.
             * - :attr:`exponent`
               - The monomial exponent used to evaluate :math:`x^\mathrm{exp}`.
             * - :attr:`boundary_points`
