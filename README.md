@@ -45,26 +45,53 @@ source qlbm-cpu-venv/bin/activate
 pip install --upgrade pip
 pip install -e .[cpu,dev,docs]
 ```
+
 If you are using `zsh` (which is the default shell on macOS) you need to replace the last line by
-```
+
+```bash
 pip install -e .\[cpu,dev,docs\]
 ```
 
 We also provide a `make` script for this purpose, which will create the environment from scratch:
 
-```
+```bash
 make install-cpu
 source qlbm-cpu-venv/bin/activate
 ```
 
 To override the default Python executable, pass `PYTHON` on the command line:
-```
+
+```bash
 make install-cpu PYTHON=your-python-binary
 ```
 
 ## Container installation
 
-There are also Docker container images in the `Docker` directory that can be used to install `qlbm` in a container environment. Due to how quickly the code base is evolving, we recommend using the CPU option for stability purposes.
+The `Docker directory` contains Dockerfiles forrunning `qlbm` in a containerized environment.
+
+Build the CPU image from the repository root:
+
+```bash
+docker build -f ./Docker/build_cpu.Dockerfile -t qlbm-cpu .
+```
+
+After the build completes, start an interactive container and mount the local `qlbm` source directory as read-only:
+
+```bash
+docker run --rm -it \
+  -v "$(pwd)/qlbm:/qlbm/qlbm:ro" \
+  qlbm-cpu
+```
+
+On systems using SELinux, add the `Z` option to relabel the mounted directory:
+
+```bash
+docker run --rm -it \
+  -v "$(pwd)/qlbm:/qlbm/qlbm:ro,Z" \
+  qlbm-cpu
+```
+
+Due to how quickly the code base is evolving, we recommend using the CPU option for stability purposes.
 
 ## Algorithms and Usage
 
