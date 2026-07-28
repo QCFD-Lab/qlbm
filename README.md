@@ -21,19 +21,31 @@
 </a>
 </p>
 
-## Install from source
+## PyPI installation
 
-Alternatively, you can also install the latest version of `qlbm` by cloning the repository and installing from source as follows (again using Python 3.12 or 3.13):
+`qlbm` can be installed through `pip`. We recommend the use of a Python 3.12 or 3.13 virtual environment:
 
 ```bash
-git clone git@github.com:QCFD-Lab/qlbm.git
+python -m venv qlbm-cpu-venv
+pip install --upgrade pip
+pip install qlbm
+```
+
+Note that `qlbm` evolves quickly and it is likely that the GitHub repository contains new features that the PyPI installation does not. To get the latest developments, we recommend the source installation.
+
+## Install from source
+
+Alternatively, you can install the latest version of `qlbm` by cloning the repository and installing from source as follows (again using Python 3.12 or 3.13):
+
+```bash
+git clone https://github.com/QCFD-Lab/qlbm.git
 cd qlbm
 python -m venv qlbm-cpu-venv
 source qlbm-cpu-venv/bin/activate
 pip install --upgrade pip
 pip install -e .[cpu,dev,docs]
 ```
-If you are using `zsh` you need to replace the last line by
+If you are using `zsh` (which is the default shell on macOS) you need to replace the last line by
 ```
 pip install -e .\[cpu,dev,docs\]
 ```
@@ -45,24 +57,16 @@ make install-cpu
 source qlbm-cpu-venv/bin/activate
 ```
 
-## PyPI installation
-
-`qlbm` can also be installed through `pip`. We recommend the use of a Python 3.12 or 3.13 virtual environment:
-
-```bash
-python -m venv qlbm-cpu-venv
-pip install --upgrade pip
-pip install qlbm
+To override the default Python executable, pass `PYTHON` on the command line:
 ```
-
-Note that `qlbm` evolves quickly and it is likely that the GitHub repository contains new features that the PyPI installation does not. To get the latest developments, we recommend the source installation.
+make install-cpu PYTHON=your-python-binary
+```
 
 ## Container installation
 
 There are also Docker container images in the `Docker` directory that can be used to install `qlbm` in a container environment. Due to how quickly the code base is evolving, we recommend using the CPU option for stability purposes.
 
 ## Algorithms and Usage
-
 
 Currently, `qlbm` supports two algorithms:
  - The Quantum Transport Method (Collisionless QLBM) described in [Efficient and fail-safe quantum algorithm for the transport equation](https://doi.org/10.1016/j.jcp.2024.112816) ([arXiv:2211.14269](https://arxiv.org/abs/2211.14269)) by M.A. Schalkers and M. Möller.
