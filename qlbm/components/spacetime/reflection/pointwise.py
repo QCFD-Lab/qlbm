@@ -86,7 +86,7 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
                     # Which in turn allows us to control on this row, in combination with the comparator
                     circuit.x(grid_qubit_indices_to_invert)
 
-                # Controlled on the gird qubits, swap the velocities affected by reflection
+                # Controlled on the grid qubits, swap the velocities affected by reflection
                 for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs:
                     circuit.compose(
                         MCSwap(
@@ -140,7 +140,7 @@ class PointWiseSpaceTimeReflectionOperator(SpaceTimeOperator):
                     # Which in turn allows us to control on this row, in combination with the comparator
                     circuit.x(grid_qubit_indices_to_invert)
 
-                # Controlled on the gird qubits, swap the velocities affected by reflection
+                # Controlled on the grid qubits, swap the velocities affected by reflection
                 for neighbor_velocity_pair in reflection_data.neighbor_velocity_pairs:
                     circuit.compose(
                         MCSwap(

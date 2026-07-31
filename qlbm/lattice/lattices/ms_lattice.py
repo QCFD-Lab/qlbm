@@ -453,7 +453,7 @@ class MSLattice(AmplitudeLattice):
             # Whether particles have streamed inside the object
             return 1
         # If there is at least one object with specular reflection
-        # 2 ancilla qubits are requried for velocity inversion
+        # 2 ancilla qubits are required for velocity inversion
         else:
             return self.num_dims
 

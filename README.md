@@ -12,7 +12,7 @@
 - Constructing quantum circuits in [Qiskit](https://www.ibm.com/quantum/qiskit) that implement QLBMs
 - Compiling quantum circuits to quantum computer and simulator platforms with Qiskit and [Pytket](https://tket.quantinuum.com/api-docs/)
 - Simulating quantum circuits on classical hardware with Qiskit and [Qulacs](http://docs.qulacs.org/en/latest/)
-- Visualizing results in [Paraview](https://www.paraview.org/)
+- Visualizing results in [ParaView](https://www.paraview.org/)
 - Analyzing the properties , scalability, and performance of quantum algorithms
 
 <p align="center">
@@ -67,7 +67,7 @@ make install-cpu PYTHON=your-python-binary
 
 ## Container installation
 
-The `Docker directory` contains Dockerfiles forrunning `qlbm` in a containerized environment.
+The `Docker directory` contains Dockerfiles for running `qlbm` in a containerized environment.
 
 Build the CPU image from the repository root:
 
@@ -102,7 +102,7 @@ Currently, `qlbm` supports two algorithms:
 
 The `demos` directory contains several use cases for simulating and analyzing these algorithms. Each demo requires minimal setup once the virtual environment has been configured. Consult the `README.md` file in the `demos` directory for further details.
 
-> **Note on visualization**: we rely on  Paraview for visualizing the flow field of the simulation. You can install Paraview from [this link](https://www.paraview.org/download/).
+> **Note on visualization**: we rely on  ParaView for visualizing the flow field of the simulation. You can install ParaView from [this link](https://www.paraview.org/download/).
 
 ## Configuration
 

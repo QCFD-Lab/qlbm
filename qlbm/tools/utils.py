@@ -102,7 +102,7 @@ def evaluate_qasm_rotation_string(qasm_repr: str) -> str:
         The QASM string with symbolic values evaluated numerically.
     """
     return re.sub(
-        r"(r[xyz]|p)(\([-]?[\d]*[*]?pi[/]?[\d]*\))",  # Replace all  (r[xyz]/p(...)) rotation matrix notations by evaluating occurrances of pi
+        r"(r[xyz]|p)(\([-]?[\d]*[*]?pi[/]?[\d]*\))",  # Replace all  (r[xyz]/p(...)) rotation matrix notations by evaluating occurrences of pi
         lambda m: f"{m.group(1)}({str(eval(m.group(2).replace('pi', str(pi))))})",  # Replace pi by the numeric value and evaluate
         qasm_repr,
     )
@@ -193,7 +193,7 @@ def greedy_grouping(schedule: List[List[int]]) -> List[List[int]]:
     Parameters
     ----------
     schedule : List[List[int]]
-        The ouput of the cfl counter in get_time_series
+        The output of the cfl counter in get_time_series
 
     Returns
     -------

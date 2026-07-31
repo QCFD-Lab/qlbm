@@ -71,7 +71,7 @@ class AmplitudeResult(QBMResult):
         )
 
         if self.lattice.num_dims == 1:
-            # The second dimension is a dirty rendering trick for VTK and Paraview
+            # The second dimension is a dirty rendering trick for VTK and ParaView
             count_history = np.zeros((self.lattice.num_gridpoints[0] + 1, 2))
             num_grid_bits = self.lattice.num_grid_qubits
             for count in counts:
@@ -82,7 +82,7 @@ class AmplitudeResult(QBMResult):
                     if velocity_bits
                     else 0
                 )
-                # Another dirty rendering trick for VTK and Paraview
+                # Another dirty rendering trick for VTK and ParaView
                 count_history[x][0] += counts[count] * (1 + rest_bonus)
                 count_history[x][1] += counts[count] * (1 + rest_bonus)
 

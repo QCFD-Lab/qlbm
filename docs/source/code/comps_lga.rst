@@ -32,13 +32,13 @@ QLGA Circuits
 
 This page contains documentation about the quantum circuits that make up the 
 **L**\ attice **G**\ as **A**\ utomata (LGA) algorithms of ``qlbm``.
-This includes two aglorithms:
+This includes two algorithms:
 
 #. **S**\ pace-\ **T**\ ime **Q**\ uantum **L**\ attice **B**\ oltzmann **M**\ ethod (STQLBM), described in :cite:p:`spacetime` and extended in :cite:p:`spacetime2`.
 #. **L**\ inear **Q**\ uantum **L**\ attice **G**\ as **A**\ utomata (LQLGA), :cite:p:`lqlga1`, :cite:p:`lqlga2`.
 
 At its core, the Space-Time QLBM uses an extended computational basis state
-encoding that that circumvents the non-locality of the streaming
+encoding that circumvents the non-locality of the streaming
 step by including additional information from neighboring grid points.
 This happens in several distinct steps:
 The LQGLA encodes a lattice of :math:`N_g` gridpoints with :math:`q` discrete velocities

@@ -610,7 +610,7 @@ class AmplitudeLattice(Lattice, ABC):
 
     The amplitude-based encoding generally maps LBM populations :math:`f_i` onto basis states as :math:`\sqrt{f_i}\ket{x}\ket{v}`,
     with :math:`x` the position and :math:`v` the velocity.
-    Amplitude-based encdoings generally compress both the grid register and the velocity register into logarithmically
+    Amplitude-based encodings generally compress both the grid register and the velocity register into logarithmically
     many qubits.
 
     ``qlbm`` currently has 2 amplitude-based lattices: the :class:`.MSLattice` and :class:`.ABLattice` used in the :class:`.MSQLBM` and :class:`.ABQLBM`, respectively.

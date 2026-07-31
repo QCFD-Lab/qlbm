@@ -401,7 +401,7 @@ class SpaceTimeLatticeBuilder(ABC):
 
         Returns
         -------
-            int: The nubmer of qubits required to encode the grid.
+            int: The number of qubits required to encode the grid.
         """
         pass
 

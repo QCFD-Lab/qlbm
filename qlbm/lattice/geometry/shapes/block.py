@@ -847,7 +847,7 @@ class Block(SpaceTimeShape, LQLGAShape):
 
         The information is formatted as ``List[List[List[Tuple[int, ...]]]]``.
         The outermost list is by dimension.
-        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimenison.
+        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimension.
         The innermost list contains the gridpoints that make up the surface encoded as tuples.
 
         Returns

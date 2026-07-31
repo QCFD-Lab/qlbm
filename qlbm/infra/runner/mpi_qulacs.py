@@ -53,7 +53,7 @@ class MPIQulacsRunner:
         snapshot_execution: bool = False,
         statevector_sampling: bool = False,
     ) -> AmplitudeResult:
-        """Simualtes the provided algorithm configuration.
+        """Simulates the provided algorithm configuration.
 
         Parameters
         ----------
@@ -106,7 +106,7 @@ class MPIQulacsRunner:
         statevector_sampling: bool = False,
     ) -> AmplitudeResult:
         """
-        Simualtes the provided algorithm configuration.
+        Simulates the provided algorithm configuration.
 
         Parameters
         ----------

@@ -68,7 +68,7 @@ class SpaceTimeResult(QBMResult):
         )
 
         if self.lattice.num_dims == 1:
-            # The second dimension is a dirty rendering trick for VTK and Paraview
+            # The second dimension is a dirty rendering trick for VTK and ParaView
             count_history = np.zeros((self.lattice.num_gridpoints[0] + 1, 2))
             for count in counts:
                 count_inverse = count[::-1]
@@ -81,7 +81,7 @@ class SpaceTimeResult(QBMResult):
                         "1"
                     )  # The number of 1s is the number of populations
                 )
-                # Another dirty rendering trick for VTK and Paraview
+                # Another dirty rendering trick for VTK and ParaView
                 count_history[x][0] = count_history[x][1] = (
                     counts[count] * num_populations
                 )
