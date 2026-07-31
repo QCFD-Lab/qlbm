@@ -160,4 +160,4 @@ class EquivalenceClass:
 
     @override
     def __hash__(self):
-        return hash((self.discretization, tuple(self.velocity_configurations)))
+        return hash((self.discretization, frozenset(self.velocity_configurations)))
