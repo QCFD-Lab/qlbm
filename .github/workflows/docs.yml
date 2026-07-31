@@ -23,16 +23,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.12.5
-
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}
-          key: pip-docs-3.12.5-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            pip-docs-3.12.5-
+          cache: pip
+          cache-dependency-path: pyproject.toml
 
       - name: Install dependencies
         run: |
