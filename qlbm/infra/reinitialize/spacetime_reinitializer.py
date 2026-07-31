@@ -75,7 +75,7 @@ class SpaceTimeReinitializer(Reinitializer):
         statevector : Statevector
             Ignored.
         counts : Counts
-            The counts obtained from :class:`.SpacetimeGridVelocityMeasurement` at the end of the simulation.
+            The counts obtained from :class:`.SpaceTimeGridVelocityMeasurement` at the end of the simulation.
         backend : AerBackend | None
             The backend used for simulation.
         optimization_level : int, optional
@@ -124,7 +124,7 @@ class SpaceTimeReinitializer(Reinitializer):
         """
         Splits a given ``Count`` into its position and velocity components.
 
-        Counts are assumed to be obtained from :class:`.SpacetimeGridVelocityMeasurement` objects,
+        Counts are assumed to be obtained from :class:`.SpaceTimeGridVelocityMeasurement` objects,
         and split format is the same as the input to :class:`.PointWiseSpaceTimeInitialConditions`.
 
         Parameters

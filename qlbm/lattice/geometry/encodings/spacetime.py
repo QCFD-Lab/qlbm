@@ -1,4 +1,4 @@
-"""Geometrical data encodings specific to the :class:`STQLBM` algorithm."""
+"""Geometrical data encodings specific to the :class:`SpaceTimeQLBM` algorithm."""
 
 from abc import ABC
 from typing import List, Tuple
@@ -14,7 +14,7 @@ class SpaceTimeReflectionData(ABC):
 
 class SpaceTimePWReflectionData(SpaceTimeReflectionData):
     r"""
-    Class encoding the necessary information for the reflection of a particle from asingle grid point in the :class:`.STQBLM` algorithm.
+    Class encoding the necessary information for the reflection of a particle from asingle grid point in the :class:`.SpaceTimeQLBM` algorithm.
 
     ==================================== =======================================================================
     Attribute                            Summary
@@ -89,7 +89,7 @@ class SpaceTimePWReflectionData(SpaceTimeReflectionData):
 
 class SpaceTimeVolumetricReflectionData(SpaceTimeReflectionData):
     r"""
-    Class encoding the necessary information for the reflection of a volumetric split of particles in the :class:`.STQBLM` algorithm.
+    Class encoding the necessary information for the reflection of a volumetric split of particles in the :class:`.SpaceTimeQLBM` algorithm.
 
     ========================================= =======================================================================
     Attribute                                 Summary
@@ -163,7 +163,7 @@ class SpaceTimeVolumetricReflectionData(SpaceTimeReflectionData):
 
 class SpaceTimeDiagonalReflectionData(SpaceTimeReflectionData):
     r"""
-    Class encoding the necessary information for the reflection of a volumetric split of particles in the :class:`.STQBLM` algorithm.
+    Class encoding the necessary information for the reflection of a volumetric split of particles in the :class:`.SpaceTimeQLBM` algorithm.
 
     ========================================= =======================================================================
     Attribute                                 Summary

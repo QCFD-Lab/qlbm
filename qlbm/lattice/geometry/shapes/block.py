@@ -31,7 +31,7 @@ class Block(SpaceTimeShape, LQLGAShape):
     r"""
     Contains information required for the generation of boundary conditions for an axis-parallel cuboid obstacle.
 
-    Available for the specular reflection and bounce-back for the :class:`.CQLBM` algorithm and bounce-back for the :class:`.STQBM` algorithm.
+    Available for the specular reflection and bounce-back for the :class:`.CQLBM` algorithm and bounce-back for the :class:`.SpaceTimeQLBM` algorithm.
     A block can be constructed from minimal information, see the Table below.
 
     .. list-table:: Constructor parameters
