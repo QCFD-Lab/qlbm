@@ -31,6 +31,5 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -e .[cpu,dev]
-          pip install "mypy==1.11.2"
       - name: Run mypy
         run: mypy qlbm test --config-file pyproject.toml
