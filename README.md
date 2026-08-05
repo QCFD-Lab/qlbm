@@ -12,7 +12,7 @@
 - Constructing quantum circuits in [Qiskit](https://www.ibm.com/quantum/qiskit) that implement QLBMs
 - Compiling quantum circuits to quantum computer and simulator platforms with Qiskit and [Pytket](https://tket.quantinuum.com/api-docs/)
 - Simulating quantum circuits on classical hardware with Qiskit and [Qulacs](http://docs.qulacs.org/en/latest/)
-- Visualizing results in [Paraview](https://www.paraview.org/)
+- Visualizing results in [ParaView](https://www.paraview.org/)
 - Analyzing the properties , scalability, and performance of quantum algorithms
 
 <p align="center">
@@ -21,33 +21,9 @@
 </a>
 </p>
 
-## Install from source
-
-Alternatively, you can also install the latest version of `qlbm` by cloning the repository and installing from source as follows (again using Python 3.12 or 3.13):
-
-```bash
-git clone git@github.com:QCFD-Lab/qlbm.git
-cd qlbm
-python -m venv qlbm-cpu-venv
-source qlbm-cpu-venv/bin/activate
-pip install --upgrade pip
-pip install -e .[cpu,dev,docs]
-```
-If you are using `zsh` you need to replace the last line by
-```
-pip install -e .\[cpu,dev,docs\]
-```
-
-We also provide a `make` script for this purpose, which will create the environment from scratch:
-
-```
-make install-cpu
-source qlbm-cpu-venv/bin/activate
-```
-
 ## PyPI installation
 
-`qlbm` can also be installed through `pip`. We recommend the use of a Python 3.12 or 3.13 virtual environment:
+`qlbm` can be installed through `pip`. We recommend the use of a Python 3.12 or 3.13 virtual environment:
 
 ```bash
 python -m venv qlbm-cpu-venv
@@ -57,12 +33,67 @@ pip install qlbm
 
 Note that `qlbm` evolves quickly and it is likely that the GitHub repository contains new features that the PyPI installation does not. To get the latest developments, we recommend the source installation.
 
+## Install from source
+
+Alternatively, you can install the latest version of `qlbm` by cloning the repository and installing from source as follows (again using Python 3.12 or 3.13):
+
+```bash
+git clone https://github.com/QCFD-Lab/qlbm.git
+cd qlbm
+python -m venv qlbm-cpu-venv
+source qlbm-cpu-venv/bin/activate
+pip install --upgrade pip
+pip install -e .[cpu,dev,docs]
+```
+
+If you are using `zsh` (which is the default shell on macOS) you need to replace the last line by
+
+```bash
+pip install -e .\[cpu,dev,docs\]
+```
+
+We also provide a `make` script for this purpose, which will create the environment from scratch:
+
+```bash
+make install-cpu
+source qlbm-cpu-venv/bin/activate
+```
+
+To override the default Python executable, pass `PYTHON` on the command line:
+
+```bash
+make install-cpu PYTHON=your-python-binary
+```
+
 ## Container installation
 
-There are also Docker container images in the `Docker` directory that can be used to install `qlbm` in a container environment. Due to how quickly the code base is evolving, we recommend using the CPU option for stability purposes.
+The `Docker directory` contains Dockerfiles for running `qlbm` in a containerized environment.
+
+Build the CPU image from the repository root:
+
+```bash
+docker build -f ./Docker/build_cpu.Dockerfile -t qlbm-cpu .
+```
+
+After the build completes, start an interactive container and mount the local `qlbm` source directory as read-only:
+
+```bash
+docker run --rm -it \
+  -v "$(pwd)/qlbm:/qlbm/qlbm:ro" \
+  qlbm-cpu
+```
+
+On systems using SELinux, add the `Z` option to relabel the mounted directory:
+
+```bash
+docker run --rm -it \
+  -v "$(pwd)/qlbm:/qlbm/qlbm:ro,Z" \
+  qlbm-cpu
+```
+
+Due to how quickly the code base is evolving, we recommend using the CPU option for stability purposes.
 
 ## Algorithms and Usage
-
 
 Currently, `qlbm` supports two algorithms:
  - The Quantum Transport Method (Collisionless QLBM) described in [Efficient and fail-safe quantum algorithm for the transport equation](https://doi.org/10.1016/j.jcp.2024.112816) ([arXiv:2211.14269](https://arxiv.org/abs/2211.14269)) by M.A. Schalkers and M. Möller.
@@ -71,7 +102,7 @@ Currently, `qlbm` supports two algorithms:
 
 The `demos` directory contains several use cases for simulating and analyzing these algorithms. Each demo requires minimal setup once the virtual environment has been configured. Consult the `README.md` file in the `demos` directory for further details.
 
-> **Note on visualization**: we rely on  Paraview for visualizing the flow field of the simulation. You can install Paraview from [this link](https://www.paraview.org/download/).
+> **Note on visualization**: we rely on  ParaView for visualizing the flow field of the simulation. You can install ParaView from [this link](https://www.paraview.org/download/).
 
 ## Configuration
 

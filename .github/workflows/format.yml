@@ -18,15 +18,8 @@ jobs:
         with:
           python-version: 3.12.5
           architecture: x64
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}
-          key: pip-format-3.12.5-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            pip-format-3.12.5-
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Install Ruff
         run: |
           pip install --upgrade pip

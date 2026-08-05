@@ -245,7 +245,7 @@ class MSStreamingOperator(MSOperator):
 
     #. A :class:`.StreamingAncillaPreparation` object prepares the ancilla velocity qubits for CFL time step. This happens independently for all dimensions, and it is assumed the velocity discretization is uniform across dimensions.
     #. A :class:`.ControlledIncrementer` performs incrementation or decrementation in the Fourier space, controlled on the ancilla qubits set in the previous steps.
-    #. For efficiency reasons, the velocity qubits set in step 1 are **not** reset, as they will be re-used in the subsequent reflection step. Another instance of the :class:`.StreamingAncillaPreparation` would be required to consistently end the step.
+    #. For efficiency reasons, the velocity qubits set in step 1 are **not** reset, as they will be reused in the subsequent reflection step. Another instance of the :class:`.StreamingAncillaPreparation` would be required to consistently end the step.
 
     For an in-depth mathematical explanation of the procedure, consult Section 4 of :cite:t:`collisionless`.
 

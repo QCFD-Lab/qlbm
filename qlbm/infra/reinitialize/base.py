@@ -85,7 +85,7 @@ class Reinitializer(ABC):
         """
         Whether the reinitializer requires a copy of the statevector.
 
-        Omotting the statevector may significantly increase the perfomance of reinitialization.
+        Omitting the statevector may significantly increase the performance of reinitialization.
 
         Returns
         -------

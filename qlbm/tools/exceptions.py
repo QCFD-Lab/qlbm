@@ -10,7 +10,7 @@ class LatticeException(Exception):
 
 
 class ResultsException(Exception):
-    """Exception raised during the processing of :class:`QBMResults` objects."""
+    """Exception raised during the processing of :class:`QBMResult` objects."""
 
     def __init__(self, message: str) -> None:
         self.message = message

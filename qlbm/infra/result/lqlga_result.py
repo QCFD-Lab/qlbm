@@ -60,7 +60,7 @@ class LQLGAResult(QBMResult):
     ):
         total_counts = sum(counts.values())
         if self.lattice.num_dims == 1:
-            # The second dimension is a dirty rendering trick for VTK and Paraview
+            # The second dimension is a dirty rendering trick for VTK and ParaView
             count_history = np.zeros((self.lattice.num_gridpoints[0] + 1, 2))
             channel_masses = LatticeDiscretizationProperties.get_channel_masses(
                 self.lattice.discretization

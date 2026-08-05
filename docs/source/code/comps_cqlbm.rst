@@ -26,17 +26,17 @@ Amplitude-Based Circuits
 
 This page documents the components that are used in algorithms
 that use the **A** mplitude **B** ased (AB) Encoding.
-At the moment, this includes two algorihtms:
+At the moment, this includes two algorithms:
 
 #. The "regular" Amplitude-Based Collisionless QLBM: ABQLBM,
 #. The Multi-Speed (MS) Collisionless QLBM: MSQLBM.
 
 :class:`.ABQLBM` uses :class:`.ABLattice`\ s and :class:`.OHLattice`\ s, while :class:`.MSQLBM` is built from :class:`.MSLattice`\ s.
-The general interface of :class:`.CQLBM` is built from all 3 lattice instances and delegeates to the appropriate implementation automatically.
+The general interface of :class:`.CQLBM` is built from all 3 lattice instances and delegates to the appropriate implementation automatically.
 
 Both algorithms are instances of the Collisionless QLBM (:class:`.CQLBM`), also known as the
 Quantum Transport Method (QTM).
-Both algorithms compress the grid and the vnumber of discrete velocities
+Both algorithms compress the grid and the number of discrete velocities
 into :math:`N_g\cdot N_v \mapsto \lceil \log_2 N_g \rceil + \lceil \log_2 N_v \rceil` qubits.
 The amplitude of each basis state is directly related to the populations in the classical LBM discretization.
 The MSQLBM is a generalization of the ABQLBM. 

@@ -10,7 +10,7 @@ All code should be formatted using `ruff` with default options. You should verif
 
 ### Type annotation
 
-`mypy` is used as a static type checker and all submissions must pass its checks. YYou should verify that your changes adhere to the `mypy` standards before submitting a PR.  The exact version used in the CI pipeline can be found in the `pyproject.toml` file. There are some custom rules used for type checking: you can check whether your submission adheres to them by running `mypy qlbm test --config-file pyproject.toml`.
+`mypy` is used as a static type checker and all submissions must pass its checks. You should verify that your changes adhere to the `mypy` standards before submitting a PR.  The exact version used in the CI pipeline can be found in the `pyproject.toml` file. There are some custom rules used for type checking: you can check whether your submission adheres to them by running `mypy qlbm test --config-file pyproject.toml`.
 Linting
 
 

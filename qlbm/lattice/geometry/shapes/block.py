@@ -31,7 +31,7 @@ class Block(SpaceTimeShape, LQLGAShape):
     r"""
     Contains information required for the generation of boundary conditions for an axis-parallel cuboid obstacle.
 
-    Available for the specular reflection and bounce-back for the :class:`.CQLBM` algorithm and bounce-back for the :class:`.STQBM` algorithm.
+    Available for the specular reflection and bounce-back for the :class:`.CQLBM` algorithm and bounce-back for the :class:`.SpaceTimeQLBM` algorithm.
     A block can be constructed from minimal information, see the Table below.
 
     .. list-table:: Constructor parameters
@@ -847,7 +847,7 @@ class Block(SpaceTimeShape, LQLGAShape):
 
         The information is formatted as ``List[List[List[Tuple[int, ...]]]]``.
         The outermost list is by dimension.
-        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimenison.
+        The middle list contains two lists pertaining to the lower and upper bounds of the block in that dimension.
         The innermost list contains the gridpoints that make up the surface encoded as tuples.
 
         Returns

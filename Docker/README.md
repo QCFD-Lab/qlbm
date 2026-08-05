@@ -1,6 +1,6 @@
 # Container files
 
-We provide two docker files fo `qlbm`: one for regular development and one for GPU integration.
+We provide two Dockerfiles for `qlbm`: one for regular development and one for GPU integration.
 
 ## Development container
 
@@ -26,4 +26,4 @@ This will allow you to edit the files on your machine's file system in a text ed
 
 ## GPU container
 
-`build_gpu.Dockerfile` contains an image allows you to simulate `qlbm` algorithms on nVidia GPU hardware with Qiskit and using the nVidia cuQuantum appliance.
+`build_gpu.Dockerfile` contains an image that allows you to simulate `qlbm` algorithms on NVIDIA GPU hardware with Qiskit using the NVIDIA cuQuantum appliance.

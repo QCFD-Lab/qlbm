@@ -30,7 +30,7 @@ class PointWiseSpaceTimeInitialConditions(LBMPrimitive):
     The initialization follows the following steps:
 
     * For each (position, velocity) pair:
-        #. Set the gird qubits encoding the position to :math:`\ket{1}^{\otimes n_g}` using :math:`X` gates;
+        #. Set the grid qubits encoding the position to :math:`\ket{1}^{\otimes n_g}` using :math:`X` gates;
         #. Set each of the toggled velocities to :math:`\ket{1}` by means of :math:`MCX` gates, controlled on the qubits set in the previous step;
         #. Undo the operation of step 1 (i.e., repeat the :math:`X` gates);
         #. Repeat steps 1-3 for all neighboring velocity qubits, adjusting for grid position and relative velocity index.

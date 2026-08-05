@@ -2,7 +2,7 @@
 
 Includes qiskit and tket integrations for transpiling,
 qiskit and qulacs integrations for running,
-and paraview integration for visualization.
+and ParaView integration for visualization.
 """
 
 from .compiler import CircuitCompiler

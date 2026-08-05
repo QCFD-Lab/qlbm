@@ -1,4 +1,4 @@
-"""Circuits implementing componenets of quantum adders. See :cite:`draper` and :cite:`adder`."""
+"""Circuits implementing components of quantum adders. See :cite:`draper` and :cite:`adder`."""
 
 from logging import Logger, getLogger
 from math import pi

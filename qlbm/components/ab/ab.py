@@ -27,7 +27,7 @@ class ABQLBM(LBMAlgorithm):
     The ABQLBM works with :math:`D_dQ_q` discretizations only.
     For multi-speed alternatives, see :class:`.MSQLBM`.
 
-    Eample usage:
+    Example usage:
 
     .. code-block:: python
 

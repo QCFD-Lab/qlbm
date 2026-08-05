@@ -17,7 +17,7 @@ from qlbm.tools.utils import flatten
 
 class Circle(SpaceTimeShape):
     """
-    Contains information required for the generation of bounce-back boundary conditions for the :class:`.STQBM` algorithm.
+    Contains information required for the generation of bounce-back boundary conditions for the :class:`.SpaceTimeQLBM` algorithm.
 
     A circle can be constructed from minimal information, see the Table below.
 

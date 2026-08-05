@@ -20,9 +20,9 @@ Users can visualize both geometry and quantum circuits constructed from the JSON
 
 ## Simulation
 
-`qlbm` currently supports two algorithms with different configurations and capabilities. To simulate the end-to-end algorithms and visualize the resulting flow field, users can interact with the notebooks in the `simulation` directory. Each notebook will generate outputs in a new `qlbm-output` directory. Each output subdirectory of `qlbm-output` will itself contain a `paraview` directory where the time step `step_<x>.vti` and geometry `cube_<x>.stl` files can be visualized in Paraview.
+`qlbm` currently supports two algorithms with different configurations and capabilities. To simulate the end-to-end algorithms and visualize the resulting flow field, users can interact with the notebooks in the `simulation` directory. Each notebook will generate outputs in a new `qlbm-output` directory. Each output subdirectory of `qlbm-output` will itself contain a `paraview` directory where the time step `step_<x>.vti` and geometry `cube_<x>.stl` files can be visualized in ParaView.
 
-> **Note on visualization**: we rely on  Paraview for visualizing the flow field of the simulation. You can install Paraview from [this link](https://www.paraview.org/download/).
+> **Note on visualization**: we rely on  ParaView for visualizing the flow field of the simulation. You can install ParaView from [this link](https://www.paraview.org/download/).
 
 ## Benchmarks
 

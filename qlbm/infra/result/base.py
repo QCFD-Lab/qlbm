@@ -29,7 +29,7 @@ class QBMResult(ABC):
     =========================== ======================================================================
     :attr:`lattice`             The :class:`.Lattice` of the simulated system.
     :attr:`directory`           The directory to which the results outputs data to.
-    :attr:`paraview_dir`        The subdirectory under ``directory`` which stores the Paraview files.
+    :attr:`paraview_dir`        The subdirectory under ``directory`` which stores the ParaView files.
     :attr:`output_file_name`    The root name for files containing time step artifacts, by default "step".
     =========================== ======================================================================
     """

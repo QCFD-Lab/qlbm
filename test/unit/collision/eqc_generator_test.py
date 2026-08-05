@@ -31,6 +31,22 @@ def test_eqc_generator_d2q4():
     assert eqcs_expected == eqcs
 
 
+def test_equal_equivalence_classes_have_equal_hashes():
+    configurations = [
+        (True, False, True, False),
+        (False, True, False, True),
+    ]
+    forward = EquivalenceClass(
+        LatticeDiscretization.D2Q4, set(configurations)
+    )
+    reversed_order = EquivalenceClass(
+        LatticeDiscretization.D2Q4, set(reversed(configurations))
+    )
+
+    assert forward == reversed_order
+    assert hash(forward) == hash(reversed_order)
+
+
 def test_eqc_generator_d3q6():
     generator = EquivalenceClassGenerator(LatticeDiscretization.D3Q6)
     eqcs = generator.generate_equivalence_classes()

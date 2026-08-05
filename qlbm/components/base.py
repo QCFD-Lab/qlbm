@@ -188,7 +188,7 @@ class MSOperator(LBMOperator):
     """
     Specialization of the :class:`.LBMOperator` operator class for the Multi-Speed Collisionless Quantum Lattice Boltzmann Method algorithm by :cite:t:`collisionless`.
 
-    Specializaitons of this class infer their properties
+    Specializations of this class infer their properties
     based on a :class:`.MSLattice`.
 
     ========================= ======================================================================
@@ -215,7 +215,7 @@ class SpaceTimeOperator(LBMOperator):
     """
     Specialization of the :class:`.LBMOperator` operator class for the Space-Time QBM algorithm by :cite:t:`spacetime`.
 
-    Specializaitons of this class infer their properties
+    Specializations of this class infer their properties
     based on a :class:`.SpaceTimeLattice`.
 
     ========================= ======================================================================
@@ -242,7 +242,7 @@ class LQLGAOperator(LBMOperator):
     """
     Specialization of the :class:`.LBMOperator` operator class for the LQLGA algorithm.
 
-    Specializaitons of this class infer their properties
+    Specializations of this class infer their properties
     based on a :class:`.LQLGALattice`.
 
     ========================= ======================================================================

@@ -81,7 +81,7 @@ class LQLGAStreamingOperator(LQLGAOperator):
     ) -> List[List[Tuple[int, int]]]:
         """
 
-        Implements the logarithmic depth streaming line permuation as described in Section 4 of :cite:`spacetime`.
+        Implements the logarithmic depth streaming line permutation as described in Section 4 of :cite:`spacetime`.
 
         Parameters
         ----------
