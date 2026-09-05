@@ -1,5 +1,6 @@
 """Lattice and Block utilitites."""
 
+from .bgk import D2Q9AngleEncoding
 from .geometry.encodings.ms import (
     DimensionalReflectionData,
     ReflectionPoint,
@@ -14,6 +15,7 @@ from .geometry.shapes.circle import (
 )
 from .geometry.shapes.ymonomial import YMonomial
 from .lattices import Lattice, MSLattice
+from .lattices.ab_bgk_lattice import ABBGKLattice
 from .lattices.ab_lattice import ABLattice
 from .lattices.lqlga_lattice import LQLGALattice
 from .lattices.oh_lattice import OHLattice
@@ -26,6 +28,8 @@ from .spacetime.properties_base import (
 __all__ = [
     "Lattice",
     "ABLattice",
+    "ABBGKLattice",
+    "D2Q9AngleEncoding",
     "MSLattice",
     "OHLattice",
     "SpaceTimeLattice",

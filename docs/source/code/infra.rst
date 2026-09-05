@@ -46,6 +46,9 @@ Performance
 .. autoclass:: qlbm.infra.reinitialize.spacetime_reinitializer.SpaceTimeReinitializer
     :members:
 
+.. autoclass:: qlbm.infra.reinitialize.ab_bgk_reinitializer.ABBGKReinitializer
+    :members:
+
 .. _compilers:
 
 Compilers
@@ -63,6 +66,9 @@ Results
     :members:
 
 .. autoclass:: qlbm.infra.result.amplitude_result.AmplitudeResult
+    :members:
+
+.. autoclass:: qlbm.infra.result.ab_bgk_result.ABBGKResult
     :members:
 
 .. autoclass:: qlbm.infra.result.spacetime_result.SpaceTimeResult

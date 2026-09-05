@@ -1,0 +1,16 @@
+{
+    "description": "Optimized branch amplitudes for the D2Q9 angle-encoded BGK collision.",
+    "objective": "minimize alpha(beta) = ||C_tilde(beta) B_in(beta)||_2 subject to beta_k > 0 and sum_k beta_k ** 2 == 1",
+    "optimizer": "scipy.optimize.minimize with method='Powell', xtol=1e-8, ftol=1e-10",
+    "max_velocity": 0.1,
+    "beta": [
+        0.9826667709665132,
+        0.09888785535198928,
+        0.09888785535198928,
+        0.009888785535188788,
+        0.0702267124854646,
+        0.09888792717079868
+    ],
+    "alpha": 0.5056232620484985,
+    "reachable_subspace_rank": 13
+}

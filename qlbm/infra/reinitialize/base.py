@@ -93,3 +93,21 @@ class Reinitializer(ABC):
             Whether a statevector is needed.
         """
         pass
+
+    def requires_statevector_snapshots(self) -> bool:
+        """
+        Whether simulating the algorithm requires reinitialization between every time step.
+
+        Runners can simulate :math:`t` time steps either by reinitializing after each of
+        them, or by concatenating :math:`t` copies of the time step circuit. The second
+        option is only valid when the state at the end of a time step is a valid input
+        for the next one, which does not hold for algorithms whose time step is closed
+        by a classical step, such as :class:`.ABBGKQLBM`. Reinitializers of such
+        algorithms override this to ``True``, and runners then refuse to concatenate.
+
+        Returns
+        -------
+        bool
+            Whether statevector snapshots are mandatory, by default ``False``.
+        """
+        return False

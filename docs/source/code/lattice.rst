@@ -14,6 +14,7 @@ for accessing the information that determines the structure and composition of q
     #. :class:`.ABLattice` is the "standard" amplitude-based lattice, where both the grid and the velocities are logarithmically compressed. It supports only :math:`D_dQ_q` discretization.
     #. :class:`.MSLattice` is the multi-speed lattice for the algorithm described in :cite:t:`collisionless`. It is the same as the :class:`.ABLattice`, except it supports different velocity discretizations.
     #. :class:`.OHLattice` is the amplitude-based lattice where the grid is logarithmically compressed, but the :math:`D_dQ_q` velocities are not. It assigns one basis state per discrete velocity.
+    #. :class:`.ABBGKLattice` is the :class:`.ABLattice` specialized for the :class:`.ABBGKQLBM` algorithm. It reserves one marker qubit to separate the physical populations from the auxiliary amplitudes that make its collision unitary.
 
 #. LGA lattices. These rely on the computational basis state encoding (CBSE) and are used for QLGA algorithms.
     #. :class:`.SpaceTimeLattice` is the realization of the space-time data encoding described in :cite:`spacetime` and :cite:`spacetime2`. It uses an expanded CBSE to accommodate multiple time steps.
@@ -39,6 +40,9 @@ Concretely, each :class:`.Lattice` fulfills the following functionality:
     :members:
 
 .. autoclass:: qlbm.lattice.lattices.ab_lattice.ABLattice
+    :members:
+
+.. autoclass:: qlbm.lattice.lattices.ab_bgk_lattice.ABBGKLattice
     :members:
 
 .. autoclass:: qlbm.lattice.lattices.oh_lattice.OHLattice
@@ -109,3 +113,17 @@ The :class:`.SpaceTimeQLBM` algorithm on makes use of the following:
 .. autoclass:: qlbm.lattice.geometry.SpaceTimeVolumetricReflectionData
 
 .. autoclass:: qlbm.lattice.geometry.SpaceTimeDiagonalReflectionData
+
+
+.. _collision_models:
+
+Collision Models
+----------------------------------
+
+Some collision operators are governed by classical structure that is worth keeping
+separate from the quantum circuits that realize it. Such models hold the linear algebra
+of a collision, and are shared between circuit synthesis and the post-processing of
+measurement outcomes.
+
+.. autoclass:: qlbm.lattice.bgk.angle_encoding.D2Q9AngleEncoding
+    :members:

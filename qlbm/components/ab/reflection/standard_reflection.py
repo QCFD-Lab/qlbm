@@ -194,13 +194,23 @@ class ABReflectionOperator(LBMOperator):
 
     lattice: AmplitudeLattice
 
+    control_on_marker_state: bool
+    """Whether reflection is restricted to the marker-one sector of the state.
+
+    Algorithms that reserve the marker qubit to separate physical from auxiliary
+    amplitudes, such as :class:`.ABBGKQLBM`, must apply boundary conditions to the
+    physical sector only."""
+
     def __init__(
         self,
         lattice: ABLattice,
         shapes: Dict[str, List[Shape]] | None = None,
+        control_on_marker_state: bool = False,
         logger: Logger = getLogger("qlbm"),
     ) -> None:
         super().__init__(lattice, logger)
+
+        self.control_on_marker_state = control_on_marker_state
 
         if shapes is not None:
             if not self.lattice.has_multiple_geometries():
@@ -229,7 +239,10 @@ class ABReflectionOperator(LBMOperator):
 
         if not self.lattice.has_multiple_geometries():
             shapes_dict: Dict[str, List[Shape]] = self.shapes  # type: ignore[assignment]
-            return self.__create_circuit_d2q9(shapes_dict)
+            return self.__create_circuit_d2q9(
+                shapes_dict,
+                control_on_marker_state=self.control_on_marker_state,
+            )
         else:
             circuit = self.lattice.circuit.copy()
             geometry_list: List[Dict[str, List[Shape]]] = self.shapes  # type: ignore[assignment]

@@ -17,13 +17,15 @@ The :ref:`infra` module integrates the quantum components
 with Tket, Qiskit, and Qulacs transpilers and runners.
 The :ref:`tools` module contains miscellaneous utilities.
 
-``qlbm`` currently supports three algorithms:
+``qlbm`` currently supports four algorithms:
 
 #. The **C**\ ollisionless **QLBM** (CQLBM) first described in :cite:p:`collisionless` and later expanded in :cite:p:`qmem`.
 
 #. **S**\ pace-\ **T**\ ime **QLBM** (STQLBM) described in :cite:p:`spacetime` and :cite:p:`spacetime2`.
 
 #. **L**\ inear \ **Q**\ uantum **L**\ attice **G**\ as **A**\ utomata (LQLGA) described in :cite:p:`spacetime2`, :cite:p:`lqlga1`, and :cite:p:`lqlga2`.
+
+#. The **A**\ mplitude **B**\ ased **QLBM** with an angle-encoded **BGK** collision (ABBGKQLBM), which extends the collisionless amplitude-based encoding with a :math:`\tau=1` collision.
 
 .. .. card:: Intro to QLBM
 ..     :link: internal_docs

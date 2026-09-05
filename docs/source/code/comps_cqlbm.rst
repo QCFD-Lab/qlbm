@@ -10,12 +10,13 @@ Amplitude-Based Circuits
     from qlbm.components import (
         CQLBM,
         MSQLBM,
+        ABBGKQLBM,
         MSStreamingOperator,
         ControlledIncrementer,
         SpecularReflectionOperator,
         ParameterizedPhaseShift,
     )
-    from qlbm.lattice import MSLattice
+    from qlbm.lattice import ABBGKLattice, MSLattice
     print("ok")
 
 .. testoutput::
@@ -26,16 +27,18 @@ Amplitude-Based Circuits
 
 This page documents the components that are used in algorithms
 that use the **A** mplitude **B** ased (AB) Encoding.
-At the moment, this includes two algorithms:
+At the moment, this includes three algorithms:
 
 #. The "regular" Amplitude-Based Collisionless QLBM: ABQLBM,
-#. The Multi-Speed (MS) Collisionless QLBM: MSQLBM.
+#. The Multi-Speed (MS) Collisionless QLBM: MSQLBM,
+#. The Amplitude-Based QLBM with an angle-encoded BGK collision: ABBGKQLBM.
 
 :class:`.ABQLBM` uses :class:`.ABLattice`\ s and :class:`.OHLattice`\ s, while :class:`.MSQLBM` is built from :class:`.MSLattice`\ s.
 The general interface of :class:`.CQLBM` is built from all 3 lattice instances and delegates to the appropriate implementation automatically.
 
-Both algorithms are instances of the Collisionless QLBM (:class:`.CQLBM`), also known as the
+The first two algorithms are instances of the Collisionless QLBM (:class:`.CQLBM`), also known as the
 Quantum Transport Method (QTM).
+:class:`.ABBGKQLBM` extends the first with a collision, and is documented in :ref:`abbgk`.
 Both algorithms compress the grid and the number of discrete velocities
 into :math:`N_g\cdot N_v \mapsto \lceil \log_2 N_g \rceil + \lceil \log_2 N_v \rceil` qubits.
 The amplitude of each basis state is directly related to the populations in the classical LBM discretization.
@@ -138,3 +141,53 @@ Measurement
 .. autoclass:: qlbm.components.ms.primitives.GridMeasurement
 
 .. autoclass:: qlbm.components.ab.measurement.ABGridMeasurement
+
+.. _abbgk:
+
+Angle-Encoded BGK Collision
+----------------------------------
+
+The collisionless algorithms above stream populations that are already stored as
+amplitudes. :class:`.ABBGKQLBM` adds a :math:`\tau=1` BGK collision to every time step,
+so a single circuit performs a complete LBM cycle.
+
+The construction rests on a change of variables. Writing the macroscopic velocity as
+:math:`u_x = U \sin\theta_x` and :math:`u_y = U \sin\theta_y` makes the
+:math:`D_2Q_9` equilibrium *exactly linear* in six trigonometric features of the two
+angles. Those features are prepared in superposition on five qubits, three labelling the
+feature and two carrying the rotations, and a single :math:`32 \times 32` unitary maps
+the resulting state onto the equilibrium populations. The classical linear algebra behind
+that unitary lives in :class:`.D2Q9AngleEncoding`; see :ref:`collision_models`.
+
+A collision contracts the state, so the unitary needs somewhere to put the norm it
+removes. :class:`.ABBGKLattice` reserves one marker qubit for that purpose: its
+:math:`\ket{1}` sector holds the physical populations and its :math:`\ket{0}` sector the
+auxiliary amplitudes. Streaming and reflection are therefore controlled on the marker,
+which :class:`.ABBGKQLBM` arranges by passing it to :class:`.ABStreamingOperator` and
+:class:`.ABReflectionOperator`.
+
+.. note::
+    The collision maps a branch-angle state onto populations, and not back again, so a
+    time step cannot be applied twice in a row. Each step starts from a freshly encoded
+    flow field, which :class:`.ABBGKReinitializer` derives from the state at the end of
+    the previous one. Recomputing the equilibrium from the moments at every step is what
+    keeps the nonlinearity of the collision exact rather than linearized, and is why
+    simulations of this algorithm require statevector snapshots.
+
+.. autoclass:: qlbm.components.ab.bgk.ABBGKQLBM
+
+.. autoclass:: qlbm.components.ab.collision.bgk_collision.ABBGKCollisionOperator
+
+.. autoclass:: qlbm.components.ab.collision.bgk_collision.ABLocalBGKCollision
+
+.. autoclass:: qlbm.components.ab.collision.initial.ABBGKInitialConditions
+
+.. autoclass:: qlbm.components.ab.collision.angle_encoding.ABAngleEncodedEquilibrium
+
+.. autoclass:: qlbm.components.ab.collision.angle_encoding.ABBranchStatePreparation
+
+.. autoclass:: qlbm.components.ab.collision.angle_encoding.ABBranchAngleEncoding
+
+.. autofunction:: qlbm.components.ab.collision.angle_encoding.append_multi_controlled_ry
+
+.. autoclass:: qlbm.components.ab.collision.measurement.ABBGKMeasurement

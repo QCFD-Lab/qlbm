@@ -20,7 +20,9 @@ Users can visualize both geometry and quantum circuits constructed from the JSON
 
 ## Simulation
 
-`qlbm` currently supports two algorithms with different configurations and capabilities. To simulate the end-to-end algorithms and visualize the resulting flow field, users can interact with the notebooks in the `simulation` directory. Each notebook will generate outputs in a new `qlbm-output` directory. Each output subdirectory of `qlbm-output` will itself contain a `paraview` directory where the time step `step_<x>.vti` and geometry `cube_<x>.stl` files can be visualized in ParaView.
+`qlbm` currently supports several algorithms with different configurations and capabilities. To simulate the end-to-end algorithms and visualize the resulting flow field, users can interact with the notebooks in the `simulation` directory. Each notebook will generate outputs in a new `qlbm-output` directory. Each output subdirectory of `qlbm-output` will itself contain a `paraview` directory where the time step `step_<x>.vti` and geometry `cube_<x>.stl` files can be visualized in ParaView.
+
+The `ab_bgk_taylor_green.ipynb` and `ab_bgk_obstacle_flow.ipynb` notebooks simulate `ABBGKQLBM`, the amplitude-based algorithm with an angle-encoded BGK collision, and additionally compare the result against a classical $D_2Q_9$ BGK solver. The first is a decaying Taylor-Green vortex on a periodic lattice; the second is a uniform stream interacting with a bounce-back obstacle.
 
 > **Note on visualization**: we rely on  ParaView for visualizing the flow field of the simulation. You can install ParaView from [this link](https://www.paraview.org/download/).
 

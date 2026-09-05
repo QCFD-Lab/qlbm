@@ -141,5 +141,7 @@ class CircuitRunner(ABC):
             The quantum circuit representation of the statevector.
         """
         circuit = self.lattice.circuit.copy()
-        circuit.append(Initialize(statevector), circuit.qubits)
+        # Deep circuits accumulate enough floating-point error for the simulated
+        # statevector to drift outside Qiskit's normalization tolerance.
+        circuit.append(Initialize(statevector, normalize=True), circuit.qubits)
         return circuit

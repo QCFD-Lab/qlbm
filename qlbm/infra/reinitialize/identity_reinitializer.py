@@ -79,7 +79,7 @@ class IdentityReinitializer(Reinitializer):
         """
         circuit = self.lattice.circuit.copy()
         circuit.compose(
-            Initialize(statevector),
+            Initialize(statevector, normalize=True),
             inplace=True,
             qubits=range(circuit.num_qubits),
         )

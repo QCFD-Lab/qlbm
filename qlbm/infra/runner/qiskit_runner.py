@@ -72,6 +72,16 @@ class QiskitRunner(CircuitRunner):
                 "Cannot perform statevector sampling without a dedicated backend."
             )
 
+        if (
+            not statevector_snapshots
+            and self.reinitializer.requires_statevector_snapshots()
+        ):
+            raise ExecutionException(
+                f"{type(self.reinitializer).__name__} must reinitialize the state "
+                "between time steps, which is only possible with "
+                "statevector_snapshots=True."
+            )
+
         simulation_result = self.new_result(output_directory, output_file_name)
         simulation_result.visualize_geometry()
 

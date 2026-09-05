@@ -83,6 +83,9 @@ include-package-data = true
 [tool.setuptools.packages.find]
 include = ["qlbm", "qlbm.*"]
 
+[tool.setuptools.package-data]
+"qlbm.lattice.bgk" = ["data/*.json"]
+
 [tool.mypy]
 python_version = "3.12"
 warn_return_any = false    # False positives due to Qiskit implementation

@@ -323,6 +323,42 @@ def get_qubits_to_invert(number_encoded: int, num_qubits: int) -> List[int]:
     return [i for i in range(num_qubits) if not bit_value(number_encoded, i)]
 
 
+def basis_state_offsets(
+    values: np.typing.NDArray[np.int64] | List[int] | int,
+    qubit_indices: List[int],
+) -> np.typing.NDArray[np.int64]:
+    r"""
+    Converts register values into the statevector indices that encode them.
+
+    Qiskit orders statevectors in little-endian fashion, so qubit :math:`j` of the
+    whole circuit contributes :math:`2^j` to a basis state index whenever it is
+    :math:`\ket{1}`. A register value is spread over the qubits listed in
+    ``qubit_indices``, least significant bit first, and this function accumulates the
+    contribution of every set bit. Combining the offsets of disjoint registers with a
+    bitwise ``or`` gives the index of the joint basis state.
+
+    Parameters
+    ----------
+    values : numpy.typing.NDArray[numpy.int64] | List[int] | int
+        The register value or values to convert.
+    qubit_indices : List[int]
+        The circuit-wide indices of the qubits that hold the register, ordered from
+        the least to the most significant bit.
+
+    Returns
+    -------
+    numpy.typing.NDArray[numpy.int64]
+        The statevector index contributions, shaped like ``values``.
+    """
+    values = np.asarray(values, dtype=np.int64)
+    offsets = np.zeros_like(values, dtype=np.int64)
+
+    for local_bit, global_qubit in enumerate(qubit_indices):
+        offsets |= ((values >> local_bit) & 1) << np.int64(global_qubit)
+
+    return offsets
+
+
 class ComparatorMode(Enum):
     r"""Enumerator for the modes of quantum comparator circuits.
 
