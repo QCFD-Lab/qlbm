@@ -35,6 +35,13 @@ class OHLattice(ABLattice):
     For multi-speed implementations, see :class:`.MSQLBM` and :class:`.MSLattice`.
     For the fully compressed velocity register counterpart, see :class:`.ABLattice`.
 
+    .. warning::
+
+        Every configured grid dimension must contain a power-of-two number of
+        points. For example, ``{"x": 16, "y": 8}`` is valid, whereas
+        ``{"x": 12, "y": 8}`` is rejected. Multiple geometries and the
+        accumulation register are not supported by ``OHLattice``.
+
     The registers encoded in the lattice and their accessors are given below.
     For the size of each register,
     :math:`N_{g_j}` is the number of grid points of dimension :math:`j` (i.e., 64, 128),
@@ -110,9 +117,11 @@ class OHLattice(ABLattice):
     """The discretization of the lattice, one of :class:`.LatticeDiscretization`."""
 
     num_gridpoints: List[int]
-    """The number of gridpoints in each dimension of the lattice.
-    **Important** : for easier compatibility with binary arithmetic, the number of gridpoints
-    specified in the input dictionary is one larger than the one held in the ``Lattice``."""
+    """The largest valid zero-based coordinate in each dimension.
+
+    For an input dimension of ``x=16``, valid x coordinates are ``0..15``,
+    ``num_gridpoints[0]`` is 15, and the x register contains four qubits.
+    """
 
     shapes: Dict[str, List[Shape]]
     """The shapes of the lattice, which are used to define the geometry of the lattice.
