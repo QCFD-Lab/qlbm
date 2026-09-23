@@ -130,7 +130,17 @@ class ABDiscreteUniformInitialConditions(LBMPrimitive):
     each dimension (x, then y); selected bits vary between 0 and 1, while
     unselected bits remain 0. Thus ``[1, 3, 4], ([], [])`` prepares channels
     1 (+x), 3 (-x), and 4 (-y) at grid point (0, 0). For a 2D lattice,
-    ``([0, 1], [0])`` covers x=0..3 and y=0..1.
+    ``[1, 3, 4], ([0, 1], [0])`` prepares the same velocity channels covers
+    x=0..3 and y=0..1.
+
+    .. warning::
+
+        ``grid_qubits_to_superpose`` does not accept coordinate ranges and
+        cannot select an arbitrary interval. Selecting bit positions
+        ``Q`` produces coordinates of the form
+        ``sum(b_q * 2**q for q in Q)``, where each ``b_q`` is 0 or 1.
+        For example, ``[0, 1]`` produces coordinates 0, 1, 2, and 3, but no
+        bit-position list produces exactly the interval 2 through 7.
 
     Example usage:
 
