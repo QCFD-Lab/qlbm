@@ -27,7 +27,23 @@ class ABInitialConditions(LBMPrimitive):
     Initial conditions for the :class:`ABQLBM` algorithm.
 
     This component creates an equal magnitude superposition of all velocity
-    basis states at position ``(0, 0)`` using the :class:`.UniformStatePrep`.
+    basis states using the :class:`.UniformStatePrep`. Its spatial state depends
+    on the lattice encoding:
+
+    * With an :class:`.ABLattice`, ``x`` remains 0 and every ``y`` coordinate is
+      placed in superposition. For a ``16 x 8`` grid, the populated points are
+      therefore ``(0, 0)`` through ``(0, 7)``.
+    * With an :class:`.OHLattice`, the grid register remains at ``(0, 0)``.
+
+    When the lattice contains multiple geometries, the component also places
+    every marker qubit in superposition.
+
+    .. warning::
+
+        If the number of geometries is not a power of two, applying a Hadamard
+        gate to every marker qubit also creates marker states with no associated
+        geometry. Use :class:`.ABParallelDiscreteUniformInitialConditions` when
+        each marker state needs an explicitly configured initial condition.
 
     Example usage:
 
@@ -123,15 +139,18 @@ class ABDiscreteUniformInitialConditions(LBMPrimitive):
     """
     Initial conditions for the :class:`ABQLBM` algorithm.
 
-    This component creates an equal magnitude superposition of a configurable set of velocity and grid indices.
+    This component creates an equal magnitude superposition of a configurable
+    set of velocity and grid indices. The selected velocities are alternative
+    basis states; they do not represent several independently occupied channels
+    at the same grid point.
 
     ``velocity_indices`` lists zero-based velocity channels. The tuple
     ``grid_qubits_to_superpose`` lists zero-based coordinate bit positions for
-    each dimension (x, then y); selected bits vary between 0 and 1, while
-    unselected bits remain 0. Thus ``[1, 3, 4], ([], [])`` prepares channels
-    1 (+x), 3 (-x), and 4 (-y) at grid point (0, 0). For a 2D lattice,
-    ``[1, 3, 4], ([0, 1], [0])`` prepares the same velocity channels covers
-    x=0..3 and y=0..1.
+    each dimension (x, then y, then z when present); selected bits vary between
+    0 and 1, while unselected bits remain 0. Thus ``[1, 3, 4], ([], [])``
+    prepares channels 1 (+x), 3 (-x), and 4 (-y) at grid point (0, 0). On a 2D
+    lattice, ``[1, 3, 4], ([0, 1], [0])`` prepares the same velocity channels
+    over x=0..3 and y=0..1.
 
     .. warning::
 
@@ -140,7 +159,11 @@ class ABDiscreteUniformInitialConditions(LBMPrimitive):
         ``Q`` produces coordinates of the form
         ``sum(b_q * 2**q for q in Q)``, where each ``b_q`` is 0 or 1.
         For example, ``[0, 1]`` produces coordinates 0, 1, 2, and 3, but no
-        bit-position list produces exactly the interval 2 through 7.
+        bit-position list produces exactly the interval 2 through 7. Preparing
+        such an interval requires a separate state-preparation circuit.
+
+        ``velocity_indices`` must be nonempty and contain unique indices. Each
+        index must be between 0 and ``num_velocities_per_point - 1``.
 
     Example usage:
 
@@ -158,7 +181,9 @@ class ABDiscreteUniformInitialConditions(LBMPrimitive):
 
         ABDiscreteUniformInitialConditions(lattice, [1, 3, 4], ([], [])).draw("mpl")
 
-    The primitive can also applied to the :class:`.OHLattice`:
+    The primitive can also be applied to the :class:`.OHLattice`. The same
+    channel indices are used, but each selected channel becomes a separate
+    one-hot basis state:
 
     .. plot::
         :include-source:
@@ -294,9 +319,21 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
     """
     Marker-sensitive initial conditions for the :class:`ABQLBM` algorithm.
 
-    This component creates an equal magnitude superposition of a configurable set of velocity and grid indices,
-    entangled with the state of the marker register.
-    Used in parallel realizations of configurations.
+    This component creates marker-sensitive initial conditions for parallel
+    configurations. Entry ``i`` of ``velocity_indices_list`` and
+    ``grid_qubits_to_superpose_list`` is prepared when the marker register is in
+    basis state ``|i>``. For example, with two marker qubits, entries 0 through 3
+    correspond to ``|00>``, ``|01>``, ``|10>``, and ``|11>``, respectively.
+
+    Each grid tuple uses the same bit-position convention and has the same range
+    restrictions as :class:`.ABDiscreteUniformInitialConditions`. Each velocity
+    list must be nonempty and contain unique channel indices.
+
+    .. warning::
+
+        Parallel initial conditions support :class:`.ABLattice` only. The number
+        of configurations cannot exceed the number of marker basis states,
+        ``2**lattice.num_marker_qubits``.
 
     Example usage:
 
@@ -319,6 +356,11 @@ class ABParallelDiscreteUniformInitialConditions(LBMPrimitive):
             [[0, 1], [0, 3], [0], [0, 5]],
             [([0], [0])] * 4,
         ).draw("mpl")
+
+    In this example, all four configurations cover grid points ``(0, 0)``,
+    ``(1, 0)``, ``(0, 1)``, and ``(1, 1)``. Marker states ``|00>``, ``|01>``,
+    ``|10>``, and ``|11>`` select velocity lists ``[0, 1]``, ``[0, 3]``,
+    ``[0]``, and ``[0, 5]``, respectively.
 
     """
 
