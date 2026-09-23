@@ -125,6 +125,13 @@ class ABDiscreteUniformInitialConditions(LBMPrimitive):
 
     This component creates an equal magnitude superposition of a configurable set of velocity and grid indices.
 
+    ``velocity_indices`` lists zero-based velocity channels. The tuple
+    ``grid_qubits_to_superpose`` lists zero-based coordinate bit positions for
+    each dimension (x, then y); selected bits vary between 0 and 1, while
+    unselected bits remain 0. Thus ``[1, 3, 4], ([], [])`` prepares channels
+    1 (+x), 3 (-x), and 4 (-y) at grid point (0, 0). For a 2D lattice,
+    ``([0, 1], [0])`` covers x=0..3 and y=0..1.
+
     Example usage:
 
     .. plot::
