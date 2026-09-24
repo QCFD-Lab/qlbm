@@ -13,6 +13,7 @@ from typing_extensions import override
 
 from qlbm.infra.result import QBMResult
 from qlbm.lattice import Lattice
+from qlbm.tools.exceptions import ExecutionException
 from qlbm.tools.utils import get_circuit_properties
 
 from .base import CircuitRunner
@@ -27,7 +28,7 @@ class QiskitRunner(CircuitRunner):
 
     #. The ``initial_conditions`` is either a ``qlbm`` :class:`.QuantumComponent`, a Qiskit ``Statevector`` or a Qiskit``QuantumCircuit``.
     #. The ``execution_backend`` is a Qiskit ``AerBackend``.
-    #. If enabled, the ``sampling_backend`` is a Qiskit ``AerBackend``.
+    #. The ``measurement`` circuit contains only ``measure`` (and ``barrier``) instructions when ``statevector_sampling`` is enabled.
 
     =========================== ======================================================================
     Attribute                   Summary
@@ -60,6 +61,7 @@ class QiskitRunner(CircuitRunner):
         self.execution_backend = self.config.execution_backend
         self.sampling_backend = self.config.sampling_backend
         self.statevector_to_disk = save_statevector_to_disk
+        self.seed = seed
         self.rng = np.random.default_rng(seed)
 
     @override
@@ -198,7 +200,7 @@ class QiskitRunner(CircuitRunner):
                 circuit.compose(self.config.postprocessing.copy(), inplace=True)  # type: ignore
                 circuit.compose(self.config.measurement.copy(), inplace=True)  # type: ignore
                 qiskit_execution_result = self.execution_backend.run(  # type: ignore
-                    circuit, shots=num_shots
+                    circuit, shots=num_shots, seed_simulator=self._aer_seed(step)
                 ).result()
                 counts = qiskit_execution_result.get_counts()
 
@@ -231,34 +233,49 @@ class QiskitRunner(CircuitRunner):
         num_shots: int,
         initial_conditions: QiskitQC,
         simulation_result: QBMResult,
+        snapshots_per_job: int | None = None,
     ) -> QBMResult:
-        circuit = QiskitQC(
-            *(self.config.measurement.qregs + self.config.measurement.cregs)  # type: ignore
-        )
-        circuit.compose(
-            initial_conditions, inplace=True, qubits=range(circuit.num_qubits)
-        )
-        circuit.save_statevector(label="step_0")
-        for step in range(1, num_steps + 1):
-            circuit.compose(self.config.algorithm, inplace=True)
-            circuit.save_statevector(label=f"step_{step}")
+        registers = self.config.measurement.qregs + self.config.measurement.cregs  # type: ignore
+        num_qubits: int = self.config.measurement.num_qubits  # type: ignore[union-attr]
+        if snapshots_per_job is None:
+            # Every snapshot stays in the job result until it returns, so a
+            # job holds at most about a gibibyte of them.
+            snapshots_per_job = max(1, (1 << 30) // (16 << num_qubits))
 
-        self.logger.info(
-            f"Main circuit for all {num_steps} steps has properties {get_circuit_properties(circuit)}"
-        )
-        simulation_start_time = perf_counter_ns()
-        data = self.execution_backend.run(circuit).result().data(0)  # type: ignore
-        self.logger.info(
-            f"Simulation of {num_steps} steps took {perf_counter_ns() - simulation_start_time} (ns)"
-        )
+        state: Statevector | None = None
+        step = 0
+        while step <= num_steps:
+            circuit = QiskitQC(*registers)
+            first_step = step
+            if state is None:
+                circuit.compose(
+                    initial_conditions, inplace=True, qubits=range(circuit.num_qubits)
+                )
+                circuit.save_statevector(label=f"step_{step}")
+                step += 1
+            else:
+                circuit.append(SetStatevector(state), circuit.qubits)
+            while step <= num_steps and step - first_step < snapshots_per_job:
+                circuit.compose(self.config.algorithm, inplace=True)
+                circuit.save_statevector(label=f"step_{step}")
+                step += 1
 
-        for step in range(num_steps + 1):
-            statevector = data[f"step_{step}"]
-            simulation_result.save_timestep_counts(
-                self._sample(statevector, num_shots), step
+            self.logger.info(
+                f"Main circuit for steps {first_step}-{step - 1} has properties {get_circuit_properties(circuit)}"
             )
-            if self.statevector_to_disk:
-                simulation_result.save_statevector(statevector, step=step)
+            simulation_start_time = perf_counter_ns()
+            data = self.execution_backend.run(circuit).result().data(0)  # type: ignore
+            self.logger.info(
+                f"Simulation of steps {first_step}-{step - 1} took {perf_counter_ns() - simulation_start_time} (ns)"
+            )
+
+            for saved_step in range(first_step, step):
+                state = data[f"step_{saved_step}"]
+                simulation_result.save_timestep_counts(
+                    self._sample(state, num_shots), saved_step
+                )
+                if self.statevector_to_disk:
+                    simulation_result.save_statevector(state, step=saved_step)
 
         return simulation_result
 
@@ -296,7 +313,9 @@ class QiskitRunner(CircuitRunner):
                 circuit.compose(self.config.postprocessing.copy(), inplace=True)  # type: ignore
                 circuit.compose(self.config.measurement.copy(), inplace=True)  # type: ignore
                 counts = (
-                    self.execution_backend.run(circuit, shots=num_shots)  # type: ignore
+                    self.execution_backend.run(  # type: ignore
+                        circuit, shots=num_shots, seed_simulator=self._aer_seed(step)
+                    )
                     .result()
                     .get_counts()
                 )
@@ -309,6 +328,22 @@ class QiskitRunner(CircuitRunner):
 
         return simulation_result
 
+    def _aer_seed(self, step: int) -> int | None:
+        """
+        The simulator seed for time step ``step``; ``None`` when the runner is unseeded.
+
+        Parameters
+        ----------
+        step : int
+            The time step, which offsets the seed so steps draw independently.
+
+        Returns
+        -------
+        int | None
+            The seed to pass to Aer.
+        """
+        return None if self.seed is None else self.seed + step
+
     def _measure_pairs(self) -> List[Tuple[int, int]]:
         """
         The ``(qubit, classical bit)`` pairs measured by the ``measurement`` circuit.
@@ -317,16 +352,29 @@ class QiskitRunner(CircuitRunner):
         -------
         List[Tuple[int, int]]
             The pairs, one per ``measure`` instruction.
+
+        Raises
+        ------
+        ExecutionException
+            If the measurement circuit contains gates: sampling the saved
+            statevector only reproduces a measure-only circuit.
         """
         measurement: QiskitQC = self.config.measurement  # type: ignore[assignment]
-        return [
-            (
-                measurement.find_bit(instruction.qubits[0]).index,
-                measurement.find_bit(instruction.clbits[0]).index,
-            )
-            for instruction in measurement.data
-            if instruction.operation.name == "measure"
-        ]
+        pairs = []
+        for instruction in measurement.data:
+            name = instruction.operation.name
+            if name == "measure":
+                pairs.append(
+                    (
+                        measurement.find_bit(instruction.qubits[0]).index,
+                        measurement.find_bit(instruction.clbits[0]).index,
+                    )
+                )
+            elif name != "barrier":
+                raise ExecutionException(
+                    f"Statevector sampling needs a measure-only measurement circuit, found '{name}'. Move gates into postprocessing or disable statevector_sampling."
+                )
+        return pairs
 
     def _postprocess(self, statevector: Statevector) -> Statevector:
         """
@@ -345,7 +393,9 @@ class QiskitRunner(CircuitRunner):
         postprocessing: QiskitQC = self.config.postprocessing  # type: ignore[assignment]
         if postprocessing.size() == 0:
             return statevector
-        circuit = QiskitQC(*postprocessing.qregs)
+        circuit = QiskitQC(
+            *(self.config.measurement.qregs + self.config.measurement.cregs)  # type: ignore
+        )
         circuit.append(SetStatevector(statevector), circuit.qubits)
         circuit.compose(postprocessing, inplace=True)
         circuit.save_statevector(label="post")
@@ -368,18 +418,38 @@ class QiskitRunner(CircuitRunner):
             Counts in Qiskit's format: bitstrings over the classical register,
             classical bit 0 rightmost.
         """
-        probabilities = np.abs(np.asarray(self._postprocess(statevector).data)) ** 2
+        postprocessed = self._postprocess(statevector)
+        num_qubits = postprocessed.num_qubits
         num_clbits: int = self.config.measurement.num_clbits  # type: ignore[union-attr]
-        # Marginalise onto the measured qubits by folding every basis index
-        # onto the classical-register value it would produce.
-        indices = np.arange(probabilities.shape[0], dtype=np.int64)
-        keys = np.zeros_like(indices)
-        for qubit, clbit in self._measure_pairs():
-            keys |= ((indices >> qubit) & 1) << clbit
-        marginal: np.ndarray = np.bincount(
-            keys, weights=probabilities, minlength=1 << num_clbits
+        # Most significant classical bit first, so the marginal's flat index
+        # is the measured bits in register order.
+        pairs = sorted(self._measure_pairs(), key=lambda pair: pair[1], reverse=True)
+
+        # Axis i of the probability tensor is qubit n-1-i; summing out the
+        # unmeasured axes and ordering the rest by classical bit gives the
+        # marginal in one pass, without index arrays over the full state.
+        tensor = (np.abs(np.asarray(postprocessed.data)) ** 2).reshape([2] * num_qubits)
+        kept_axes = [num_qubits - 1 - qubit for qubit, _ in pairs]
+        dropped_axes = tuple(sorted(set(range(num_qubits)) - set(kept_axes)))
+        marginal = tensor.sum(axis=dropped_axes) if dropped_axes else tensor
+        remaining_axes = [
+            axis for axis in range(num_qubits) if axis not in dropped_axes
+        ]
+        marginal = marginal.transpose(
+            [remaining_axes.index(axis) for axis in kept_axes]
+        ).ravel()
+
+        # Place each measured bit at its classical bit within the full register.
+        packed = np.arange(marginal.size)
+        keys = np.zeros_like(packed)
+        for position, (_, clbit) in enumerate(pairs):
+            keys |= ((packed >> (len(pairs) - 1 - position)) & 1) << clbit
+        probabilities: np.ndarray = np.zeros(1 << num_clbits)
+        probabilities[keys] = marginal
+
+        draws: np.ndarray = self.rng.multinomial(
+            num_shots, probabilities / probabilities.sum()
         )
-        draws: np.ndarray = self.rng.multinomial(num_shots, marginal / marginal.sum())
         return {
             format(key, f"0{num_clbits}b"): float(count)
             for key, count in enumerate(draws)

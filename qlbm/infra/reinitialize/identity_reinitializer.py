@@ -59,7 +59,7 @@ class IdentityReinitializer(Reinitializer):
         optimization_level: int = 0,
     ) -> QiskitQC | QulacsQC:
         """
-        Returns the provided ``statevector`` as a new Qiskit ``Initialize`` object that can be prepended to the time step circuit to resume simulation.
+        Returns a circuit that sets the register to ``statevector`` (Aer's ``SetStatevector``) and can be prepended to the time step circuit to resume simulation.
 
         Parameters
         ----------
@@ -75,7 +75,7 @@ class IdentityReinitializer(Reinitializer):
         Returns
         -------
         QiskitQC | QulacsQC
-            A Qiskit ``Initialize`` object.
+            A circuit whose only instruction is Aer's ``SetStatevector``.
         """
         circuit = self.lattice.circuit.copy()
         # Aer sets the state directly; ``Initialize`` would reset and re-prepare it.

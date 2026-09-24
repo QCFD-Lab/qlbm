@@ -1,16 +1,20 @@
 """Sampling and time-loop behaviour of the :class:`.QiskitRunner`."""
 
 import numpy as np
+import pytest
 from qiskit import QuantumCircuit, transpile
+from qiskit.quantum_info import Statevector
 from qiskit_aer import AerSimulator
 
 from qlbm.components.common import EmptyPrimitive
 from qlbm.components.ms import MSQLBM, GridMeasurement, MSInitialConditions
 from qlbm.infra.compiler import CircuitCompiler
+from qlbm.infra.reinitialize.identity_reinitializer import IdentityReinitializer
 from qlbm.infra.runner import QiskitRunner
 from qlbm.infra.runner.simulation_config import SimulationConfig
 from qlbm.lattice import MSLattice
 from qlbm.lattice.lattices.spacetime_lattice import SpaceTimeLattice
+from qlbm.tools.exceptions import ExecutionException
 
 OUTPUT_DIR = "test/artifacts"
 NUM_STEPS = 2
@@ -65,9 +69,29 @@ def test_statevector_sampling_matches_aer_counts():
         assert abs(counts.get(key, 0) - aer_counts.get(key, 0)) / SHOTS < tolerance
 
 
-def test_single_job_snapshot_loop_matches_per_step_loop():
-    """One Aer job with a snapshot per step yields the statevectors the per-step loop yields."""
-    trajectories = []
+def reference_trajectory(config, num_steps):
+    """The per-step statevectors computed by qiskit's own ``Statevector`` evolution."""
+    state = Statevector.from_instruction(config.initial_conditions)
+    trajectory = [np.asarray(state.data)]
+    for _ in range(num_steps):
+        state = state.evolve(config.algorithm)
+        trajectory.append(np.asarray(state.data))
+    return trajectory
+
+
+def saved_trajectory(directory, num_steps):
+    """The statevectors a runner wrote to ``directory``."""
+    return [
+        np.load(f"{directory}/statevectors/step_{step}.npy")
+        for step in range(num_steps + 1)
+    ]
+
+
+def test_snapshot_loops_reproduce_the_statevector_evolution():
+    """Both snapshot loops, the single-job one and the per-step one, write the trajectory qiskit's ``Statevector`` evolution gives."""
+    config, lattice = ms_config()
+    reference = reference_trajectory(config, NUM_STEPS)
+
     for per_step in (False, True):
         config, lattice = ms_config()
         runner = QiskitRunner(config, lattice, save_statevector_to_disk=True, seed=1)
@@ -75,14 +99,75 @@ def test_single_job_snapshot_loop_matches_per_step_loop():
             runner.reinitializer.reuses_statevector = lambda: False  # type: ignore[method-assign]
         directory = f"{OUTPUT_DIR}/snapshot-loop-{int(per_step)}"
         runner.run(NUM_STEPS, SHOTS, directory, statevector_snapshots=True)
-        trajectories.append(
-            [
-                np.load(f"{directory}/statevectors/step_{step}.npy")
-                for step in range(NUM_STEPS + 1)
-            ]
-        )
-    for step, (single, per_step) in enumerate(zip(*trajectories)):
-        np.testing.assert_allclose(single, per_step, atol=1e-12, err_msg=f"step {step}")
+        for step, (saved, expected) in enumerate(
+            zip(saved_trajectory(directory, NUM_STEPS), reference, strict=True)
+        ):
+            np.testing.assert_allclose(
+                saved, expected, atol=1e-12, err_msg=f"per_step={per_step} step {step}"
+            )
+
+
+def test_single_job_loop_is_chunked_when_snapshots_are_capped(monkeypatch):
+    """Capping the snapshots per job splits the trajectory into several jobs with the same result."""
+    config, lattice = ms_config()
+    reference = reference_trajectory(config, NUM_STEPS)
+    runner = QiskitRunner(config, lattice, save_statevector_to_disk=True, seed=1)
+    jobs = []
+    backend_run = config.execution_backend.run
+
+    def counting_run(circuit, **kwargs):
+        jobs.append(circuit.count_ops().get("save_statevector", 0))
+        return backend_run(circuit, **kwargs)
+
+    monkeypatch.setattr(config.execution_backend, "run", counting_run)
+    # One snapshot per job: force the smallest chunk the loop supports.
+    monkeypatch.setattr(
+        "qlbm.infra.runner.qiskit_runner.QiskitRunner._run_single_job_snapshot_loop",
+        _chunked_with_one_snapshot(runner),
+    )
+    directory = f"{OUTPUT_DIR}/snapshot-loop-chunked"
+    runner.run(NUM_STEPS, SHOTS, directory, statevector_snapshots=True)
+
+    assert jobs == [1] * (NUM_STEPS + 1)
+    for step, (saved, expected) in enumerate(
+        zip(saved_trajectory(directory, NUM_STEPS), reference, strict=True)
+    ):
+        np.testing.assert_allclose(saved, expected, atol=1e-12, err_msg=f"step {step}")
+
+
+def _chunked_with_one_snapshot(runner):
+    """The single-job loop with its per-job snapshot budget forced to one."""
+    original = type(runner)._run_single_job_snapshot_loop
+
+    def loop(self, *args, **kwargs):
+        return original(self, *args, **kwargs, snapshots_per_job=1)
+
+    return loop
+
+
+def test_measurement_circuit_with_gates_is_rejected_under_statevector_sampling():
+    """Sampling the saved statevector reproduces only a measure-only measurement circuit."""
+    config, lattice = ms_config()
+    measurement = QuantumCircuit(*(config.measurement.qregs + config.measurement.cregs))
+    measurement.h(0)
+    measurement.compose(config.measurement, inplace=True)
+    config.measurement = measurement
+    runner = QiskitRunner(config, lattice, seed=3)
+
+    with pytest.raises(ExecutionException):
+        runner.run(0, 16, f"{OUTPUT_DIR}/gated-measurement", statevector_snapshots=True)
+
+
+def test_identity_reinitializer_reuses_the_statevector():
+    """The identity reinitializer is the one that lets the runner keep the state across steps."""
+    config, lattice = ms_config()
+    assert isinstance(
+        lattice.create_reinitializer(config.get_execution_compiler()),
+        IdentityReinitializer,
+    )
+    assert lattice.create_reinitializer(
+        config.get_execution_compiler()
+    ).reuses_statevector()
 
 
 def test_sampling_backend_is_optional_with_statevector_sampling():

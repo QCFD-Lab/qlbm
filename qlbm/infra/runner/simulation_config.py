@@ -72,7 +72,7 @@ class SimulationConfig:
         * - :attr:`execution_backend`
           - The specific ``AerSimulator`` use (if using Qiskit) or ``None`` if using Qulacs.
         * - :attr:`sampling_backend`
-          - Accepted for compatibility and unused: with ``statevector_sampling`` enabled, the runner samples the saved statevector directly.
+          - The ``AerSimulator`` the Qulacs runner samples on if ``statevector_sampling`` is enabled; the Qiskit runner samples the saved statevector itself and ignores it.
         * - :attr:`statevector_sampling`
           - Whether statevector sampling should be utilized.
 
@@ -206,7 +206,7 @@ class SimulationConfig:
 
     sampling_backend_types = {
         QISKIT: [AerBackend, type(None)],
-        QULACS: [AerBackend, type(None)],
+        QULACS: [AerBackend],
     }
 
     def __init__(
@@ -377,11 +377,12 @@ class SimulationConfig:
         self.algorithm = execution_compiler.compile(
             self.algorithm, self.execution_backend, self.optimization_level
         )
-        # Without a sampling backend the saved statevector is sampled directly,
-        # so postprocessing and measurement target the execution backend.
+        # The Qiskit runner samples the saved statevector on the execution
+        # backend, so postprocessing and measurement must target it; only the
+        # Qulacs runner still sends them to the sampling backend.
         sampling_target = (
             self.sampling_backend
-            if self.statevector_sampling and self.sampling_backend is not None
+            if self.statevector_sampling and self.target_platform == self.QULACS
             else self.execution_backend
         )
         self.postprocessing = sampling_compiler.compile(
