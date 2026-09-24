@@ -3,10 +3,10 @@
 from logging import Logger, getLogger
 
 from qiskit import QuantumCircuit as QiskitQC
-from qiskit.circuit.library import Initialize
 from qiskit.quantum_info import Statevector
 from qiskit.result import Counts
 from qiskit_aer.backends.aer_simulator import AerBackend
+from qiskit_aer.library import SetStatevector  # type: ignore[import-untyped]
 from qulacs import QuantumCircuit as QulacsQC
 from typing_extensions import override
 
@@ -78,12 +78,13 @@ class IdentityReinitializer(Reinitializer):
             A Qiskit ``Initialize`` object.
         """
         circuit = self.lattice.circuit.copy()
-        circuit.compose(
-            Initialize(statevector),
-            inplace=True,
-            qubits=range(circuit.num_qubits),
-        )
+        # Aer sets the state directly; ``Initialize`` would reset and re-prepare it.
+        circuit.append(SetStatevector(statevector), circuit.qubits)
         return circuit
+
+    @override
+    def reuses_statevector(self) -> bool:
+        return True
 
     @override
     def requires_statevector(self) -> bool:

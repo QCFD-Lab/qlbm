@@ -72,7 +72,7 @@ class SimulationConfig:
         * - :attr:`execution_backend`
           - The specific ``AerSimulator`` use (if using Qiskit) or ``None`` if using Qulacs.
         * - :attr:`sampling_backend`
-          - The specific ``AerSimulator`` to use if ``statevector_sampling`` is enabled.
+          - Accepted for compatibility and unused: with ``statevector_sampling`` enabled, the runner samples the saved statevector directly.
         * - :attr:`statevector_sampling`
           - Whether statevector sampling should be utilized.
 
@@ -205,8 +205,8 @@ class SimulationConfig:
     execution_backend_types = {QISKIT: [AerBackend], QULACS: [type(None)]}
 
     sampling_backend_types = {
-        QISKIT: [AerBackend],
-        QULACS: [AerBackend],
+        QISKIT: [AerBackend, type(None)],
+        QULACS: [AerBackend, type(None)],
     }
 
     def __init__(
@@ -377,17 +377,16 @@ class SimulationConfig:
         self.algorithm = execution_compiler.compile(
             self.algorithm, self.execution_backend, self.optimization_level
         )
-        self.postprocessing = sampling_compiler.compile(
-            self.postprocessing,
+        # Without a sampling backend the saved statevector is sampled directly,
+        # so postprocessing and measurement target the execution backend.
+        sampling_target = (
             self.sampling_backend
-            if self.statevector_sampling
-            else self.execution_backend,
-            self.optimization_level,
+            if self.statevector_sampling and self.sampling_backend is not None
+            else self.execution_backend
+        )
+        self.postprocessing = sampling_compiler.compile(
+            self.postprocessing, sampling_target, self.optimization_level
         )
         self.measurement = sampling_compiler.compile(
-            self.measurement,
-            self.sampling_backend
-            if self.statevector_sampling
-            else self.execution_backend,
-            self.optimization_level,
+            self.measurement, sampling_target, self.optimization_level
         )
