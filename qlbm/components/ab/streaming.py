@@ -30,6 +30,13 @@ class ABStreamingOperator(LBMOperator):
     by controlling phase gates on the state of the velocity qubits.
     Additional controls qubits can be specified to restrict this operation.
 
+    .. warning::
+
+        Streaming is currently implemented for D1Q3 with :class:`.ABLattice`
+        and for D2Q9 with :class:`.ABLattice` or :class:`.OHLattice`. Other
+        discretizations accepted by the lattice constructors are not supported
+        by this operator.
+
     Example usage:
 
     .. plot::

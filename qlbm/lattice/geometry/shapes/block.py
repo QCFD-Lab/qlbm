@@ -41,7 +41,7 @@ class Block(SpaceTimeShape, LQLGAShape):
         * - Parameter
           - Description
         * - :attr:`bounds`
-          - A ``List[Tuple[int, int]]`` of lower and upper bounds in each dimension. For example, ``[(2, 5), (10, 12)]``; ``[(2, 5), (9, 12), (33, 70)]``.
+          - A ``List[Tuple[int, int]]`` of inclusive lower and upper bounds in each dimension. For example, ``[(2, 5), (10, 12)]`` contains x coordinates 2, 3, 4, and 5 and y coordinates 10, 11, and 12.
         * - :attr:`num_qubits`
           - The number of grid qubits of the underlying lattice.
         * - :attr:`boundary_condition`
@@ -58,7 +58,7 @@ class Block(SpaceTimeShape, LQLGAShape):
         * - Attribute
           - Description
         * - :attr:`bounds`
-          - The ``List[Tuple[int, int]]`` of lower and upper bounds in each dimension. For example, ``[(2, 5), (10, 12)]``; ``[(2, 5), (9, 12), (33, 70)]``.
+          - The ``List[Tuple[int, int]]`` of inclusive lower and upper bounds in each dimension. For example, ``[(2, 5), (10, 12)]`` includes x coordinates 2 through 5 and y coordinates 10 through 12.
         * - :attr:`inside_points_data`
           - The ``List[Tuple[DimensionalReflectionData, ...]]`` data encoding the corner points on the `inside` of the obstacle. The outer list contains :math:`d` entries, one per dimension. Each entry is a tuple of :class:`DimensionalReflectionData` of the lower and upper bounds of that dimension, respectively.
         * - :attr:`outside_points_data`
@@ -96,7 +96,7 @@ class Block(SpaceTimeShape, LQLGAShape):
     """
 
     bounds: List[Tuple[int, int]]
-    """Lower and upper bounds of the block in each spatial dimension."""
+    """Inclusive lower and upper bounds in each spatial dimension."""
 
     num_gridpoints: List[int]
     """Number of gridpoints in each spatial dimension."""

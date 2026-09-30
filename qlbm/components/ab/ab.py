@@ -27,6 +27,13 @@ class ABQLBM(LBMAlgorithm):
     The ABQLBM works with :math:`D_dQ_q` discretizations only.
     For multi-speed alternatives, see :class:`.MSQLBM`.
 
+    .. warning::
+
+        The complete algorithm currently supports D2Q9 only because its
+        reflection operators are implemented only for D2Q9. The standalone
+        :class:`.ABStreamingOperator` additionally supports D1Q3 with an
+        :class:`.ABLattice`.
+
     Example usage:
 
     .. code-block:: python
