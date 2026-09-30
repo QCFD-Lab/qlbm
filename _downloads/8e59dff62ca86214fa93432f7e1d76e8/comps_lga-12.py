@@ -1,0 +1,7 @@
+from qlbm.components.common import EQCCollisionOperator
+from qlbm.lattice import LatticeDiscretization
+
+# Select a discretization and draw its circuit
+EQCCollisionOperator(
+    LatticeDiscretization.D2Q4
+).draw("mpl")
