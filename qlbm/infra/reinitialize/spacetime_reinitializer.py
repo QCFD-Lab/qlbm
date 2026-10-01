@@ -86,12 +86,21 @@ class SpaceTimeReinitializer(Reinitializer):
         QiskitQC | QulacsQC
             The suitably compiles initial conditions circuit.
         """
+        initial_conditions = PointWiseSpaceTimeInitialConditions(
+            self.lattice,
+            self.counts_to_velocity_pairs(counts),
+            self.lattice.filter_inside_blocks,
+        )
+        # Aer executes the X, H and MCX gates of this circuit natively, so the
+        # unoptimised Qiskit compile is an identity on it.
+        if (
+            isinstance(backend, AerBackend)
+            and optimization_level == 0
+            and self.compiler.compiler_type == "QISKIT"
+        ):
+            return initial_conditions.circuit
         return self.compiler.compile(
-            PointWiseSpaceTimeInitialConditions(
-                self.lattice,
-                self.counts_to_velocity_pairs(counts),
-                self.lattice.filter_inside_blocks,
-            ),
+            initial_conditions,
             backend=backend,
             optimization_level=optimization_level,
         )

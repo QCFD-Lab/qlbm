@@ -80,6 +80,20 @@ class Reinitializer(ABC):
         """
         pass
 
+    def reuses_statevector(self) -> bool:
+        """
+        Whether the next time step continues from the previous statevector unchanged.
+
+        A runner may then simulate the whole trajectory as one circuit instead
+        of re-seeding the simulator at every time step.
+
+        Returns
+        -------
+        bool
+            ``False`` unless the reinitializer is the identity.
+        """
+        return False
+
     @abstractmethod
     def requires_statevector(self) -> bool:
         """
