@@ -36,8 +36,12 @@ The general interface of :class:`.CQLBM` is built from all 3 lattice instances a
 
 Both algorithms are instances of the Collisionless QLBM (:class:`.CQLBM`), also known as the
 Quantum Transport Method (QTM).
-Both algorithms compress the grid and the number of discrete velocities
-into :math:`N_g\cdot N_v \mapsto \lceil \log_2 N_g \rceil + \lceil \log_2 N_v \rceil` qubits.
+All amplitude-based lattices compress the grid into logarithmically many
+qubits. :class:`.ABLattice` also compresses the velocity index, whereas
+:class:`.OHLattice` assigns one qubit to each velocity channel. For example,
+excluding ancillae, a :math:`16 \times 8` D2Q9 lattice uses 7 grid qubits and
+either 4 velocity qubits with :class:`.ABLattice` (11 total) or 9 velocity
+qubits with :class:`.OHLattice` (16 total).
 The amplitude of each basis state is directly related to the populations in the classical LBM discretization.
 The MSQLBM is a generalization of the ABQLBM. 
 The implementation of the algorithms was first described in :cite:p:`collisionless` and later expanded in :cite:p:`qmem`.
@@ -55,6 +59,28 @@ This page documents the individual components that make up the CQLBM algorithm.
 Subsections follow a top-down approach, where end-to-end operators are introduced first,
 before being broken down into their constituent parts.
 
+.. warning::
+
+    Constructing an :class:`.ABLattice` for a :math:`D_dQ_q` discretization
+    does not imply that every AB operator supports that discretization. Current
+    operator support is:
+
+    .. list-table::
+        :header-rows: 1
+        :widths: 40 30
+
+        * - Component
+          - Supported discretizations
+        * - :class:`.ABDiscreteUniformInitialConditions`
+          - Generic :math:`D_dQ_q`
+        * - :class:`.ABStreamingOperator`
+          - D1Q3 with :class:`.ABLattice`; D2Q9 with :class:`.ABLattice` or
+            :class:`.OHLattice`
+        * - AB reflection operators
+          - D2Q9 with :class:`.ABLattice` or :class:`.OHLattice`
+        * - Complete :class:`.ABQLBM`
+          - D2Q9 with :class:`.ABLattice` or :class:`.OHLattice`
+
 .. _cqlbm_e2e:
 
 End-to-end algorithms
@@ -70,6 +96,48 @@ End-to-end algorithms
 
 Initial Conditions
 -----------------------------------
+
+Several AB components identify velocities by their zero-based channel index.
+For D2Q9, the convention is:
+
+.. list-table:: D2Q9 velocity channels
+    :header-rows: 1
+    :widths: 15 25 35
+
+    * - Index
+      - Velocity vector
+      - Direction
+    * - 0
+      - ``(0, 0)``
+      - Rest
+    * - 1
+      - ``(+1, 0)``
+      - Positive x
+    * - 2
+      - ``(0, +1)``
+      - Positive y
+    * - 3
+      - ``(-1, 0)``
+      - Negative x
+    * - 4
+      - ``(0, -1)``
+      - Negative y
+    * - 5
+      - ``(+1, +1)``
+      - Positive x, positive y
+    * - 6
+      - ``(-1, +1)``
+      - Negative x, positive y
+    * - 7
+      - ``(-1, -1)``
+      - Negative x, negative y
+    * - 8
+      - ``(+1, -1)``
+      - Positive x, negative y
+
+With :class:`.ABLattice`, the velocity register stores this index in binary.
+With :class:`.OHLattice`, channel ``i`` is represented by a 1 on velocity
+qubit ``i`` and 0 on every other velocity qubit.
 
 .. autoclass:: qlbm.components.ms.primitives.MSInitialConditions
 

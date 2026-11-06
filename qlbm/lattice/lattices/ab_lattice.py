@@ -27,6 +27,12 @@ class ABLattice(AmplitudeLattice):
     This lattice is only built from :math:`D_dQ_q` specifications.
     For multi-speed implementations, see :class:`.MSQLBM`.
 
+    .. warning::
+
+        Every configured grid dimension must contain a power-of-two number of
+        points. For example, ``{"x": 16, "y": 8}`` is valid, whereas
+        ``{"x": 12, "y": 8}`` is rejected.
+
     The registers encoded in the lattice and their accessors are given below.
     For the size of each register,
     :math:`N_{g_j}` is the number of grid points of dimension :math:`j` (i.e., 64, 128),
@@ -102,9 +108,11 @@ class ABLattice(AmplitudeLattice):
     """The discretization of the lattice, one of :class:`.LatticeDiscretization`."""
 
     num_gridpoints: List[int]
-    """The number of gridpoints in each dimension of the lattice.
-    **Important** : for easier compatibility with binary arithmetic, the number of gridpoints
-    specified in the input dictionary is one larger than the one held in the ``Lattice``."""
+    """The largest valid zero-based coordinate in each dimension.
+
+    For an input dimension of ``x=16``, valid x coordinates are ``0..15``,
+    ``num_gridpoints[0]`` is 15, and the x register contains four qubits.
+    """
 
     shapes: Dict[str, List[Shape]]
     """The shapes of the lattice, which are used to define the geometry of the lattice.
@@ -226,8 +234,14 @@ class ABLattice(AmplitudeLattice):
         """
         Sets the number of marker qubits and updates the registers accordingly.
 
-        Note that the previous marker logic, inferred by the geometry, is overwritten,
-        and therefore might be inconsistent.
+        Two marker qubits provide four marker basis states, ``|00>`` through
+        ``|11>``. This method changes only the register width; it does not
+        associate geometries or initial conditions with those states.
+
+        .. warning::
+
+            This overrides the marker width inferred from existing geometries
+            and can make the marker register inconsistent with them.
 
         Parameters
         ----------
@@ -261,12 +275,38 @@ class ABLattice(AmplitudeLattice):
                 },
             )
 
+            lattice.set_geometries(
+                [
+                    [
+                        {
+                            "shape": "cuboid",
+                            "x": [4, 6],
+                            "y": [4, 6],
+                            "boundary": "bounceback",
+                        }
+                    ],
+                    [
+                        {
+                            "shape": "cuboid",
+                            "x": [9, 11],
+                            "y": [9, 11],
+                            "boundary": "bounceback",
+                        }
+                    ],
+                ]
+            )
+
             lattice.circuit.draw("mpl")
+
+        In this example, the first geometry is associated with marker state
+        ``|0>`` and the second with ``|1>``. List order determines this mapping.
 
         Parameters
         ----------
-        geometries : Dict
-            A list of geometries to simulate on the same lattice.
+        geometries : List[List[Dict]]
+            Geometry configurations to simulate on the same lattice. Each outer
+            list entry defines one marker state and contains that configuration's
+            shape dictionaries.
         """
         self.geometries = [self.parse_geometry_dict(g) for g in geometries]
         if len(self.geometries) == 1:
