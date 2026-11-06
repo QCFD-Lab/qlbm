@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v4
@@ -31,6 +31,13 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -e .[cpu,dev]
+      - name: Build Qulacs for the Python 3.14 runner
+        if: matrix.python-version == '3.14'
+        env:
+          USE_SIMD: "No"
+        run: |
+          pip install --no-cache-dir --force-reinstall --no-deps --no-binary=qulacs qulacs
+          python -c "import qulacs; print(qulacs.__version__)"
       - name: Display Python version
         run: python -c "import sys; print(sys.version)"
       - name: Run tests
