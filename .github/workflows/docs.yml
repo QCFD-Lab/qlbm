@@ -9,7 +9,7 @@ on:
 jobs:
   docs:
     if: github.repository_owner == 'QCFD-Lab'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     permissions:
@@ -29,10 +29,6 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get install -y -qq pandoc libglfw3-dev libgles2-mesa-dev
-
-      - name: Check Qulacs import
-        run: |
-          python -c "import qulacs"
 
       - name: Install qlbm
         run: |
