@@ -36,6 +36,8 @@ dependencies = [
     "qiskit-qulacs>=0.1.0",
     "tqdm>=4.66",
     "vtk",
+    "trimesh",
+    "rtree",
 ]
 authors = [{ name = "qlbm authors" }, { email = "qcfd-EWI@tudelft.nl" }]
 maintainers = [{ name = "Calin Georgescu", email = "c.a.georgescu@tudelft.nl" }]
