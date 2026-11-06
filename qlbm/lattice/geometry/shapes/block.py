@@ -6,7 +6,6 @@ from json import dumps
 from typing import Dict, List, Tuple, cast, override
 
 import numpy as np
-from stl import mesh
 
 from qlbm.lattice.geometry.encodings.ms import (
     DimensionalReflectionData,
@@ -25,6 +24,7 @@ from qlbm.lattice.spacetime.properties_base import (
 )
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import bit_value, dimension_letter, flatten, get_qubits_to_invert
+from stl import mesh
 
 
 class Block(SpaceTimeShape, LQLGAShape):

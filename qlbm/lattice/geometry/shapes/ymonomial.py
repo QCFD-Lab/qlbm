@@ -4,9 +4,9 @@ from json import dumps
 from typing import Dict, List, override
 
 import numpy as np
-from stl import mesh
 
 from qlbm.tools import ComparatorMode
+from stl import mesh
 
 from .base import Shape
 

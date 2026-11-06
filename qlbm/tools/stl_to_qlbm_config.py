@@ -1,18 +1,19 @@
 """Create a 2D staircase approximation of an STL object for QLBM simulations."""
 
+import warnings
 from os import PathLike
 from pathlib import Path
 from typing import Literal, TypeAlias
-import warnings
+
+import matplotlib.pyplot as plt
 import numpy as np
 import trimesh
-from trimesh.ray.ray_triangle import RayMeshIntersector
-import matplotlib.pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.colors import ListedColormap
+from matplotlib.artist import Artist
 from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap
+from matplotlib.figure import Figure
 from matplotlib.patches import Patch
-
+from trimesh.ray.ray_triangle import RayMeshIntersector
 
 # Define tuple aliases to make the coordinate dimensions clear.
 Vector2: TypeAlias = tuple[float, float]
@@ -22,6 +23,7 @@ FilePath: TypeAlias = str | PathLike[str]
 
 
 def finite_vector(value, n, name):
+    """Convert a vector to floats and reject invalid dimensions or values."""
     a = np.asarray(value, dtype=float)
     if a.shape != (n,) or not np.isfinite(a).all():
         raise ValueError(f"{name} must contain {n} finite numbers.")
@@ -41,7 +43,8 @@ def classify(mesh, points):
         points: NumPy array of shape (N, 3), containing point coordinates
             in the same coordinate system as the mesh.
 
-    Returns:
+    Returns
+    -------
         A boolean array of length N, where True means solid, and the number
         of non-surface points for which the three ray tests disagreed.
     """
@@ -282,8 +285,9 @@ class STLGeometry:
         source_center = mesh.bounds.mean(axis=0)
 
         # Convert degrees to radians and build the rotation matrix.
+        angles = np.deg2rad(rotation)
         rotation_matrix = trimesh.transformations.euler_matrix(
-            *np.deg2rad(rotation), axes="sxyz"
+            angles[0], angles[1], angles[2], "sxyz"
         )[:3, :3]
 
         # Build a 4×4 matrix combining scaling, rotation, and translation.
@@ -404,7 +408,8 @@ class STLGeometry:
         NOTE: Only 2D D2Q9 configurations are supported because the current ABQLBM
         zone-agnostic reflection implementation does not support 3D.
 
-        Returns:
+        Returns
+        -------
             dict: Grid dimensions and the D2Q9 velocity model under "lattice",
                 and rectangles with bounce-back boundaries under "geometry".
                 Pass this dictionary to ABLattice(config).
@@ -419,20 +424,26 @@ class STLGeometry:
         # blocks holds finished rectangles. active maps each (start_x, end_x)
         # stretch to the first y row where its current rectangle appeared.
         # For example: active = {(1, 3): 1} means x=1..3, starting at y=1.
-        blocks, active = [], {}
+        blocks: list[dict] = []
+        active: dict[tuple[int, int], int] = {}
 
         # Scan rows along y. The mask is indexed [x, y], so s[:, iy] is a row.
         # The extra iteration has no solid stretches and closes any rectangles
         # still active after the last real row.
         for iy in range(s.shape[1] + 1):
-            runs = set()
+            runs: set[tuple[int, int]] = set()
             if iy < s.shape[1]:
                 # Convert False/True to 0/1, pad both ends with zeros, and find
                 # differences between neighbors. +1 starts a solid stretch,
                 # -1 marks the first position after it, so subtract 1 for its end.
                 d = np.diff(np.pad(s[:, iy].astype(np.int8), (1, 1)))
                 # Example: [0, 1, 1, 1, 0, 0] gives the inclusive run (1, 3).
-                runs = set(zip(np.flatnonzero(d == 1), np.flatnonzero(d == -1) - 1))
+                runs = {
+                    (int(start), int(end))
+                    for start, end in zip(
+                        np.flatnonzero(d == 1), np.flatnonzero(d == -1) - 1
+                    )
+                }
 
             # If a stretch disappears or changes width, finish its rectangle
             # at the previous row (iy - 1). list(active) lets us remove entries
@@ -467,7 +478,8 @@ class STLGeometry:
     def export_paraview_stl(self, filename: FilePath) -> None:
         """Save the complete staircase as one STL overlay for ParaView."""
         blocks = self.to_qlbm_config()["geometry"]
-        vertices, faces = [], []
+        vertices: list[tuple[float, float, float]] = []
+        faces: list[tuple[int, int, int]] = []
         for block in blocks:
             # Inclusive index bounds become cell edges half a unit farther out.
             # This gives single-row rectangles area and joins adjacent pieces.
@@ -516,7 +528,7 @@ class STLGeometry:
             plane_origin=po,
         )
 
-        legend_handles = [
+        legend_handles: list[Artist] = [
             Patch(facecolor="#e3eff7", edgecolor="#b9c7d0", label="Fluid cells"),
             Patch(facecolor="#e78a39", edgecolor="#b9c7d0", label="Solid cells"),
         ]

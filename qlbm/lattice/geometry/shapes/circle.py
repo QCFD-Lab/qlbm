@@ -4,7 +4,6 @@ from json import dumps
 from typing import Dict, List, Tuple, cast, override
 
 import numpy as np
-from stl import mesh
 
 from qlbm.lattice.geometry.encodings.spacetime import (
     SpaceTimePWReflectionData,
@@ -13,6 +12,7 @@ from qlbm.lattice.geometry.shapes.base import SpaceTimeShape
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.exceptions import LatticeException
 from qlbm.tools.utils import flatten
+from stl import mesh
 
 
 class Circle(SpaceTimeShape):

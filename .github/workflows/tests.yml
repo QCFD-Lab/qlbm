@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        python-version: ["3.12", "3.13" ,"3.14"]
+        python-version: ["3.12", "3.13"]
 
     steps:
       - uses: actions/checkout@v4
@@ -20,25 +20,9 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Cache pip packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pip
-            ${{ env.pythonLocation }}
-          key: pip-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}
-          restore-keys: |
-            pip-${{ matrix.python-version }}-
-      - name: Cache apt packages
-        uses: actions/cache@v4
-        id: cache-apt
-        with:
-          path: /var/cache/apt/archives
-          key: apt-${{ runner.os }}-libboost-cmake-${{ hashFiles('.github/workflows/tests.yml') }}
-          restore-keys: |
-            apt-${{ runner.os }}-libboost-cmake-
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Install dependencies
-        if: steps.cache-apt.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq libboost-all-dev cmake

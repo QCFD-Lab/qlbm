@@ -3,8 +3,6 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple
 
-from stl import mesh
-
 from qlbm.lattice.geometry.encodings.lqlga import LQLGAPointwiseReflectionData
 from qlbm.lattice.geometry.encodings.spacetime import (
     SpaceTimePWReflectionData,
@@ -12,6 +10,7 @@ from qlbm.lattice.geometry.encodings.spacetime import (
 )
 from qlbm.lattice.spacetime.properties_base import SpaceTimeLatticeBuilder
 from qlbm.tools.utils import flatten, get_qubits_to_invert
+from stl import mesh
 
 
 class Shape(ABC):
