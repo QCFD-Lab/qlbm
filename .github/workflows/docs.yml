@@ -30,6 +30,10 @@ jobs:
         run: |
           sudo apt-get install -y -qq pandoc libglfw3-dev libgles2-mesa-dev
 
+      - name: Check Qulacs import
+        run: |
+          python -c "import qulacs"
+
       - name: Install qlbm
         run: |
           python -m pip install -U .[cpu,dev,docs]
